@@ -14,6 +14,13 @@ export const appComponents: Record<string, AppCalculatorComponent> = {
       </div>
     ),
   }),
+  "hypotheek-impact-studieschuld": dynamic(() => import("../../apps/hypotheek-impact-studieschuld/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
   "studieschuld-vs-beleggen": dynamic(() => import("../../apps/studieschuld-vs-beleggen/Calculator"), {
     loading: () => (
       <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">

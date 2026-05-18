@@ -21,6 +21,22 @@ export const appRegistry = [
     "entry": "Calculator.tsx"
   },
   {
+    "slug": "hypotheek-impact-studieschuld",
+    "title": "Hypotheek-impact studieschuld",
+    "description": "Schat indicatief hoeveel je DUO-maandlast kan drukken op je hypotheekruimte en wat dat betekent voor je woningdoel.",
+    "type": "frontend",
+    "category": "Hypotheek",
+    "tags": [
+      "studieschuld",
+      "hypotheek",
+      "duo",
+      "leencapaciteit"
+    ],
+    "status": "active",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
     "slug": "studieschuld-vs-beleggen",
     "title": "Studieschuld aflossen of beleggen",
     "description": "Vergelijk of extra aflossen op je studieschuld financieel gunstiger is dan beleggen.",
