@@ -78,6 +78,14 @@ function btnClassName(kind: BtnKind, size: BtnSize, full?: boolean, className?: 
   } ${className ?? ""}`;
 }
 
+function btnStyle(kind: BtnKind) {
+  if (kind === "primary" || kind === "accent") {
+    return { color: "#ffffff" };
+  }
+
+  return undefined;
+}
+
 interface BtnProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   kind?: BtnKind;
   size?: BtnSize;
@@ -93,7 +101,11 @@ export function Btn({
   ...props
 }: BtnProps) {
   return (
-    <button {...props} className={btnClassName(kind, size, full, className)}>
+    <button
+      {...props}
+      className={btnClassName(kind, size, full, className)}
+      style={btnStyle(kind)}
+    >
       {children}
     </button>
   );
@@ -115,7 +127,11 @@ export function BtnLink({
   className?: string;
 }) {
   return (
-    <Link href={href} className={btnClassName(kind, size, full, className)}>
+    <Link
+      href={href}
+      className={btnClassName(kind, size, full, className)}
+      style={btnStyle(kind)}
+    >
       {children}
     </Link>
   );
