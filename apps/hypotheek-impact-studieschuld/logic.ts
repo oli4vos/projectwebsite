@@ -5,27 +5,26 @@ import {
   getFinancialConstants,
   getStudentDebtGrossUpFactor,
 } from "@/lib/financial-constants";
+import {
+  calculateDuoMonthlyPaymentAfterExtraRepayment as calculateDuoMonthlyPaymentAfterExtraRepaymentCentral,
+  determineRelevantDuoPayment as determineRelevantDuoPaymentCentral,
+  sanitizeDuoMoney,
+  sanitizeDuoPercent,
+  type DuoSituation as CentralDuoSituation,
+  type DuoPaymentSource as CentralDuoPaymentSource,
+  type RepaymentRule as CentralRepaymentRule,
+} from "@/lib/duo";
 
 const DEFAULT_YEAR = getDefaultFinancialYear();
 const FINANCIAL_CONSTANTS = getFinancialConstants(DEFAULT_YEAR);
 
 export const LAST_CHECKED = FINANCIAL_CONSTANTS.duo.meta.lastChecked;
 
-export type DuoSituation =
-  | "repaying"
-  | "gracePeriod"
-  | "incomeBasedReduction"
-  | "paymentPause"
-  | "unknown";
+export type DuoSituation = CentralDuoSituation;
 
-export type RepaymentRule =
-  | "SF35"
-  | "SF15"
-  | "SF15_OLD"
-  | "SF15_LLLK"
-  | "UNKNOWN";
+export type RepaymentRule = CentralRepaymentRule;
 
-export type PaymentSource = "actual" | "statutory" | "estimated" | "mixed";
+export type PaymentSource = CentralDuoPaymentSource;
 
 export const DEFAULT_DUO_RATES_2026: Record<RepaymentRule, number> = {
   ...FINANCIAL_CONSTANTS.duo.rates,
@@ -204,11 +203,11 @@ function getEffectiveDuoTerm(input: {
 }
 
 export function sanitizeMoney(value: number): number {
-  return Math.max(sanitizeFiniteNumber(value, 0), 0);
+  return sanitizeDuoMoney(value);
 }
 
 export function sanitizePercent(value: number): number {
-  return Math.min(Math.max(sanitizeFiniteNumber(value, 0), 0), 100);
+  return sanitizeDuoPercent(value);
 }
 
 export function getDefaultDuoRate(rule: RepaymentRule): number {
@@ -297,198 +296,25 @@ export function determineRelevantDuoPayment(
     | "remainingTermYears"
   >,
 ): RelevantDuoPaymentResult {
-  const actualMonthlyPayment = sanitizeOptionalMoney(input.actualMonthlyPayment);
-  const statutoryMonthlyPayment = sanitizeOptionalMoney(
-    input.statutoryMonthlyPayment,
-  );
-  const remainingStudentDebt = sanitizeOptionalMoney(input.remainingStudentDebt) ?? 0;
-  const duoRate = getEffectiveDuoRate(input);
-  const duoTermYears = getEffectiveDuoTerm(input);
-  const estimatedStatutoryPayment = calculateAnnuityPayment(
-    remainingStudentDebt,
-    duoRate,
-    duoTermYears,
-  );
-  const warnings: string[] = [];
+  const result = determineRelevantDuoPaymentCentral({
+    situation: input.situation,
+    repaymentRule: input.repaymentRule,
+    currentMonthlyPayment: input.actualMonthlyPayment,
+    statutoryMonthlyPayment: input.statutoryMonthlyPayment,
+    remainingDebt: input.remainingStudentDebt,
+    annualInterestRate: input.duoInterestRate,
+    remainingTermYears: input.remainingTermYears,
+  });
 
-  if (input.repaymentRule === "UNKNOWN") {
-    warnings.push(
-      "De terugbetalingsregel staat op onbekend. Deze tool rekent daarom voorlopig met SF35-aannames.",
-    );
-  }
-
-  if (input.duoInterestRate === undefined) {
-    warnings.push(
-      `DUO-rente niet ingevuld. We gebruiken daarom voorlopig ${duoRate.toFixed(2).replace(".", ",")}% op basis van je terugbetalingsregel.`,
-    );
-  }
-
-  if (input.remainingTermYears === undefined) {
-    warnings.push(
-      `Resterende looptijd niet ingevuld. We gebruiken daarom voorlopig ${duoTermYears} jaar.`,
-    );
-  }
-
-  if (
-    input.repaymentRule === "SF15_LLLK" &&
-    input.situation === "paymentPause"
-  ) {
-    warnings.push(
-      "Bij SF15-lllk is er normaal geen aflossingsvrije periode. Controleer in Mijn DUO of je situatie echt zo staat.",
-    );
-  }
-
-  const actualPositive =
-    actualMonthlyPayment !== undefined ? actualMonthlyPayment : undefined;
-  const statutoryPositive =
-    statutoryMonthlyPayment !== undefined ? statutoryMonthlyPayment : undefined;
-
-  switch (input.situation) {
-    case "repaying": {
-      if (actualPositive !== undefined && actualPositive > 0) {
-        return {
-          primaryNetMonthlyPayment: actualPositive,
-          optimisticNetMonthlyPayment: actualPositive,
-          conservativeNetMonthlyPayment: actualPositive,
-          estimatedStatutoryPayment,
-          source: "actual",
-          explanation:
-            "Je betaalt al maandelijks aan DUO. Daarom nemen we je actuele DUO-maandbedrag als startpunt.",
-          warnings,
-        };
-      }
-
-      if (statutoryPositive !== undefined && statutoryPositive > 0) {
-        warnings.push(
-          "Je actuele maandbedrag ontbreekt of is 0. Daarom rekenen we met het wettelijke maandbedrag dat je hebt ingevuld.",
-        );
-
-        return {
-          primaryNetMonthlyPayment: statutoryPositive,
-          optimisticNetMonthlyPayment: statutoryPositive,
-          conservativeNetMonthlyPayment: statutoryPositive,
-          estimatedStatutoryPayment,
-          source: "statutory",
-          explanation:
-            "Je maandelijkse terugbetaling loopt al, maar zonder actueel DUO-bedrag is het wettelijke maandbedrag het veiligste startpunt.",
-          warnings,
-        };
-      }
-
-      warnings.push(
-        "Zonder actueel of wettelijk DUO-bedrag schakelt de tool terug naar een schatting op basis van schuld, rente en resterende looptijd.",
-      );
-
-      return {
-        primaryNetMonthlyPayment: estimatedStatutoryPayment,
-        optimisticNetMonthlyPayment: estimatedStatutoryPayment,
-        conservativeNetMonthlyPayment: estimatedStatutoryPayment,
-        estimatedStatutoryPayment,
-        source: "estimated",
-        explanation:
-          "Je betaalt waarschijnlijk al, maar omdat er geen bruikbaar DUO-bedrag is ingevuld, schatten we het wettelijke maandbedrag.",
-        warnings,
-      };
-    }
-
-    case "gracePeriod": {
-      const fallbackPayment =
-        statutoryPositive !== undefined && statutoryPositive > 0
-          ? statutoryPositive
-          : estimatedStatutoryPayment;
-
-      warnings.push(
-        "Je zit in de aanloopfase. Een hypotheekverstrekker kijkt dan vaak niet naar wat je nu betaalt, maar naar wat je straks moet betalen.",
-      );
-
-      return {
-        primaryNetMonthlyPayment: fallbackPayment,
-        optimisticNetMonthlyPayment: fallbackPayment,
-        conservativeNetMonthlyPayment: fallbackPayment,
-        estimatedStatutoryPayment,
-        source:
-          statutoryPositive !== undefined && statutoryPositive > 0
-            ? "statutory"
-            : "estimated",
-        explanation:
-          "Omdat je nog niet echt aan het aflossen bent, nemen we het wettelijke of geschatte maandbedrag dat straks waarschijnlijk relevant wordt.",
-        warnings,
-      };
-    }
-
-    case "incomeBasedReduction": {
-      const optimistic =
-        actualPositive !== undefined && actualPositive >= 0
-          ? actualPositive
-          : estimatedStatutoryPayment;
-      const conservative =
-        statutoryPositive !== undefined && statutoryPositive > 0
-          ? statutoryPositive
-          : estimatedStatutoryPayment;
-
-      warnings.push(
-        "Je maandbedrag is verlaagd op basis van draagkracht. Een geldverstrekker kan soms toch naar een hoger wettelijk bedrag kijken.",
-      );
-
-      if (statutoryPositive === undefined || statutoryPositive === 0) {
-        warnings.push(
-          "Het wettelijke maandbedrag ontbreekt. Daarom gebruiken we daarvoor een schatting op basis van schuld, rente en resterende looptijd.",
-        );
-      }
-
-      return {
-        primaryNetMonthlyPayment: conservative,
-        optimisticNetMonthlyPayment: optimistic,
-        conservativeNetMonthlyPayment: conservative,
-        estimatedStatutoryPayment,
-        source: "mixed",
-        explanation:
-          "Bij draagkrachtverlaging laten we twee lezingen zien: optimistisch het feitelijke lagere bedrag, voorzichtig het wettelijke of geschatte bedrag.",
-        warnings,
-      };
-    }
-
-    case "paymentPause": {
-      const actualPayment = actualPositive ?? 0;
-      const fallbackPayment =
-        statutoryPositive !== undefined && statutoryPositive > 0
-          ? statutoryPositive
-          : estimatedStatutoryPayment;
-
-      warnings.push(
-        "Een aflossingsvrije periode maakt je studieschuld niet onzichtbaar. €0 betalen is meestal niet de juiste hypotheekbasis.",
-      );
-
-      return {
-        primaryNetMonthlyPayment: fallbackPayment,
-        optimisticNetMonthlyPayment: actualPayment,
-        conservativeNetMonthlyPayment: fallbackPayment,
-        estimatedStatutoryPayment,
-        source: "mixed",
-        explanation:
-          "Je feitelijke betaling kan tijdelijk laag of nul zijn, maar voor de hypotheekimpact rekenen we voorzichtig met wat je zou moeten betalen.",
-        warnings,
-      };
-    }
-
-    case "unknown":
-    default: {
-      warnings.push(
-        "Je situatie staat op onbekend. Mijn DUO blijft leidend, maar deze tool maakt alvast een veilige schatting.",
-      );
-
-      return {
-        primaryNetMonthlyPayment: estimatedStatutoryPayment,
-        optimisticNetMonthlyPayment: estimatedStatutoryPayment,
-        conservativeNetMonthlyPayment: estimatedStatutoryPayment,
-        estimatedStatutoryPayment,
-        source: "estimated",
-        explanation:
-          "Omdat nog niet duidelijk is welk DUO-bedrag echt leidend is, schatten we een wettelijk maandbedrag op basis van schuld, rente en looptijd.",
-        warnings,
-      };
-    }
-  }
+  return {
+    primaryNetMonthlyPayment: result.primaryMonthlyPayment,
+    optimisticNetMonthlyPayment: result.optimisticMonthlyPayment,
+    conservativeNetMonthlyPayment: result.conservativeMonthlyPayment,
+    estimatedStatutoryPayment: result.estimatedStatutoryMonthlyPayment,
+    source: result.source,
+    explanation: result.explanation,
+    warnings: result.warnings,
+  };
 }
 
 export function calculateMortgageImpact(
@@ -563,23 +389,18 @@ export function calculateExtraRepaymentScenario(
   const mortgageRate = sanitizePercent(input.mortgageRate);
   const mortgageTermYears = sanitizeYears(input.mortgageTermYears, 30);
   const extraRepaymentInput = sanitizeOptionalMoney(input.extraRepayment) ?? 0;
-  const extraRepaymentUsed = Math.min(extraRepaymentInput, remainingStudentDebt);
-  const newStudentDebt = roundMoney(
-    Math.max(remainingStudentDebt - extraRepaymentUsed, 0),
-  );
-  const oldEstimatedMonthlyPayment = calculateAnnuityPayment(
-    remainingStudentDebt,
-    duoRate,
-    duoTermYears,
-  );
-  const newEstimatedMonthlyPayment = calculateAnnuityPayment(
-    newStudentDebt,
-    duoRate,
-    duoTermYears,
-  );
-  const monthlyPaymentReduction = roundMoney(
-    Math.max(oldEstimatedMonthlyPayment - newEstimatedMonthlyPayment, 0),
-  );
+  const repaymentScenario = calculateDuoMonthlyPaymentAfterExtraRepaymentCentral({
+    repaymentRule: input.repaymentRule,
+    remainingDebt: remainingStudentDebt,
+    annualInterestRate: duoRate,
+    remainingTermYears: duoTermYears,
+    extraRepaymentAmount: extraRepaymentInput,
+  });
+  const extraRepaymentUsed = repaymentScenario.extraRepaymentUsed;
+  const newStudentDebt = repaymentScenario.newRemainingDebt;
+  const oldEstimatedMonthlyPayment = repaymentScenario.oldStatutoryMonthlyPayment;
+  const newEstimatedMonthlyPayment = repaymentScenario.newStatutoryMonthlyPayment;
+  const monthlyPaymentReduction = repaymentScenario.monthlyPaymentReduction;
   const brutering = getBruteringFactor(mortgageRate);
   const grossMonthlyImpactReduction = roundMoney(
     monthlyPaymentReduction * brutering.factor,

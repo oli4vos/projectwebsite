@@ -91,6 +91,7 @@ const paymentSourceLabels: Record<PaymentSource, string> = {
   actual: "Feitelijke betaling",
   statutory: "Wettelijk maandbedrag",
   estimated: "Geschat maandbedrag",
+  incomeBased: "Draagkracht-scenario",
   mixed: "Combinatie van feitelijk en wettelijk/geschat",
 };
 

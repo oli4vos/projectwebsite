@@ -7,6 +7,53 @@ Dit bestand is bedoeld als werksamenvatting voor toekomstige agent-rondes. Werk 
 - Financiële rekentool-site voor mensen die meer grip, regie en inzicht willen in financiële keuzes.
 - Subtiele knipoog naar de pechgeneratie, zonder slachtoffertaal of politieke boosheid.
 - Copy moet handelingsgericht zijn: scenario's, keuzes, vooruitkijken, heldere aannames.
+- De site moet toegankelijk zijn voor mensen met weinig financiële kennis, maar ook verdieping bieden voor mensen die de berekening echt willen begrijpen.
+- Onderliggende boodschap: we hebben misschien pech gehad, maar we zijn niet zielig; we pakken de controle terug.
+
+## Taalconventie frontend
+
+Alle zichtbare tekst in de frontend moet standaard in het Nederlands zijn.
+
+Dit geldt voor:
+
+- navigatie
+- knoppen
+- formulieren
+- labels
+- helperteksten
+- foutmeldingen
+- lege states
+- tooltips
+- disclaimers
+- resultaatblokken
+- dashboardteksten
+- calculatoruitleg
+- verdiepingssecties
+- metadata die zichtbaar wordt in de UI
+
+Gebruik geen Engelse frontend-copy zoals:
+
+- "Submit"
+- "Reset"
+- "Learn more"
+- "Get started"
+- "No results found"
+- "Loading"
+- "Error"
+
+Gebruik in plaats daarvan Nederlandse termen, bijvoorbeeld:
+
+- "Bereken"
+- "Opnieuw invullen"
+- "Lees meer"
+- "Bekijk rekentools"
+- "Geen resultaten gevonden"
+- "Laden..."
+- "Er ging iets mis"
+
+Technische bestandsnamen, componentnamen, variabelen, routes en code mogen Engels blijven als dat logisch is voor onderhoudbaarheid.
+
+Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte frontend-copy moet Nederlands zijn, tenzij expliciet anders gevraagd.
 
 ## Stack
 
@@ -60,6 +107,7 @@ Dit bestand is bedoeld als werksamenvatting voor toekomstige agent-rondes. Werk 
 - `src/lib/profile-tool-mapping.ts`: centrale mapping van profielwaarden naar tool-defaults
 - `src/lib/profile-prefill.ts`: gedeelde helper voor consistente tool-prefill-flow
 - `src/lib/financial-constants/`: centrale jaarlijkse aannames/variabelen + helpers
+- `src/lib/duo/`: centrale DUO-domeinlaag met wettelijk maandbedrag, relevant maandbedrag per situatie en scenariofuncties voor extra aflossen
 - `next.config.ts`: standaard Next-config + GitHub Pages static export in Actions
 
 ## Huidige tools
@@ -103,14 +151,18 @@ Dit bestand is bedoeld als werksamenvatting voor toekomstige agent-rondes. Werk 
 ## Belangrijke conventies
 
 - Hou rekenlogica zo veel mogelijk puur en los van UI.
+- DUO-logica (wettelijk maandbedrag, situatie-afhankelijke relevantie, extra aflossen scenario's) loopt centraal via `src/lib/duo`.
 - Validatie gebeurt nu per calculatorcomponent in de client.
 - Dashboard haalt alleen manifestdata op uit de gegenereerde registry.
 - Verborgen tools blijven buiten dashboard en app-routes via manifestveld `visibility: "hidden"`.
 - Donkere CTA's moeten expliciet wit contrast houden. Bronbestand: `src/components/ui.tsx`.
+- Alle gebruikersgerichte frontend-copy is standaard Nederlands. Engelse tekst mag alleen in code, technische namen of wanneer expliciet gekozen.
+- Mobile-first is verplicht: elke nieuwe component of tool moet standaard goed werken op mobiel.
+- Uitvoerige QA-rondes of brede responsive testmatrices alleen uitvoeren als de gebruiker daarom vraagt én dit bevestigt.
 - UX-standaard voor rekentools:
   - eerst invulvelden
   - dan een beknopte samenvatting met kernuitkomst in gewone taal
-  - daarna uitklapbare verdieping (standaard dicht) met uitleg, aannames en praktische aandachtspunten
+  - daarna uitklapbare verdieping, standaard dicht, met uitleg, aannames en praktische aandachtspunten
 - Jaarlijkse financiële aannames komen centraal uit `src/lib/financial-constants`.
 - Toolverdieping mag die centrale aannames tonen, maar light-gebruikers worden niet gedwongen die details te openen.
 - Er zijn nu meerdere pechgeneratie/studieschuld-tools; hou tone of voice en disclaimerstijl tussen die modules consistent.
@@ -136,6 +188,7 @@ Dit bestand is bedoeld als werksamenvatting voor toekomstige agent-rondes. Werk 
 - Eerst metadata/manifest stabiel houden, daarna UI en logica per tool.
 - Als er meer tools bijkomen, overweeg `app.json` uit te breiden met extra velden zoals `hero`, `assumptions`, `disclaimer` of `order`.
 - Toekomstige tax-engine kan deze centrale constantslaag hergebruiken, maar is nu bewust nog niet gebouwd.
+- Volgende DUO-stap: officiële draagkrachtberekening pas toevoegen zodra alle actuele draagkrachtparameters betrouwbaar in de constantslaag staan.
 
 ## Responsive design en layout-conventies
 
@@ -173,42 +226,3 @@ Gebruik bij voorkeur dit principe:
 --text-lead: clamp(1.05rem, 1rem + 0.35vw, 1.25rem);
 --text-h1: clamp(2rem, 1.4rem + 3vw, 4.5rem);
 --text-h2: clamp(1.5rem, 1.2rem + 1.4vw, 2.75rem);
-```
-
-Doorgevoerd in code:
-- `src/app/globals.css`: fluid typografietokens + utility classes.
-- `src/components/ui.tsx`: knoppen minimaal ~44px hoog.
-- `src/components/SiteHeader.tsx`: nav-items met minimaal ~44px tap-target.
-- `src/app/page.tsx`, `src/components/AppDashboard.tsx`, `src/app/apps/[slug]/page.tsx`, `src/components/ToolCard.tsx`: responsievere heading/body-schaal met `clamp()`.
-
-## Mobiel als harde basisvoorwaarde
-
-De site moet altijd optimaal werken op mobiel. Mobile-first is geen nice-to-have maar een harde ontwerp- en bouwvoorwaarde.
-
-Bij elke UI-wijziging geldt:
-
-- De mobiele ervaring mag nooit achteraf worden "gerepareerd"; ontwerp en bouw eerst voor mobiel.
-- Elke pagina, rekentool, kaart, input, CTA, filter en resultaatblok moet bruikbaar zijn op een klein scherm.
-- Er mag geen horizontale overflow ontstaan.
-- Teksten, koppen en knoppen moeten op mobiel compact maar goed leesbaar blijven.
-- Inputvelden moeten makkelijk te bedienen zijn met duim/toetsenbord.
-- Resultaatblokken moeten op mobiel direct begrijpelijk zijn, zonder dat de gebruiker veel hoeft te scrollen of zoeken.
-- Verdieping, uitleg en aannames moeten mobielvriendelijk worden getoond, bijvoorbeeld via accordions.
-- Desktop mag rijker en ruimer zijn, maar mobiel moet de primaire gebruikservaring blijven.
-
-### Testbeleid
-
-Voer standaard alleen lichte, gerichte checks uit die nodig zijn voor de wijziging.
-
-Uitvoerige tests, brede regressietests, uitgebreide responsive testmatrices of lange QA-rondes worden alleen uitgevoerd als de gebruiker daar expliciet om vraagt én dit daarna bevestigt.
-
-Standaard verwacht gedrag bij kleine wijzigingen:
-
-- controleer of de wijziging mobiel logisch blijft;
-- voorkom duidelijke layoutbreuken;
-- draai alleen de projectchecks die relevant zijn voor de wijziging;
-- stel geen uitgebreide testcampagne voor tenzij daar expliciet om wordt gevraagd.
-
-Kort uitgangspunt:
-
-"Altijd mobiel goed bouwen. Uitvoerig testen alleen op verzoek en na bevestiging."
