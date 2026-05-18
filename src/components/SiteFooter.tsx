@@ -7,7 +7,7 @@ export function SiteFooter() {
       <div className="mx-auto flex max-w-7xl flex-col gap-5 px-5 py-6 text-[12.5px] text-[var(--muted)] sm:px-8 lg:flex-row lg:items-center lg:justify-between lg:px-10">
         <div className="flex items-center gap-4">
           <Logo size={16} />
-          <span>Pech gehad, maar met betere aannames kun je wel regie terugpakken.</span>
+          <span>Onafhankelijke rekentools voor meer grip, regie en inzicht.</span>
         </div>
         <div className="flex flex-wrap items-center gap-3 sm:gap-5">
           <Link

@@ -39,7 +39,7 @@ export function Pill({
   tone?: PillTone;
 }) {
   const map: Record<PillTone, string> = {
-    default: "border hair bg-white/90 text-[var(--muted)]",
+    default: "border hair bg-white text-[var(--muted)]",
     pos: "border-transparent bg-[var(--pos-soft)] text-[oklch(40%_0.10_152)]",
     neg: "border-transparent bg-[var(--neg-soft)] text-[oklch(40%_0.13_28)]",
     accent: "border-transparent bg-[var(--accent-soft)] text-[oklch(40%_0.07_232)]",
@@ -48,7 +48,7 @@ export function Pill({
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-[var(--radius-soft)] border px-2.5 py-1 text-[11px] tabular ${map[tone]}`}
+      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] tabular ${map[tone]}`}
     >
       {children}
     </span>
@@ -62,18 +62,18 @@ function btnClassName(kind: BtnKind, size: BtnSize, full?: boolean, className?: 
   const sizes: Record<BtnSize, string> = {
     sm: "h-8 px-3 text-[13px]",
     md: "h-10 px-4 text-[14px]",
-    lg: "h-11 px-5 text-[15px]",
+    lg: "h-12 px-5 text-[15px]",
   };
 
   const kinds: Record<BtnKind, string> = {
     primary:
-      "border border-[var(--deep)] bg-[var(--deep)] text-white hover:bg-[oklch(18%_0.02_225)] hover:text-white visited:text-white",
-    ghost: "border border-transparent bg-transparent text-[var(--ink)] hover:bg-[rgba(255,255,255,0.7)]",
+      "bg-[var(--deep)] text-white hover:bg-black hover:text-white visited:text-white",
+    ghost: "bg-transparent text-[var(--ink)] hover:bg-[var(--paper-soft)]",
     outline: "border hair bg-white text-[var(--ink)] hover:bg-[var(--paper-soft)]",
-    accent: "border border-transparent bg-[var(--accent)] text-white hover:brightness-105",
+    accent: "bg-[var(--accent)] text-white hover:brightness-110",
   };
 
-  return `inline-flex items-center justify-center gap-2 rounded-[var(--radius-soft)] font-medium tracking-[-0.005em] shadow-[0_0_0_rgba(0,0,0,0)] transition duration-200 hover:-translate-y-px hover:shadow-paper focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 active:translate-y-px ${sizes[size]} ${kinds[kind]} ${
+  return `inline-flex items-center justify-center gap-2 rounded-full font-medium tracking-[-0.005em] shadow-[0_0_0_rgba(0,0,0,0)] transition duration-200 hover:-translate-y-px hover:shadow-paper focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 active:translate-y-px ${sizes[size]} ${kinds[kind]} ${
     full ? "w-full" : ""
   } ${className ?? ""}`;
 }

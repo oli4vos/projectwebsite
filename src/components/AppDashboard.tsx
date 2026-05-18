@@ -33,12 +33,12 @@ export function AppDashboard({ apps }: AppDashboardProps) {
 
   const recentExamples = [
     {
-      slug: "hypotheek-impact-studieschuld",
-      title: "Wat doet € 150 DUO-maandlast met je hypotheekruimte?",
-      meta: "€ 48.000 inkomen · ordegrootte · drie scenario's",
+      slug: "studieschuld-vs-beleggen",
+      title: "Aflossen of beleggen bij 2,56% DUO-rente",
+      meta: "€ 150 / mnd · 10 jaar · scenariovergelijking",
       when: "vandaag",
-      result: "€ 8.100 tot € 9.900",
-      category: resolveCategory("Hypotheek", "hypotheek-impact-studieschuld"),
+      result: "€ 4.283 verschil",
+      category: resolveCategory("Schulden", "studieschuld-vs-beleggen"),
     },
     {
       slug: "studieschuld-vs-beleggen",
@@ -54,26 +54,28 @@ export function AppDashboard({ apps }: AppDashboardProps) {
     <div className="space-y-8">
       <section
         id="apps"
-        className="sheet grid gap-4 p-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-end"
+        className="grid gap-4 rounded-[1.5rem] border hair bg-white/80 p-6 shadow-paper md:grid-cols-[minmax(0,1fr)_auto] md:items-end"
       >
         <div>
-          <div className="kicker">Overzicht</div>
+          <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
+            Overzicht
+          </div>
           <h2 className="mt-2 font-serif text-[30px] tracking-[-0.02em] text-[var(--ink)]">
-            Kies het scenario waar je nu weer vat op wilt krijgen
+            Kies het scenario waar je nu regie op wilt
           </h2>
           <p className="mt-3 max-w-[58ch] text-[14px] leading-[1.65] text-[var(--ink-2)]">
-            Zoek op onderwerp of filter op categorie. Elke tool is bedoeld om
-            ingewikkelde keuzes terug te brengen tot iets wat je kunt overzien,
-            doorrekenen en uitleggen.
+            Zoek op onderwerp of filter op categorie. Elke tool gebruikt heldere
+            aannames en is bedoeld om keuzes vergelijkbaar te maken, niet om ze voor
+            je te maken.
           </p>
         </div>
 
-        <div className="sheet-muted px-4 py-3 text-[12px] text-[var(--muted)]">
+        <div className="text-[12px] text-[var(--muted)]">
           {filteredApps.length} van {apps.length} rekentools zichtbaar
         </div>
       </section>
 
-      <section className="sheet grid gap-4 p-6 md:grid-cols-[minmax(0,1fr)_280px] md:items-end">
+      <section className="grid gap-4 rounded-[1.5rem] border hair bg-white/80 p-6 shadow-paper md:grid-cols-[minmax(0,1fr)_280px] md:items-end">
         <label className="grid gap-2">
           <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
             Zoek op titel, thema of tag
@@ -83,7 +85,7 @@ export function AppDashboard({ apps }: AppDashboardProps) {
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Bijvoorbeeld: studieschuld, beleggen of hypotheek"
-            className="ring-focus hair h-11 rounded-[var(--radius-soft)] border bg-white px-4 text-[14px] text-[var(--ink)] outline-none"
+            className="ring-focus hair h-12 rounded-full border bg-white px-4 text-[14px] text-[var(--ink)] outline-none"
           />
         </label>
 
@@ -94,7 +96,7 @@ export function AppDashboard({ apps }: AppDashboardProps) {
           <select
             value={selectedCategory}
             onChange={(event) => setSelectedCategory(event.target.value)}
-            className="ring-focus hair h-11 rounded-[var(--radius-soft)] border bg-white px-4 text-[14px] text-[var(--ink)] outline-none"
+            className="ring-focus hair h-12 rounded-full border bg-white px-4 text-[14px] text-[var(--ink)] outline-none"
           >
             {categories.map((category) => (
               <option key={category} value={category}>
@@ -111,7 +113,7 @@ export function AppDashboard({ apps }: AppDashboardProps) {
             key={category}
             type="button"
             onClick={() => setSelectedCategory(category)}
-            className={`rounded-[var(--radius-soft)] px-3 py-2 text-[13px] transition ${
+            className={`rounded-full px-3 py-2 text-[13px] transition ${
               selectedCategory === category
                 ? "bg-[var(--deep)] text-white"
                 : "hair border bg-white text-[var(--muted)] hover:text-[var(--ink)]"
@@ -129,7 +131,7 @@ export function AppDashboard({ apps }: AppDashboardProps) {
           ))}
         </div>
       ) : (
-        <section className="sheet border-dashed p-10 text-center">
+        <section className="rounded-[1.5rem] border border-dashed hair bg-white/60 p-10 text-center">
           <h2 className="text-xl font-semibold tracking-tight text-[var(--ink)]">
             Geen rekentools gevonden
           </h2>
@@ -141,13 +143,13 @@ export function AppDashboard({ apps }: AppDashboardProps) {
       )}
 
       <section id="scenario" className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="sheet p-6">
+        <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
           <div className="flex items-center justify-between gap-4">
             <h3 className="font-serif text-[22px] tracking-[-0.015em] text-[var(--ink)]">
               Voorbeeldscenario&apos;s
             </h3>
             <span className="text-[12px] text-[var(--muted)]">
-              Herkenbaar, maar niet dwingend
+              Herkenbaar, maar altijd aanpasbaar naar je eigen situatie
             </span>
           </div>
           <div className="mt-4">
@@ -179,22 +181,24 @@ export function AppDashboard({ apps }: AppDashboardProps) {
 
         <div
           id="werkwijze"
-          className="ink-panel p-6"
+          className="rounded-[1.5rem] bg-[var(--deep)] p-6 text-white shadow-paper-lg"
         >
-          <div className="text-[11px] uppercase tracking-[0.14em] text-white/55">Werkwijze</div>
+          <div className="text-[11px] uppercase tracking-[0.14em] text-white/55">
+            Werkwijze
+          </div>
           <h3 className="mt-3 font-serif text-[24px] leading-[1.12] tracking-[-0.02em]">
-            Geen glazen bol. Wel betere aannames.
+            Geen black box. Wel betere uitgangspunten.
           </h3>
           <p className="mt-4 text-[14px] leading-[1.7] text-white/75">
-            Niet iedereen begon met een makkelijke uitgangspositie. Juist dan helpt
-            het om aannames zichtbaar te maken, scenario&apos;s naast elkaar te zetten
-            en keuzes terug te brengen tot iets wat je rustig kunt bekijken.
+            Niet iedereen begon met veel marge. Juist dan helpt het om aannames
+            zichtbaar te maken, scenario&apos;s naast elkaar te zetten en keuzes stap
+            voor stap terug te brengen tot iets waar je zelf weer grip op hebt.
           </p>
           <div className="mt-6 grid grid-cols-3 gap-4 border-t border-white/10 pt-5">
             {[
-              ["3", "actieve tools"],
-              ["4", "vaste uitkomstblokken"],
-              ["0", "verplicht jargon"],
+              ["1", "voorbeeldtool"],
+              ["4", "kernuitkomsten"],
+              ["100%", "lokaal in de browser"],
             ].map(([number, label]) => (
               <div key={label}>
                 <div className="font-serif text-[24px] leading-none">{number}</div>

@@ -11,7 +11,7 @@ const navItems = [
 ] as const;
 
 function navClassName() {
-  return "rounded-[var(--radius-soft)] px-3 py-2 text-[var(--muted)] transition hover:bg-white/70 hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2";
+  return "rounded-full px-3 py-2 text-[var(--muted)] transition hover:bg-white/70 hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2";
 }
 
 export function SiteHeader() {
@@ -20,7 +20,7 @@ export function SiteHeader() {
   const onToolPage = pathname.startsWith("/apps/");
 
   return (
-    <header className="hair-b sticky top-0 z-20 bg-[rgba(245,241,234,0.92)] backdrop-blur-md">
+    <header className="hair-b sticky top-0 z-20 bg-[rgba(245,241,234,0.78)] backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 py-4 sm:px-8 lg:px-10">
         <div className="flex min-w-0 items-center gap-4 sm:gap-8">
           <Link
@@ -44,11 +44,11 @@ export function SiteHeader() {
             Overzicht
           </BtnLink>
           <BtnLink
-            href="/apps/hypotheek-impact-studieschuld"
+            href="/apps/studieschuld-vs-beleggen"
             kind={onToolPage ? "outline" : "primary"}
             size="sm"
           >
-            Start voorbeeld
+            Open voorbeeldtool
           </BtnLink>
         </div>
       </div>
