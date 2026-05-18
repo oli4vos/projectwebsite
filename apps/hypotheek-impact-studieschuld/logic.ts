@@ -193,9 +193,14 @@ function getEffectiveDuoTerm(input: {
   repaymentRule: RepaymentRule;
   remainingTermYears?: number;
 }) {
-  return input.remainingTermYears === undefined
-    ? getDefaultTerm(input.repaymentRule)
-    : Math.max(sanitizeYears(input.remainingTermYears, 0), 0);
+  const defaultTerm = getDefaultTerm(input.repaymentRule);
+
+  if (input.remainingTermYears === undefined) {
+    return defaultTerm;
+  }
+
+  const sanitizedTerm = sanitizeYears(input.remainingTermYears, 0);
+  return sanitizedTerm > 0 ? sanitizedTerm : defaultTerm;
 }
 
 export function sanitizeMoney(value: number): number {
@@ -325,6 +330,15 @@ export function determineRelevantDuoPayment(
   if (input.remainingTermYears === undefined) {
     warnings.push(
       `Resterende looptijd niet ingevuld. We gebruiken daarom voorlopig ${duoTermYears} jaar.`,
+    );
+  }
+
+  if (
+    input.repaymentRule === "SF15_LLLK" &&
+    input.situation === "paymentPause"
+  ) {
+    warnings.push(
+      "Bij SF15-lllk is er normaal geen aflossingsvrije periode. Controleer in Mijn DUO of je situatie echt zo staat.",
     );
   }
 

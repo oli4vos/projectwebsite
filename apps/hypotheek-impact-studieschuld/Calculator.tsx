@@ -465,6 +465,11 @@ function CalculatorContent({
             hypotheekruimte kan doen.
           </p>
           <p className="mt-3 text-[13px] leading-[1.65] text-[var(--muted)]">
+            Sinds 2024 kijken geldverstrekkers meestal vooral naar je DUO-maandlast,
+            maar tijdelijke verlagingen of betaalpauzes tellen niet altijd als
+            structureel lagere last.
+          </p>
+          <p className="mt-3 text-[13px] leading-[1.65] text-[var(--muted)]">
             Pech gehad met het leenstelsel? Deze tool helpt je niet klagen, maar rekenen.
           </p>
         </div>
