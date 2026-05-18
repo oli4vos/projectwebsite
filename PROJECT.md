@@ -48,6 +48,7 @@ Dit bestand is bedoeld als werksamenvatting voor toekomstige agent-rondes. Werk 
 - `src/components/ToolCard.tsx`: daadwerkelijke kaart-UI
 - `src/components/AppRenderer.tsx`: pakt lazy toolcomponent op basis van slug
 - `src/components/ui.tsx`: `Btn`, `BtnLink`, `Pill`, `Logo`, `CategoryDot`
+- `src/components/ToolDisclosure.tsx`: standaard uitklapbare verdiepingssectie voor rekentools
 
 ## Huidige data/config
 
@@ -102,6 +103,10 @@ Dit bestand is bedoeld als werksamenvatting voor toekomstige agent-rondes. Werk 
 - Dashboard haalt alleen manifestdata op uit de gegenereerde registry.
 - Verborgen tools blijven buiten dashboard en app-routes via manifestveld `visibility: "hidden"`.
 - Donkere CTA's moeten expliciet wit contrast houden. Bronbestand: `src/components/ui.tsx`.
+- UX-standaard voor rekentools:
+  - eerst invulvelden
+  - dan een beknopte samenvatting met kernuitkomst in gewone taal
+  - daarna uitklapbare verdieping (standaard dicht) met uitleg, aannames en praktische aandachtspunten
 - Er zijn nu meerdere pechgeneratie/studieschuld-tools; hou tone of voice en disclaimerstijl tussen die modules consistent.
 - Partnerstudieschuld zit nog niet als aparte invoer in `apps/hypotheek-impact-studieschuld`; alleen copy/context. Dat is een logische v3-uitbreiding.
 - Toekomstige profielstap:
@@ -168,3 +173,35 @@ Doorgevoerd in code:
 - `src/components/ui.tsx`: knoppen minimaal ~44px hoog.
 - `src/components/SiteHeader.tsx`: nav-items met minimaal ~44px tap-target.
 - `src/app/page.tsx`, `src/components/AppDashboard.tsx`, `src/app/apps/[slug]/page.tsx`, `src/components/ToolCard.tsx`: responsievere heading/body-schaal met `clamp()`.
+
+## Mobiel als harde basisvoorwaarde
+
+De site moet altijd optimaal werken op mobiel. Mobile-first is geen nice-to-have maar een harde ontwerp- en bouwvoorwaarde.
+
+Bij elke UI-wijziging geldt:
+
+- De mobiele ervaring mag nooit achteraf worden "gerepareerd"; ontwerp en bouw eerst voor mobiel.
+- Elke pagina, rekentool, kaart, input, CTA, filter en resultaatblok moet bruikbaar zijn op een klein scherm.
+- Er mag geen horizontale overflow ontstaan.
+- Teksten, koppen en knoppen moeten op mobiel compact maar goed leesbaar blijven.
+- Inputvelden moeten makkelijk te bedienen zijn met duim/toetsenbord.
+- Resultaatblokken moeten op mobiel direct begrijpelijk zijn, zonder dat de gebruiker veel hoeft te scrollen of zoeken.
+- Verdieping, uitleg en aannames moeten mobielvriendelijk worden getoond, bijvoorbeeld via accordions.
+- Desktop mag rijker en ruimer zijn, maar mobiel moet de primaire gebruikservaring blijven.
+
+### Testbeleid
+
+Voer standaard alleen lichte, gerichte checks uit die nodig zijn voor de wijziging.
+
+Uitvoerige tests, brede regressietests, uitgebreide responsive testmatrices of lange QA-rondes worden alleen uitgevoerd als de gebruiker daar expliciet om vraagt én dit daarna bevestigt.
+
+Standaard verwacht gedrag bij kleine wijzigingen:
+
+- controleer of de wijziging mobiel logisch blijft;
+- voorkom duidelijke layoutbreuken;
+- draai alleen de projectchecks die relevant zijn voor de wijziging;
+- stel geen uitgebreide testcampagne voor tenzij daar expliciet om wordt gevraagd.
+
+Kort uitgangspunt:
+
+"Altijd mobiel goed bouwen. Uitvoerig testen alleen op verzoek en na bevestiging."

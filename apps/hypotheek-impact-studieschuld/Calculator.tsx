@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ResultRow } from "@/components/ResultRow";
+import { ToolDisclosure } from "@/components/ToolDisclosure";
 import { Pill } from "@/components/ui";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { getMortgageImpactDefaultsFromProfile } from "@/lib/profile-tool-mapping";
@@ -902,6 +903,11 @@ function CalculatorContent({
           )}
         </div>
 
+        <ToolDisclosure
+          title="Verdieping"
+          subtitle="Hoe rekenen we dit? Welke aannames gebruiken we? Wat betekent dit in de praktijk en waar moet je op letten?"
+        >
+          <div className="space-y-5">
         <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h3 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
@@ -1255,6 +1261,8 @@ function CalculatorContent({
         </div>
 
         <InfoList items={result?.warnings ?? []} tone="warning" />
+          </div>
+        </ToolDisclosure>
       </section>
     </div>
   );
