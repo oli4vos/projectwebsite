@@ -1,1 +1,8 @@
 - onderliggende aannames inzichtelijk weergeven, dus met welke percentages etc gerekend wordt. als mensen dit soort zaken willen weten is het te vinden, maar behoud de light versie door het gewoon op de achtergrond te laten maar wel vindbaar
+- gebruikers kunnen algemene gegevens invoeren en deze worden vervolgens gebruikt voor meerdere berekenen.
+- algemene laag met belastingen meenemen, dus aftrek van hypotheekrente in box 1 tarieven en tarieven grensen in box 3 etc, de relevante belasingen
+- in vaste dienst of ZZP, AOV etc meenemen, pensioenopbouw
+- wettelijk maandbedrag vanuit duo meenemen, dit berekenen dmv een annuiteit. Vervolgens een optie geven om te berekenen of je beter extra snel kunt aflossen of beleggen. Voor studieschuld is het niet zo relevant want aflossen moet je toch, daarnaast ook daadwerkelijke maandbedrag berekenen obv inkomen etc. deze logica is belangrijk want dit moet je minimaal aflossen en zit geen keuze in de keuze zit hem wel in het extra aflossen of niet.
+- qua design moet alles veel meer flex, als het scherm verkleind wordt of via een mobiel wordt aangeroepen moet de juiste info zichtbaar blijven
+- grafieken moeten makkelijker te lezen zijn met een overzichtelijke maar adaptieve x en Y as, x altijd tijd in jaren afhaneklijk van de lengte kan dit per jaar maar bv ook per vijf jaar in de as staan, y as altijd in euros, maar afhaneklijk van de grens van de grafiek in stappen van honderden of (tien) duizenden.
+- 

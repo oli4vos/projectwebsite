@@ -40,6 +40,9 @@ export function SiteHeader() {
         </div>
 
         <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
+          <BtnLink href="/profiel" kind={pathname === "/profiel" ? "outline" : "ghost"} size="sm">
+            Mijn profiel
+          </BtnLink>
           <BtnLink href="/#apps" kind={onHome ? "outline" : "ghost"} size="sm">
             Overzicht
           </BtnLink>

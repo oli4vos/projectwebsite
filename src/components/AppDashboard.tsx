@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useDeferredValue, useState } from "react";
 import type { AppManifest } from "@/lib/app-types";
 import { CategoryDot } from "@/components/ui";
+import { BtnLink } from "@/components/ui";
 import { resolveCategory } from "@/lib/categories";
 import { AppCard } from "./AppCard";
 
@@ -105,6 +106,24 @@ export function AppDashboard({ apps }: AppDashboardProps) {
             ))}
           </select>
         </label>
+      </section>
+
+      <section className="grid gap-4 rounded-[1.5rem] border hair bg-white/80 p-6 shadow-paper md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+        <div>
+          <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
+            Mijn profiel
+          </div>
+          <h3 className="mt-2 font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
+            Vul je gegevens één keer in
+          </h3>
+          <p className="mt-3 max-w-[56ch] text-[14px] leading-[1.65] text-[var(--ink-2)]">
+            Sla inkomen, DUO-gegevens en woningdoel lokaal op in je browser. Relevante
+            tools kunnen die waarden daarna automatisch voor je invullen.
+          </p>
+        </div>
+        <BtnLink href="/profiel" kind="outline" size="md">
+          Open profiel
+        </BtnLink>
       </section>
 
       <div className="flex flex-wrap gap-2">
