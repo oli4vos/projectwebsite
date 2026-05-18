@@ -58,6 +58,7 @@ Dit bestand is bedoeld als werksamenvatting voor toekomstige agent-rondes. Werk 
 - `src/lib/market.ts`: homepage-marktcontext met externe fetches en fallbacks
 - `src/lib/user-profile.ts`: local-first profieltype, sanitizing en localStorage helpers
 - `src/lib/profile-tool-mapping.ts`: centrale mapping van profielwaarden naar tool-defaults
+- `src/lib/profile-prefill.ts`: gedeelde helper voor consistente tool-prefill-flow
 - `src/lib/financial-constants/`: centrale jaarlijkse aannames/variabelen + helpers
 - `next.config.ts`: standaard Next-config + GitHub Pages static export in Actions
 
@@ -89,6 +90,7 @@ Dit bestand is bedoeld als werksamenvatting voor toekomstige agent-rondes. Werk 
   - `apps/studieschuld-vs-beleggen`
 - Die tools lezen profielwaarden als defaults, maar schrijven nog niet automatisch terug naar het profiel.
 - De mapping daarvan loopt centraal via `src/lib/profile-tool-mapping.ts`.
+- Tool-prefillgedrag (initial values, profile-key, apply profile patch) loopt gedeeld via `src/lib/profile-prefill.ts`.
 
 ## Werkwijze bij nieuwe rekentools
 

@@ -6,6 +6,10 @@ import { ToolDisclosure } from "@/components/ToolDisclosure";
 import { Pill } from "@/components/ui";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { getFinancialConstants } from "@/lib/financial-constants";
+import {
+  createProfilePrefillState,
+  mergeProfilePatchIntoValues,
+} from "@/lib/profile-prefill";
 import { getMortgageImpactDefaultsFromProfile } from "@/lib/profile-tool-mapping";
 import {
   LAST_CHECKED,
@@ -390,18 +394,18 @@ function InfoList({
 export default function Calculator() {
   const { profile, hasProfile } = useUserProfile();
   const profilePatch = getMortgageImpactDefaultsFromProfile(profile);
-  const hasRelevantProfileValues = hasProfile && Object.keys(profilePatch).length > 0;
-  const profileKey = hasRelevantProfileValues
-    ? `profile-${profile.updatedAt ?? JSON.stringify(profilePatch)}`
-    : "profile-empty";
+  const { hasRelevantProfileValues, profileKey, initialValues } =
+    createProfilePrefillState<FormState>({
+      defaultValues,
+      profilePatch,
+      hasProfile,
+      profileUpdatedAt: profile.updatedAt,
+    });
 
   return (
     <CalculatorContent
       key={profileKey}
-      initialValues={{
-        ...defaultValues,
-        ...profilePatch,
-      }}
+      initialValues={initialValues}
       hasRelevantProfileValues={hasRelevantProfileValues}
       profilePatch={profilePatch}
     />
@@ -442,14 +446,7 @@ function CalculatorContent({
   }
 
   function applyProfileValues() {
-    if (Object.keys(profilePatch).length === 0) {
-      return;
-    }
-
-    setFormValues((current) => ({
-      ...current,
-      ...profilePatch,
-    }));
+    setFormValues((current) => mergeProfilePatchIntoValues(current, profilePatch));
   }
 
   return (

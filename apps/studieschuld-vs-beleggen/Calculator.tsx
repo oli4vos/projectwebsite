@@ -5,6 +5,10 @@ import { AreaChart } from "@/components/charts";
 import { ResultRow } from "@/components/ResultRow";
 import { Pill } from "@/components/ui";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import {
+  createProfilePrefillState,
+  mergeProfilePatchIntoValues,
+} from "@/lib/profile-prefill";
 import { getStudentDebtVsInvestingDefaultsFromProfile } from "@/lib/profile-tool-mapping";
 import {
   calculateStudyDebtVsInvesting,
@@ -96,18 +100,18 @@ function FieldError({ message }: { message?: string }) {
 export default function Calculator() {
   const { profile, hasProfile } = useUserProfile();
   const profilePatch = getStudentDebtVsInvestingDefaultsFromProfile(profile);
-  const hasRelevantProfileValues = hasProfile && Object.keys(profilePatch).length > 0;
-  const profileKey = hasRelevantProfileValues
-    ? `profile-${profile.updatedAt ?? JSON.stringify(profilePatch)}`
-    : "profile-empty";
+  const { hasRelevantProfileValues, profileKey, initialValues } =
+    createProfilePrefillState<FormState>({
+      defaultValues,
+      profilePatch,
+      hasProfile,
+      profileUpdatedAt: profile.updatedAt,
+    });
 
   return (
     <CalculatorContent
       key={profileKey}
-      initialValues={{
-        ...defaultValues,
-        ...profilePatch,
-      }}
+      initialValues={initialValues}
       hasRelevantProfileValues={hasRelevantProfileValues}
       profilePatch={profilePatch}
     />
@@ -144,14 +148,7 @@ function CalculatorContent({
   }
 
   function applyProfileValues() {
-    if (Object.keys(profilePatch).length === 0) {
-      return;
-    }
-
-    setFormValues((current) => ({
-      ...current,
-      ...profilePatch,
-    }));
+    setFormValues((current) => mergeProfilePatchIntoValues(current, profilePatch));
   }
 
   return (

@@ -4,6 +4,30 @@ import type {
   UserProfile,
 } from "@/lib/user-profile";
 
+export const PROFILE_FIELDS_MORTGAGE_IMPACT = [
+  "income.grossAnnualIncome",
+  "income.partnerGrossAnnualIncome",
+  "studentDebt.remainingDebt",
+  "studentDebt.currentMonthlyPayment",
+  "studentDebt.statutoryMonthlyPayment",
+  "studentDebt.repaymentRule",
+  "studentDebt.duoSituation",
+  "studentDebt.duoInterestRate",
+  "studentDebt.remainingTermYears",
+  "housing.targetHomePrice",
+  "housing.ownFunds",
+  "housing.mortgageRate",
+  "housing.mortgageTermYears",
+  "housing.maxMortgageWithoutStudentDebt",
+] as const;
+
+export const PROFILE_FIELDS_STUDENT_DEBT_VS_INVESTING = [
+  "savingInvesting.monthlyFreeCashflow",
+  "studentDebt.duoInterestRate",
+  "savingInvesting.expectedAnnualReturn",
+  "savingInvesting.investmentHorizonYears",
+] as const;
+
 type MortgageImpactDefaults = Partial<{
   grossIncomeUser: string;
   grossIncomePartner: string;
