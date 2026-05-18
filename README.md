@@ -46,6 +46,14 @@ apps/
     app.json
     Calculator.tsx
     logic.ts
+  hypotheek-impact-studieschuld/
+    app.json
+    Calculator.tsx
+    logic.ts
+  compensatie-pechgeneratie/
+    app.json
+    Calculator.tsx
+    logic.ts
 
 scripts/
   generate-app-registry.mjs
@@ -53,6 +61,7 @@ scripts/
 src/
   app/
     apps/[slug]/page.tsx
+    profiel/page.tsx
     globals.css
     layout.tsx
     page.tsx
@@ -65,6 +74,8 @@ src/
     app-components.tsx
     app-registry.ts
     app-types.ts
+    profile-tool-mapping.ts
+    user-profile.ts
 ```
 
 ## Nieuwe app toevoegen
@@ -112,9 +123,12 @@ De generator valideert minimaal:
 - `category` is verplicht
 - `tags` is een array
 - `status` is `active`, `beta` of `draft`
+- `visibility` is optioneel `public` of `hidden` (`public` is default)
 - `entry` is verplicht en mag geen `..` bevatten
 
 De browser doet geen filesystem-discovery. Alleen de gegenereerde registry en lazy imports worden gebruikt.
+
+Tools met `"visibility": "hidden"` blijven in de codebase, maar worden niet in de gegenereerde dashboard/route-registry opgenomen.
 
 ## Build en deploy
 
@@ -156,7 +170,8 @@ Belangrijk:
 
 - Geen `eval` of willekeurige code-executie.
 - Geen secrets in de codebase.
-- Geen externe API-calls.
+- Geen externe API-calls binnen rekentools.
+- Homepage-marktcontext gebruikt wel externe publieke bronnen met fallbacks (`src/lib/market.ts`).
 - Apps worden alleen zichtbaar via een geldig manifest.
 - Inputvalidatie gebeurt in de calculatorcomponenten.
 - De generator weigert ongeldige manifests of onveilige `entry`-paden.

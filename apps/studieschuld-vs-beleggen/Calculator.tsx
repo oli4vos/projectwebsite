@@ -4,6 +4,8 @@ import { useState } from "react";
 import { AreaChart } from "@/components/charts";
 import { ResultRow } from "@/components/ResultRow";
 import { Pill } from "@/components/ui";
+import { useUserProfile } from "@/hooks/useUserProfile";
+import { getStudentDebtVsInvestingDefaultsFromProfile } from "@/lib/profile-tool-mapping";
 import {
   calculateStudyDebtVsInvesting,
   type CalculatorInput,
@@ -23,6 +25,12 @@ const defaultValues: FormState = {
   annualDebtRate: "2.56",
   annualInvestmentReturn: "6",
   years: "10",
+};
+
+type CalculatorContentProps = {
+  initialValues: FormState;
+  hasRelevantProfileValues: boolean;
+  profilePatch: Partial<FormState>;
 };
 
 function formatCurrency(value: number) {
@@ -86,7 +94,32 @@ function FieldError({ message }: { message?: string }) {
 }
 
 export default function Calculator() {
-  const [formValues, setFormValues] = useState<FormState>(defaultValues);
+  const { profile, hasProfile } = useUserProfile();
+  const profilePatch = getStudentDebtVsInvestingDefaultsFromProfile(profile);
+  const hasRelevantProfileValues = hasProfile && Object.keys(profilePatch).length > 0;
+  const profileKey = hasRelevantProfileValues
+    ? `profile-${profile.updatedAt ?? JSON.stringify(profilePatch)}`
+    : "profile-empty";
+
+  return (
+    <CalculatorContent
+      key={profileKey}
+      initialValues={{
+        ...defaultValues,
+        ...profilePatch,
+      }}
+      hasRelevantProfileValues={hasRelevantProfileValues}
+      profilePatch={profilePatch}
+    />
+  );
+}
+
+function CalculatorContent({
+  initialValues,
+  hasRelevantProfileValues,
+  profilePatch,
+}: CalculatorContentProps) {
+  const [formValues, setFormValues] = useState<FormState>(initialValues);
   const { errors, parsedValues } = validateForm(formValues);
   const result = parsedValues ? calculateStudyDebtVsInvesting(parsedValues) : null;
   const hasErrors = Object.keys(errors).length > 0;
@@ -110,6 +143,17 @@ export default function Calculator() {
     }));
   }
 
+  function applyProfileValues() {
+    if (Object.keys(profilePatch).length === 0) {
+      return;
+    }
+
+    setFormValues((current) => ({
+      ...current,
+      ...profilePatch,
+    }));
+  }
+
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
       <section className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
@@ -127,6 +171,19 @@ export default function Calculator() {
             advies.
           </p>
         </div>
+
+        {hasRelevantProfileValues ? (
+          <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
+            <span>Profielwaarden gevonden in deze browser.</span>
+            <button
+              type="button"
+              onClick={applyProfileValues}
+              className="rounded-full border hair bg-white px-3 py-2 text-[12px] text-[var(--ink)] transition hover:bg-[var(--paper-soft)]"
+            >
+              Gebruik profielwaarden
+            </button>
+          </div>
+        ) : null}
 
         <div className="mt-6 grid gap-5">
           <label className="grid gap-2">

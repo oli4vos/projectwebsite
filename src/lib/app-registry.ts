@@ -17,22 +17,26 @@ export const appRegistry = [
       "maandlasten"
     ],
     "status": "active",
+    "visibility": "public",
     "version": "1.0.0",
     "entry": "Calculator.tsx"
   },
   {
     "slug": "hypotheek-impact-studieschuld",
     "title": "Hypotheek-impact studieschuld",
-    "description": "Schat indicatief hoeveel je DUO-maandlast kan drukken op je hypotheekruimte en wat dat betekent voor je woningdoel.",
+    "description": "Zie welk DUO-bedrag waarschijnlijk meetelt, hoe brutering werkt en wat je studieschuld indicatief doet met je hypotheekruimte.",
     "type": "frontend",
     "category": "Hypotheek",
     "tags": [
       "studieschuld",
       "hypotheek",
-      "duo",
-      "leencapaciteit"
+      "DUO",
+      "brutering",
+      "starter",
+      "pechgeneratie"
     ],
-    "status": "active",
+    "status": "beta",
+    "visibility": "public",
     "version": "1.0.0",
     "entry": "Calculator.tsx"
   },
@@ -48,6 +52,7 @@ export const appRegistry = [
       "rente"
     ],
     "status": "active",
+    "visibility": "public",
     "version": "1.0.0",
     "entry": "Calculator.tsx"
   }

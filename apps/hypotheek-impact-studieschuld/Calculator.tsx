@@ -1,42 +1,111 @@
 "use client";
 
 import { useState } from "react";
-import { AreaChart } from "@/components/charts";
 import { ResultRow } from "@/components/ResultRow";
 import { Pill } from "@/components/ui";
+import { useUserProfile } from "@/hooks/useUserProfile";
+import { getMortgageImpactDefaultsFromProfile } from "@/lib/profile-tool-mapping";
 import {
-  IMPACT_SCENARIOS,
+  LAST_CHECKED,
+  QUICK_RULE_SCENARIOS,
   calculateHypotheekImpact,
+  getDefaultDuoRate,
+  getDefaultTerm,
+  type DuoSituation,
   type HypotheekImpactInput,
+  type PaymentSource,
+  type RepaymentRule,
 } from "./logic";
 
 type FormState = {
+  situation: DuoSituation;
+  repaymentRule: RepaymentRule;
+  actualMonthlyPayment: string;
+  statutoryMonthlyPayment: string;
+  remainingStudentDebt: string;
+  duoInterestRate: string;
+  remainingTermYears: string;
+  extraRepayment: string;
   grossIncomeUser: string;
   grossIncomePartner: string;
-  duoMonthlyPayment: string;
-  remainingStudentDebt: string;
   desiredHomePrice: string;
   ownMoney: string;
-  extraRepaymentScenario: string;
+  maxMortgageWithoutStudentDebt: string;
+  mortgageRate: string;
+  mortgageTermYears: string;
+  showAdvancedAssumptions: boolean;
 };
 
 type ValidationErrors = Partial<Record<keyof FormState, string>>;
 
 const defaultValues: FormState = {
+  situation: "repaying",
+  repaymentRule: "SF35",
+  actualMonthlyPayment: "150",
+  statutoryMonthlyPayment: "",
+  remainingStudentDebt: "22000",
+  duoInterestRate: "2.33",
+  remainingTermYears: "35",
+  extraRepayment: "",
   grossIncomeUser: "48000",
   grossIncomePartner: "",
-  duoMonthlyPayment: "150",
-  remainingStudentDebt: "22000",
   desiredHomePrice: "375000",
   ownMoney: "25000",
-  extraRepaymentScenario: "",
+  maxMortgageWithoutStudentDebt: "",
+  mortgageRate: "3.8",
+  mortgageTermYears: "30",
+  showAdvancedAssumptions: false,
 };
+
+type CalculatorContentProps = {
+  initialValues: FormState;
+  hasRelevantProfileValues: boolean;
+  profilePatch: Partial<FormState>;
+};
+
+const situationLabels: Record<DuoSituation, string> = {
+  repaying: "Ik betaal al maandelijks aan DUO",
+  gracePeriod: "Ik zit in de aanloopfase",
+  incomeBasedReduction: "Mijn maandbedrag is verlaagd door draagkracht",
+  paymentPause: "Ik gebruik een aflossingsvrije periode",
+  unknown: "Ik weet het niet",
+};
+
+const ruleLabels: Record<RepaymentRule, string> = {
+  SF35: "SF35",
+  SF15: "SF15",
+  SF15_OLD: "SF15-oud",
+  SF15_LLLK: "SF15-lllk",
+  UNKNOWN: "Onbekend",
+};
+
+const paymentSourceLabels: Record<PaymentSource, string> = {
+  actual: "Feitelijke betaling",
+  statutory: "Wettelijk maandbedrag",
+  estimated: "Geschat maandbedrag",
+  mixed: "Combinatie van feitelijk en wettelijk/geschat",
+};
+
+function formatIsoDateLabel(value: string) {
+  const date = new Date(`${value}T00:00:00`);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat("nl-NL", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(date);
+}
 
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("nl-NL", {
     style: "currency",
     currency: "EUR",
-    maximumFractionDigits: 0,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
   }).format(value);
 }
 
@@ -48,44 +117,128 @@ function formatPercent(value: number) {
   }).format(value);
 }
 
+function formatDecimal(value: number, digits = 2) {
+  return new Intl.NumberFormat("nl-NL", {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  }).format(value);
+}
+
+function normalizeNumericInput(value: string) {
+  return value.replace(/\s+/g, "").replace(",", ".");
+}
+
 function parseOptionalNumber(value: string) {
-  if (value.trim().length === 0) {
+  const normalizedValue = normalizeNumericInput(value);
+
+  if (normalizedValue.length === 0) {
     return undefined;
   }
 
-  return Number(value);
+  return Number(normalizedValue);
+}
+
+function parseRequiredNumber(value: string) {
+  const normalizedValue = normalizeNumericInput(value);
+
+  if (normalizedValue.length === 0) {
+    return Number.NaN;
+  }
+
+  return Number(normalizedValue);
 }
 
 function validateForm(values: FormState) {
   const errors: ValidationErrors = {};
 
-  const grossIncomeUser = Number(values.grossIncomeUser);
-  if (!Number.isFinite(grossIncomeUser) || grossIncomeUser <= 0) {
-    errors.grossIncomeUser = "Voer een bruto jaarinkomen groter dan 0 in.";
-  }
-
-  const grossIncomePartnerValue = parseOptionalNumber(values.grossIncomePartner);
-  if (
-    grossIncomePartnerValue !== undefined &&
-    (!Number.isFinite(grossIncomePartnerValue) || grossIncomePartnerValue < 0)
-  ) {
-    errors.grossIncomePartner = "Gebruik 0 of een hoger partnerinkomen.";
-  }
-
-  const duoMonthlyPayment = Number(values.duoMonthlyPayment);
-  if (!Number.isFinite(duoMonthlyPayment) || duoMonthlyPayment < 0) {
-    errors.duoMonthlyPayment = "Voer een geldig DUO-maandbedrag van 0 of hoger in.";
-  }
-
+  const actualMonthlyPayment = parseOptionalNumber(values.actualMonthlyPayment);
+  const statutoryMonthlyPayment = parseOptionalNumber(values.statutoryMonthlyPayment);
   const remainingStudentDebt = parseOptionalNumber(values.remainingStudentDebt);
+  const duoInterestRate = parseOptionalNumber(values.duoInterestRate);
+  const remainingTermYears = parseOptionalNumber(values.remainingTermYears);
+  const extraRepayment = parseOptionalNumber(values.extraRepayment);
+  const grossIncomeUser = parseRequiredNumber(values.grossIncomeUser);
+  const grossIncomePartner = parseOptionalNumber(values.grossIncomePartner);
+  const desiredHomePrice = parseOptionalNumber(values.desiredHomePrice);
+  const ownMoney = parseOptionalNumber(values.ownMoney);
+  const maxMortgageWithoutStudentDebt = parseOptionalNumber(
+    values.maxMortgageWithoutStudentDebt,
+  );
+  const mortgageRate = parseRequiredNumber(values.mortgageRate);
+  const mortgageTermYears = parseRequiredNumber(values.mortgageTermYears);
+
+  const showActualField =
+    values.situation === "repaying" ||
+    values.situation === "incomeBasedReduction" ||
+    values.situation === "paymentPause";
+  const showStatutoryField =
+    values.situation === "gracePeriod" ||
+    values.situation === "incomeBasedReduction" ||
+    values.situation === "paymentPause" ||
+    values.situation === "unknown";
+  const canEstimateFromDebt =
+    remainingStudentDebt !== undefined && Number.isFinite(remainingStudentDebt);
+
+  if (showActualField) {
+    if (
+      actualMonthlyPayment !== undefined &&
+      (!Number.isFinite(actualMonthlyPayment) || actualMonthlyPayment < 0)
+    ) {
+      errors.actualMonthlyPayment =
+        "Gebruik 0 of een hoger DUO-maandbedrag.";
+    }
+  }
+
+  if (showStatutoryField) {
+    if (
+      statutoryMonthlyPayment !== undefined &&
+      (!Number.isFinite(statutoryMonthlyPayment) || statutoryMonthlyPayment < 0)
+    ) {
+      errors.statutoryMonthlyPayment =
+        "Gebruik 0 of een hoger wettelijk maandbedrag.";
+    }
+  }
+
   if (
     remainingStudentDebt !== undefined &&
     (!Number.isFinite(remainingStudentDebt) || remainingStudentDebt < 0)
   ) {
-    errors.remainingStudentDebt = "Gebruik 0 of een hogere resterende studieschuld.";
+    errors.remainingStudentDebt =
+      "Gebruik 0 of een hogere resterende studieschuld.";
   }
 
-  const desiredHomePrice = parseOptionalNumber(values.desiredHomePrice);
+  if (
+    duoInterestRate !== undefined &&
+    (!Number.isFinite(duoInterestRate) || duoInterestRate < 0)
+  ) {
+    errors.duoInterestRate = "Gebruik 0% of een hoger DUO-rentepercentage.";
+  }
+
+  if (
+    remainingTermYears !== undefined &&
+    (!Number.isFinite(remainingTermYears) || remainingTermYears <= 0)
+  ) {
+    errors.remainingTermYears = "Gebruik een resterende looptijd groter dan 0.";
+  }
+
+  if (
+    extraRepayment !== undefined &&
+    (!Number.isFinite(extraRepayment) || extraRepayment < 0)
+  ) {
+    errors.extraRepayment = "Gebruik 0 of een hoger bedrag voor extra aflossen.";
+  }
+
+  if (!Number.isFinite(grossIncomeUser) || grossIncomeUser < 0) {
+    errors.grossIncomeUser = "Gebruik 0 of een hoger bruto jaarinkomen.";
+  }
+
+  if (
+    grossIncomePartner !== undefined &&
+    (!Number.isFinite(grossIncomePartner) || grossIncomePartner < 0)
+  ) {
+    errors.grossIncomePartner = "Gebruik 0 of een hoger partnerinkomen.";
+  }
+
   if (
     desiredHomePrice !== undefined &&
     (!Number.isFinite(desiredHomePrice) || desiredHomePrice < 0)
@@ -93,47 +246,96 @@ function validateForm(values: FormState) {
     errors.desiredHomePrice = "Gebruik 0 of een hogere woningprijs.";
   }
 
-  const ownMoney = parseOptionalNumber(values.ownMoney);
   if (ownMoney !== undefined && (!Number.isFinite(ownMoney) || ownMoney < 0)) {
     errors.ownMoney = "Gebruik 0 of een hoger bedrag aan eigen geld.";
   }
 
-  const extraRepaymentScenario = parseOptionalNumber(values.extraRepaymentScenario);
   if (
-    extraRepaymentScenario !== undefined &&
-    (!Number.isFinite(extraRepaymentScenario) || extraRepaymentScenario < 0)
+    maxMortgageWithoutStudentDebt !== undefined &&
+    (!Number.isFinite(maxMortgageWithoutStudentDebt) ||
+      maxMortgageWithoutStudentDebt < 0)
   ) {
-    errors.extraRepaymentScenario = "Gebruik 0 of een hoger bedrag voor extra aflossen.";
+    errors.maxMortgageWithoutStudentDebt =
+      "Gebruik 0 of een hogere maximale hypotheek.";
+  }
+
+  if (!Number.isFinite(mortgageRate) || mortgageRate < 0) {
+    errors.mortgageRate = "Gebruik 0% of een hogere hypotheekrente.";
+  }
+
+  if (!Number.isFinite(mortgageTermYears) || mortgageTermYears <= 0) {
+    errors.mortgageTermYears = "Gebruik een hypotheeklooptijd groter dan 0.";
   }
 
   if (
-    extraRepaymentScenario !== undefined &&
-    extraRepaymentScenario > 0 &&
+    values.situation === "repaying" &&
+    actualMonthlyPayment === undefined &&
+    statutoryMonthlyPayment === undefined &&
+    !canEstimateFromDebt
+  ) {
+    errors.actualMonthlyPayment =
+      "Vul je actuele DUO-bedrag in, of geef minimaal je resterende schuld op zodat we kunnen schatten.";
+  }
+
+  if (values.situation === "incomeBasedReduction") {
+    if (actualMonthlyPayment === undefined) {
+      errors.actualMonthlyPayment =
+        "Vul het lagere draagkrachtbedrag in dat je nu feitelijk betaalt.";
+    }
+
+    if (statutoryMonthlyPayment === undefined && !canEstimateFromDebt) {
+      errors.statutoryMonthlyPayment =
+        "Vul ook je wettelijke maandbedrag in, of geef je resterende schuld op zodat we dit kunnen schatten.";
+    }
+  }
+
+  if (
+    (values.situation === "gracePeriod" ||
+      values.situation === "paymentPause" ||
+      values.situation === "unknown") &&
+    statutoryMonthlyPayment === undefined &&
+    !canEstimateFromDebt
+  ) {
+    errors.remainingStudentDebt =
+      "Vul je resterende studieschuld in, of geef een wettelijk maandbedrag op zodat we een veilige schatting kunnen maken.";
+  }
+
+  if (
+    extraRepayment !== undefined &&
+    extraRepayment > 0 &&
     remainingStudentDebt === undefined
   ) {
-    errors.extraRepaymentScenario =
-      "Vul ook je resterende studieschuld in om een aflosscenario te schatten.";
+    errors.extraRepayment =
+      "Vul ook je resterende studieschuld in om extra aflossen te kunnen schatten.";
   }
 
   if (
-    extraRepaymentScenario !== undefined &&
+    extraRepayment !== undefined &&
     remainingStudentDebt !== undefined &&
-    extraRepaymentScenario > remainingStudentDebt
+    extraRepayment > remainingStudentDebt
   ) {
-    errors.extraRepaymentScenario =
+    errors.extraRepayment =
       "Extra aflossen kan in deze tool niet hoger zijn dan je resterende studieschuld.";
   }
 
   const parsedValues: HypotheekImpactInput | null =
     Object.keys(errors).length === 0
       ? {
-          grossIncomeUser,
-          grossIncomePartner: grossIncomePartnerValue ?? 0,
-          duoMonthlyPayment,
+          situation: values.situation,
+          repaymentRule: values.repaymentRule,
+          actualMonthlyPayment,
+          statutoryMonthlyPayment,
           remainingStudentDebt,
+          duoInterestRate,
+          remainingTermYears,
+          extraRepayment,
+          grossIncomeUser,
+          grossIncomePartner: grossIncomePartner ?? 0,
           desiredHomePrice,
           ownMoney,
-          extraRepaymentScenario,
+          maxMortgageWithoutStudentDebt,
+          mortgageRate,
+          mortgageTermYears,
         }
       : null;
 
@@ -151,179 +353,485 @@ function FieldError({ message }: { message?: string }) {
   return <p className="text-sm text-red-700">{message}</p>;
 }
 
+function InfoList({
+  items,
+  tone = "default",
+}: {
+  items: string[];
+  tone?: "default" | "warning";
+}) {
+  const uniqueItems = [...new Set(items)];
+
+  if (uniqueItems.length === 0) {
+    return null;
+  }
+
+  return (
+    <div
+      className={`mt-4 rounded-xl border px-4 py-3 text-[13px] leading-[1.65] ${
+        tone === "warning"
+          ? "border-[var(--neg-soft)] bg-[var(--neg-soft)]/45 text-[oklch(35%_0.13_28)]"
+          : "border-[var(--hair)] bg-[var(--paper-soft)] text-[var(--muted)]"
+      }`}
+    >
+      <ul className="space-y-2">
+        {uniqueItems.map((item) => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 export default function Calculator() {
-  const [formValues, setFormValues] = useState<FormState>(defaultValues);
+  const { profile, hasProfile } = useUserProfile();
+  const profilePatch = getMortgageImpactDefaultsFromProfile(profile);
+  const hasRelevantProfileValues = hasProfile && Object.keys(profilePatch).length > 0;
+  const profileKey = hasRelevantProfileValues
+    ? `profile-${profile.updatedAt ?? JSON.stringify(profilePatch)}`
+    : "profile-empty";
+
+  return (
+    <CalculatorContent
+      key={profileKey}
+      initialValues={{
+        ...defaultValues,
+        ...profilePatch,
+      }}
+      hasRelevantProfileValues={hasRelevantProfileValues}
+      profilePatch={profilePatch}
+    />
+  );
+}
+
+function CalculatorContent({
+  initialValues,
+  hasRelevantProfileValues,
+  profilePatch,
+}: CalculatorContentProps) {
+  const [formValues, setFormValues] = useState<FormState>(initialValues);
   const { errors, parsedValues } = validateForm(formValues);
   const result = parsedValues ? calculateHypotheekImpact(parsedValues) : null;
   const hasErrors = Object.keys(errors).length > 0;
+  const showActualField =
+    formValues.situation === "repaying" ||
+    formValues.situation === "incomeBasedReduction" ||
+    formValues.situation === "paymentPause";
+  const showStatutoryField =
+    formValues.situation === "gracePeriod" ||
+    formValues.situation === "incomeBasedReduction" ||
+    formValues.situation === "paymentPause" ||
+    formValues.situation === "unknown";
+  const usedDefaultDuoRate = formValues.duoInterestRate.trim().length === 0;
+  const usedDefaultTerm = formValues.remainingTermYears.trim().length === 0;
+  const hasMixedPaymentOutcome = Boolean(
+    result &&
+      result.mortgageImpact.optimisticPrincipalImpact !==
+        result.mortgageImpact.conservativePrincipalImpact,
+  );
 
-  const currentSeries = result
-    ? result.impactScenarios.map((scenario) => scenario.impact)
-    : [];
-  const scenarioSeries = result?.extraRepaymentScenario
-    ? result.extraRepaymentScenario.impactScenarios.map((scenario) => scenario.impact)
-    : [];
-
-  const chartSeries =
-    result && currentSeries.length > 0
-      ? [
-          {
-            color: "oklch(46% 0.07 232)",
-            points: currentSeries,
-          },
-          ...(scenarioSeries.length > 0
-            ? [
-                {
-                  color: "oklch(54% 0.10 152)",
-                  points: scenarioSeries,
-                },
-              ]
-            : []),
-        ]
-      : null;
-
-  const minImpact = result?.impactScenarios[0]?.impact ?? 0;
-  const maxImpact =
-    result?.impactScenarios[result.impactScenarios.length - 1]?.impact ?? 0;
-  const middleImpact =
-    result?.impactScenarios.find((scenario) => scenario.key === "middle")?.impact ?? 0;
-  const scenarioImpactScenarios = result?.extraRepaymentScenario?.impactScenarios ?? [];
-  const scenarioMinImpact = scenarioImpactScenarios[0]?.impact ?? 0;
-  const scenarioMaxImpact =
-    scenarioImpactScenarios[scenarioImpactScenarios.length - 1]?.impact ?? 0;
-
-  function updateField(field: keyof FormState, value: string) {
+  function updateField<K extends keyof FormState>(field: K, value: FormState[K]) {
     setFormValues((current) => ({
       ...current,
       [field]: value,
     }));
   }
 
+  function applyProfileValues() {
+    if (Object.keys(profilePatch).length === 0) {
+      return;
+    }
+
+    setFormValues((current) => ({
+      ...current,
+      ...profilePatch,
+    }));
+  }
+
   return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
+    <div className="grid gap-8 lg:grid-cols-[minmax(0,0.98fr)_minmax(0,1.02fr)]">
       <section className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
         <div>
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
-            Scenario
+            Rekentool v2
           </div>
-          <h2 className="mt-2 font-serif text-[28px] tracking-[-0.02em] text-[var(--ink)]">
-            Vul je inkomen en DUO-maandlast in
+          <h2 className="mt-2 font-serif text-[30px] tracking-[-0.02em] text-[var(--ink)]">
+            Hypotheek-impact van je studieschuld
           </h2>
           <p className="mt-3 text-[14px] leading-[1.7] text-[var(--ink-2)]">
-            Deze tool helpt je om in gewone taal te zien hoeveel ruimte je
-            studieschuld indicatief kan wegnemen uit je hypotheekmogelijkheden.
-            Niet om je iets aan te praten, wel om meer grip te krijgen op je
-            volgende vraag.
+            Je studieschuld hoeft een koophuis niet onmogelijk te maken, maar je
+            DUO-maandlast telt wel mee. Deze tool laat zien welk bedrag waarschijnlijk
+            relevant is, hoe brutering werkt en wat dat indicatief met je
+            hypotheekruimte kan doen.
+          </p>
+          <p className="mt-3 text-[13px] leading-[1.65] text-[var(--muted)]">
+            Pech gehad met het leenstelsel? Deze tool helpt je niet klagen, maar rekenen.
           </p>
         </div>
 
-        <div className="mt-6 grid gap-5">
-          <label className="grid gap-2">
-            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-              Bruto jaarinkomen gebruiker
-            </span>
-            <input
-              inputMode="decimal"
-              value={formValues.grossIncomeUser}
-              onChange={(event) => updateField("grossIncomeUser", event.target.value)}
-              aria-invalid={Boolean(errors.grossIncomeUser)}
-              className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-            />
-            <FieldError message={errors.grossIncomeUser} />
-          </label>
+        <div className="mt-6 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
+          Deze tool geeft een indicatie. Een hypotheekverstrekker of adviseur rekent
+          met actuele normen, acceptatiebeleid en jouw volledige situatie.
+        </div>
 
-          <label className="grid gap-2">
-            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-              Bruto jaarinkomen partner (optioneel)
-            </span>
-            <input
-              inputMode="decimal"
-              value={formValues.grossIncomePartner}
-              onChange={(event) => updateField("grossIncomePartner", event.target.value)}
-              aria-invalid={Boolean(errors.grossIncomePartner)}
-              placeholder="Bijvoorbeeld 32000"
-              className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-            />
-            <FieldError message={errors.grossIncomePartner} />
-          </label>
+        {hasRelevantProfileValues ? (
+          <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--hair)] bg-white px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
+            <span>Profielwaarden gevonden in deze browser.</span>
+            <button
+              type="button"
+              onClick={applyProfileValues}
+              className="rounded-full border hair bg-white px-3 py-2 text-[12px] text-[var(--ink)] transition hover:bg-[var(--paper-soft)]"
+            >
+              Gebruik profielwaarden
+            </button>
+          </div>
+        ) : null}
 
-          <label className="grid gap-2">
-            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-              Huidige DUO-maandlast
-            </span>
-            <input
-              inputMode="decimal"
-              value={formValues.duoMonthlyPayment}
-              onChange={(event) => updateField("duoMonthlyPayment", event.target.value)}
-              aria-invalid={Boolean(errors.duoMonthlyPayment)}
-              className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-            />
-            <FieldError message={errors.duoMonthlyPayment} />
-          </label>
+        <div className="mt-7">
+          <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
+            Stap 1
+          </div>
+          <h3 className="mt-1 font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
+            Jouw DUO-situatie
+          </h3>
+          <p className="mt-2 text-[13px] leading-[1.65] text-[var(--muted)]">
+            Je vindt dit in Mijn DUO bij Mijn schulden.
+          </p>
+          <div className="mt-4 grid gap-5">
+            <label className="grid gap-2">
+              <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                Situatie
+              </span>
+              <select
+                value={formValues.situation}
+                onChange={(event) =>
+                  updateField("situation", event.target.value as DuoSituation)
+                }
+                className="ring-focus hair h-12 rounded-md border bg-white px-4 text-[15px] text-[var(--ink)] outline-none"
+              >
+                {Object.entries(situationLabels).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
 
-          <label className="grid gap-2">
-            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-              Resterende studieschuld (optioneel)
-            </span>
-            <input
-              inputMode="decimal"
-              value={formValues.remainingStudentDebt}
-              onChange={(event) =>
-                updateField("remainingStudentDebt", event.target.value)
-              }
-              aria-invalid={Boolean(errors.remainingStudentDebt)}
-              placeholder="Voor context en aflosscenario"
-              className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-            />
-            <FieldError message={errors.remainingStudentDebt} />
-          </label>
+            <label className="grid gap-2">
+              <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                Terugbetalingsregel
+              </span>
+              <select
+                value={formValues.repaymentRule}
+                onChange={(event) =>
+                  updateField("repaymentRule", event.target.value as RepaymentRule)
+                }
+                className="ring-focus hair h-12 rounded-md border bg-white px-4 text-[15px] text-[var(--ink)] outline-none"
+              >
+                {Object.entries(ruleLabels).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+              <p className="text-[12px] leading-[1.5] text-[var(--soft)]">
+                SF35 is vaak gunstiger voor je maandlast; SF15 en varianten drukken
+                vaak harder op je hypotheekruimte.
+              </p>
+            </label>
+          </div>
+        </div>
 
-          <label className="grid gap-2">
-            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-              Gewenste woningprijs (optioneel)
-            </span>
-            <input
-              inputMode="decimal"
-              value={formValues.desiredHomePrice}
-              onChange={(event) => updateField("desiredHomePrice", event.target.value)}
-              aria-invalid={Boolean(errors.desiredHomePrice)}
-              placeholder="Bijvoorbeeld 375000"
-              className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-            />
-            <FieldError message={errors.desiredHomePrice} />
-          </label>
+        <div className="mt-7">
+          <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
+            Stap 2
+          </div>
+          <h3 className="mt-1 font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
+            DUO-bedragen
+          </h3>
+          <div className="mt-4 grid gap-5">
+            {showActualField ? (
+              <label className="grid gap-2">
+                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                  Huidig DUO-maandbedrag
+                </span>
+                <input
+                  inputMode="decimal"
+                  value={formValues.actualMonthlyPayment}
+                  onChange={(event) =>
+                    updateField("actualMonthlyPayment", event.target.value)
+                  }
+                  aria-invalid={Boolean(errors.actualMonthlyPayment)}
+                  placeholder={
+                    formValues.situation === "paymentPause" ? "Bijvoorbeeld 0" : "Bijvoorbeeld 150"
+                  }
+                  className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
+                />
+                <p className="text-[12px] leading-[1.5] text-[var(--soft)]">
+                  Vul in wat je nu feitelijk betaalt. Bij een betaalpauze kan dat tijdelijk €0 zijn.
+                </p>
+                <FieldError message={errors.actualMonthlyPayment} />
+              </label>
+            ) : null}
 
-          <label className="grid gap-2">
-            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-              Eigen geld (optioneel)
-            </span>
-            <input
-              inputMode="decimal"
-              value={formValues.ownMoney}
-              onChange={(event) => updateField("ownMoney", event.target.value)}
-              aria-invalid={Boolean(errors.ownMoney)}
-              placeholder="Bijvoorbeeld 25000"
-              className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-            />
-            <FieldError message={errors.ownMoney} />
-          </label>
+            {showStatutoryField ? (
+              <label className="grid gap-2">
+                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                  Wettelijk DUO-maandbedrag
+                </span>
+                <input
+                  inputMode="decimal"
+                  value={formValues.statutoryMonthlyPayment}
+                  onChange={(event) =>
+                    updateField("statutoryMonthlyPayment", event.target.value)
+                  }
+                  aria-invalid={Boolean(errors.statutoryMonthlyPayment)}
+                  placeholder="Als je dit weet uit Mijn DUO"
+                  className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
+                />
+                <p className="text-[12px] leading-[1.5] text-[var(--soft)]">
+                  Handig als je feitelijke betaling lager is dan wat DUO wettelijk van je verwacht.
+                </p>
+                <FieldError message={errors.statutoryMonthlyPayment} />
+              </label>
+            ) : null}
 
-          <label className="grid gap-2">
-            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-              Scenario: extra aflossen op studieschuld (optioneel)
-            </span>
-            <input
-              inputMode="decimal"
-              value={formValues.extraRepaymentScenario}
-              onChange={(event) =>
-                updateField("extraRepaymentScenario", event.target.value)
-              }
-              aria-invalid={Boolean(errors.extraRepaymentScenario)}
-              placeholder="Bijvoorbeeld 5000"
-              className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-            />
-            <FieldError message={errors.extraRepaymentScenario} />
-          </label>
+            <label className="grid gap-2">
+              <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                Resterende studieschuld
+              </span>
+              <input
+                inputMode="decimal"
+                value={formValues.remainingStudentDebt}
+                onChange={(event) =>
+                  updateField("remainingStudentDebt", event.target.value)
+                }
+                aria-invalid={Boolean(errors.remainingStudentDebt)}
+                placeholder="Bijvoorbeeld 22000"
+                className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
+              />
+              <p className="text-[12px] leading-[1.5] text-[var(--soft)]">
+                Nodig voor schattingen, brutering én het scenario extra aflossen.
+              </p>
+              <FieldError message={errors.remainingStudentDebt} />
+            </label>
+
+            <label className="grid gap-2">
+              <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                DUO-rentepercentage
+              </span>
+              <input
+                inputMode="decimal"
+                value={formValues.duoInterestRate}
+                onChange={(event) => updateField("duoInterestRate", event.target.value)}
+                aria-invalid={Boolean(errors.duoInterestRate)}
+                placeholder={String(getDefaultDuoRate(formValues.repaymentRule))}
+                className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
+              />
+              <p className="text-[12px] leading-[1.5] text-[var(--soft)]">
+                Laat leeg om de standaard 2026-rente voor {ruleLabels[formValues.repaymentRule]} te gebruiken.
+              </p>
+              <FieldError message={errors.duoInterestRate} />
+            </label>
+
+            <label className="grid gap-2">
+              <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                Resterende looptijd
+              </span>
+              <input
+                inputMode="decimal"
+                value={formValues.remainingTermYears}
+                onChange={(event) =>
+                  updateField("remainingTermYears", event.target.value)
+                }
+                aria-invalid={Boolean(errors.remainingTermYears)}
+                placeholder={String(getDefaultTerm(formValues.repaymentRule))}
+                className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
+              />
+              <p className="text-[12px] leading-[1.5] text-[var(--soft)]">
+                Leeg laten mag ook: dan gebruiken we {getDefaultTerm(formValues.repaymentRule)} jaar als standaard voor {ruleLabels[formValues.repaymentRule]}.
+              </p>
+              <FieldError message={errors.remainingTermYears} />
+            </label>
+
+            <label className="grid gap-2">
+              <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                Extra aflossen (optioneel)
+              </span>
+              <input
+                inputMode="decimal"
+                value={formValues.extraRepayment}
+                onChange={(event) => updateField("extraRepayment", event.target.value)}
+                aria-invalid={Boolean(errors.extraRepayment)}
+                placeholder="Bijvoorbeeld 5000"
+                className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
+              />
+              <p className="text-[12px] leading-[1.5] text-[var(--soft)]">
+                Handig als scenario. Niet blind aflossen: buffer en flexibiliteit tellen ook mee.
+              </p>
+              <FieldError message={errors.extraRepayment} />
+            </label>
+          </div>
+        </div>
+
+        <div className="mt-7">
+          <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
+            Stap 3
+          </div>
+          <h3 className="mt-1 font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
+            Woningdoel
+          </h3>
+          <div className="mt-4 grid gap-5">
+            <label className="grid gap-2">
+              <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                Bruto jaarinkomen gebruiker
+              </span>
+              <input
+                inputMode="decimal"
+                value={formValues.grossIncomeUser}
+                onChange={(event) => updateField("grossIncomeUser", event.target.value)}
+                aria-invalid={Boolean(errors.grossIncomeUser)}
+                className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
+              />
+              <FieldError message={errors.grossIncomeUser} />
+            </label>
+
+            <label className="grid gap-2">
+              <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                Bruto jaarinkomen partner
+              </span>
+              <input
+                inputMode="decimal"
+                value={formValues.grossIncomePartner}
+                onChange={(event) =>
+                  updateField("grossIncomePartner", event.target.value)
+                }
+                aria-invalid={Boolean(errors.grossIncomePartner)}
+                placeholder="Laat leeg als je alleen koopt"
+                className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
+              />
+              <p className="text-[12px] leading-[1.5] text-[var(--soft)]">
+                Koop je samen? Dan telt de studieschuld van je partner in de praktijk ook mee.
+              </p>
+              <FieldError message={errors.grossIncomePartner} />
+            </label>
+
+            <label className="grid gap-2">
+              <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                Gewenste woningprijs
+              </span>
+              <input
+                inputMode="decimal"
+                value={formValues.desiredHomePrice}
+                onChange={(event) =>
+                  updateField("desiredHomePrice", event.target.value)
+                }
+                aria-invalid={Boolean(errors.desiredHomePrice)}
+                placeholder="Bijvoorbeeld 375000"
+                className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
+              />
+              <FieldError message={errors.desiredHomePrice} />
+            </label>
+
+            <label className="grid gap-2">
+              <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                Eigen geld
+              </span>
+              <input
+                inputMode="decimal"
+                value={formValues.ownMoney}
+                onChange={(event) => updateField("ownMoney", event.target.value)}
+                aria-invalid={Boolean(errors.ownMoney)}
+                placeholder="Bijvoorbeeld 25000"
+                className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
+              />
+              <FieldError message={errors.ownMoney} />
+            </label>
+
+            <label className="grid gap-2">
+              <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                Maximale hypotheek zonder studieschuld (optioneel)
+              </span>
+              <input
+                inputMode="decimal"
+                value={formValues.maxMortgageWithoutStudentDebt}
+                onChange={(event) =>
+                  updateField("maxMortgageWithoutStudentDebt", event.target.value)
+                }
+                aria-invalid={Boolean(errors.maxMortgageWithoutStudentDebt)}
+                placeholder="Volgens adviseur of rekenhulp"
+                className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
+              />
+              <p className="text-[12px] leading-[1.5] text-[var(--soft)]">
+                Praktisch als je al een eerste hypotheekindicatie zonder studieschuld hebt.
+              </p>
+              <FieldError message={errors.maxMortgageWithoutStudentDebt} />
+            </label>
+          </div>
+        </div>
+
+        <div className="mt-7">
+          <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
+            Stap 4
+          </div>
+          <h3 className="mt-1 font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
+            Hypotheek-aannames
+          </h3>
+          <div className="mt-4 grid gap-5">
+            <label className="grid gap-2">
+              <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                Hypotheekrentepercentage
+              </span>
+              <input
+                inputMode="decimal"
+                value={formValues.mortgageRate}
+                onChange={(event) => updateField("mortgageRate", event.target.value)}
+                aria-invalid={Boolean(errors.mortgageRate)}
+                className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
+              />
+              <FieldError message={errors.mortgageRate} />
+            </label>
+
+            <label className="grid gap-2">
+              <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                Hypotheeklooptijd
+              </span>
+              <input
+                inputMode="decimal"
+                value={formValues.mortgageTermYears}
+                onChange={(event) =>
+                  updateField("mortgageTermYears", event.target.value)
+                }
+                aria-invalid={Boolean(errors.mortgageTermYears)}
+                className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
+              />
+              <FieldError message={errors.mortgageTermYears} />
+            </label>
+
+            <label className="grid gap-3 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3">
+              <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                Toon geavanceerde aannames
+              </span>
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  checked={formValues.showAdvancedAssumptions}
+                  onChange={(event) =>
+                    updateField("showAdvancedAssumptions", event.target.checked)
+                  }
+                  className="h-4 w-4 rounded border-[var(--hair)] text-[var(--deep)]"
+                />
+                <span className="text-[14px] leading-[1.6] text-[var(--ink)]">
+                  Toon gebruikte defaults en bruteringscontext
+                </span>
+              </div>
+              {result ? (
+                <p className="text-[12px] leading-[1.5] text-[var(--soft)]">
+                  Indicatieve bruteringsstaffel: factor {formatDecimal(result.mortgageImpact.bruteringFactor)} bij {result.mortgageImpact.bruteringLabel}.
+                </p>
+              ) : null}
+            </label>
+          </div>
         </div>
 
         {hasErrors ? (
@@ -332,243 +840,416 @@ export default function Calculator() {
             zie je weer een bruikbare indicatie.
           </div>
         ) : null}
-
-        <div className="mt-6 border-t border-[var(--hair)] pt-5">
-          <div className="text-[11px] uppercase tracking-[0.12em] text-[var(--muted)]">
-            Belangrijke nuance
-          </div>
-          <p className="mt-2 text-[12.5px] leading-[1.65] text-[var(--muted)]">
-            Dit is een indicatieve berekening. Hypotheekverstrekkers gebruiken
-            eigen acceptatieregels. Gebruik dit als oriëntatie, niet als financieel
-            advies.
-          </p>
-        </div>
       </section>
 
       <section className="space-y-5">
         <div className="rounded-[1.5rem] bg-[var(--deep)] p-6 text-white shadow-paper-lg">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="text-[11px] uppercase tracking-[0.12em] text-white/55">
-              Korte conclusie
+              Bovenaan samengevat
             </div>
             {result ? <Pill tone="accent">Indicatief</Pill> : null}
           </div>
           {result ? (
             <>
-              <div className="mt-4 font-serif text-[34px] leading-[1.02] tracking-[-0.03em] sm:text-[40px]">
-                Je DUO-maandlast kan je hypotheekruimte indicatief met ongeveer{" "}
-                {formatCurrency(minImpact)} tot {formatCurrency(maxImpact)} drukken.
+              <div className="mt-4 font-serif text-[30px] leading-[1.03] tracking-[-0.03em] sm:text-[36px]">
+                Voor jouw situatie rekent deze tool met ongeveer{" "}
+                {formatCurrency(result.mortgageImpact.netDuoMonthlyPayment)} netto
+                DUO-last per maand.
               </div>
-              <p className="mt-3 max-w-[58ch] text-[14px] leading-[1.7] text-white/75">
-                In het middenscenario komt dat neer op ongeveer{" "}
-                {formatCurrency(middleImpact)} minder ruimte. Zie dit als
-                ordegrootte: genoeg om beter voorbereid het gesprek in te gaan.
+              <p className="mt-3 max-w-[58ch] text-[14px] leading-[1.7] text-white/78">
+                Na brutering telt dat indicatief als ongeveer{" "}
+                {formatCurrency(result.mortgageImpact.grossDuoMonthlyImpact)} bruto
+                maandlast. Dat kan je hypotheekruimte indicatief met ongeveer{" "}
+                {formatCurrency(result.mortgageImpact.principalImpact)} drukken.
               </p>
+              {formValues.situation === "incomeBasedReduction" ? (
+                <p className="mt-3 text-[13px] leading-[1.65] text-white/72">
+                  Let op: omdat je minder betaalt op basis van draagkracht, kan een
+                  hypotheekverstrekker mogelijk met een hoger bedrag rekenen.
+                </p>
+              ) : null}
+              {formValues.situation === "gracePeriod" ? (
+                <p className="mt-3 text-[13px] leading-[1.65] text-white/72">
+                  Je betaalt nu misschien nog niets, maar de hypotheekverstrekker kan
+                  kijken naar het bedrag dat je straks moet betalen.
+                </p>
+              ) : null}
+              {formValues.situation === "paymentPause" ? (
+                <p className="mt-3 text-[13px] leading-[1.65] text-white/72">
+                  Een tijdelijke betaalpauze maakt de hypotheekimpact niet automatisch nul.
+                </p>
+              ) : null}
+              {hasMixedPaymentOutcome ? (
+                <p className="mt-3 text-[13px] leading-[1.65] text-white/72">
+                  In een optimistischer lezing kom je uit op ongeveer{" "}
+                  {formatCurrency(result.mortgageImpact.optimisticPrincipalImpact)} impact,
+                  in een voorzichtigere lezing op ongeveer{" "}
+                  {formatCurrency(result.mortgageImpact.conservativePrincipalImpact)}.
+                </p>
+              ) : null}
             </>
           ) : (
             <p className="mt-4 text-[14px] leading-[1.7] text-white/75">
-              Vul geldige waarden in om de indicatieve impact van je DUO-maandlast te
-              zien.
+              Vul geldige waarden in om te zien welk DUO-bedrag waarschijnlijk
+              meetelt en wat dat indicatief doet met je hypotheekruimte.
             </p>
           )}
         </div>
 
         <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
-          <h2 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
-            Wat deze inschatting laat zien
-          </h2>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h3 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
+              Hoe komen we aan het DUO-bedrag?
+            </h3>
+            {result ? <Pill tone="dark">{paymentSourceLabels[result.duoPayment.source]}</Pill> : null}
+          </div>
           <p className="mt-3 text-[13.5px] leading-[1.65] text-[var(--muted)]">
-            We vertalen je maandlast naar een simpele jaarimpact en vermenigvuldigen
-            die met drie bandbreedtes. Dat maakt snel zichtbaar hoeveel druk je
-            studieschuld ongeveer kan geven op je leencapaciteit.
+            {result?.duoPayment.explanation ??
+              "Deze tool zoekt eerst uit welk DUO-bedrag waarschijnlijk relevant is voor je hypotheekgesprek."}
           </p>
-
           {result ? (
             <div className="mt-5">
               <ResultRow
+                label="Primaire netto DUO-last"
+                value={formatCurrency(result.duoPayment.primaryNetMonthlyPayment)}
+                sub="Bedrag waar deze tool primair mee rekent"
+                accent
+              />
+              <ResultRow
+                label="Optimistisch scenario"
+                value={formatCurrency(result.duoPayment.optimisticNetMonthlyPayment)}
+                sub="Als een geldverstrekker coulanter naar je actuele betaling kijkt"
+              />
+              <ResultRow
+                label="Voorzichtig scenario"
+                value={formatCurrency(result.duoPayment.conservativeNetMonthlyPayment)}
+                sub="Als een geldverstrekker met het wettelijke of geschatte bedrag rekent"
+              />
+              <ResultRow
+                label="Geschat wettelijk maandbedrag"
+                value={formatCurrency(result.duoPayment.estimatedStatutoryPayment)}
+                sub={`Gebaseerd op schuld, rente en looptijd onder ${ruleLabels[formValues.repaymentRule]}`}
+              />
+            </div>
+          ) : null}
+          <InfoList items={result?.duoPayment.warnings ?? []} tone="warning" />
+        </div>
+
+        <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h3 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
+              Wat is brutering?
+            </h3>
+            {result ? <Pill tone="accent">Factor {formatDecimal(result.mortgageImpact.bruteringFactor)}</Pill> : null}
+          </div>
+          <p className="mt-3 text-[13.5px] leading-[1.65] text-[var(--muted)]">
+            De DUO-maandlast is meestal een netto maandlast. Voor hypotheekberekeningen
+            wordt die vaak omgerekend naar een bruto vergelijkbare maandlast. Dat heet
+            brutering. Hoe hoger de hypotheekrente, hoe zwaarder die brutering meestal telt.
+          </p>
+          {result ? (
+            <div className="mt-5">
+              <ResultRow
+                label="Netto DUO-last"
+                value={formatCurrency(result.mortgageImpact.netDuoMonthlyPayment)}
+                sub="Bedrag dat uit je DUO-situatie naar voren komt"
+              />
+              <ResultRow
+                label="Gebruikte bruteringsfactor"
+                value={formatDecimal(result.mortgageImpact.bruteringFactor)}
+                sub={`Indicatieve staffel: ${result.mortgageImpact.bruteringLabel}`}
+              />
+              <ResultRow
+                label="Bruto maandlast-impact"
+                value={formatCurrency(result.mortgageImpact.grossDuoMonthlyImpact)}
+                sub="De netto DUO-last omgerekend naar bruto vergelijkbare hypotheeklast"
+                accent
+              />
+            </div>
+          ) : null}
+          <InfoList items={result?.mortgageImpact.assumptions ?? []} />
+        </div>
+
+        <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
+          <h3 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
+            Wat betekent dit voor je hypotheek?
+          </h3>
+          {result ? (
+            <div className="mt-5">
+              <ResultRow
+                label="Indicatieve hoofdsom-impact"
+                value={formatCurrency(result.mortgageImpact.principalImpact)}
+                sub={`Gebaseerd op ${formatDecimal(parsedValues?.mortgageRate ?? 0)}% hypotheekrente en ${parsedValues?.mortgageTermYears ?? 0} jaar`}
+                accent
+              />
+              <ResultRow
                 label="Totaal bruto jaarinkomen"
                 value={formatCurrency(result.grossIncomeTotal)}
-                sub="Gebruiker plus eventueel partnerinkomen"
-              />
-              <ResultRow
-                label="DUO-maandlast"
-                value={formatCurrency(result.duoMonthlyPayment)}
-                sub={`Per jaar ${formatCurrency(result.duoYearlyPayment)}`}
-              />
-              <ResultRow
-                label="Impact voorzichtig"
-                value={formatCurrency(result.impactScenarios[0].impact)}
-                sub="Jaarlast x factor 4,5"
-              />
-              <ResultRow
-                label="Impact midden"
-                value={formatCurrency(result.impactScenarios[1].impact)}
-                sub="Jaarlast x factor 5,0"
-              />
-              <ResultRow
-                label="Impact ruim"
-                value={formatCurrency(result.impactScenarios[2].impact)}
-                sub="Jaarlast x factor 5,5"
+                sub="Alleen context, geen officiële maximale hypotheekberekening"
               />
               {result.debtToIncomeRatio !== undefined ? (
                 <ResultRow
                   label="Studieschuld als % van jaarinkomen"
                   value={formatPercent(result.debtToIncomeRatio)}
-                  sub="Resterende schuld gedeeld door bruto jaarinkomen"
+                  sub="Geeft gevoel bij de grootte van je schuld ten opzichte van je inkomen"
+                />
+              ) : result.remainingStudentDebt > 0 ? (
+                <ResultRow
+                  label="Studieschuld als % van jaarinkomen"
+                  value="Niet te bepalen"
+                  sub="Vul een bruto inkomen boven 0 in om deze verhouding te zien"
                 />
               ) : null}
               {result.housingTarget ? (
                 <>
                   <ResultRow
-                    label="Benodigde hypotheek voor woningdoel"
+                    label="Benodigde hypotheek zonder studieschuld"
                     value={formatCurrency(result.housingTarget.neededMortgage)}
                     sub={`Woningprijs ${formatCurrency(result.housingTarget.desiredHomePrice)} minus eigen geld ${formatCurrency(result.housingTarget.ownMoney)}`}
                   />
                   <ResultRow
-                    label="Zelfde doel inclusief DUO-druk"
+                    label="Indicatieve behoefte mét studieschuldimpact"
                     value={formatCurrency(
-                      result.housingTarget.neededMortgageWithImpactMiddle,
+                      result.housingTarget.indicativeMortgageNeedWithStudentDebt,
                     )}
-                    sub="Benodigde hypotheek plus middenscenario van de impact"
+                    sub="Benodigde hypotheek plus de berekende hypotheekimpact van je studieschuld"
                     accent
                   />
+                  {result.housingTarget.maxMortgageWithStudentDebtIndicative !==
+                  undefined ? (
+                    <>
+                      <ResultRow
+                        label="Max hypotheek zonder studieschuld"
+                        value={formatCurrency(
+                          result.housingTarget.maxMortgageWithoutStudentDebt ?? 0,
+                        )}
+                        sub="Zoals jij of je adviseur die al indicatief had"
+                      />
+                      <ResultRow
+                        label="Max hypotheek met studieschuld indicatief"
+                        value={formatCurrency(
+                          result.housingTarget.maxMortgageWithStudentDebtIndicative,
+                        )}
+                        sub="Je eerdere indicatie minus de berekende studieschuldimpact"
+                      />
+                      <ResultRow
+                        label="Ruimtegat voor woningdoel"
+                        value={formatCurrency(
+                          result.housingTarget.gapToTargetIfMaxProvided ?? 0,
+                        )}
+                        sub="Voorzichtige indicatie van wat je mogelijk tekortkomt voor dit doel"
+                        accent
+                      />
+                    </>
+                  ) : null}
                 </>
               ) : null}
             </div>
           ) : null}
         </div>
 
-        {result && chartSeries ? (
-          <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <div className="text-[11px] uppercase tracking-[0.1em] text-[var(--muted)]">
-                  Bandbreedte
-                </div>
-                <div className="mt-1 font-serif text-[20px] tracking-[-0.015em] text-[var(--ink)]">
-                  Voorzichtig, midden en ruim naast elkaar
-                </div>
-              </div>
-              <div className="flex items-center gap-4 text-[12px] text-[var(--muted)]">
-                <span className="flex items-center gap-1.5">
-                  <span className="inline-block h-[2px] w-3 bg-[oklch(46%_0.07_232)]" />
-                  Huidige maandlast
-                </span>
-                {scenarioSeries.length > 0 ? (
-                  <span className="flex items-center gap-1.5">
-                    <span className="inline-block h-[2px] w-3 bg-[oklch(54%_0.10_152)]" />
-                    Aflosscenario
-                  </span>
-                ) : null}
-              </div>
-            </div>
-
-            <div className="mt-5 overflow-x-auto">
-              <AreaChart width={620} height={220} series={chartSeries} />
-              <div className="axis mt-1 flex items-center justify-between">
-                {IMPACT_SCENARIOS.map((scenario) => (
-                  <span key={scenario.key}>{scenario.label}</span>
-                ))}
-              </div>
-            </div>
-          </div>
-        ) : null}
-
-        {result?.extraRepaymentScenario ? (
-          <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <h2 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
-                Scenario: extra aflossen
-              </h2>
-              <Pill tone="pos">Eenvoudige schatting</Pill>
-            </div>
-            <p className="mt-3 text-[13.5px] leading-[1.65] text-[var(--muted)]">
-              Hier nemen we één simpele aanname: als je resterende studieschuld
-              daalt, schatten we je DUO-maandlast ongeveer in dezelfde verhouding
-              lager. Dat is niet hoe elke verstrekker of regeling exact werkt, maar
-              wel een begrijpelijke manier om scenario&apos;s te vergelijken.
-            </p>
-            <div className="mt-5">
-              <ResultRow
-                label="Aflosscenario"
-                value={formatCurrency(
-                  result.extraRepaymentScenario.extraRepaymentAmount,
-                )}
-                sub="Eenmalig extra aflossen"
-              />
-              <ResultRow
-                label="Geschatte resterende studieschuld"
-                value={formatCurrency(
-                  result.extraRepaymentScenario.estimatedRemainingStudentDebt,
-                )}
-                sub={`Met ongeveer ${formatPercent(result.extraRepaymentScenario.assumedMonthlyPaymentReductionRatio)} van je huidige maandlast`}
-              />
-              <ResultRow
-                label="Geschatte nieuwe DUO-maandlast"
-                value={formatCurrency(
-                  result.extraRepaymentScenario.estimatedMonthlyPayment,
-                )}
-                sub={`Per jaar ${formatCurrency(result.extraRepaymentScenario.duoYearlyPayment)}`}
-              />
-              <ResultRow
-                label="Nieuwe impactbandbreedte"
-                value={`${formatCurrency(scenarioMinImpact)} tot ${formatCurrency(scenarioMaxImpact)}`}
-                sub="Op basis van dezelfde drie factoren"
-                accent
-              />
-              <ResultRow
-                label="Middenscenario minder druk"
-                value={formatCurrency(
-                  result.extraRepaymentScenario.middleImpactReduction,
-                )}
-                sub="Verschil tussen huidige en geschatte nieuwe impact"
-                accent
-              />
-            </div>
-          </div>
-        ) : null}
-
         <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
-          <h2 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
-            Hoe rekenen we dit?
-          </h2>
-          <div className="mt-4 space-y-3 text-[13.5px] leading-[1.7] text-[var(--muted)]">
-            <p>
-              1. We tellen het bruto jaarinkomen van jou en eventueel je partner bij
-              elkaar op.
-            </p>
-            <p>
-              2. We zetten je DUO-maandlast om naar een jaarbedrag: maandlast × 12.
-            </p>
-            <p>
-              3. Dat jaarbedrag vermenigvuldigen we met drie eenvoudige factoren:
-              4,5, 5,0 en 5,5.
-            </p>
-            <div className="rounded-xl bg-[var(--paper-soft)] px-4 py-3 font-mono text-[13px] tabular text-[var(--ink)]">
-              Indicatieve impact = DUO-maandlast × 12 × factor
-            </div>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h3 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
+              Wat als je extra aflost?
+            </h3>
+            {result?.extraRepaymentScenario.extraRepaymentUsed ? (
+              <Pill tone="pos">Scenario actief</Pill>
+            ) : null}
           </div>
+          {result ? (
+            result.extraRepaymentScenario.extraRepaymentUsed > 0 ? (
+              <div className="mt-5">
+                <ResultRow
+                  label="Je lost extra af"
+                  value={formatCurrency(result.extraRepaymentScenario.extraRepaymentUsed)}
+                  sub="Bedrag dat in dit scenario echt is meegenomen"
+                />
+                <ResultRow
+                  label="Geschatte daling DUO-maandlast"
+                  value={formatCurrency(
+                    result.extraRepaymentScenario.monthlyPaymentReduction,
+                  )}
+                  sub={`Van ${formatCurrency(result.extraRepaymentScenario.oldEstimatedMonthlyPayment)} naar ${formatCurrency(result.extraRepaymentScenario.newEstimatedMonthlyPayment)} per maand`}
+                />
+                <ResultRow
+                  label="Gebruteerde maandlastdaling"
+                  value={formatCurrency(
+                    result.extraRepaymentScenario.grossMonthlyImpactReduction,
+                  )}
+                  sub="De maandlastdaling na toepassing van dezelfde bruteringsfactor"
+                />
+                <ResultRow
+                  label="Indicatieve extra hypotheekruimte"
+                  value={formatCurrency(
+                    result.extraRepaymentScenario.extraMortgageRoomIndicative,
+                  )}
+                  sub="Wat die lagere DUO-last in dit scenario extra kan opleveren"
+                  accent
+                />
+                <ResultRow
+                  label="Effect per €1 extra aflossen"
+                  value={
+                    result.extraRepaymentScenario.ratio !== null
+                      ? `${formatDecimal(result.extraRepaymentScenario.ratio)}x`
+                      : "n.v.t."
+                  }
+                  sub="Hoeveel extra hypotheekruimte elke extra afgeloste euro hier grofweg oplevert"
+                />
+              </div>
+            ) : (
+              <div className="mt-4 rounded-xl bg-[var(--paper-soft)] px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
+                Vul een bedrag voor extra aflossen in als je wilt zien wat een lagere
+                DUO-maandlast indicatief met je hypotheekruimte kan doen.
+              </div>
+            )
+          ) : null}
+          <InfoList items={result?.extraRepaymentScenario.warnings ?? []} tone="warning" />
         </div>
 
         <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
-          <h2 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
+          <h3 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
             Wat kun je hiermee?
-          </h2>
+          </h3>
           <div className="mt-4 space-y-3 text-[13.5px] leading-[1.7] text-[var(--muted)]">
-            <p>
-              Check eerst je officiële DUO-maandbedrag, want juist dat bedrag is in
-              de praktijk vaak bepalend.
-            </p>
-            <p>
-              Vraag daarna een hypotheekadviseur of geldverstrekker om je echte
-              leencapaciteit. Hun acceptatieregels kunnen afwijken.
-            </p>
-            <p>
-              Los niet blind af alleen om meer te kunnen lenen. Buffer,
-              flexibiliteit en je maandelijkse rust tellen ook mee.
-            </p>
+            <p>Check eerst Mijn DUO en neem je actuele overzicht serieus.</p>
+            <p>Vraag na extra aflossen om een nieuw DUO-overzicht, niet alleen om een nieuw gevoel.</p>
+            <p>Vergelijk extra aflossen altijd met buffer, aankoopkosten, verduurzaming en lagere hypotheek.</p>
+            <p>Wees eerlijk over je studieschuld; de tool helpt je juist om vooraf overzicht te krijgen.</p>
+            <p>Laat daarna een hypotheekadviseur de officiële leencapaciteit berekenen.</p>
+            <p>Hulp van ouders, werkgever of IKB kan soms helpen, maar een lager toetsinkomen kan óók impact hebben. Laat dat altijd narekenen.</p>
           </div>
         </div>
+
+        <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
+          <h3 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
+            Checklist Mijn DUO
+          </h3>
+          <p className="mt-3 text-[13.5px] leading-[1.65] text-[var(--muted)]">
+            Dit moet je uit Mijn DUO halen voor een hypotheekgesprek.
+          </p>
+          <ul className="mt-4 space-y-2 text-[13.5px] leading-[1.7] text-[var(--muted)]">
+            <li>Actuele resterende studieschuld.</li>
+            <li>Huidig maandbedrag.</li>
+            <li>Wettelijk maandbedrag.</li>
+            <li>Maandbedrag op basis van draagkracht, als dat voor jou geldt.</li>
+            <li>Terugbetalingsregel: SF35, SF15, SF15-oud of SF15-lllk.</li>
+            <li>Rentepercentage.</li>
+            <li>Resterende looptijd.</li>
+            <li>Of je in aanloopfase zit.</li>
+            <li>Of je een aflossingsvrije periode gebruikt.</li>
+            <li>Een nieuw DUO-overzicht na extra aflossing.</li>
+          </ul>
+        </div>
+
+        <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
+          <h3 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
+            SF35, SF15 en SF15-oud kort uitgelegd
+          </h3>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <div className="rounded-xl bg-[var(--paper-soft)] px-4 py-3">
+              <div className="text-[13px] font-medium text-[var(--ink)]">SF35</div>
+              <p className="mt-1 text-[12px] leading-[1.55] text-[var(--soft)]">
+                35 jaar aflossen, vaak leenstelselgeneratie. Meestal lagere maandlast, maar de schuld loopt langer mee.
+              </p>
+            </div>
+            <div className="rounded-xl bg-[var(--paper-soft)] px-4 py-3">
+              <div className="text-[13px] font-medium text-[var(--ink)]">SF15</div>
+              <p className="mt-1 text-[12px] leading-[1.55] text-[var(--soft)]">
+                15 jaar aflossen. Meestal hogere maandlast en daardoor vaak grotere hypotheekimpact.
+              </p>
+            </div>
+            <div className="rounded-xl bg-[var(--paper-soft)] px-4 py-3">
+              <div className="text-[13px] font-medium text-[var(--ink)]">SF15-oud</div>
+              <p className="mt-1 text-[12px] leading-[1.55] text-[var(--soft)]">
+                Oudere regeling. Ook 15 jaar, maar draagkracht en partnerinkomen kunnen anders uitwerken. Check Mijn DUO goed.
+              </p>
+            </div>
+            <div className="rounded-xl bg-[var(--paper-soft)] px-4 py-3">
+              <div className="text-[13px] font-medium text-[var(--ink)]">SF15-lllk</div>
+              <p className="mt-1 text-[12px] leading-[1.55] text-[var(--soft)]">
+                Levenlanglerenkrediet. 15 jaar aflossen en geen aflossingsvrije periode. Controleer rente en voorwaarden in Mijn DUO.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
+          <h3 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
+            Waarom eerlijk opgeven?
+          </h3>
+          <div className="mt-4 space-y-3 text-[13.5px] leading-[1.7] text-[var(--muted)]">
+            <p>Een studieschuld staat meestal niet bij BKR.</p>
+            <p>Toch moet je die wel opgeven bij een hypotheekaanvraag.</p>
+            <p>Verzwijgen kan problemen geven bij aanvraag, financiering en NHG.</p>
+            <p>Wees hier dus gewoon eerlijk over; dat geeft uiteindelijk meer grip dan verrassing achteraf.</p>
+          </div>
+        </div>
+
+        <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h3 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
+              Belangrijke aannames
+            </h3>
+            <Pill tone="dark">Gecontroleerd op 18 mei 2026</Pill>
+          </div>
+          <div className="mt-4 space-y-3 text-[13.5px] leading-[1.7] text-[var(--muted)]">
+            <p>
+              Bedragen en aannames gecontroleerd op 18 mei 2026. Controleer altijd
+              Mijn DUO en laat een hypotheekadviseur de officiële leencapaciteit berekenen.
+            </p>
+            <p>Laatste controle van deze aannames: {formatIsoDateLabel(LAST_CHECKED)}.</p>
+            <p>
+              Voor brutering gebruiken we een indicatieve staffel. Geldverstrekkers
+              en actuele normen kunnen daarvan afwijken.
+            </p>
+            {usedDefaultDuoRate ? (
+              <p>
+                DUO-rente niet ingevuld: de tool gebruikt daarom het standaardtarief
+                voor {ruleLabels[formValues.repaymentRule]}.
+              </p>
+            ) : null}
+            {usedDefaultTerm ? (
+              <p>
+                Resterende looptijd niet ingevuld: de tool gebruikt daarom de
+                standaardlooptijd van {getDefaultTerm(formValues.repaymentRule)} jaar.
+              </p>
+            ) : null}
+          </div>
+          {formValues.showAdvancedAssumptions ? (
+            <InfoList items={result?.assumptions ?? []} />
+          ) : null}
+        </div>
+
+        <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h3 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
+              Snelle vuistregel
+            </h3>
+            <Pill tone="default">Grove ordegrootte</Pill>
+          </div>
+          <p className="mt-3 text-[13.5px] leading-[1.65] text-[var(--muted)]">
+            Dit is de oude, grovere methode op basis van netto DUO-maandlast × 12 × factor.
+            Handig als snelle check, maar ondergeschikt aan de hoofdconclusie met brutering
+            en annuïtaire impact.
+          </p>
+          {result ? (
+            <div className="mt-5">
+              {result.quickRuleImpactScenarios.map((scenario, index) => (
+                <ResultRow
+                  key={scenario.key}
+                  label={`Vuistregel ${QUICK_RULE_SCENARIOS[index].label}`}
+                  value={formatCurrency(scenario.impact)}
+                  sub={`Netto DUO-last × 12 × factor ${formatDecimal(scenario.factor, 1)}`}
+                  accent={scenario.key === "middle"}
+                />
+              ))}
+            </div>
+          ) : null}
+        </div>
+
+        <InfoList items={result?.warnings ?? []} tone="warning" />
       </section>
     </div>
   );

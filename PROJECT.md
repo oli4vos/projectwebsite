@@ -25,6 +25,8 @@ Dit bestand is bedoeld als werksamenvatting voor toekomstige agent-rondes. Werk 
 - `scripts/generate-app-registry.mjs` scant `apps/`, valideert manifests en genereert:
   - `src/lib/app-registry.ts`
   - `src/lib/app-components.tsx`
+- Manifesten kunnen optioneel `visibility: "public" | "hidden"` zetten.
+- Alleen `visibility: "public"` wordt naar de gegenereerde registry/component-map geschreven.
 - `app-registry.ts` bevat alleen metadata.
 - `app-components.tsx` lazy-loadt calculatorcomponenten via `next/dynamic`.
 - Geen runtime filesystem discovery in de browser.
@@ -52,6 +54,8 @@ Dit bestand is bedoeld als werksamenvatting voor toekomstige agent-rondes. Werk 
 - `src/lib/app-types.ts`: manifest-typen
 - `src/lib/categories.ts`: mapping van categorie/slug naar visueel category-type
 - `src/lib/market.ts`: homepage-marktcontext met externe fetches en fallbacks
+- `src/lib/user-profile.ts`: local-first profieltype, sanitizing en localStorage helpers
+- `src/lib/profile-tool-mapping.ts`: centrale mapping van profielwaarden naar tool-defaults
 - `next.config.ts`: standaard Next-config + GitHub Pages static export in Actions
 
 ## Huidige tools
@@ -64,8 +68,24 @@ Dit bestand is bedoeld als werksamenvatting voor toekomstige agent-rondes. Werk 
   - bevat oudere rekenscripts in `.js`
 - `apps/hypotheek-impact-studieschuld`
   - indicatieve tool voor de impact van een DUO-maandlast op hypotheekruimte
-  - gebruikt drie transparante scenariofactoren: 4,5 / 5,0 / 5,5
-  - bevat optioneel een simpel aflosscenario op basis van proportionele daling
+  - v2 rekent primair via relevante DUO-maandlast -> brutering -> annuïtaire hypotheekimpact
+  - verwerkt DUO-situaties zoals aanloopfase, draagkrachtverlaging en betaalpauze
+  - bevat checklist voor Mijn DUO, uitleg van SF35/SF15-varianten en een nauwkeuriger aflosscenario
+- `apps/compensatie-pechgeneratie`
+  - staat als draft in de codebase met `visibility: "hidden"`
+  - wordt daardoor niet opgenomen in dashboard/route-registry
+
+## Profiel-MVP
+
+- Er is nu een local-first profielpagina op `/profiel`.
+- Profieldata wordt alleen lokaal opgeslagen in de browser via `localStorage`.
+- Storage key: `project-site:user-profile:v1`.
+- Privacy-uitgangspunt: geen server-opslag, geen auth, geen cookies, geen cloud sync.
+- Gekoppelde tools:
+  - `apps/hypotheek-impact-studieschuld`
+  - `apps/studieschuld-vs-beleggen`
+- Die tools lezen profielwaarden als defaults, maar schrijven nog niet automatisch terug naar het profiel.
+- De mapping daarvan loopt centraal via `src/lib/profile-tool-mapping.ts`.
 
 ## Werkwijze bij nieuwe rekentools
 
@@ -80,7 +100,14 @@ Dit bestand is bedoeld als werksamenvatting voor toekomstige agent-rondes. Werk 
 - Hou rekenlogica zo veel mogelijk puur en los van UI.
 - Validatie gebeurt nu per calculatorcomponent in de client.
 - Dashboard haalt alleen manifestdata op uit de gegenereerde registry.
+- Verborgen tools blijven buiten dashboard en app-routes via manifestveld `visibility: "hidden"`.
 - Donkere CTA's moeten expliciet wit contrast houden. Bronbestand: `src/components/ui.tsx`.
+- Er zijn nu meerdere pechgeneratie/studieschuld-tools; hou tone of voice en disclaimerstijl tussen die modules consistent.
+- Partnerstudieschuld zit nog niet als aparte invoer in `apps/hypotheek-impact-studieschuld`; alleen copy/context. Dat is een logische v3-uitbreiding.
+- Toekomstige profielstap:
+  - expliciet opslaan vanuit tools naar profiel
+  - optionele cloud/account-sync
+  - eventueel profielvelden als manifestmetadata
 - Als architectuur of navigatie verandert, update ook dit bestand.
 
 ## Risico's en aandachtspunten

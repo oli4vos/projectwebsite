@@ -1,0 +1,12 @@
+{
+  "slug": "compensatie-pechgeneratie",
+  "title": "Compensatie-checker pechgeneratie",
+  "description": "Schat je tegemoetkoming voor gemiste basisbeurs, aanvullende compensatie en eventuele studievoucher.",
+  "type": "frontend",
+  "category": "Schulden",
+  "tags": ["studieschuld", "pechgeneratie", "DUO", "compensatie", "starter"],
+  "status": "beta",
+  "visibility": "hidden",
+  "version": "1.0.0",
+  "entry": "Calculator.tsx"
+}

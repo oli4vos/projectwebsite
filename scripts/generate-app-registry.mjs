@@ -11,6 +11,7 @@ const componentsOutputPath = path.join(libDir, "app-components.tsx");
 const slugPattern = /^[a-z0-9-]+$/;
 const validTypes = new Set(["frontend", "api"]);
 const validStatuses = new Set(["active", "beta", "draft"]);
+const validVisibilities = new Set(["public", "hidden"]);
 
 function fail(message) {
   throw new Error(message);
@@ -62,6 +63,15 @@ function validateManifest(manifest, directoryName) {
     fail(`App "${slug}": status moet "active", "beta" of "draft" zijn.`);
   }
 
+  const visibility =
+    manifest.visibility === undefined
+      ? "public"
+      : ensureString(manifest.visibility, "visibility", slug);
+
+  if (!validVisibilities.has(visibility)) {
+    fail(`App "${slug}": visibility moet "public" of "hidden" zijn.`);
+  }
+
   if (entry.includes("..")) {
     fail(`App "${slug}": entry mag geen ".." bevatten.`);
   }
@@ -79,6 +89,7 @@ function validateManifest(manifest, directoryName) {
     category,
     tags,
     status,
+    visibility,
     version,
     entry,
   };
@@ -168,12 +179,24 @@ async function main() {
     manifests.push(validatedManifest);
   }
 
+  const publicManifests = manifests.filter(
+    (manifest) => manifest.visibility !== "hidden",
+  );
+
   await fs.mkdir(libDir, { recursive: true });
-  await fs.writeFile(registryOutputPath, buildRegistryFile(manifests), "utf8");
-  await fs.writeFile(componentsOutputPath, buildComponentsFile(manifests), "utf8");
+  await fs.writeFile(
+    registryOutputPath,
+    buildRegistryFile(publicManifests),
+    "utf8",
+  );
+  await fs.writeFile(
+    componentsOutputPath,
+    buildComponentsFile(publicManifests),
+    "utf8",
+  );
 
   process.stdout.write(
-    `Generated app registry for ${manifests.length} app(s).\n`,
+    `Generated app registry for ${publicManifests.length} public app(s) (${manifests.length} total).\n`,
   );
 }
 
