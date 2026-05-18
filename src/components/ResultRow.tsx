@@ -7,9 +7,9 @@ interface ResultRowProps {
 
 export function ResultRow({ label, value, sub, accent }: ResultRowProps) {
   return (
-    <div className="hair-b flex items-baseline justify-between py-3 last:border-b-0">
-      <div className="text-[13px] text-[var(--muted)]">{label}</div>
-      <div className="text-right">
+    <div className="hair-b flex items-baseline justify-between gap-3 py-3 last:border-b-0">
+      <div className="min-w-0 flex-1 text-[13px] text-[var(--muted)]">{label}</div>
+      <div className="min-w-0 shrink-0 text-right">
         <div
           className={`font-mono text-[15px] tabular ${
             accent ? "text-[oklch(40%_0.10_152)]" : ""
@@ -17,7 +17,11 @@ export function ResultRow({ label, value, sub, accent }: ResultRowProps) {
         >
           {value}
         </div>
-        {sub ? <div className="text-[11px] text-[var(--soft)] tabular">{sub}</div> : null}
+        {sub ? (
+          <div className="max-w-[30ch] text-[11px] text-[var(--soft)] tabular">
+            {sub}
+          </div>
+        ) : null}
       </div>
     </div>
   );

@@ -21,8 +21,8 @@ export function SiteHeader() {
 
   return (
     <header className="hair-b sticky top-0 z-20 bg-[rgba(245,241,234,0.78)] backdrop-blur-md">
-      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 py-4 sm:px-8 lg:px-10">
-        <div className="flex min-w-0 items-center gap-4 sm:gap-8">
+      <div className="mx-auto max-w-7xl px-4 py-3 sm:px-8 lg:px-10">
+        <div className="flex min-w-0 items-center justify-between gap-3">
           <Link
             href="/"
             aria-label="Naar home"
@@ -37,9 +37,33 @@ export function SiteHeader() {
               </Link>
             ))}
           </nav>
+
+          <div className="hidden items-center gap-2 md:flex">
+            <BtnLink href="/profiel" kind={pathname === "/profiel" ? "outline" : "ghost"} size="sm">
+              Mijn profiel
+            </BtnLink>
+            <BtnLink href="/#apps" kind={onHome ? "outline" : "ghost"} size="sm">
+              Overzicht
+            </BtnLink>
+            <BtnLink
+              href="/apps/studieschuld-vs-beleggen"
+              kind={onToolPage ? "outline" : "primary"}
+              size="sm"
+            >
+              Open voorbeeldtool
+            </BtnLink>
+          </div>
         </div>
 
-        <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
+        <nav className="mt-3 flex min-h-11 items-center gap-2 overflow-x-auto pb-1 text-[13.5px] md:hidden">
+          {navItems.map((item) => (
+            <Link key={item.href} href={item.href} className={`${navClassName()} shrink-0`}>
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="mt-3 grid grid-cols-2 gap-2 md:hidden">
           <BtnLink href="/profiel" kind={pathname === "/profiel" ? "outline" : "ghost"} size="sm">
             Mijn profiel
           </BtnLink>
@@ -50,6 +74,7 @@ export function SiteHeader() {
             href="/apps/studieschuld-vs-beleggen"
             kind={onToolPage ? "outline" : "primary"}
             size="sm"
+            className="col-span-2"
           >
             Open voorbeeldtool
           </BtnLink>
