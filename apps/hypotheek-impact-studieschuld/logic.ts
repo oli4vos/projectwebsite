@@ -543,6 +543,7 @@ export function calculateMortgageImpact(
       "We gebruiken een indicatieve bruteringsstaffel om een netto DUO-last om te rekenen naar een bruto vergelijkbare maandlast.",
       `Voor de hypotheekimpact rekenen we met ${mortgageRate.toFixed(2).replace(".", ",")}% hypotheekrente en ${mortgageTermYears} jaar looptijd.`,
       "De hoofdsom-impact volgt uit de contante waarde van die gebruteerde maandlast als annuïteit.",
+      "Een hogere bruteringsfactor verhoogt altijd de maandlast-impact. Bij hogere hypotheekrente kan de hoofdsom-impact toch lager lijken, omdat dezelfde maandlast dan minder leenhoofdsom vertegenwoordigt.",
     ],
     warnings: duoPayment.warnings,
   };

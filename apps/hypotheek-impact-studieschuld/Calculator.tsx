@@ -959,6 +959,11 @@ function CalculatorContent({
             wordt die vaak omgerekend naar een bruto vergelijkbare maandlast. Dat heet
             brutering. Hoe hoger de hypotheekrente, hoe zwaarder die brutering meestal telt.
           </p>
+          <p className="mt-3 text-[12.5px] leading-[1.6] text-[var(--soft)]">
+            Belangrijk: een hogere brutering verhoogt altijd je maandlast-impact. Dat
+            de hoofdsom-impact soms niet even hard meegroeit komt door de
+            hypotheekrente in de annuïtaire vertaling naar leenruimte.
+          </p>
           {result ? (
             <div className="mt-5">
               <ResultRow
