@@ -115,7 +115,7 @@ export function AppDashboard({ apps }: AppDashboardProps) {
             onClick={() => setSelectedCategory(category)}
             className={`rounded-full px-3 py-2 text-[13px] transition ${
               selectedCategory === category
-                ? "bg-[var(--deep)] text-[var(--paper)]"
+                ? "bg-[var(--deep)] text-white"
                 : "hair border bg-white text-[var(--muted)] hover:text-[var(--ink)]"
             }`}
           >
@@ -181,7 +181,7 @@ export function AppDashboard({ apps }: AppDashboardProps) {
 
         <div
           id="werkwijze"
-          className="rounded-[1.5rem] bg-[var(--deep)] p-6 text-[var(--paper)] shadow-paper-lg"
+          className="rounded-[1.5rem] bg-[var(--deep)] p-6 text-white shadow-paper-lg"
         >
           <div className="text-[11px] uppercase tracking-[0.14em] text-white/55">
             Werkwijze

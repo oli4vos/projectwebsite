@@ -43,7 +43,7 @@ export function Pill({
     pos: "border-transparent bg-[var(--pos-soft)] text-[oklch(40%_0.10_152)]",
     neg: "border-transparent bg-[var(--neg-soft)] text-[oklch(40%_0.13_28)]",
     accent: "border-transparent bg-[var(--accent-soft)] text-[oklch(40%_0.07_232)]",
-    dark: "border-transparent bg-[var(--deep)] text-[var(--paper)]",
+    dark: "border-transparent bg-[var(--deep)] text-white",
   };
 
   return (
@@ -66,13 +66,14 @@ function btnClassName(kind: BtnKind, size: BtnSize, full?: boolean, className?: 
   };
 
   const kinds: Record<BtnKind, string> = {
-    primary: "bg-[var(--deep)] text-[var(--paper)] hover:bg-black",
+    primary:
+      "bg-[var(--deep)] text-white hover:bg-black hover:text-white visited:text-white",
     ghost: "bg-transparent text-[var(--ink)] hover:bg-[var(--paper-soft)]",
     outline: "border hair bg-white text-[var(--ink)] hover:bg-[var(--paper-soft)]",
     accent: "bg-[var(--accent)] text-white hover:brightness-110",
   };
 
-  return `inline-flex items-center justify-center gap-2 rounded-full font-medium tracking-[-0.005em] transition duration-200 active:translate-y-px ${sizes[size]} ${kinds[kind]} ${
+  return `inline-flex items-center justify-center gap-2 rounded-full font-medium tracking-[-0.005em] shadow-[0_0_0_rgba(0,0,0,0)] transition duration-200 hover:-translate-y-px hover:shadow-paper focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 active:translate-y-px ${sizes[size]} ${kinds[kind]} ${
     full ? "w-full" : ""
   } ${className ?? ""}`;
 }

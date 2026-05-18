@@ -1,32 +1,53 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { BtnLink, Logo } from "@/components/ui";
 
+const navItems = [
+  { href: "/#apps", label: "Rekentools" },
+  { href: "/#werkwijze", label: "Werkwijze" },
+  { href: "/#scenario", label: "Scenario's" },
+] as const;
+
+function navClassName() {
+  return "rounded-full px-3 py-2 text-[var(--muted)] transition hover:bg-white/70 hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2";
+}
+
 export function SiteHeader() {
+  const pathname = usePathname();
+  const onHome = pathname === "/";
+  const onToolPage = pathname.startsWith("/apps/");
+
   return (
-    <header className="hair-b sticky top-0 z-20 backdrop-blur-md">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 sm:px-8 lg:px-10">
-        <div className="flex items-center gap-8">
-          <Link href="/" aria-label="Naar home">
+    <header className="hair-b sticky top-0 z-20 bg-[rgba(245,241,234,0.78)] backdrop-blur-md">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 py-4 sm:px-8 lg:px-10">
+        <div className="flex min-w-0 items-center gap-4 sm:gap-8">
+          <Link
+            href="/"
+            aria-label="Naar home"
+            className="rounded-full focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
+          >
             <Logo size={22} />
           </Link>
-          <nav className="hidden items-center gap-6 text-[13.5px] text-[var(--muted)] md:flex">
-            <Link href="/#apps" className="hover:text-[var(--ink)]">
-              Rekentools
-            </Link>
-            <Link href="/#werkwijze" className="hover:text-[var(--ink)]">
-              Werkwijze
-            </Link>
-            <Link href="/#scenario" className="hover:text-[var(--ink)]">
-              Scenario&apos;s
-            </Link>
+          <nav className="hidden items-center gap-2 text-[13.5px] md:flex">
+            {navItems.map((item) => (
+              <Link key={item.href} href={item.href} className={navClassName()}>
+                {item.label}
+              </Link>
+            ))}
           </nav>
         </div>
 
-        <div className="flex items-center gap-2">
-          <BtnLink href="/#apps" kind="ghost" size="sm">
+        <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
+          <BtnLink href="/#apps" kind={onHome ? "outline" : "ghost"} size="sm">
             Overzicht
           </BtnLink>
-          <BtnLink href="/apps/studieschuld-vs-beleggen" kind="primary" size="sm">
+          <BtnLink
+            href="/apps/studieschuld-vs-beleggen"
+            kind={onToolPage ? "outline" : "primary"}
+            size="sm"
+          >
             Open voorbeeldtool
           </BtnLink>
         </div>

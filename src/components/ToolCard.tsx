@@ -26,7 +26,7 @@ export function ToolCard({
   return (
     <Link
       href={href}
-      className={`group relative flex w-full flex-col overflow-hidden rounded-xl border hair bg-white text-left transition hover:-translate-y-px hover:shadow-paper ${
+      className={`group relative flex w-full flex-col overflow-hidden rounded-xl border hair bg-white text-left transition duration-200 hover:-translate-y-px hover:shadow-paper focus-visible:-translate-y-px focus-visible:shadow-paper focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 active:translate-y-0 ${
         dense ? "p-5" : "p-6"
       }`}
     >
@@ -60,14 +60,14 @@ export function ToolCard({
             </div>
             <div className="mt-1 font-mono text-[18px] tabular">{stat}</div>
           </div>
-          <span className="text-[13px] font-medium text-[var(--ink)] opacity-80 group-hover:opacity-100">
+          <span className="text-[13px] font-medium text-[var(--ink)] opacity-80 transition group-hover:translate-x-0.5 group-hover:opacity-100 group-focus-visible:translate-x-0.5 group-focus-visible:opacity-100">
             Openen →
           </span>
         </div>
       ) : (
         <div className="mt-6 flex items-center justify-between">
           <span className="text-[12px] text-[var(--soft)]">Scenario en uitleg</span>
-          <span className="text-[13px] font-medium text-[var(--ink)] opacity-80 group-hover:opacity-100">
+          <span className="text-[13px] font-medium text-[var(--ink)] opacity-80 transition group-hover:translate-x-0.5 group-hover:opacity-100 group-focus-visible:translate-x-0.5 group-focus-visible:opacity-100">
             Openen →
           </span>
         </div>

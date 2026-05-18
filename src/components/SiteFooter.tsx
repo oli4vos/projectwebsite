@@ -9,14 +9,23 @@ export function SiteFooter() {
           <Logo size={16} />
           <span>Onafhankelijke rekentools voor meer grip, regie en inzicht.</span>
         </div>
-        <div className="flex items-center gap-5">
-          <Link href="/#werkwijze" className="hover:text-[var(--ink)]">
+        <div className="flex flex-wrap items-center gap-3 sm:gap-5">
+          <Link
+            href="/#werkwijze"
+            className="rounded-full px-2 py-1 transition hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
+          >
             Werkwijze
           </Link>
-          <Link href="/#apps" className="hover:text-[var(--ink)]">
+          <Link
+            href="/#apps"
+            className="rounded-full px-2 py-1 transition hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
+          >
             Rekentools
           </Link>
-          <Link href="/apps/studieschuld-vs-beleggen" className="hover:text-[var(--ink)]">
+          <Link
+            href="/apps/studieschuld-vs-beleggen"
+            className="rounded-full px-2 py-1 transition hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
+          >
             Voorbeeldtool
           </Link>
         </div>

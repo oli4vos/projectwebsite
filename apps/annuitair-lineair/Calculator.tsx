@@ -198,7 +198,7 @@ export default function Calculator() {
       </section>
 
       <section className="space-y-5">
-        <div className="rounded-[1.5rem] bg-[var(--deep)] p-6 text-[var(--paper)] shadow-paper-lg">
+        <div className="rounded-[1.5rem] bg-[var(--deep)] p-6 text-white shadow-paper-lg">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="text-[11px] uppercase tracking-[0.12em] text-white/55">
               Eerste maand
