@@ -25,7 +25,7 @@ export default async function HomePage() {
               Financiële rekentools · {today}
             </div>
             <h1
-              className="mt-5 max-w-4xl font-serif text-[46px] leading-[0.98] tracking-[-0.035em] text-[var(--ink)] sm:text-[64px]"
+              className="mt-5 max-w-4xl font-serif text-[38px] leading-[0.98] tracking-[-0.035em] text-[var(--ink)] sm:text-[54px] lg:text-[64px]"
               style={{ textWrap: "balance" }}
             >
               Pech gehad.
@@ -40,11 +40,16 @@ export default async function HomePage() {
             <p className="mt-4 max-w-[54ch] text-[13.5px] leading-[1.7] text-[var(--muted)]">
               Je hoeft geen financieel expert te zijn. Een beetje rekenen helpt al.
             </p>
-            <div className="mt-7 flex flex-wrap items-center gap-3">
-              <BtnLink href="/#apps" kind="primary" size="md">
+            <div className="mt-7 grid gap-3 sm:flex sm:flex-wrap sm:items-center">
+              <BtnLink href="/#apps" kind="primary" size="md" className="w-full sm:w-auto">
                 Bekijk rekentools
               </BtnLink>
-              <BtnLink href="/apps/hypotheek-impact-studieschuld" kind="outline" size="md">
+              <BtnLink
+                href="/apps/hypotheek-impact-studieschuld"
+                kind="outline"
+                size="md"
+                className="w-full sm:w-auto"
+              >
                 Open voorbeeldtool
               </BtnLink>
             </div>
@@ -67,7 +72,7 @@ export default async function HomePage() {
                 Indicatief
               </span>
             </div>
-            <div className="mt-5 grid grid-cols-2 gap-x-6 gap-y-5">
+            <div className="mt-5 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
               {market.map(({ label, value, delta, negative, points }) => (
                 <div key={label} className="flex items-center justify-between gap-3">
                   <div>

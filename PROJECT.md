@@ -56,6 +56,7 @@ Dit bestand is bedoeld als werksamenvatting voor toekomstige agent-rondes. Werk 
 - `src/lib/categories.ts`: mapping van categorie/slug naar visueel category-type
 - `src/lib/market.ts`: homepage-marktcontext met externe fetches en fallbacks
 - `next.config.ts`: standaard Next-config + GitHub Pages static export in Actions
+- `handoff/`: Claude design referentiemateriaal, niet de production-bron
 
 ## Huidige tools
 
@@ -100,6 +101,7 @@ Dit bestand is bedoeld als werksamenvatting voor toekomstige agent-rondes. Werk 
 - `src/lib/categories.ts` is nu heuristisch op string-matching gebaseerd; bij meer tools kan dat te grof worden.
 - `apps/annuitair-lineair/` mixt TypeScript wrappercode met oudere `.js` rekenscripts; dat maakt uniform onderhoud lastiger.
 - Manifesten ondersteunen nu alleen één entry-component per tool; geen subpagina's of complexere toolmodules.
+- `handoff/` bevat artboards en voorbeeldviews. Gebruik die alleen als designreferentie; echte wijzigingen horen in `src/` en `apps/`.
 
 ## Aanbevolen uitbreidingsrichting
 

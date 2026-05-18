@@ -42,6 +42,10 @@ apps/
     app.json
     Calculator.tsx
     logic.ts
+  hypotheek-impact-studieschuld/
+    app.json
+    Calculator.tsx
+    logic.ts
   studieschuld-vs-beleggen/
     app.json
     Calculator.tsx
@@ -65,6 +69,10 @@ src/
     app-components.tsx
     app-registry.ts
     app-types.ts
+
+handoff/
+  src/
+  preview.html
 ```
 
 ## Nieuwe app toevoegen
@@ -116,6 +124,16 @@ De generator valideert minimaal:
 
 De browser doet geen filesystem-discovery. Alleen de gegenereerde registry en lazy imports worden gebruikt.
 
+## Claude design handoff
+
+De map `handoff/` staat in deze repo als designreferentie. Die artboards en voorbeeldcomponenten zijn niet de production-app zelf.
+
+Belangrijk:
+
+- pas echte sitewijzigingen toe in `src/` en `apps/`
+- gebruik `handoff/` om richting, layout en copy-patronen over te nemen
+- behandel `handoff/` niet als de bron van routing, data of calculatielogica
+
 ## Build en deploy
 
 ```bash
@@ -156,7 +174,7 @@ Belangrijk:
 
 - Geen `eval` of willekeurige code-executie.
 - Geen secrets in de codebase.
-- Geen externe API-calls.
+- Geen onnodige externe API-calls. Alleen `src/lib/market.ts` gebruikt externe brondata voor context op de homepage, met fallbacks.
 - Apps worden alleen zichtbaar via een geldig manifest.
 - Inputvalidatie gebeurt in de calculatorcomponenten.
 - De generator weigert ongeldige manifests of onveilige `entry`-paden.
