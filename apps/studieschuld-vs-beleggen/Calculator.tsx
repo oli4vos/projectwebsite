@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { AreaChart } from "@/components/charts";
-import { ResultRow } from "@/components/ResultRow";
+import { ExplanationPanel } from "@/components/ExplanationPanel";
+import { InputField } from "@/components/inputs";
+import { ResultReceipt } from "@/components/ResultReceipt";
 import { Pill } from "@/components/ui";
 import {
   calculateStudyDebtVsInvesting,
@@ -77,14 +79,6 @@ function validateForm(values: FormState) {
   };
 }
 
-function FieldError({ message }: { message?: string }) {
-  if (!message) {
-    return null;
-  }
-
-  return <p className="text-sm text-red-700">{message}</p>;
-}
-
 export default function Calculator() {
   const [formValues, setFormValues] = useState<FormState>(defaultValues);
   const { errors, parsedValues } = validateForm(formValues);
@@ -112,11 +106,9 @@ export default function Calculator() {
 
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
-      <section className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
+      <section className="sheet p-6">
         <div>
-          <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
-            Scenario
-          </div>
+          <div className="kicker">Scenario</div>
           <h2 className="mt-2 font-serif text-[28px] tracking-[-0.02em] text-[var(--ink)]">
             Vul je scenario in
           </h2>
@@ -129,67 +121,36 @@ export default function Calculator() {
         </div>
 
         <div className="mt-6 grid gap-5">
-          <label className="grid gap-2">
-            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-              Maandbedrag
-            </span>
-            <input
-              inputMode="decimal"
-              value={formValues.monthlyAmount}
-              onChange={(event) => updateField("monthlyAmount", event.target.value)}
-              aria-invalid={Boolean(errors.monthlyAmount)}
-              className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-            />
-            <FieldError message={errors.monthlyAmount} />
-          </label>
-
-          <label className="grid gap-2">
-            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-              Rente studieschuld per jaar (%)
-            </span>
-            <input
-              inputMode="decimal"
-              value={formValues.annualDebtRate}
-              onChange={(event) => updateField("annualDebtRate", event.target.value)}
-              aria-invalid={Boolean(errors.annualDebtRate)}
-              className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-            />
-            <FieldError message={errors.annualDebtRate} />
-          </label>
-
-          <label className="grid gap-2">
-            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-              Verwacht beleggingsrendement per jaar (%)
-            </span>
-            <input
-              inputMode="decimal"
-              value={formValues.annualInvestmentReturn}
-              onChange={(event) =>
-                updateField("annualInvestmentReturn", event.target.value)
-              }
-              aria-invalid={Boolean(errors.annualInvestmentReturn)}
-              className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-            />
-            <FieldError message={errors.annualInvestmentReturn} />
-          </label>
-
-          <label className="grid gap-2">
-            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-              Looptijd in jaren
-            </span>
-            <input
-              inputMode="decimal"
-              value={formValues.years}
-              onChange={(event) => updateField("years", event.target.value)}
-              aria-invalid={Boolean(errors.years)}
-              className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-            />
-            <FieldError message={errors.years} />
-          </label>
+          <InputField
+            label="Maandbedrag"
+            value={formValues.monthlyAmount}
+            onChange={(event) => updateField("monthlyAmount", event.target.value)}
+            error={errors.monthlyAmount}
+          />
+          <InputField
+            label="Rente studieschuld per jaar (%)"
+            value={formValues.annualDebtRate}
+            onChange={(event) => updateField("annualDebtRate", event.target.value)}
+            error={errors.annualDebtRate}
+          />
+          <InputField
+            label="Verwacht beleggingsrendement per jaar (%)"
+            value={formValues.annualInvestmentReturn}
+            onChange={(event) =>
+              updateField("annualInvestmentReturn", event.target.value)
+            }
+            error={errors.annualInvestmentReturn}
+          />
+          <InputField
+            label="Looptijd in jaren"
+            value={formValues.years}
+            onChange={(event) => updateField("years", event.target.value)}
+            error={errors.years}
+          />
         </div>
 
         {hasErrors ? (
-          <div className="mt-6 rounded-xl border border-[var(--neg-soft)] bg-[var(--neg-soft)]/55 px-4 py-3 text-sm text-[oklch(35%_0.13_28)]">
+          <div className="mt-6 rounded-[var(--radius-soft)] border border-[var(--neg-soft)] bg-[var(--neg-soft)]/55 px-4 py-3 text-sm text-[oklch(35%_0.13_28)]">
             Controleer de invoervelden hierboven. Zodra alle waarden geldig zijn,
             krijg je weer een helder scenario met vergelijkbare uitkomsten.
           </div>
@@ -207,7 +168,7 @@ export default function Calculator() {
       </section>
 
       <section className="space-y-5">
-        <div className="rounded-[1.5rem] bg-[var(--deep)] p-6 text-white shadow-paper-lg">
+        <div className="ink-panel p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="text-[11px] uppercase tracking-[0.12em] text-white/55">
               Indicatieve uitkomst
@@ -237,44 +198,39 @@ export default function Calculator() {
           )}
         </div>
 
-        <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
-          <h2 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
-            Wat dit scenario laat zien
-          </h2>
-          <p className="mt-3 text-[13.5px] leading-[1.65] text-[var(--muted)]">
-            De rekensom blijft bewust simpel en transparant. Aflossen wordt benaderd
-            via de schuld­rente, beleggen via hetzelfde maandbedrag met het opgegeven
-            rendement, zodat je de afweging eerlijk naast elkaar kunt zetten.
-          </p>
-          {result ? (
-            <div className="mt-5">
-              <ResultRow
-                label="Totale extra aflossing"
-                value={formatCurrency(result.totalExtraRepayment)}
-                sub="Zelf gekozen inleg binnen de volledige looptijd"
-              />
-              <ResultRow
-                label="Indicatieve rentebesparing"
-                value={formatCurrency(result.indicativeInterestSavings)}
-                sub="Benadering van het voordeel van sneller aflossen"
-              />
-              <ResultRow
-                label="Verwachte waarde bij beleggen"
-                value={formatCurrency(result.expectedInvestmentValue)}
-                sub="Zelfde maandbedrag met het gekozen rendement"
-              />
-              <ResultRow
-                label="Verschil beleggen minus aflossen"
-                value={formatCurrency(result.difference)}
-                sub="De kernuitkomst van deze vergelijking"
-                accent={result.difference >= 0}
-              />
-            </div>
-          ) : null}
-        </div>
+        {result ? (
+          <ResultReceipt
+            eyebrow="Resultaatblad"
+            title="Wat dit scenario laat zien"
+            summary="De rekensom blijft bewust simpel en transparant. Aflossen wordt benaderd via de schuld­rente, beleggen via hetzelfde maandbedrag met het opgegeven rendement."
+            rows={[
+              {
+                label: "Totale extra aflossing",
+                value: formatCurrency(result.totalExtraRepayment),
+                note: "Zelf gekozen inleg binnen de volledige looptijd",
+              },
+              {
+                label: "Indicatieve rentebesparing",
+                value: formatCurrency(result.indicativeInterestSavings),
+                note: "Benadering van het voordeel van sneller aflossen",
+              },
+              {
+                label: "Verwachte waarde bij beleggen",
+                value: formatCurrency(result.expectedInvestmentValue),
+                note: "Zelfde maandbedrag met het gekozen rendement",
+              },
+              {
+                label: "Verschil beleggen minus aflossen",
+                value: formatCurrency(result.difference),
+                note: "De kernuitkomst van deze vergelijking",
+                accent: result.difference >= 0,
+              },
+            ]}
+          />
+        ) : null}
 
         {result && chartSeries ? (
-          <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
+          <div className="sheet p-6">
             <div className="flex items-center justify-between gap-4">
               <div>
                 <div className="text-[11px] uppercase tracking-[0.1em] text-[var(--muted)]">
@@ -306,17 +262,29 @@ export default function Calculator() {
           </div>
         ) : null}
 
-        <div className="rounded-[1.5rem] border hair bg-white p-5 shadow-paper">
-          <div className="text-[11px] uppercase tracking-[0.1em] text-[var(--muted)]">
-            Belangrijk om te onthouden
-          </div>
-          <p className="mt-2 text-[12.5px] leading-[1.65] text-[var(--muted)]">
-            Deze tool gebruikt geen belastingeffecten, koersschommelingen of
-            persoonlijke risicovoorkeur. Het doel is niet om een definitief oordeel
-            te geven, maar om je sneller naar een betere vervolgvraag of keuze te
-            brengen.
-          </p>
-        </div>
+        <ExplanationPanel
+          eyebrow="Verdieping"
+          title="Hoe lees je deze uitkomst?"
+          intro="Deze tool is vooral nuttig als eerste vergelijking. Daarna begint het echte afwegen pas."
+          items={[
+            {
+              title: "Hoe is dit berekend?",
+              text: "We rekenen twee routes door met exact hetzelfde maandbedrag: extra aflossen tegen DUO-rente of beleggen tegen het ingevulde rendement.",
+            },
+            {
+              title: "Welke aannames gebruiken we?",
+              text: "We nemen geen belastingeffecten, kosten, koersschommelingen of gedragsverschillen mee. Het model laat vooral de grove richting zien.",
+            },
+            {
+              title: "Wat zijn risico's?",
+              text: "Beleggen kan lager uitpakken dan verwacht. Extra aflossen geeft meer zekerheid, maar maakt je geld minder flexibel zodra het weg is.",
+            },
+            {
+              title: "Wanneer kan een andere keuze beter zijn?",
+              text: "Als je buffer nog dun is, je risico laag wilt houden of je op korte termijn een huis wilt kopen, kan flexibiliteit belangrijker zijn dan de hoogste verwachte uitkomst.",
+            },
+          ]}
+        />
       </section>
     </div>
   );

@@ -46,6 +46,9 @@ Dit bestand is bedoeld als werksamenvatting voor toekomstige agent-rondes. Werk 
 - `src/components/ToolCard.tsx`: daadwerkelijke kaart-UI
 - `src/components/AppRenderer.tsx`: pakt lazy toolcomponent op basis van slug
 - `src/components/ui.tsx`: `Btn`, `BtnLink`, `Pill`, `Logo`, `CategoryDot`
+- `src/components/ExplanationPanel.tsx`: vaste verdiepingsblokken voor berekening, aannames en risico's
+- `src/components/ResultReceipt.tsx`: rekensheet-achtige samenvatting van uitkomsten
+- `src/components/inputs.tsx`: bevat nu ook `InputField` voor consistente calculatorvelden
 
 ## Huidige data/config
 
@@ -81,6 +84,12 @@ Dit bestand is bedoeld als werksamenvatting voor toekomstige agent-rondes. Werk 
 - Validatie gebeurt nu per calculatorcomponent in de client.
 - Dashboard haalt alleen manifestdata op uit de gegenereerde registry.
 - Donkere CTA's moeten expliciet wit contrast houden. Bronbestand: `src/components/ui.tsx`.
+- Designrichting is bewust papierachtig en niet-SaaS:
+  - off-white achtergrond
+  - donkere inktkleur
+  - beperkte radius
+  - cards als sheets of scenario-vellen
+  - uitleg altijd onder de uitkomst
 - Als architectuur of navigatie verandert, update ook dit bestand.
 
 ## Risico's en aandachtspunten

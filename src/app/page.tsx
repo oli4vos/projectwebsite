@@ -19,39 +19,43 @@ export default async function HomePage() {
     <>
       <SiteHeader />
       <main id="main-content" className="mx-auto min-h-[100dvh] max-w-7xl px-5 pb-10 pt-8 sm:px-8 lg:px-10 lg:pb-14">
-        <section className="hair-b grid gap-8 pb-10 lg:grid-cols-[minmax(0,1.1fr)_420px] lg:pt-4">
+        <section className="hair-b grid gap-8 pb-10 lg:grid-cols-[minmax(0,1.12fr)_420px] lg:pt-4">
           <div className="pt-4">
-            <div className="text-[11px] uppercase tracking-[0.16em] text-[var(--muted)]">
+            <div className="kicker">
               Financiële rekentools · {today}
             </div>
             <h1
-              className="mt-5 max-w-4xl font-serif text-[44px] leading-[1.04] tracking-[-0.03em] text-[var(--ink)] sm:text-[58px]"
+              className="mt-5 max-w-4xl font-serif text-[46px] leading-[0.98] tracking-[-0.035em] text-[var(--ink)] sm:text-[64px]"
               style={{ textWrap: "balance" }}
             >
-              Grip op keuzes die lang blijven doorwerken.
+              Pech gehad.
+              <br />
+              Grip terugpakken.
             </h1>
             <p className="mt-6 max-w-[62ch] text-[15.5px] leading-[1.7] text-[var(--ink-2)]">
-              Soms begon je met studieschuld, hoge woonlasten of weinig financiële
-              marge. Dan helpt het om scenario&apos;s rustig naast elkaar te zetten. Met
-              simpele tools, eerlijke aannames en heldere uitleg krijg je meer regie
-              over wat nu slim voelt en later houdbaar blijft.
+              Rekentools voor financiële keuzes rond studieschuld, beleggen,
+              hypotheek en maandlasten. Begrijpelijk voor wie snel inzicht wil,
+              transparant voor wie de berekening echt wil snappen.
+            </p>
+            <p className="mt-4 max-w-[54ch] text-[13.5px] leading-[1.7] text-[var(--muted)]">
+              Je hoeft geen financieel expert te zijn. Een beetje rekenen helpt al.
             </p>
             <div className="mt-7 flex flex-wrap items-center gap-3">
               <BtnLink href="/#apps" kind="primary" size="md">
                 Bekijk rekentools
               </BtnLink>
-              <BtnLink href="/apps/studieschuld-vs-beleggen" kind="outline" size="md">
-                Open voorbeeldscenario
+              <BtnLink href="/apps/hypotheek-impact-studieschuld" kind="outline" size="md">
+                Open voorbeeldtool
               </BtnLink>
             </div>
             <div className="mt-7 flex flex-wrap gap-2">
-              <Pill tone="accent">Grip boven giswerk</Pill>
-              <Pill>Heldere scenario&apos;s</Pill>
-              <Pill>Eerlijke aannames</Pill>
+              <Pill tone="accent">Geen glazen bol. Wel betere aannames.</Pill>
+              <Pill>Scenario&apos;s boven losse meningen</Pill>
+              <Pill>Geen financieel advies. Wel meer grip.</Pill>
             </div>
           </div>
 
-          <aside className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
+          <aside className="sheet p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="tick size-[7px] rounded-full bg-[var(--pos)]" />
@@ -88,8 +92,8 @@ export default async function HomePage() {
               ))}
             </div>
             <p className="mt-5 border-t border-[var(--hair)] pt-4 text-[12.5px] leading-[1.6] text-[var(--muted)]">
-              Deze referenties geven context aan je scenario&apos;s. De tools zelf
-              rekenen lokaal met de waarden die jij invult.
+              Deze referenties geven alleen context. De rekentools zelf draaien op
+              jouw invoer en laten zien hoe een scenario kan verschuiven.
             </p>
           </aside>
         </section>

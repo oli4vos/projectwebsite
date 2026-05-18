@@ -3,6 +3,7 @@
 :root {
   --paper: #f5f1ea;
   --paper-soft: #efeae0;
+  --paper-deep: #ebe4d7;
   --card: #ffffff;
   --ink: #14181f;
   --ink-2: #2a2f3a;
@@ -11,14 +12,17 @@
   --hair: #e6e1d5;
   --hair-2: #d9d3c4;
   --deep: #0f141c;
-  --accent: oklch(46% 0.07 232);
-  --accent-soft: oklch(92% 0.025 232);
+  --accent: oklch(43% 0.06 202);
+  --accent-soft: oklch(92% 0.018 202);
   --pos: oklch(54% 0.1 152);
   --pos-soft: oklch(94% 0.04 152);
   --neg: oklch(54% 0.13 28);
   --neg-soft: oklch(94% 0.04 28);
   --gold: oklch(72% 0.1 78);
-  --shadow: 0 1px 0 rgba(20, 24, 31, 0.05), 0 24px 60px -28px rgba(20, 24, 31, 0.25);
+  --radius-card: 8px;
+  --radius-soft: 6px;
+  --radius-pill: 999px;
+  --shadow: 0 1px 0 rgba(20, 24, 31, 0.04), 0 18px 40px -34px rgba(20, 24, 31, 0.18);
 }
 
 @theme inline {
@@ -46,9 +50,11 @@ body {
   margin: 0;
   min-height: 100dvh;
   background:
-    radial-gradient(circle at top left, rgba(70, 107, 160, 0.08), transparent 26%),
-    radial-gradient(circle at bottom right, rgba(176, 137, 76, 0.08), transparent 24%),
-    linear-gradient(180deg, var(--paper) 0%, #f2ede4 100%);
+    linear-gradient(rgba(217, 211, 196, 0.32) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(217, 211, 196, 0.32) 1px, transparent 1px),
+    radial-gradient(circle at top right, rgba(83, 113, 105, 0.055), transparent 32%),
+    linear-gradient(180deg, var(--paper) 0%, var(--paper-deep) 100%);
+  background-size: 26px 26px, 26px 26px, auto, auto;
   color: var(--ink);
   font-family: var(--font-ui), system-ui, sans-serif;
   font-feature-settings: "ss01", "cv11";
@@ -103,11 +109,46 @@ input::placeholder {
 }
 
 .shadow-paper {
-  box-shadow: 0 1px 0 rgba(20, 24, 31, 0.04), 0 10px 30px -22px rgba(20, 24, 31, 0.18);
+  box-shadow: 0 1px 0 rgba(20, 24, 31, 0.03), 0 8px 24px -24px rgba(20, 24, 31, 0.16);
 }
 
 .shadow-paper-lg {
   box-shadow: var(--shadow);
+}
+
+.sheet {
+  border: 1px solid var(--hair);
+  border-radius: var(--radius-card);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 1px 0 rgba(20, 24, 31, 0.03), 0 12px 28px -28px rgba(20, 24, 31, 0.18);
+}
+
+.sheet-muted {
+  border: 1px solid var(--hair);
+  border-radius: var(--radius-card);
+  background: rgba(245, 241, 234, 0.84);
+}
+
+.ink-panel {
+  border-radius: var(--radius-card);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.015), transparent),
+    var(--deep);
+  color: white;
+  box-shadow: var(--shadow);
+}
+
+.kicker {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.microcopy {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.65;
 }
 
 .tick {

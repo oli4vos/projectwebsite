@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { AreaChart } from "@/components/charts";
-import { ResultRow } from "@/components/ResultRow";
+import { ExplanationPanel } from "@/components/ExplanationPanel";
+import { InputField } from "@/components/inputs";
+import { ResultReceipt } from "@/components/ResultReceipt";
 import { Pill } from "@/components/ui";
 import {
   IMPACT_SCENARIOS,
@@ -143,14 +145,6 @@ function validateForm(values: FormState) {
   };
 }
 
-function FieldError({ message }: { message?: string }) {
-  if (!message) {
-    return null;
-  }
-
-  return <p className="text-sm text-red-700">{message}</p>;
-}
-
 export default function Calculator() {
   const [formValues, setFormValues] = useState<FormState>(defaultValues);
   const { errors, parsedValues } = validateForm(formValues);
@@ -201,11 +195,9 @@ export default function Calculator() {
 
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
-      <section className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
+      <section className="sheet p-6">
         <div>
-          <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
-            Scenario
-          </div>
+          <div className="kicker">Scenario</div>
           <h2 className="mt-2 font-serif text-[28px] tracking-[-0.02em] text-[var(--ink)]">
             Vul je inkomen en DUO-maandlast in
           </h2>
@@ -218,116 +210,59 @@ export default function Calculator() {
         </div>
 
         <div className="mt-6 grid gap-5">
-          <label className="grid gap-2">
-            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-              Bruto jaarinkomen gebruiker
-            </span>
-            <input
-              inputMode="decimal"
-              value={formValues.grossIncomeUser}
-              onChange={(event) => updateField("grossIncomeUser", event.target.value)}
-              aria-invalid={Boolean(errors.grossIncomeUser)}
-              className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-            />
-            <FieldError message={errors.grossIncomeUser} />
-          </label>
-
-          <label className="grid gap-2">
-            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-              Bruto jaarinkomen partner (optioneel)
-            </span>
-            <input
-              inputMode="decimal"
-              value={formValues.grossIncomePartner}
-              onChange={(event) => updateField("grossIncomePartner", event.target.value)}
-              aria-invalid={Boolean(errors.grossIncomePartner)}
-              placeholder="Bijvoorbeeld 32000"
-              className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-            />
-            <FieldError message={errors.grossIncomePartner} />
-          </label>
-
-          <label className="grid gap-2">
-            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-              Huidige DUO-maandlast
-            </span>
-            <input
-              inputMode="decimal"
-              value={formValues.duoMonthlyPayment}
-              onChange={(event) => updateField("duoMonthlyPayment", event.target.value)}
-              aria-invalid={Boolean(errors.duoMonthlyPayment)}
-              className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-            />
-            <FieldError message={errors.duoMonthlyPayment} />
-          </label>
-
-          <label className="grid gap-2">
-            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-              Resterende studieschuld (optioneel)
-            </span>
-            <input
-              inputMode="decimal"
-              value={formValues.remainingStudentDebt}
-              onChange={(event) =>
-                updateField("remainingStudentDebt", event.target.value)
-              }
-              aria-invalid={Boolean(errors.remainingStudentDebt)}
-              placeholder="Voor context en aflosscenario"
-              className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-            />
-            <FieldError message={errors.remainingStudentDebt} />
-          </label>
-
-          <label className="grid gap-2">
-            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-              Gewenste woningprijs (optioneel)
-            </span>
-            <input
-              inputMode="decimal"
-              value={formValues.desiredHomePrice}
-              onChange={(event) => updateField("desiredHomePrice", event.target.value)}
-              aria-invalid={Boolean(errors.desiredHomePrice)}
-              placeholder="Bijvoorbeeld 375000"
-              className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-            />
-            <FieldError message={errors.desiredHomePrice} />
-          </label>
-
-          <label className="grid gap-2">
-            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-              Eigen geld (optioneel)
-            </span>
-            <input
-              inputMode="decimal"
-              value={formValues.ownMoney}
-              onChange={(event) => updateField("ownMoney", event.target.value)}
-              aria-invalid={Boolean(errors.ownMoney)}
-              placeholder="Bijvoorbeeld 25000"
-              className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-            />
-            <FieldError message={errors.ownMoney} />
-          </label>
-
-          <label className="grid gap-2">
-            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-              Scenario: extra aflossen op studieschuld (optioneel)
-            </span>
-            <input
-              inputMode="decimal"
-              value={formValues.extraRepaymentScenario}
-              onChange={(event) =>
-                updateField("extraRepaymentScenario", event.target.value)
-              }
-              aria-invalid={Boolean(errors.extraRepaymentScenario)}
-              placeholder="Bijvoorbeeld 5000"
-              className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-            />
-            <FieldError message={errors.extraRepaymentScenario} />
-          </label>
+          <InputField
+            label="Bruto jaarinkomen gebruiker"
+            value={formValues.grossIncomeUser}
+            onChange={(event) => updateField("grossIncomeUser", event.target.value)}
+            error={errors.grossIncomeUser}
+          />
+          <InputField
+            label="Bruto jaarinkomen partner (optioneel)"
+            value={formValues.grossIncomePartner}
+            onChange={(event) => updateField("grossIncomePartner", event.target.value)}
+            error={errors.grossIncomePartner}
+            placeholder="Bijvoorbeeld 32000"
+          />
+          <InputField
+            label="Huidige DUO-maandlast"
+            value={formValues.duoMonthlyPayment}
+            onChange={(event) => updateField("duoMonthlyPayment", event.target.value)}
+            error={errors.duoMonthlyPayment}
+          />
+          <InputField
+            label="Resterende studieschuld (optioneel)"
+            value={formValues.remainingStudentDebt}
+            onChange={(event) => updateField("remainingStudentDebt", event.target.value)}
+            error={errors.remainingStudentDebt}
+            placeholder="Voor context en aflosscenario"
+          />
+          <InputField
+            label="Gewenste woningprijs (optioneel)"
+            value={formValues.desiredHomePrice}
+            onChange={(event) => updateField("desiredHomePrice", event.target.value)}
+            error={errors.desiredHomePrice}
+            placeholder="Bijvoorbeeld 375000"
+          />
+          <InputField
+            label="Eigen geld (optioneel)"
+            value={formValues.ownMoney}
+            onChange={(event) => updateField("ownMoney", event.target.value)}
+            error={errors.ownMoney}
+            placeholder="Bijvoorbeeld 25000"
+          />
+          <InputField
+            label="Scenario: extra aflossen op studieschuld (optioneel)"
+            value={formValues.extraRepaymentScenario}
+            onChange={(event) =>
+              updateField("extraRepaymentScenario", event.target.value)
+            }
+            error={errors.extraRepaymentScenario}
+            placeholder="Bijvoorbeeld 5000"
+          />
         </div>
 
         {hasErrors ? (
-          <div className="mt-6 rounded-xl border border-[var(--neg-soft)] bg-[var(--neg-soft)]/55 px-4 py-3 text-sm text-[oklch(35%_0.13_28)]">
+          <div className="mt-6 rounded-[var(--radius-soft)] border border-[var(--neg-soft)] bg-[var(--neg-soft)]/55 px-4 py-3 text-sm text-[oklch(35%_0.13_28)]">
             Controleer de invoervelden hierboven. Zodra alle waarden geldig zijn,
             zie je weer een bruikbare indicatie.
           </div>
@@ -346,7 +281,7 @@ export default function Calculator() {
       </section>
 
       <section className="space-y-5">
-        <div className="rounded-[1.5rem] bg-[var(--deep)] p-6 text-white shadow-paper-lg">
+        <div className="ink-panel p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="text-[11px] uppercase tracking-[0.12em] text-white/55">
               Korte conclusie
@@ -373,73 +308,69 @@ export default function Calculator() {
           )}
         </div>
 
-        <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
-          <h2 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
-            Wat deze inschatting laat zien
-          </h2>
-          <p className="mt-3 text-[13.5px] leading-[1.65] text-[var(--muted)]">
-            We vertalen je maandlast naar een simpele jaarimpact en vermenigvuldigen
-            die met drie bandbreedtes. Dat maakt snel zichtbaar hoeveel druk je
-            studieschuld ongeveer kan geven op je leencapaciteit.
-          </p>
-
-          {result ? (
-            <div className="mt-5">
-              <ResultRow
-                label="Totaal bruto jaarinkomen"
-                value={formatCurrency(result.grossIncomeTotal)}
-                sub="Gebruiker plus eventueel partnerinkomen"
-              />
-              <ResultRow
-                label="DUO-maandlast"
-                value={formatCurrency(result.duoMonthlyPayment)}
-                sub={`Per jaar ${formatCurrency(result.duoYearlyPayment)}`}
-              />
-              <ResultRow
-                label="Impact voorzichtig"
-                value={formatCurrency(result.impactScenarios[0].impact)}
-                sub="Jaarlast x factor 4,5"
-              />
-              <ResultRow
-                label="Impact midden"
-                value={formatCurrency(result.impactScenarios[1].impact)}
-                sub="Jaarlast x factor 5,0"
-              />
-              <ResultRow
-                label="Impact ruim"
-                value={formatCurrency(result.impactScenarios[2].impact)}
-                sub="Jaarlast x factor 5,5"
-              />
-              {result.debtToIncomeRatio !== undefined ? (
-                <ResultRow
-                  label="Studieschuld als % van jaarinkomen"
-                  value={formatPercent(result.debtToIncomeRatio)}
-                  sub="Resterende schuld gedeeld door bruto jaarinkomen"
-                />
-              ) : null}
-              {result.housingTarget ? (
-                <>
-                  <ResultRow
-                    label="Benodigde hypotheek voor woningdoel"
-                    value={formatCurrency(result.housingTarget.neededMortgage)}
-                    sub={`Woningprijs ${formatCurrency(result.housingTarget.desiredHomePrice)} minus eigen geld ${formatCurrency(result.housingTarget.ownMoney)}`}
-                  />
-                  <ResultRow
-                    label="Zelfde doel inclusief DUO-druk"
-                    value={formatCurrency(
-                      result.housingTarget.neededMortgageWithImpactMiddle,
-                    )}
-                    sub="Benodigde hypotheek plus middenscenario van de impact"
-                    accent
-                  />
-                </>
-              ) : null}
-            </div>
-          ) : null}
-        </div>
+        {result ? (
+          <ResultReceipt
+            eyebrow="Resultaatblad"
+            title="Wat deze inschatting laat zien"
+            summary="We vertalen je maandlast naar een simpele jaarimpact en vermenigvuldigen die met drie bandbreedtes. Zo zie je snel hoeveel druk je studieschuld ongeveer kan geven op je leencapaciteit."
+            rows={[
+              {
+                label: "Totaal bruto jaarinkomen",
+                value: formatCurrency(result.grossIncomeTotal),
+                note: "Gebruiker plus eventueel partnerinkomen",
+              },
+              {
+                label: "DUO-maandlast",
+                value: formatCurrency(result.duoMonthlyPayment),
+                note: `Per jaar ${formatCurrency(result.duoYearlyPayment)}`,
+              },
+              {
+                label: "Impact voorzichtig",
+                value: formatCurrency(result.impactScenarios[0].impact),
+                note: "Jaarlast x factor 4,5",
+              },
+              {
+                label: "Impact midden",
+                value: formatCurrency(result.impactScenarios[1].impact),
+                note: "Jaarlast x factor 5,0",
+              },
+              {
+                label: "Impact ruim",
+                value: formatCurrency(result.impactScenarios[2].impact),
+                note: "Jaarlast x factor 5,5",
+              },
+              ...(result.debtToIncomeRatio !== undefined
+                ? [
+                    {
+                      label: "Studieschuld als % van jaarinkomen",
+                      value: formatPercent(result.debtToIncomeRatio),
+                      note: "Resterende schuld gedeeld door bruto jaarinkomen",
+                    },
+                  ]
+                : []),
+              ...(result.housingTarget
+                ? [
+                    {
+                      label: "Benodigde hypotheek voor woningdoel",
+                      value: formatCurrency(result.housingTarget.neededMortgage),
+                      note: `Woningprijs ${formatCurrency(result.housingTarget.desiredHomePrice)} minus eigen geld ${formatCurrency(result.housingTarget.ownMoney)}`,
+                    },
+                    {
+                      label: "Zelfde doel inclusief DUO-druk",
+                      value: formatCurrency(
+                        result.housingTarget.neededMortgageWithImpactMiddle,
+                      ),
+                      note: "Benodigde hypotheek plus middenscenario van de impact",
+                      accent: true,
+                    },
+                  ]
+                : []),
+            ]}
+          />
+        ) : null}
 
         {result && chartSeries ? (
-          <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
+          <div className="sheet p-6">
             <div className="flex items-center justify-between gap-4">
               <div>
                 <div className="text-[11px] uppercase tracking-[0.1em] text-[var(--muted)]">
@@ -475,7 +406,7 @@ export default function Calculator() {
         ) : null}
 
         {result?.extraRepaymentScenario ? (
-          <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
+          <div className="sheet p-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h2 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
                 Scenario: extra aflossen
@@ -489,86 +420,73 @@ export default function Calculator() {
               wel een begrijpelijke manier om scenario&apos;s te vergelijken.
             </p>
             <div className="mt-5">
-              <ResultRow
-                label="Aflosscenario"
-                value={formatCurrency(
-                  result.extraRepaymentScenario.extraRepaymentAmount,
-                )}
-                sub="Eenmalig extra aflossen"
-              />
-              <ResultRow
-                label="Geschatte resterende studieschuld"
-                value={formatCurrency(
-                  result.extraRepaymentScenario.estimatedRemainingStudentDebt,
-                )}
-                sub={`Met ongeveer ${formatPercent(result.extraRepaymentScenario.assumedMonthlyPaymentReductionRatio)} van je huidige maandlast`}
-              />
-              <ResultRow
-                label="Geschatte nieuwe DUO-maandlast"
-                value={formatCurrency(
-                  result.extraRepaymentScenario.estimatedMonthlyPayment,
-                )}
-                sub={`Per jaar ${formatCurrency(result.extraRepaymentScenario.duoYearlyPayment)}`}
-              />
-              <ResultRow
-                label="Nieuwe impactbandbreedte"
-                value={`${formatCurrency(scenarioMinImpact)} tot ${formatCurrency(scenarioMaxImpact)}`}
-                sub="Op basis van dezelfde drie factoren"
-                accent
-              />
-              <ResultRow
-                label="Middenscenario minder druk"
-                value={formatCurrency(
-                  result.extraRepaymentScenario.middleImpactReduction,
-                )}
-                sub="Verschil tussen huidige en geschatte nieuwe impact"
-                accent
+              <ResultReceipt
+                title="Effect van extra aflossen"
+                rows={[
+                  {
+                    label: "Aflosscenario",
+                    value: formatCurrency(
+                      result.extraRepaymentScenario.extraRepaymentAmount,
+                    ),
+                    note: "Eenmalig extra aflossen",
+                  },
+                  {
+                    label: "Geschatte resterende studieschuld",
+                    value: formatCurrency(
+                      result.extraRepaymentScenario.estimatedRemainingStudentDebt,
+                    ),
+                    note: `Met ongeveer ${formatPercent(result.extraRepaymentScenario.assumedMonthlyPaymentReductionRatio)} van je huidige maandlast`,
+                  },
+                  {
+                    label: "Geschatte nieuwe DUO-maandlast",
+                    value: formatCurrency(
+                      result.extraRepaymentScenario.estimatedMonthlyPayment,
+                    ),
+                    note: `Per jaar ${formatCurrency(result.extraRepaymentScenario.duoYearlyPayment)}`,
+                  },
+                  {
+                    label: "Nieuwe impactbandbreedte",
+                    value: `${formatCurrency(scenarioMinImpact)} tot ${formatCurrency(scenarioMaxImpact)}`,
+                    note: "Op basis van dezelfde drie factoren",
+                    accent: true,
+                  },
+                  {
+                    label: "Middenscenario minder druk",
+                    value: formatCurrency(
+                      result.extraRepaymentScenario.middleImpactReduction,
+                    ),
+                    note: "Verschil tussen huidige en geschatte nieuwe impact",
+                    accent: true,
+                  },
+                ]}
               />
             </div>
           </div>
         ) : null}
 
-        <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
-          <h2 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
-            Hoe rekenen we dit?
-          </h2>
-          <div className="mt-4 space-y-3 text-[13.5px] leading-[1.7] text-[var(--muted)]">
-            <p>
-              1. We tellen het bruto jaarinkomen van jou en eventueel je partner bij
-              elkaar op.
-            </p>
-            <p>
-              2. We zetten je DUO-maandlast om naar een jaarbedrag: maandlast × 12.
-            </p>
-            <p>
-              3. Dat jaarbedrag vermenigvuldigen we met drie eenvoudige factoren:
-              4,5, 5,0 en 5,5.
-            </p>
-            <div className="rounded-xl bg-[var(--paper-soft)] px-4 py-3 font-mono text-[13px] tabular text-[var(--ink)]">
-              Indicatieve impact = DUO-maandlast × 12 × factor
-            </div>
-          </div>
-        </div>
-
-        <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
-          <h2 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
-            Wat kun je hiermee?
-          </h2>
-          <div className="mt-4 space-y-3 text-[13.5px] leading-[1.7] text-[var(--muted)]">
-            <p>
-              Check eerst je officiële DUO-maandbedrag, want juist dat bedrag is in
-              de praktijk vaak bepalend.
-            </p>
-            <p>
-              Vraag daarna een hypotheekadviseur of geldverstrekker om je echte
-              leencapaciteit. Hun acceptatieregels kunnen afwijken.
-            </p>
-            <p>
-              Los niet blind af alleen om meer te kunnen lenen. Buffer,
-              flexibiliteit en je maandelijkse rust tellen ook mee.
-            </p>
-          </div>
-        </div>
+        <ExplanationPanel
+          eyebrow="Verdieping"
+          title="Hoe rekenen we dit en wat kun je ermee?"
+          intro="Deze tool kiest bewust voor een simpele ordegrootte in plaats van een schijnnauwkeurige hypotheekberekening."
+          items={[
+            {
+              title: "Hoe is dit berekend?",
+              text: "We tellen het bruto jaarinkomen op, zetten de DUO-maandlast om naar een jaarbedrag en vermenigvuldigen dat met factor 4,5, 5,0 en 5,5.",
+            },
+            {
+              title: "Welke aannames gebruiken we?",
+              text: "Hypotheekverstrekkers gebruiken eigen acceptatieregels. Deze tool doet dus geen officiële leencapaciteitsberekening, maar alleen een begrijpelijke schatting.",
+            },
+            {
+              title: "Wat zijn risico's?",
+              text: "Als je teveel op de uitkomst leunt, kun je de nuance missen: rente, contractvorm, sector, toetsinkomen en beleid van een bank kunnen de echte uitkomst veranderen.",
+            },
+            {
+              title: "Wanneer kan een andere keuze beter zijn?",
+              text: "Check eerst je officiële DUO-maandbedrag, laat echte leencapaciteit doorrekenen en los niet blind af als dat je buffer of flexibiliteit te veel onder druk zet.",
+            },
+          ]}
+        />
       </section>
     </div>
   );

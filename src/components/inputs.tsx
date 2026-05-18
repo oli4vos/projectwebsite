@@ -1,3 +1,45 @@
+import type { ChangeEventHandler } from "react";
+
+interface InputFieldProps {
+  label: string;
+  value: string;
+  onChange: ChangeEventHandler<HTMLInputElement>;
+  error?: string;
+  hint?: string;
+  placeholder?: string;
+  inputMode?: "decimal" | "numeric" | "text" | "search" | "email" | "tel" | "url";
+}
+
+export function InputField({
+  label,
+  value,
+  onChange,
+  error,
+  hint,
+  placeholder,
+  inputMode = "decimal",
+}: InputFieldProps) {
+  return (
+    <label className="grid gap-2">
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-[11px] uppercase tracking-[0.12em] text-[var(--muted)]">
+          {label}
+        </span>
+        {hint ? <span className="text-[11px] text-[var(--soft)]">{hint}</span> : null}
+      </div>
+      <input
+        inputMode={inputMode}
+        value={value}
+        onChange={onChange}
+        aria-invalid={Boolean(error)}
+        placeholder={placeholder}
+        className="ring-focus hair h-11 rounded-[var(--radius-soft)] border bg-white px-3.5 font-mono text-[15px] tabular text-[var(--ink)] outline-none"
+      />
+      {error ? <p className="text-sm text-red-700">{error}</p> : null}
+    </label>
+  );
+}
+
 interface FieldProps {
   label: string;
   value: string | number;
@@ -14,7 +56,9 @@ export function Field({ label, value, suffix, hint, prefix, big }: FieldProps) {
         <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">{label}</span>
         {hint ? <span className="text-[11px] text-[var(--soft)]">{hint}</span> : null}
       </div>
-      <div className={`hair flex items-center rounded-md border bg-white px-3 ${big ? "h-14" : "h-11"}`}>
+      <div
+        className={`hair flex items-center rounded-[var(--radius-soft)] border bg-white px-3 ${big ? "h-14" : "h-11"}`}
+      >
         {prefix ? <span className="mr-2 tabular text-[var(--muted)]">{prefix}</span> : null}
         <input
           defaultValue={value}
@@ -78,13 +122,13 @@ interface ToggleProps {
 
 export function Toggle({ options, active = 0, onChange }: ToggleProps) {
   return (
-    <div className="hair inline-flex items-center gap-0.5 rounded-full border bg-[var(--paper-soft)] p-1">
+    <div className="hair inline-flex items-center gap-0.5 rounded-[var(--radius-soft)] border bg-[var(--paper-soft)] p-1">
       {options.map((option, index) => (
         <button
           key={option}
           type="button"
           onClick={() => onChange?.(index)}
-          className={`h-8 rounded-full px-3.5 text-[13px] font-medium transition ${
+          className={`h-8 rounded-[calc(var(--radius-soft)-2px)] px-3.5 text-[13px] font-medium transition ${
             index === active ? "bg-white text-[var(--ink)] shadow-paper" : "text-[var(--muted)]"
           }`}
         >

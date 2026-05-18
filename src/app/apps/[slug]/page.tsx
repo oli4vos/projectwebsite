@@ -77,21 +77,24 @@ export default async function AppDetailPage({ params }: AppDetailPageProps) {
               {app.description}
             </p>
             <p className="mt-4 max-w-[58ch] text-[14px] leading-[1.7] text-[var(--muted)]">
-              Gebruik deze tool om scenario&apos;s naast elkaar te zetten, aannames
-              expliciet te maken en met meer inzicht vooruit te kijken zonder dat het
-              voelt alsof je eerst financieel jargon moet leren spreken.
+              Je hoeft geen financieel expert te zijn om hier iets aan te hebben.
+              De opzet is bewust simpel: eerst de uitkomst, daarna de berekening en
+              de aannames eronder.
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
               {app.tags.map((tag) => (
                 <Pill key={tag}>{tag}</Pill>
               ))}
             </div>
+            <div className="sheet-muted mt-6 max-w-[60ch] px-4 py-3 text-[12.5px] leading-[1.65] text-[var(--muted)]">
+              Geen financieel advies. Wel een duwtje richting meer grip. Gebruik de
+              uitkomst als oriëntatie en leg belangrijke keuzes altijd naast je
+              echte voorwaarden, risico&apos;s en buffer.
+            </div>
           </div>
 
-          <aside className="rounded-[1.5rem] border hair bg-white p-5 shadow-paper">
-            <div className="text-[11px] uppercase tracking-[0.12em] text-[var(--muted)]">
-              Context
-            </div>
+          <aside className="sheet p-5">
+            <div className="kicker">Context</div>
             <div className="mt-4 space-y-3 text-[13.5px]">
               <div className="flex items-center justify-between">
                 <span className="text-[var(--muted)]">Status</span>
@@ -109,8 +112,9 @@ export default async function AppDetailPage({ params }: AppDetailPageProps) {
               </div>
             </div>
             <div className="mt-5 border-t border-[var(--hair)] pt-4 text-[12.5px] leading-[1.6] text-[var(--muted)]">
-              Heldere aannames, lokale berekening en een resultaat dat je direct kunt
-              vertalen naar je eigen keuze of vervolgvraag.
+              Eerst inzicht, dan nuance. Deze tool rekent lokaal en probeert het
+              verschil tussen scenario&apos;s begrijpelijk te maken voordat je de diepte
+              in gaat.
             </div>
           </aside>
         </section>

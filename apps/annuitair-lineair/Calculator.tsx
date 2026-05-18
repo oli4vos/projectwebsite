@@ -2,7 +2,9 @@
 
 import { useMemo, useState } from "react";
 import { AreaChart } from "@/components/charts";
-import { ResultRow } from "@/components/ResultRow";
+import { ExplanationPanel } from "@/components/ExplanationPanel";
+import { InputField } from "@/components/inputs";
+import { ResultReceipt } from "@/components/ResultReceipt";
 import { Pill } from "@/components/ui";
 import { calculateMortgageComparison } from "./logic";
 
@@ -75,11 +77,6 @@ function validate(values: FormState) {
   };
 }
 
-function FieldError({ message }: { message?: string }) {
-  if (!message) return null;
-  return <p className="text-sm text-red-700">{message}</p>;
-}
-
 export default function Calculator() {
   const [formValues, setFormValues] = useState<FormState>(defaults);
   const { errors, parsed } = validate(formValues);
@@ -110,10 +107,8 @@ export default function Calculator() {
 
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
-      <section className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
-        <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
-          Scenario
-        </div>
+      <section className="sheet p-6">
+        <div className="kicker">Scenario</div>
         <h2 className="mt-2 font-serif text-[28px] tracking-[-0.02em] text-[var(--ink)]">
           Vergelijk twee hypotheekroutes
         </h2>
@@ -124,65 +119,34 @@ export default function Calculator() {
         </p>
 
         <div className="mt-6 grid gap-5">
-          <label className="grid gap-2">
-            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-              Hypotheekbedrag
-            </span>
-            <input
-              inputMode="decimal"
-              value={formValues.loanAmount}
-              onChange={(event) => updateField("loanAmount", event.target.value)}
-              aria-invalid={Boolean(errors.loanAmount)}
-              className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-            />
-            <FieldError message={errors.loanAmount} />
-          </label>
-
-          <label className="grid gap-2">
-            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-              Hypotheekrente per jaar (%)
-            </span>
-            <input
-              inputMode="decimal"
-              value={formValues.interestRatePercent}
-              onChange={(event) =>
-                updateField("interestRatePercent", event.target.value)
-              }
-              aria-invalid={Boolean(errors.interestRatePercent)}
-              className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-            />
-            <FieldError message={errors.interestRatePercent} />
-          </label>
-
-          <label className="grid gap-2">
-            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-              Looptijd in jaren
-            </span>
-            <input
-              inputMode="decimal"
-              value={formValues.loanTermYears}
-              onChange={(event) => updateField("loanTermYears", event.target.value)}
-              aria-invalid={Boolean(errors.loanTermYears)}
-              className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-            />
-            <FieldError message={errors.loanTermYears} />
-          </label>
-
-          <label className="grid gap-2">
-            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-              Verwacht rendement beleggingspot (%)
-            </span>
-            <input
-              inputMode="decimal"
-              value={formValues.annualReturnPercent}
-              onChange={(event) =>
-                updateField("annualReturnPercent", event.target.value)
-              }
-              aria-invalid={Boolean(errors.annualReturnPercent)}
-              className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-            />
-            <FieldError message={errors.annualReturnPercent} />
-          </label>
+          <InputField
+            label="Hypotheekbedrag"
+            value={formValues.loanAmount}
+            onChange={(event) => updateField("loanAmount", event.target.value)}
+            error={errors.loanAmount}
+          />
+          <InputField
+            label="Hypotheekrente per jaar (%)"
+            value={formValues.interestRatePercent}
+            onChange={(event) =>
+              updateField("interestRatePercent", event.target.value)
+            }
+            error={errors.interestRatePercent}
+          />
+          <InputField
+            label="Looptijd in jaren"
+            value={formValues.loanTermYears}
+            onChange={(event) => updateField("loanTermYears", event.target.value)}
+            error={errors.loanTermYears}
+          />
+          <InputField
+            label="Verwacht rendement beleggingspot (%)"
+            value={formValues.annualReturnPercent}
+            onChange={(event) =>
+              updateField("annualReturnPercent", event.target.value)
+            }
+            error={errors.annualReturnPercent}
+          />
         </div>
 
         <div className="mt-6 border-t border-[var(--hair)] pt-5">
@@ -198,7 +162,7 @@ export default function Calculator() {
       </section>
 
       <section className="space-y-5">
-        <div className="rounded-[1.5rem] bg-[var(--deep)] p-6 text-white shadow-paper-lg">
+        <div className="ink-panel p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="text-[11px] uppercase tracking-[0.12em] text-white/55">
               Eerste maand
@@ -234,54 +198,47 @@ export default function Calculator() {
           )}
         </div>
 
-        <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
-          <h2 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
-            Kernuitkomsten
-          </h2>
-          <p className="mt-3 text-[13.5px] leading-[1.65] text-[var(--muted)]">
-            Hiermee zie je wat de hypotheekvorm doet met rente, maandlast en de
-            eventuele buffer die je opbouwt als annuïtair netto goedkoper uitvalt.
-          </p>
-
-          {result ? (
-            <div className="mt-5">
-              <ResultRow
-                label="Annuïtair bruto maand 1"
-                value={formatCurrency(result.firstMonth.annuityBruto)}
-                sub={`Netto ${formatCurrency(result.firstMonth.annuityNetto)}`}
-              />
-              <ResultRow
-                label="Lineair bruto maand 1"
-                value={formatCurrency(result.firstMonth.linearBruto)}
-                sub={`Netto ${formatCurrency(result.firstMonth.linearNetto)}`}
-              />
-              <ResultRow
-                label="Rentvoordeel lineair"
-                value={formatCurrency(result.totals.interestBenefitLinear)}
-                sub="Lagere totale rente over de hele looptijd"
-                accent
-              />
-              <ResultRow
-                label="Eindwaarde beleggingspot"
-                value={formatCurrency(result.totals.endPot)}
-                sub={`Maximale stand ${formatCurrency(result.totals.maxPot)}`}
-                accent={result.totals.endPot > 0}
-              />
-              <ResultRow
-                label="Omslagmaand"
-                value={
-                  result.totals.omslagMaand
-                    ? `maand ${result.totals.omslagMaand}`
-                    : "geen omslag"
-                }
-                sub="Eerste maand waarop lineair netto goedkoper wordt"
-              />
-            </div>
-          ) : null}
-        </div>
+        {result ? (
+          <ResultReceipt
+            eyebrow="Resultaatblad"
+            title="Kernuitkomsten"
+            summary="Hiermee zie je wat de hypotheekvorm doet met rente, maandlast en de eventuele buffer die je opbouwt als annuïtair netto goedkoper uitvalt."
+            rows={[
+              {
+                label: "Annuïtair bruto maand 1",
+                value: formatCurrency(result.firstMonth.annuityBruto),
+                note: `Netto ${formatCurrency(result.firstMonth.annuityNetto)}`,
+              },
+              {
+                label: "Lineair bruto maand 1",
+                value: formatCurrency(result.firstMonth.linearBruto),
+                note: `Netto ${formatCurrency(result.firstMonth.linearNetto)}`,
+              },
+              {
+                label: "Rentvoordeel lineair",
+                value: formatCurrency(result.totals.interestBenefitLinear),
+                note: "Lagere totale rente over de hele looptijd",
+                accent: true,
+              },
+              {
+                label: "Eindwaarde beleggingspot",
+                value: formatCurrency(result.totals.endPot),
+                note: `Maximale stand ${formatCurrency(result.totals.maxPot)}`,
+                accent: result.totals.endPot > 0,
+              },
+              {
+                label: "Omslagmaand",
+                value: result.totals.omslagMaand
+                  ? `maand ${result.totals.omslagMaand}`
+                  : "geen omslag",
+                note: "Eerste maand waarop lineair netto goedkoper wordt",
+              },
+            ]}
+          />
+        ) : null}
 
         {result && chartSeries ? (
-          <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
+          <div className="sheet p-6">
             <div className="flex items-center justify-between gap-4">
               <div>
                 <div className="text-[11px] uppercase tracking-[0.1em] text-[var(--muted)]">
@@ -314,16 +271,29 @@ export default function Calculator() {
           </div>
         ) : null}
 
-        <div className="rounded-[1.5rem] border hair bg-white p-5 shadow-paper">
-          <div className="text-[11px] uppercase tracking-[0.1em] text-[var(--muted)]">
-            Let op
-          </div>
-          <p className="mt-2 text-[12.5px] leading-[1.65] text-[var(--muted)]">
-            Deze tool is een vereenvoudigde vergelijking. Werkelijke belastingeffecten,
-            rentevaste periodes en productvoorwaarden kunnen de uitkomst verschuiven.
-            Gebruik dit vooral om je scenario scherper te krijgen.
-          </p>
-        </div>
+        <ExplanationPanel
+          eyebrow="Verdieping"
+          title="Waar moet je hier scherp op blijven?"
+          intro="Deze vergelijking is vooral bedoeld om verschillen zichtbaar te maken, niet om je definitieve hypotheekkeuze voor je te maken."
+          items={[
+            {
+              title: "Hoe is dit berekend?",
+              text: "De tool rekent annuïtair en lineair naast elkaar met dezelfde hoofdsom, rente en looptijd, plus een eenvoudige beleggingspot op basis van netto verschil.",
+            },
+            {
+              title: "Welke aannames gebruiken we?",
+              text: "We werken met een vaste belastingfactor en een vast rendement voor de pot. Daarmee blijft de vergelijking begrijpelijk, maar niet volledig persoonlijk.",
+            },
+            {
+              title: "Wat zijn risico's?",
+              text: "Werkelijke productvoorwaarden, rentevaste periodes en je fiscale situatie kunnen de uitkomst verschuiven. Een beleggingspot kan ook lager uitpakken.",
+            },
+            {
+              title: "Wanneer kan een andere keuze beter zijn?",
+              text: "Als je maximale maandrust zoekt, kan annuïtair prettiger voelen. Als je sneller wilt aflossen en lagere totale rente belangrijk vindt, kan lineair juist beter passen.",
+            },
+          ]}
+        />
       </section>
     </div>
   );
