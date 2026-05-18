@@ -54,7 +54,7 @@ export function AppDashboard({ apps }: AppDashboardProps) {
     <div className="space-y-8">
       <section
         id="apps"
-        className="sheet grid gap-4 p-5 sm:p-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-end"
+        className="sheet grid gap-4 p-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-end"
       >
         <div>
           <div className="kicker">Overzicht</div>
@@ -73,7 +73,7 @@ export function AppDashboard({ apps }: AppDashboardProps) {
         </div>
       </section>
 
-      <section className="sheet grid gap-4 p-5 sm:p-6 md:grid-cols-[minmax(0,1fr)_280px] md:items-end">
+      <section className="sheet grid gap-4 p-6 md:grid-cols-[minmax(0,1fr)_280px] md:items-end">
         <label className="grid gap-2">
           <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
             Zoek op titel, thema of tag
@@ -141,8 +141,8 @@ export function AppDashboard({ apps }: AppDashboardProps) {
       )}
 
       <section id="scenario" className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="sheet p-5 sm:p-6">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+        <div className="sheet p-6">
+          <div className="flex items-center justify-between gap-4">
             <h3 className="font-serif text-[22px] tracking-[-0.015em] text-[var(--ink)]">
               Voorbeeldscenario&apos;s
             </h3>
@@ -155,7 +155,7 @@ export function AppDashboard({ apps }: AppDashboardProps) {
               <Link
                 key={example.title}
                 href={`/apps/${example.slug}`}
-                className="hair-b grid gap-2 py-4 last:border-b-0 sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-4"
+                className="hair-b grid grid-cols-[minmax(0,1fr)_auto] gap-4 py-4 last:border-b-0"
               >
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
@@ -169,7 +169,7 @@ export function AppDashboard({ apps }: AppDashboardProps) {
                     {example.meta}
                   </div>
                 </div>
-                <div className="self-start font-mono text-[13px] tabular text-[var(--ink-2)] sm:self-center">
+                <div className="self-center font-mono text-[13px] tabular text-[var(--ink-2)]">
                   {example.result}
                 </div>
               </Link>
@@ -179,7 +179,7 @@ export function AppDashboard({ apps }: AppDashboardProps) {
 
         <div
           id="werkwijze"
-          className="ink-panel p-5 sm:p-6"
+          className="ink-panel p-6"
         >
           <div className="text-[11px] uppercase tracking-[0.14em] text-white/55">Werkwijze</div>
           <h3 className="mt-3 font-serif text-[24px] leading-[1.12] tracking-[-0.02em]">

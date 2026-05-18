@@ -21,7 +21,7 @@ export function SiteHeader() {
 
   return (
     <header className="hair-b sticky top-0 z-20 bg-[rgba(245,241,234,0.92)] backdrop-blur-md">
-      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-5 py-3.5 sm:px-8 sm:py-4 lg:px-10">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 py-4 sm:px-8 lg:px-10">
         <div className="flex min-w-0 items-center gap-4 sm:gap-8">
           <Link
             href="/"
@@ -39,20 +39,14 @@ export function SiteHeader() {
           </nav>
         </div>
 
-        <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:items-center sm:justify-end">
-          <BtnLink
-            href="/#apps"
-            kind={onHome ? "outline" : "ghost"}
-            size="sm"
-            className="w-full"
-          >
+        <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
+          <BtnLink href="/#apps" kind={onHome ? "outline" : "ghost"} size="sm">
             Overzicht
           </BtnLink>
           <BtnLink
             href="/apps/hypotheek-impact-studieschuld"
             kind={onToolPage ? "outline" : "primary"}
             size="sm"
-            className="w-full"
           >
             Start voorbeeld
           </BtnLink>
