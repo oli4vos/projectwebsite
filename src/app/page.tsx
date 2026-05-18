@@ -24,13 +24,13 @@ export default async function HomePage() {
             <div className="text-[11px] uppercase tracking-[0.16em] text-[var(--muted)]">
               Financiële rekentools · {today}
             </div>
-            <h1
-              className="mt-5 max-w-4xl font-serif text-[44px] leading-[1.04] tracking-[-0.03em] text-[var(--ink)] sm:text-[58px]"
+          <h1
+              className="text-fluid-h1 mt-5 max-w-4xl font-serif tracking-[-0.03em] text-[var(--ink)]"
               style={{ textWrap: "balance" }}
             >
               Grip op keuzes die lang blijven doorwerken.
             </h1>
-            <p className="mt-6 max-w-[62ch] text-[15.5px] leading-[1.7] text-[var(--ink-2)]">
+            <p className="text-fluid-lead mt-6 max-w-[62ch] leading-[1.7] text-[var(--ink-2)]">
               Soms begon je met studieschuld, hoge woonlasten of weinig financiële
               marge. Dan helpt het om scenario&apos;s rustig naast elkaar te zetten. Met
               simpele tools, eerlijke aannames en heldere uitleg krijg je meer regie

@@ -19,6 +19,10 @@
   --neg-soft: oklch(94% 0.04 28);
   --gold: oklch(72% 0.1 78);
   --shadow: 0 1px 0 rgba(20, 24, 31, 0.05), 0 24px 60px -28px rgba(20, 24, 31, 0.25);
+  --text-body: clamp(0.95rem, 0.9rem + 0.2vw, 1.05rem);
+  --text-lead: clamp(1.05rem, 1rem + 0.35vw, 1.25rem);
+  --text-h1: clamp(2rem, 1.4rem + 3vw, 4.5rem);
+  --text-h2: clamp(1.5rem, 1.2rem + 1.4vw, 2.75rem);
 }
 
 @theme inline {
@@ -51,6 +55,8 @@ body {
     linear-gradient(180deg, var(--paper) 0%, #f2ede4 100%);
   color: var(--ink);
   font-family: var(--font-ui), system-ui, sans-serif;
+  font-size: var(--text-body);
+  line-height: 1.6;
   font-feature-settings: "ss01", "cv11";
   text-rendering: optimizeLegibility;
 }
@@ -171,4 +177,22 @@ input::placeholder {
   font-size: 11px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+}
+
+.text-fluid-body {
+  font-size: var(--text-body);
+}
+
+.text-fluid-lead {
+  font-size: var(--text-lead);
+}
+
+.text-fluid-h1 {
+  font-size: var(--text-h1);
+  line-height: 1.04;
+}
+
+.text-fluid-h2 {
+  font-size: var(--text-h2);
+  line-height: 1.12;
 }

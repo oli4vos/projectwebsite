@@ -60,8 +60,8 @@ type BtnSize = "sm" | "md" | "lg";
 
 function btnClassName(kind: BtnKind, size: BtnSize, full?: boolean, className?: string) {
   const sizes: Record<BtnSize, string> = {
-    sm: "h-8 px-3 text-[13px]",
-    md: "h-10 px-4 text-[14px]",
+    sm: "min-h-11 px-3.5 text-[13px]",
+    md: "min-h-11 px-4 text-[14px]",
     lg: "h-12 px-5 text-[15px]",
   };
 

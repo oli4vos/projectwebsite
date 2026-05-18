@@ -42,7 +42,9 @@ export function ToolCard({
 
       <h3
         className={`mt-4 font-serif leading-[1.15] tracking-[-0.01em] text-[var(--ink)] ${
-          dense ? "text-[18px]" : "text-[22px]"
+          dense
+            ? "text-[clamp(1rem,0.95rem+0.3vw,1.125rem)]"
+            : "text-[clamp(1.15rem,1.05rem+0.6vw,1.375rem)]"
         }`}
       >
         {title}

@@ -61,7 +61,7 @@ export function AppDashboard({ apps }: AppDashboardProps) {
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
             Overzicht
           </div>
-          <h2 className="mt-2 font-serif text-[30px] tracking-[-0.02em] text-[var(--ink)]">
+          <h2 className="text-fluid-h2 mt-2 font-serif tracking-[-0.02em] text-[var(--ink)]">
             Kies het scenario waar je nu regie op wilt
           </h2>
           <p className="mt-3 max-w-[58ch] text-[14px] leading-[1.65] text-[var(--ink-2)]">
@@ -113,7 +113,7 @@ export function AppDashboard({ apps }: AppDashboardProps) {
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
             Mijn profiel
           </div>
-          <h3 className="mt-2 font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
+          <h3 className="mt-2 font-serif text-[clamp(1.35rem,1.1rem+1vw,1.9rem)] tracking-[-0.02em] text-[var(--ink)]">
             Vul je gegevens één keer in
           </h3>
           <p className="mt-3 max-w-[56ch] text-[14px] leading-[1.65] text-[var(--ink-2)]">
@@ -134,8 +134,8 @@ export function AppDashboard({ apps }: AppDashboardProps) {
             onClick={() => setSelectedCategory(category)}
             className={`rounded-full px-3 py-2 text-[13px] transition ${
               selectedCategory === category
-                ? "bg-[var(--deep)] text-white"
-                : "hair border bg-white text-[var(--muted)] hover:text-[var(--ink)]"
+                ? "min-h-11 bg-[var(--deep)] text-white"
+                : "min-h-11 hair border bg-white text-[var(--muted)] hover:text-[var(--ink)]"
             }`}
           >
             {category}
@@ -164,7 +164,7 @@ export function AppDashboard({ apps }: AppDashboardProps) {
       <section id="scenario" className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
         <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
           <div className="flex items-center justify-between gap-4">
-            <h3 className="font-serif text-[22px] tracking-[-0.015em] text-[var(--ink)]">
+            <h3 className="font-serif text-[clamp(1.2rem,1.05rem+0.7vw,1.5rem)] tracking-[-0.015em] text-[var(--ink)]">
               Voorbeeldscenario&apos;s
             </h3>
             <span className="text-[12px] text-[var(--muted)]">
@@ -205,7 +205,7 @@ export function AppDashboard({ apps }: AppDashboardProps) {
           <div className="text-[11px] uppercase tracking-[0.14em] text-white/55">
             Werkwijze
           </div>
-          <h3 className="mt-3 font-serif text-[24px] leading-[1.12] tracking-[-0.02em]">
+          <h3 className="mt-3 font-serif text-[clamp(1.35rem,1.1rem+1vw,1.9rem)] leading-[1.12] tracking-[-0.02em]">
             Geen black box. Wel betere uitgangspunten.
           </h3>
           <p className="mt-4 text-[14px] leading-[1.7] text-white/75">

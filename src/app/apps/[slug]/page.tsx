@@ -70,10 +70,10 @@ export default async function AppDetailPage({ params }: AppDetailPageProps) {
               </span>
             </div>
 
-            <h1 className="mt-4 font-serif text-[40px] leading-[1.08] tracking-[-0.03em] text-[var(--ink)] sm:text-[52px]">
+            <h1 className="text-fluid-h1 mt-4 font-serif tracking-[-0.03em] text-[var(--ink)]">
               {app.title}
             </h1>
-            <p className="mt-5 max-w-[62ch] text-[15.5px] leading-[1.7] text-[var(--ink-2)]">
+            <p className="text-fluid-lead mt-5 max-w-[62ch] leading-[1.7] text-[var(--ink-2)]">
               {app.description}
             </p>
             <p className="mt-4 max-w-[58ch] text-[14px] leading-[1.7] text-[var(--muted)]">
