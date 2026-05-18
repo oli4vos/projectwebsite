@@ -1,0 +1,174 @@
+@import "tailwindcss";
+
+:root {
+  --paper: #f5f1ea;
+  --paper-soft: #efeae0;
+  --card: #ffffff;
+  --ink: #14181f;
+  --ink-2: #2a2f3a;
+  --muted: #6e7180;
+  --soft: #a6a8b2;
+  --hair: #e6e1d5;
+  --hair-2: #d9d3c4;
+  --deep: #0f141c;
+  --accent: oklch(46% 0.07 232);
+  --accent-soft: oklch(92% 0.025 232);
+  --pos: oklch(54% 0.1 152);
+  --pos-soft: oklch(94% 0.04 152);
+  --neg: oklch(54% 0.13 28);
+  --neg-soft: oklch(94% 0.04 28);
+  --gold: oklch(72% 0.1 78);
+  --shadow: 0 1px 0 rgba(20, 24, 31, 0.05), 0 24px 60px -28px rgba(20, 24, 31, 0.25);
+}
+
+@theme inline {
+  --color-background: var(--paper);
+  --color-foreground: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--hair);
+  --color-card: var(--card);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --font-sans: var(--font-ui);
+  --font-mono: var(--font-mono-ui);
+  --font-serif: var(--font-display);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background:
+    radial-gradient(circle at top left, rgba(70, 107, 160, 0.08), transparent 26%),
+    radial-gradient(circle at bottom right, rgba(176, 137, 76, 0.08), transparent 24%),
+    linear-gradient(180deg, var(--paper) 0%, #f2ede4 100%);
+  color: var(--ink);
+  font-family: var(--font-ui), system-ui, sans-serif;
+  font-feature-settings: "ss01", "cv11";
+  text-rendering: optimizeLegibility;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+input::placeholder {
+  color: var(--soft);
+}
+
+::selection {
+  background: rgba(72, 105, 155, 0.18);
+}
+
+.font-serif {
+  font-family: var(--font-display), Georgia, serif;
+  font-feature-settings: "lnum", "ss01";
+}
+
+.font-mono,
+.tabular {
+  font-family: var(--font-mono-ui), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.hair {
+  border-color: var(--hair);
+}
+
+.hair-b {
+  border-bottom: 1px solid var(--hair);
+}
+
+.hair-t {
+  border-top: 1px solid var(--hair);
+}
+
+.ring-focus:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.shadow-paper {
+  box-shadow: 0 1px 0 rgba(20, 24, 31, 0.04), 0 10px 30px -22px rgba(20, 24, 31, 0.18);
+}
+
+.shadow-paper-lg {
+  box-shadow: var(--shadow);
+}
+
+.tick {
+  animation: blink 2.4s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%,
+  60% {
+    opacity: 1;
+  }
+
+  70%,
+  100% {
+    opacity: 0.25;
+  }
+}
+
+.spark-area {
+  fill: var(--pos);
+  opacity: 0.12;
+}
+
+.spark-line {
+  fill: none;
+  stroke: var(--pos);
+  stroke-width: 1.5;
+}
+
+.spark-line-neg {
+  fill: none;
+  stroke: var(--neg);
+  stroke-width: 1.5;
+}
+
+.dot {
+  display: inline-block;
+  height: 8px;
+  width: 8px;
+  border-radius: 999px;
+}
+
+.dot-studie {
+  background: oklch(58% 0.1 76);
+}
+
+.dot-beleg {
+  background: oklch(46% 0.07 232);
+}
+
+.dot-hyp {
+  background: oklch(54% 0.1 152);
+}
+
+.dot-maand {
+  background: oklch(54% 0.13 28);
+}
+
+.axis {
+  color: var(--soft);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}

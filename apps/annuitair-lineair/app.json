@@ -1,0 +1,11 @@
+{
+  "slug": "annuitair-lineair",
+  "title": "Annuïtair of lineair",
+  "description": "Vergelijk bruto en netto maandlasten van een annuïtaire en lineaire hypotheek, inclusief het effect van een beleggingspot.",
+  "type": "frontend",
+  "category": "Hypotheek",
+  "tags": ["hypotheek", "annuiteit", "lineair", "maandlasten"],
+  "status": "active",
+  "version": "1.0.0",
+  "entry": "Calculator.tsx"
+}

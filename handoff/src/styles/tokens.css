@@ -1,0 +1,68 @@
+/* Olivier — design tokens. Importeer dit bestand één keer globaal. */
+:root {
+  --paper:      #F5F1EA;
+  --paper-soft: #EFEAE0;
+  --card:       #FFFFFF;
+  --ink:        #14181F;
+  --ink-2:      #2A2F3A;
+  --muted:      #6E7180;
+  --soft:       #A6A8B2;
+  --hair:       #E6E1D5;
+  --hair-2:     #D9D3C4;
+  --deep:       #0F141C;
+
+  --accent:      oklch(46% 0.07 232);   /* steel-blue */
+  --accent-soft: oklch(92% 0.025 232);
+  --pos:         oklch(54% 0.10 152);   /* forest */
+  --pos-soft:    oklch(94% 0.04 152);
+  --neg:         oklch(54% 0.13 28);    /* brick */
+  --neg-soft:    oklch(94% 0.04 28);
+  --gold:        oklch(72% 0.10 78);    /* ochre */
+}
+
+html, body { background: var(--paper); color: var(--ink); }
+body {
+  font-family: "Geist", system-ui, -apple-system, sans-serif;
+  font-feature-settings: "ss01","cv11";
+}
+
+.font-serif { font-family: "Source Serif 4", "Source Serif Pro", Georgia, serif; font-feature-settings: "lnum","ss01"; }
+.font-mono  { font-family: "Geist Mono", ui-monospace, "SF Mono", monospace; font-variant-numeric: tabular-nums; }
+.tabular    { font-variant-numeric: tabular-nums; }
+
+/* hairlines */
+.hair   { border-color: var(--hair); }
+.hair-b { border-bottom: 1px solid var(--hair); }
+.hair-t { border-top:    1px solid var(--hair); }
+
+/* placeholder image fill */
+.placeholder-stripes {
+  background-image: repeating-linear-gradient(135deg, var(--hair-2) 0 1px, transparent 1px 10px);
+  background-color: var(--paper-soft);
+}
+
+/* tiny pulse for "live" ticker dot */
+@keyframes blink { 0%, 60% { opacity: 1 } 70%, 100% { opacity: 0.25 } }
+.tick { animation: blink 2.4s ease-in-out infinite; }
+
+/* sparkline */
+.spark-area     { fill: var(--pos); opacity: .12; }
+.spark-line     { stroke: var(--pos); fill: none; stroke-width: 1.5; }
+.spark-line-neg { stroke: var(--neg); fill: none; stroke-width: 1.5; }
+
+/* focus ring */
+.ring-focus:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* shadows */
+.shadow-paper    { box-shadow: 0 1px 0 rgba(20,24,31,.04), 0 10px 30px -22px rgba(20,24,31,.18); }
+.shadow-paper-lg { box-shadow: 0 1px 0 rgba(20,24,31,.05), 0 24px 60px -28px rgba(20,24,31,.25); }
+
+/* category dot palette */
+.dot { width: 8px; height: 8px; border-radius: 999px; display: inline-block; }
+.dot-studie  { background: oklch(58% 0.10 76);  }
+.dot-beleg   { background: oklch(46% 0.07 232); }
+.dot-hyp     { background: oklch(54% 0.10 152); }
+.dot-maand   { background: oklch(54% 0.13 28);  }
+
+/* axis label */
+.axis { color: var(--soft); font-size: 11px; letter-spacing: .04em; text-transform: uppercase; }

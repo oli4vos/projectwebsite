@@ -1,0 +1,11 @@
+{
+  "slug": "studieschuld-vs-beleggen",
+  "title": "Studieschuld aflossen of beleggen",
+  "description": "Vergelijk of extra aflossen op je studieschuld financieel gunstiger is dan beleggen.",
+  "type": "frontend",
+  "category": "Schulden",
+  "tags": ["studieschuld", "beleggen", "rente"],
+  "status": "active",
+  "version": "1.0.0",
+  "entry": "Calculator.tsx"
+}
