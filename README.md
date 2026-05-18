@@ -139,6 +139,12 @@ Deze repo is voorbereid op dezelfde route als `volpa`: publiceren via GitHub Pag
 
 De workflow staat in `.github/workflows/deploy-pages.yml`.
 
+Let op:
+
+- GitHub Pages moet eerst eenmalig op de repository geactiveerd zijn via `Settings > Pages`.
+- De workflow kan dat niet zelfstandig inschakelen met alleen de standaard `GITHUB_TOKEN`.
+- Zie je in Actions een fout rond `Get Pages site failed` of `Not Found`, dan staat `Source` meestal nog niet op `GitHub Actions`.
+
 Belangrijk:
 
 - Lokaal blijft de app normaal draaien met `npm run dev` en `npm run build`.
