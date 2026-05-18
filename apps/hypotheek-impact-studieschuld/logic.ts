@@ -1,4 +1,15 @@
-export const LAST_CHECKED = "2026-05-18";
+import {
+  getDefaultFinancialYear,
+  getDuoDefaultTermForRule,
+  getDuoRateForRule,
+  getFinancialConstants,
+  getStudentDebtGrossUpFactor,
+} from "@/lib/financial-constants";
+
+const DEFAULT_YEAR = getDefaultFinancialYear();
+const FINANCIAL_CONSTANTS = getFinancialConstants(DEFAULT_YEAR);
+
+export const LAST_CHECKED = FINANCIAL_CONSTANTS.duo.meta.lastChecked;
 
 export type DuoSituation =
   | "repaying"
@@ -17,33 +28,22 @@ export type RepaymentRule =
 export type PaymentSource = "actual" | "statutory" | "estimated" | "mixed";
 
 export const DEFAULT_DUO_RATES_2026: Record<RepaymentRule, number> = {
-  SF35: 2.33,
-  SF15: 2.29,
-  SF15_OLD: 2.29,
-  SF15_LLLK: 2.33,
-  UNKNOWN: 2.33,
+  ...FINANCIAL_CONSTANTS.duo.rates,
 };
 
 export const DEFAULT_TERMS: Record<RepaymentRule, number> = {
-  SF35: 35,
-  SF15: 15,
-  SF15_OLD: 15,
-  SF15_LLLK: 15,
-  UNKNOWN: 35,
+  ...FINANCIAL_CONSTANTS.duo.defaultTerms,
 };
 
-export const BRUTERING_FACTORS = [
-  { minRate: 0, maxRate: 2.0, factor: 1.05, label: "2,0% of lager" },
-  { minRate: 2.0, maxRate: 2.5, factor: 1.1, label: "2,0% tot 2,5%" },
-  { minRate: 2.5, maxRate: 3.0, factor: 1.15, label: "2,5% tot 3,0%" },
-  { minRate: 3.0, maxRate: 3.5, factor: 1.2, label: "3,0% tot 3,5%" },
-  { minRate: 3.5, maxRate: 4.0, factor: 1.2, label: "3,5% tot 4,0%" },
-  { minRate: 4.0, maxRate: 4.5, factor: 1.25, label: "4,0% tot 4,5%" },
-  { minRate: 4.5, maxRate: 5.0, factor: 1.3, label: "4,5% tot 5,0%" },
-  { minRate: 5.0, maxRate: 5.5, factor: 1.3, label: "5,0% tot 5,5%" },
-  { minRate: 5.5, maxRate: 6.0, factor: 1.35, label: "5,5% tot 6,0%" },
-  { minRate: 6.0, maxRate: Number.POSITIVE_INFINITY, factor: 1.4, label: "6,0% of hoger" },
-] as const;
+export const BRUTERING_FACTORS: ReadonlyArray<{
+  minRate: number;
+  maxRate: number;
+  factor: number;
+  label: string;
+}> = FINANCIAL_CONSTANTS.mortgage.studentDebtGrossUpFactors.map((band) => ({
+  ...band,
+  maxRate: band.maxRate === null ? Number.POSITIVE_INFINITY : band.maxRate,
+}));
 
 export const QUICK_RULE_SCENARIOS = [
   { key: "careful", label: "Voorzichtig", factor: 4.5 },
@@ -212,11 +212,11 @@ export function sanitizePercent(value: number): number {
 }
 
 export function getDefaultDuoRate(rule: RepaymentRule): number {
-  return DEFAULT_DUO_RATES_2026[rule] ?? DEFAULT_DUO_RATES_2026.UNKNOWN;
+  return getDuoRateForRule(rule, DEFAULT_YEAR);
 }
 
 export function getDefaultTerm(rule: RepaymentRule): number {
-  return DEFAULT_TERMS[rule] ?? DEFAULT_TERMS.UNKNOWN;
+  return getDuoDefaultTermForRule(rule, DEFAULT_YEAR);
 }
 
 export function calculateAnnuityPayment(
@@ -277,11 +277,7 @@ export function getBruteringFactor(mortgageRate: number): {
   label: string;
 } {
   const safeMortgageRate = sanitizePercent(mortgageRate);
-  const band =
-    BRUTERING_FACTORS.find(
-      (item) =>
-        safeMortgageRate >= item.minRate && safeMortgageRate < item.maxRate,
-    ) ?? BRUTERING_FACTORS[BRUTERING_FACTORS.length - 1];
+  const band = getStudentDebtGrossUpFactor(safeMortgageRate, DEFAULT_YEAR);
 
   return {
     factor: band.factor,

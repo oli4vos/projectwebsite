@@ -5,6 +5,7 @@ import { ResultRow } from "@/components/ResultRow";
 import { ToolDisclosure } from "@/components/ToolDisclosure";
 import { Pill } from "@/components/ui";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { getFinancialConstants } from "@/lib/financial-constants";
 import { getMortgageImpactDefaultsFromProfile } from "@/lib/profile-tool-mapping";
 import {
   LAST_CHECKED,
@@ -17,6 +18,8 @@ import {
   type PaymentSource,
   type RepaymentRule,
 } from "./logic";
+
+const FINANCIAL_CONSTANTS = getFinancialConstants(2026);
 
 type FormState = {
   situation: DuoSituation;
@@ -45,16 +48,16 @@ const defaultValues: FormState = {
   actualMonthlyPayment: "150",
   statutoryMonthlyPayment: "",
   remainingStudentDebt: "22000",
-  duoInterestRate: "2.33",
-  remainingTermYears: "35",
+  duoInterestRate: String(FINANCIAL_CONSTANTS.duo.rates.SF35),
+  remainingTermYears: String(FINANCIAL_CONSTANTS.duo.defaultTerms.SF35),
   extraRepayment: "",
   grossIncomeUser: "48000",
   grossIncomePartner: "",
   desiredHomePrice: "375000",
   ownMoney: "25000",
   maxMortgageWithoutStudentDebt: "",
-  mortgageRate: "3.8",
-  mortgageTermYears: "30",
+  mortgageRate: String(FINANCIAL_CONSTANTS.mortgage.defaultMortgageRate),
+  mortgageTermYears: String(FINANCIAL_CONSTANTS.mortgage.defaultMortgageTermYears),
   showAdvancedAssumptions: false,
 };
 
@@ -1219,6 +1222,20 @@ function CalculatorContent({
             <p>
               Voor brutering gebruiken we een indicatieve staffel. Geldverstrekkers
               en actuele normen kunnen daarvan afwijken.
+            </p>
+            <p>
+              Centrale bron DUO-rente: {FINANCIAL_CONSTANTS.duo.meta.sourceLabel} (
+              {FINANCIAL_CONSTANTS.duo.meta.status}).
+            </p>
+            <p>
+              Centrale bron brutering/hypotheekdefaults:{" "}
+              {FINANCIAL_CONSTANTS.mortgage.meta.sourceLabel} (
+              {FINANCIAL_CONSTANTS.mortgage.meta.status}).
+            </p>
+            <p>
+              Standaard hypotheek-aannames 2026:{" "}
+              {formatDecimal(FINANCIAL_CONSTANTS.mortgage.defaultMortgageRate)}%
+              rente en {FINANCIAL_CONSTANTS.mortgage.defaultMortgageTermYears} jaar.
             </p>
             {usedDefaultDuoRate ? (
               <p>

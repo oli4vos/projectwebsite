@@ -35,6 +35,7 @@ Dit bestand is bedoeld als werksamenvatting voor toekomstige agent-rondes. Werk 
 
 - `/` via `src/app/page.tsx`
 - `/apps/[slug]` via `src/app/apps/[slug]/page.tsx`
+- `/variabelen` via `src/app/variabelen/page.tsx`
 - `not-found` via `src/app/not-found.tsx`
 
 ## Huidige UI-structuur
@@ -57,6 +58,7 @@ Dit bestand is bedoeld als werksamenvatting voor toekomstige agent-rondes. Werk 
 - `src/lib/market.ts`: homepage-marktcontext met externe fetches en fallbacks
 - `src/lib/user-profile.ts`: local-first profieltype, sanitizing en localStorage helpers
 - `src/lib/profile-tool-mapping.ts`: centrale mapping van profielwaarden naar tool-defaults
+- `src/lib/financial-constants/`: centrale jaarlijkse aannames/variabelen + helpers
 - `next.config.ts`: standaard Next-config + GitHub Pages static export in Actions
 
 ## Huidige tools
@@ -107,6 +109,8 @@ Dit bestand is bedoeld als werksamenvatting voor toekomstige agent-rondes. Werk 
   - eerst invulvelden
   - dan een beknopte samenvatting met kernuitkomst in gewone taal
   - daarna uitklapbare verdieping (standaard dicht) met uitleg, aannames en praktische aandachtspunten
+- Jaarlijkse financiële aannames komen centraal uit `src/lib/financial-constants`.
+- Toolverdieping mag die centrale aannames tonen, maar light-gebruikers worden niet gedwongen die details te openen.
 - Er zijn nu meerdere pechgeneratie/studieschuld-tools; hou tone of voice en disclaimerstijl tussen die modules consistent.
 - Partnerstudieschuld zit nog niet als aparte invoer in `apps/hypotheek-impact-studieschuld`; alleen copy/context. Dat is een logische v3-uitbreiding.
 - Toekomstige profielstap:
@@ -129,6 +133,7 @@ Dit bestand is bedoeld als werksamenvatting voor toekomstige agent-rondes. Werk 
 - Voor nieuwe tools dezelfde modulevorm aanhouden onder `apps/`.
 - Eerst metadata/manifest stabiel houden, daarna UI en logica per tool.
 - Als er meer tools bijkomen, overweeg `app.json` uit te breiden met extra velden zoals `hero`, `assumptions`, `disclaimer` of `order`.
+- Toekomstige tax-engine kan deze centrale constantslaag hergebruiken, maar is nu bewust nog niet gebouwd.
 
 ## Responsive design en layout-conventies
 

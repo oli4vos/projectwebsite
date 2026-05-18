@@ -28,6 +28,12 @@ export function SiteFooter() {
           >
             Voorbeeldtool
           </Link>
+          <Link
+            href="/variabelen"
+            className="rounded-full px-2 py-1 transition hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
+          >
+            Variabelen
+          </Link>
         </div>
       </div>
     </footer>
