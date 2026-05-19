@@ -14,6 +14,8 @@ import type {
 } from "@/lib/duo/types";
 
 const DEFAULT_YEAR = getDefaultFinancialYear();
+const DUO_DRAAGKRACHT_SOURCE_URL =
+  "https://duo.nl/particulier/studieschuld-terugbetalen/berekening-maandbedrag.jsp";
 
 function safeFinite(value: number | undefined, fallback = 0) {
   return Number.isFinite(value) ? (value as number) : fallback;
@@ -200,6 +202,13 @@ export function calculateIndicativeIncomeBasedMonthlyPayment(input: {
       "DUO vergelijkt draagkracht met je wettelijke maandbedrag. Je betaalt het laagste van die twee.",
     );
   }
+
+  warnings.push(
+    `Indicatief model op basis van DUO-uitleg over maandbedrag en draagkracht (${DUO_DRAAGKRACHT_SOURCE_URL}).`,
+  );
+  warnings.push(
+    "Bijzondere DUO-situaties zoals peiljaarverlegging, buitenlandse inkomenssituaties en regeling-specifieke uitzonderingen zijn niet volledig doorgerekend in dit model.",
+  );
 
   warnings.push(
     "Extra aflossen boven je verplichte bedrag blijft een keuze. Dat deel kun je ook als alternatiefscenario inzetten voor buffer of beleggen.",

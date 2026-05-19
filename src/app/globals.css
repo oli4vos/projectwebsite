@@ -198,3 +198,9 @@ input::placeholder {
   font-size: var(--text-h2);
   line-height: 1.12;
 }
+
+.page-shell {
+  margin-inline: auto;
+  width: min(100%, 80rem);
+  padding-inline: clamp(1rem, 1.8vw, 2.5rem);
+}

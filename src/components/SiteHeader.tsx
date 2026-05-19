@@ -25,25 +25,23 @@ export function SiteHeader() {
   useEffect(() => {
     function handleScroll() {
       if (window.innerWidth >= 768) {
-        if (isMobileCompact) {
-          setIsMobileCompact(false);
-        }
+        setIsMobileCompact(false);
         lastScrollY.current = window.scrollY;
         return;
       }
 
       const currentY = window.scrollY;
 
-      if (currentY <= 40) {
+      if (currentY <= 24) {
         setIsMobileCompact(false);
         lastScrollY.current = currentY;
         return;
       }
 
-      if (currentY > lastScrollY.current + 8 && currentY > 90) {
+      if (currentY > lastScrollY.current + 8 && currentY > 84) {
         setIsMobileCompact(true);
-      } else if (currentY < lastScrollY.current - 8) {
-        setIsMobileCompact(false);
+      } else if (currentY > 24) {
+        setIsMobileCompact(true);
       }
 
       lastScrollY.current = currentY;
@@ -55,11 +53,11 @@ export function SiteHeader() {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [isMobileCompact]);
+  }, []);
 
   return (
     <header className="hair-b sticky top-0 z-20 bg-[rgba(245,241,234,0.78)] backdrop-blur-md">
-      <div className="mx-auto max-w-7xl px-4 py-3 sm:px-8 lg:px-10">
+      <div className="page-shell py-3">
         <div className="flex min-w-0 items-center justify-between gap-3">
           <Link
             href="/"

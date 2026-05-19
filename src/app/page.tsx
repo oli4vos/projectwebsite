@@ -18,9 +18,9 @@ export default async function HomePage() {
   return (
     <>
       <SiteHeader />
-      <main id="main-content" className="mx-auto min-h-[100dvh] max-w-7xl px-5 pb-10 pt-8 sm:px-8 lg:px-10 lg:pb-14">
+      <main id="main-content" className="page-shell min-h-[100dvh] pb-10 pt-8 lg:pb-14">
         <section className="hair-b grid gap-8 pb-10 lg:grid-cols-[minmax(0,1.1fr)_420px] lg:pt-4">
-          <div className="pt-4">
+          <div className="min-w-0 pt-4">
             <div className="text-[11px] uppercase tracking-[0.16em] text-[var(--muted)]">
               Financiële rekentools · {today}
             </div>
@@ -51,7 +51,7 @@ export default async function HomePage() {
             </div>
           </div>
 
-          <aside className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
+          <aside className="min-w-0 rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="tick size-[7px] rounded-full bg-[var(--pos)]" />

@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { MobileFieldFlowControls } from "@/components/MobileFieldFlowControls";
 import { ResultRow } from "@/components/ResultRow";
 import { ToolDisclosure } from "@/components/ToolDisclosure";
 import { Pill } from "@/components/ui";
+import { useMobileFieldFlow } from "@/hooks/useMobileFieldFlow";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { getFinancialConstants } from "@/lib/financial-constants";
 import {
@@ -418,7 +420,6 @@ function CalculatorContent({
   profilePatch,
 }: CalculatorContentProps) {
   const [formValues, setFormValues] = useState<FormState>(initialValues);
-  const [mobileStep, setMobileStep] = useState<1 | 2 | 3 | 4>(1);
   const { errors, parsedValues } = validateForm(formValues);
   const result = parsedValues ? calculateHypotheekImpact(parsedValues) : null;
   const hasErrors = Object.keys(errors).length > 0;
@@ -433,6 +434,61 @@ function CalculatorContent({
     formValues.situation === "unknown";
   const usedDefaultDuoRate = formValues.duoInterestRate.trim().length === 0;
   const usedDefaultTerm = formValues.remainingTermYears.trim().length === 0;
+  const mobileFieldOrder = [
+    "situation",
+    "repaymentRule",
+    ...(showActualField ? ["actualMonthlyPayment"] : []),
+    ...(showStatutoryField ? ["statutoryMonthlyPayment"] : []),
+    "remainingStudentDebt",
+    "duoInterestRate",
+    "remainingTermYears",
+    "extraRepayment",
+    "grossIncomeUser",
+    "grossIncomePartner",
+    "desiredHomePrice",
+    "ownMoney",
+    "maxMortgageWithoutStudentDebt",
+    "mortgageRate",
+    "mortgageTermYears",
+    "showAdvancedAssumptions",
+  ];
+  const mobileFlow = useMobileFieldFlow(mobileFieldOrder);
+  const step1Fields = ["situation", "repaymentRule"];
+  const step2Fields = [
+    ...(showActualField ? ["actualMonthlyPayment"] : []),
+    ...(showStatutoryField ? ["statutoryMonthlyPayment"] : []),
+    "remainingStudentDebt",
+    "duoInterestRate",
+    "remainingTermYears",
+    "extraRepayment",
+  ];
+  const step3Fields = [
+    "grossIncomeUser",
+    "grossIncomePartner",
+    "desiredHomePrice",
+    "ownMoney",
+    "maxMortgageWithoutStudentDebt",
+  ];
+  const step4Fields = ["mortgageRate", "mortgageTermYears", "showAdvancedAssumptions"];
+  const isStepVisible = (fieldIds: string[]) =>
+    fieldIds.some((fieldId) => mobileFlow.isActiveField(fieldId));
+  const isCurrentFieldBlocked = Boolean(
+    {
+      actualMonthlyPayment: errors.actualMonthlyPayment,
+      statutoryMonthlyPayment: errors.statutoryMonthlyPayment,
+      remainingStudentDebt: errors.remainingStudentDebt,
+      duoInterestRate: errors.duoInterestRate,
+      remainingTermYears: errors.remainingTermYears,
+      extraRepayment: errors.extraRepayment,
+      grossIncomeUser: errors.grossIncomeUser,
+      grossIncomePartner: errors.grossIncomePartner,
+      desiredHomePrice: errors.desiredHomePrice,
+      ownMoney: errors.ownMoney,
+      maxMortgageWithoutStudentDebt: errors.maxMortgageWithoutStudentDebt,
+      mortgageRate: errors.mortgageRate,
+      mortgageTermYears: errors.mortgageTermYears,
+    }[mobileFlow.activeFieldId],
+  );
   const hasMixedPaymentOutcome = Boolean(
     result &&
       result.mortgageImpact.optimisticPrincipalImpact !==
@@ -494,7 +550,7 @@ function CalculatorContent({
           </div>
         ) : null}
 
-        <div className={mobileStep === 1 ? "mt-7" : "mt-7 hidden md:block"}>
+        <div className={`mt-7 ${isStepVisible(step1Fields) ? "block" : "hidden"} md:block`}>
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
             Stap 1
           </div>
@@ -505,7 +561,7 @@ function CalculatorContent({
             Je vindt dit in Mijn DUO bij Mijn schulden.
           </p>
           <div className="mt-4 grid gap-5">
-            <label className="grid gap-2">
+            <label className={mobileFlow.getFieldClassName("situation")}>
               <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
                 Situatie
               </span>
@@ -514,6 +570,7 @@ function CalculatorContent({
                 onChange={(event) =>
                   updateField("situation", event.target.value as DuoSituation)
                 }
+                onKeyDown={mobileFlow.handleEnterAdvance("situation")}
                 className="ring-focus hair h-12 rounded-md border bg-white px-4 text-[15px] text-[var(--ink)] outline-none"
               >
                 {Object.entries(situationLabels).map(([value, label]) => (
@@ -524,7 +581,7 @@ function CalculatorContent({
               </select>
             </label>
 
-            <label className="grid gap-2">
+            <label className={mobileFlow.getFieldClassName("repaymentRule")}>
               <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
                 Terugbetalingsregel
               </span>
@@ -533,6 +590,7 @@ function CalculatorContent({
                 onChange={(event) =>
                   updateField("repaymentRule", event.target.value as RepaymentRule)
                 }
+                onKeyDown={mobileFlow.handleEnterAdvance("repaymentRule")}
                 className="ring-focus hair h-12 rounded-md border bg-white px-4 text-[15px] text-[var(--ink)] outline-none"
               >
                 {Object.entries(ruleLabels).map(([value, label]) => (
@@ -547,18 +605,9 @@ function CalculatorContent({
               </p>
             </label>
           </div>
-          <div className="mt-5 flex gap-2 md:hidden">
-            <button
-              type="button"
-              onClick={() => setMobileStep(2)}
-              className="ring-focus hair inline-flex h-11 flex-1 items-center justify-center rounded-full border bg-[var(--paper-soft)] px-4 text-[14px] text-[var(--ink)]"
-            >
-              Volgende stap
-            </button>
-          </div>
         </div>
 
-        <div className={mobileStep === 2 ? "mt-7" : "mt-7 hidden md:block"}>
+        <div className={`mt-7 ${isStepVisible(step2Fields) ? "block" : "hidden"} md:block`}>
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
             Stap 2
           </div>
@@ -567,7 +616,7 @@ function CalculatorContent({
           </h3>
           <div className="mt-4 grid gap-5">
             {showActualField ? (
-              <label className="grid gap-2">
+              <label className={mobileFlow.getFieldClassName("actualMonthlyPayment")}>
                 <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
                   Huidig DUO-maandbedrag
                 </span>
@@ -577,6 +626,10 @@ function CalculatorContent({
                   onChange={(event) =>
                     updateField("actualMonthlyPayment", event.target.value)
                   }
+                  onKeyDown={mobileFlow.handleEnterAdvance(
+                    "actualMonthlyPayment",
+                    Boolean(errors.actualMonthlyPayment),
+                  )}
                   aria-invalid={Boolean(errors.actualMonthlyPayment)}
                   placeholder={
                     formValues.situation === "paymentPause" ? "Bijvoorbeeld 0" : "Bijvoorbeeld 150"
@@ -591,7 +644,7 @@ function CalculatorContent({
             ) : null}
 
             {showStatutoryField ? (
-              <label className="grid gap-2">
+              <label className={mobileFlow.getFieldClassName("statutoryMonthlyPayment")}>
                 <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
                   Wettelijk DUO-maandbedrag
                 </span>
@@ -601,6 +654,10 @@ function CalculatorContent({
                   onChange={(event) =>
                     updateField("statutoryMonthlyPayment", event.target.value)
                   }
+                  onKeyDown={mobileFlow.handleEnterAdvance(
+                    "statutoryMonthlyPayment",
+                    Boolean(errors.statutoryMonthlyPayment),
+                  )}
                   aria-invalid={Boolean(errors.statutoryMonthlyPayment)}
                   placeholder="Als je dit weet uit Mijn DUO"
                   className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
@@ -612,7 +669,7 @@ function CalculatorContent({
               </label>
             ) : null}
 
-            <label className="grid gap-2">
+            <label className={mobileFlow.getFieldClassName("remainingStudentDebt")}>
               <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
                 Resterende studieschuld
               </span>
@@ -622,6 +679,10 @@ function CalculatorContent({
                 onChange={(event) =>
                   updateField("remainingStudentDebt", event.target.value)
                 }
+                onKeyDown={mobileFlow.handleEnterAdvance(
+                  "remainingStudentDebt",
+                  Boolean(errors.remainingStudentDebt),
+                )}
                 aria-invalid={Boolean(errors.remainingStudentDebt)}
                 placeholder="Bijvoorbeeld 22000"
                 className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
@@ -632,7 +693,7 @@ function CalculatorContent({
               <FieldError message={errors.remainingStudentDebt} />
             </label>
 
-            <label className="grid gap-2">
+            <label className={mobileFlow.getFieldClassName("duoInterestRate")}>
               <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
                 DUO-rentepercentage
               </span>
@@ -640,6 +701,10 @@ function CalculatorContent({
                 inputMode="decimal"
                 value={formValues.duoInterestRate}
                 onChange={(event) => updateField("duoInterestRate", event.target.value)}
+                onKeyDown={mobileFlow.handleEnterAdvance(
+                  "duoInterestRate",
+                  Boolean(errors.duoInterestRate),
+                )}
                 aria-invalid={Boolean(errors.duoInterestRate)}
                 placeholder={String(getDefaultDuoRate(formValues.repaymentRule))}
                 className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
@@ -650,7 +715,7 @@ function CalculatorContent({
               <FieldError message={errors.duoInterestRate} />
             </label>
 
-            <label className="grid gap-2">
+            <label className={mobileFlow.getFieldClassName("remainingTermYears")}>
               <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
                 Resterende looptijd
               </span>
@@ -660,6 +725,10 @@ function CalculatorContent({
                 onChange={(event) =>
                   updateField("remainingTermYears", event.target.value)
                 }
+                onKeyDown={mobileFlow.handleEnterAdvance(
+                  "remainingTermYears",
+                  Boolean(errors.remainingTermYears),
+                )}
                 aria-invalid={Boolean(errors.remainingTermYears)}
                 placeholder={String(getDefaultTerm(formValues.repaymentRule))}
                 className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
@@ -670,7 +739,7 @@ function CalculatorContent({
               <FieldError message={errors.remainingTermYears} />
             </label>
 
-            <label className="grid gap-2">
+            <label className={mobileFlow.getFieldClassName("extraRepayment")}>
               <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
                 Extra aflossen (optioneel)
               </span>
@@ -678,6 +747,10 @@ function CalculatorContent({
                 inputMode="decimal"
                 value={formValues.extraRepayment}
                 onChange={(event) => updateField("extraRepayment", event.target.value)}
+                onKeyDown={mobileFlow.handleEnterAdvance(
+                  "extraRepayment",
+                  Boolean(errors.extraRepayment),
+                )}
                 aria-invalid={Boolean(errors.extraRepayment)}
                 placeholder="Bijvoorbeeld 5000"
                 className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
@@ -688,25 +761,9 @@ function CalculatorContent({
               <FieldError message={errors.extraRepayment} />
             </label>
           </div>
-          <div className="mt-5 flex gap-2 md:hidden">
-            <button
-              type="button"
-              onClick={() => setMobileStep(1)}
-              className="ring-focus hair inline-flex h-11 flex-1 items-center justify-center rounded-full border bg-white px-4 text-[14px] text-[var(--ink)]"
-            >
-              Terug
-            </button>
-            <button
-              type="button"
-              onClick={() => setMobileStep(3)}
-              className="ring-focus hair inline-flex h-11 flex-1 items-center justify-center rounded-full border bg-[var(--paper-soft)] px-4 text-[14px] text-[var(--ink)]"
-            >
-              Volgende stap
-            </button>
-          </div>
         </div>
 
-        <div className={mobileStep === 3 ? "mt-7" : "mt-7 hidden md:block"}>
+        <div className={`mt-7 ${isStepVisible(step3Fields) ? "block" : "hidden"} md:block`}>
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
             Stap 3
           </div>
@@ -714,7 +771,7 @@ function CalculatorContent({
             Woningdoel
           </h3>
           <div className="mt-4 grid gap-5">
-            <label className="grid gap-2">
+            <label className={mobileFlow.getFieldClassName("grossIncomeUser")}>
               <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
                 Bruto jaarinkomen gebruiker
               </span>
@@ -722,13 +779,17 @@ function CalculatorContent({
                 inputMode="decimal"
                 value={formValues.grossIncomeUser}
                 onChange={(event) => updateField("grossIncomeUser", event.target.value)}
+                onKeyDown={mobileFlow.handleEnterAdvance(
+                  "grossIncomeUser",
+                  Boolean(errors.grossIncomeUser),
+                )}
                 aria-invalid={Boolean(errors.grossIncomeUser)}
                 className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
               />
               <FieldError message={errors.grossIncomeUser} />
             </label>
 
-            <label className="grid gap-2">
+            <label className={mobileFlow.getFieldClassName("grossIncomePartner")}>
               <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
                 Bruto jaarinkomen partner
               </span>
@@ -738,6 +799,10 @@ function CalculatorContent({
                 onChange={(event) =>
                   updateField("grossIncomePartner", event.target.value)
                 }
+                onKeyDown={mobileFlow.handleEnterAdvance(
+                  "grossIncomePartner",
+                  Boolean(errors.grossIncomePartner),
+                )}
                 aria-invalid={Boolean(errors.grossIncomePartner)}
                 placeholder="Laat leeg als je alleen koopt"
                 className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
@@ -748,7 +813,7 @@ function CalculatorContent({
               <FieldError message={errors.grossIncomePartner} />
             </label>
 
-            <label className="grid gap-2">
+            <label className={mobileFlow.getFieldClassName("desiredHomePrice")}>
               <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
                 Gewenste woningprijs
               </span>
@@ -758,6 +823,10 @@ function CalculatorContent({
                 onChange={(event) =>
                   updateField("desiredHomePrice", event.target.value)
                 }
+                onKeyDown={mobileFlow.handleEnterAdvance(
+                  "desiredHomePrice",
+                  Boolean(errors.desiredHomePrice),
+                )}
                 aria-invalid={Boolean(errors.desiredHomePrice)}
                 placeholder="Bijvoorbeeld 375000"
                 className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
@@ -765,7 +834,7 @@ function CalculatorContent({
               <FieldError message={errors.desiredHomePrice} />
             </label>
 
-            <label className="grid gap-2">
+            <label className={mobileFlow.getFieldClassName("ownMoney")}>
               <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
                 Eigen geld
               </span>
@@ -773,6 +842,10 @@ function CalculatorContent({
                 inputMode="decimal"
                 value={formValues.ownMoney}
                 onChange={(event) => updateField("ownMoney", event.target.value)}
+                onKeyDown={mobileFlow.handleEnterAdvance(
+                  "ownMoney",
+                  Boolean(errors.ownMoney),
+                )}
                 aria-invalid={Boolean(errors.ownMoney)}
                 placeholder="Bijvoorbeeld 25000"
                 className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
@@ -780,7 +853,9 @@ function CalculatorContent({
               <FieldError message={errors.ownMoney} />
             </label>
 
-            <label className="grid gap-2">
+            <label
+              className={mobileFlow.getFieldClassName("maxMortgageWithoutStudentDebt")}
+            >
               <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
                 Maximale hypotheek zonder studieschuld (optioneel)
               </span>
@@ -790,6 +865,10 @@ function CalculatorContent({
                 onChange={(event) =>
                   updateField("maxMortgageWithoutStudentDebt", event.target.value)
                 }
+                onKeyDown={mobileFlow.handleEnterAdvance(
+                  "maxMortgageWithoutStudentDebt",
+                  Boolean(errors.maxMortgageWithoutStudentDebt),
+                )}
                 aria-invalid={Boolean(errors.maxMortgageWithoutStudentDebt)}
                 placeholder="Volgens adviseur of rekenhulp"
                 className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
@@ -800,25 +879,9 @@ function CalculatorContent({
               <FieldError message={errors.maxMortgageWithoutStudentDebt} />
             </label>
           </div>
-          <div className="mt-5 flex gap-2 md:hidden">
-            <button
-              type="button"
-              onClick={() => setMobileStep(2)}
-              className="ring-focus hair inline-flex h-11 flex-1 items-center justify-center rounded-full border bg-white px-4 text-[14px] text-[var(--ink)]"
-            >
-              Terug
-            </button>
-            <button
-              type="button"
-              onClick={() => setMobileStep(4)}
-              className="ring-focus hair inline-flex h-11 flex-1 items-center justify-center rounded-full border bg-[var(--paper-soft)] px-4 text-[14px] text-[var(--ink)]"
-            >
-              Volgende stap
-            </button>
-          </div>
         </div>
 
-        <div className={mobileStep === 4 ? "mt-7" : "mt-7 hidden md:block"}>
+        <div className={`mt-7 ${isStepVisible(step4Fields) ? "block" : "hidden"} md:block`}>
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
             Stap 4
           </div>
@@ -826,7 +889,7 @@ function CalculatorContent({
             Hypotheek-aannames
           </h3>
           <div className="mt-4 grid gap-5">
-            <label className="grid gap-2">
+            <label className={mobileFlow.getFieldClassName("mortgageRate")}>
               <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
                 Hypotheekrentepercentage
               </span>
@@ -834,13 +897,17 @@ function CalculatorContent({
                 inputMode="decimal"
                 value={formValues.mortgageRate}
                 onChange={(event) => updateField("mortgageRate", event.target.value)}
+                onKeyDown={mobileFlow.handleEnterAdvance(
+                  "mortgageRate",
+                  Boolean(errors.mortgageRate),
+                )}
                 aria-invalid={Boolean(errors.mortgageRate)}
                 className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
               />
               <FieldError message={errors.mortgageRate} />
             </label>
 
-            <label className="grid gap-2">
+            <label className={mobileFlow.getFieldClassName("mortgageTermYears")}>
               <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
                 Hypotheeklooptijd
               </span>
@@ -850,13 +917,19 @@ function CalculatorContent({
                 onChange={(event) =>
                   updateField("mortgageTermYears", event.target.value)
                 }
+                onKeyDown={mobileFlow.handleEnterAdvance(
+                  "mortgageTermYears",
+                  Boolean(errors.mortgageTermYears),
+                )}
                 aria-invalid={Boolean(errors.mortgageTermYears)}
                 className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
               />
               <FieldError message={errors.mortgageTermYears} />
             </label>
 
-            <label className="grid gap-3 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3">
+            <label
+              className={`${mobileFlow.getFieldClassName("showAdvancedAssumptions")} rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3`}
+            >
               <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
                 Toon geavanceerde aannames
               </span>
@@ -867,6 +940,7 @@ function CalculatorContent({
                   onChange={(event) =>
                     updateField("showAdvancedAssumptions", event.target.checked)
                   }
+                  onKeyDown={mobileFlow.handleEnterAdvance("showAdvancedAssumptions")}
                   className="h-4 w-4 rounded border-[var(--hair)] text-[var(--deep)]"
                 />
                 <span className="text-[14px] leading-[1.6] text-[var(--ink)]">
@@ -880,15 +954,14 @@ function CalculatorContent({
               ) : null}
             </label>
           </div>
-          <div className="mt-5 flex gap-2 md:hidden">
-            <button
-              type="button"
-              onClick={() => setMobileStep(3)}
-              className="ring-focus hair inline-flex h-11 flex-1 items-center justify-center rounded-full border bg-white px-4 text-[14px] text-[var(--ink)]"
-            >
-              Terug
-            </button>
-          </div>
+          <MobileFieldFlowControls
+            current={mobileFlow.activeIndex + 1}
+            total={mobileFlow.total}
+            canGoPrev={mobileFlow.canGoPrev}
+            canGoNext={mobileFlow.canGoNext && !isCurrentFieldBlocked}
+            onPrev={mobileFlow.goPrev}
+            onNext={mobileFlow.goNext}
+          />
         </div>
 
         {hasErrors ? (

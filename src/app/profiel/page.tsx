@@ -419,7 +419,7 @@ export default function ProfilePage() {
       <SiteHeader />
       <main
         id="main-content"
-        className="mx-auto min-h-[100dvh] max-w-4xl px-5 pb-10 pt-8 sm:px-8 lg:px-10 lg:pb-14"
+        className="page-shell min-h-[100dvh] max-w-4xl pb-10 pt-8 lg:pb-14"
       >
         <section className="grid gap-4 rounded-[1.5rem] border hair bg-white/80 p-6 shadow-paper">
           <div>

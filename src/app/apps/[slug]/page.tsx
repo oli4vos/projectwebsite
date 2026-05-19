@@ -51,7 +51,7 @@ export default async function AppDetailPage({ params }: AppDetailPageProps) {
   return (
     <>
       <SiteHeader />
-      <main id="main-content" className="mx-auto min-h-[100dvh] max-w-7xl px-5 pb-10 pt-8 sm:px-8 lg:px-10 lg:pb-14">
+      <main id="main-content" className="page-shell min-h-[100dvh] pb-10 pt-8 lg:pb-14">
         <Link
           href="/"
           className="inline-flex items-center gap-2 text-[13px] text-[var(--muted)] transition hover:text-[var(--ink)]"

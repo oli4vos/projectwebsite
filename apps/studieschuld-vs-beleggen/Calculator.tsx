@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { MobileFieldFlowControls } from "@/components/MobileFieldFlowControls";
 import {
   AreaChart,
   getAdaptiveEuroTicks,
@@ -9,6 +10,7 @@ import {
 import { ResultRow } from "@/components/ResultRow";
 import { ToolDisclosure } from "@/components/ToolDisclosure";
 import { Pill } from "@/components/ui";
+import { useMobileFieldFlow } from "@/hooks/useMobileFieldFlow";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { getDefaultFinancialYear } from "@/lib/financial-constants";
 import type { Box3Method } from "@/lib/tax";
@@ -202,10 +204,39 @@ function CalculatorContent({
   profilePatch,
 }: CalculatorContentProps) {
   const [formValues, setFormValues] = useState<FormState>(initialValues);
-  const [mobileStep, setMobileStep] = useState<1 | 2>(1);
   const { errors, parsedValues } = validateForm(formValues);
   const result = parsedValues ? calculateStudyDebtVsInvesting(parsedValues) : null;
   const hasErrors = Object.keys(errors).length > 0;
+  const mobileFieldOrder = [
+    "monthlyAmount",
+    "annualDebtRate",
+    "annualInvestmentReturn",
+    "years",
+    "box3EffectEnabled",
+    ...(formValues.box3EffectEnabled
+      ? [
+          "taxYear",
+          "hasFiscalPartner",
+          "box3Method",
+          "box3BankDeposits",
+          "box3InvestmentsAndOtherAssets",
+          "box3Debts",
+        ]
+      : []),
+  ];
+  const mobileFlow = useMobileFieldFlow(mobileFieldOrder);
+  const isCurrentFieldBlocked = Boolean(
+    {
+      monthlyAmount: errors.monthlyAmount,
+      annualDebtRate: errors.annualDebtRate,
+      annualInvestmentReturn: errors.annualInvestmentReturn,
+      years: errors.years,
+      taxYear: errors.taxYear,
+      box3BankDeposits: errors.box3BankDeposits,
+      box3InvestmentsAndOtherAssets: errors.box3InvestmentsAndOtherAssets,
+      box3Debts: errors.box3Debts,
+    }[mobileFlow.activeFieldId],
+  );
   const chartSeries = result
     ? (() => {
         const series = [
@@ -287,8 +318,8 @@ function CalculatorContent({
           </div>
         ) : null}
 
-        <div className={`mt-6 grid gap-5 ${mobileStep === 1 ? "block" : "hidden"} md:block`}>
-          <label className="grid gap-2">
+        <div className="mt-6 grid gap-5">
+          <label className={mobileFlow.getFieldClassName("monthlyAmount")}>
             <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
               Maandbedrag
             </span>
@@ -296,13 +327,17 @@ function CalculatorContent({
               inputMode="decimal"
               value={formValues.monthlyAmount}
               onChange={(event) => updateField("monthlyAmount", event.target.value)}
+              onKeyDown={mobileFlow.handleEnterAdvance(
+                "monthlyAmount",
+                Boolean(errors.monthlyAmount),
+              )}
               aria-invalid={Boolean(errors.monthlyAmount)}
               className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
             />
             <FieldError message={errors.monthlyAmount} />
           </label>
 
-          <label className="grid gap-2">
+          <label className={mobileFlow.getFieldClassName("annualDebtRate")}>
             <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
               Rente studieschuld per jaar (%)
             </span>
@@ -310,13 +345,17 @@ function CalculatorContent({
               inputMode="decimal"
               value={formValues.annualDebtRate}
               onChange={(event) => updateField("annualDebtRate", event.target.value)}
+              onKeyDown={mobileFlow.handleEnterAdvance(
+                "annualDebtRate",
+                Boolean(errors.annualDebtRate),
+              )}
               aria-invalid={Boolean(errors.annualDebtRate)}
               className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
             />
             <FieldError message={errors.annualDebtRate} />
           </label>
 
-          <label className="grid gap-2">
+          <label className={mobileFlow.getFieldClassName("annualInvestmentReturn")}>
             <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
               Verwacht beleggingsrendement per jaar (%)
             </span>
@@ -326,13 +365,17 @@ function CalculatorContent({
               onChange={(event) =>
                 updateField("annualInvestmentReturn", event.target.value)
               }
+              onKeyDown={mobileFlow.handleEnterAdvance(
+                "annualInvestmentReturn",
+                Boolean(errors.annualInvestmentReturn),
+              )}
               aria-invalid={Boolean(errors.annualInvestmentReturn)}
               className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
             />
             <FieldError message={errors.annualInvestmentReturn} />
           </label>
 
-          <label className="grid gap-2">
+          <label className={mobileFlow.getFieldClassName("years")}>
             <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
               Looptijd in jaren
             </span>
@@ -340,30 +383,19 @@ function CalculatorContent({
               inputMode="decimal"
               value={formValues.years}
               onChange={(event) => updateField("years", event.target.value)}
+              onKeyDown={mobileFlow.handleEnterAdvance(
+                "years",
+                Boolean(errors.years),
+              )}
               aria-invalid={Boolean(errors.years)}
               className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
             />
             <FieldError message={errors.years} />
           </label>
-          <button
-            type="button"
-            onClick={() => setMobileStep(2)}
-            className="ring-focus hair inline-flex h-11 items-center justify-center rounded-full border bg-[var(--paper-soft)] px-4 text-[14px] text-[var(--ink)] md:hidden"
-          >
-            Volgende stap: aannames
-          </button>
-        </div>
 
-        <div className={`mt-5 grid gap-5 ${mobileStep === 2 ? "block" : "hidden"} md:mt-0 md:block`}>
-          <button
-            type="button"
-            onClick={() => setMobileStep(1)}
-            className="ring-focus hair inline-flex h-11 items-center justify-center rounded-full border bg-white px-4 text-[14px] text-[var(--ink)] md:hidden"
+          <label
+            className={`${mobileFlow.getFieldClassName("box3EffectEnabled")} rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3`}
           >
-            Terug naar basisvelden
-          </button>
-
-          <label className="grid gap-2 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3">
             <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
               Geavanceerde aanname
             </span>
@@ -374,6 +406,7 @@ function CalculatorContent({
                 onChange={(event) =>
                   updateField("box3EffectEnabled", event.target.checked)
                 }
+                onKeyDown={mobileFlow.handleEnterAdvance("box3EffectEnabled")}
                 className="size-4 accent-[var(--accent)]"
               />
               Box 3-effect indicatief meenemen
@@ -386,7 +419,7 @@ function CalculatorContent({
 
           {formValues.box3EffectEnabled ? (
             <>
-              <label className="grid gap-2">
+              <label className={mobileFlow.getFieldClassName("taxYear")}>
                 <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
                   Belastingjaar
                 </span>
@@ -394,13 +427,17 @@ function CalculatorContent({
                   inputMode="numeric"
                   value={formValues.taxYear}
                   onChange={(event) => updateField("taxYear", event.target.value)}
+                  onKeyDown={mobileFlow.handleEnterAdvance(
+                    "taxYear",
+                    Boolean(errors.taxYear),
+                  )}
                   aria-invalid={Boolean(errors.taxYear)}
                   className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
                 />
                 <FieldError message={errors.taxYear} />
               </label>
 
-              <label className="grid gap-2">
+              <label className={mobileFlow.getFieldClassName("hasFiscalPartner")}>
                 <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
                   Fiscale partner
                 </span>
@@ -411,13 +448,14 @@ function CalculatorContent({
                     onChange={(event) =>
                       updateField("hasFiscalPartner", event.target.checked)
                     }
+                    onKeyDown={mobileFlow.handleEnterAdvance("hasFiscalPartner")}
                     className="size-4 accent-[var(--accent)]"
                   />
                   Ja, reken met partnervrijstelling
                 </span>
               </label>
 
-              <label className="grid gap-2">
+              <label className={mobileFlow.getFieldClassName("box3Method")}>
                 <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
                   Box 3-methode
                 </span>
@@ -431,6 +469,7 @@ function CalculatorContent({
                         event.target.checked ? "forfaitary" : "actual",
                       )
                     }
+                    onKeyDown={mobileFlow.handleEnterAdvance("box3Method")}
                     className="size-4 accent-[var(--accent)]"
                   />
                   Gebruik forfaitair rendement (anders werkelijk rendement)
@@ -441,7 +480,7 @@ function CalculatorContent({
                 </p>
               </label>
 
-              <label className="grid gap-2">
+              <label className={mobileFlow.getFieldClassName("box3BankDeposits")}>
                 <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
                   Box 3 banktegoeden / spaargeld
                 </span>
@@ -451,13 +490,19 @@ function CalculatorContent({
                   onChange={(event) =>
                     updateField("box3BankDeposits", event.target.value)
                   }
+                  onKeyDown={mobileFlow.handleEnterAdvance(
+                    "box3BankDeposits",
+                    Boolean(errors.box3BankDeposits),
+                  )}
                   aria-invalid={Boolean(errors.box3BankDeposits)}
                   className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
                 />
                 <FieldError message={errors.box3BankDeposits} />
               </label>
 
-              <label className="grid gap-2">
+              <label
+                className={mobileFlow.getFieldClassName("box3InvestmentsAndOtherAssets")}
+              >
                 <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
                   Box 3 beleggingen / overige bezittingen
                 </span>
@@ -467,13 +512,17 @@ function CalculatorContent({
                   onChange={(event) =>
                     updateField("box3InvestmentsAndOtherAssets", event.target.value)
                   }
+                  onKeyDown={mobileFlow.handleEnterAdvance(
+                    "box3InvestmentsAndOtherAssets",
+                    Boolean(errors.box3InvestmentsAndOtherAssets),
+                  )}
                   aria-invalid={Boolean(errors.box3InvestmentsAndOtherAssets)}
                   className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
                 />
                 <FieldError message={errors.box3InvestmentsAndOtherAssets} />
               </label>
 
-              <label className="grid gap-2">
+              <label className={mobileFlow.getFieldClassName("box3Debts")}>
                 <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
                   Box 3 schulden
                 </span>
@@ -481,6 +530,10 @@ function CalculatorContent({
                   inputMode="decimal"
                   value={formValues.box3Debts}
                   onChange={(event) => updateField("box3Debts", event.target.value)}
+                  onKeyDown={mobileFlow.handleEnterAdvance(
+                    "box3Debts",
+                    Boolean(errors.box3Debts),
+                  )}
                   aria-invalid={Boolean(errors.box3Debts)}
                   className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
                 />
@@ -488,6 +541,15 @@ function CalculatorContent({
               </label>
             </>
           ) : null}
+
+          <MobileFieldFlowControls
+            current={mobileFlow.activeIndex + 1}
+            total={mobileFlow.total}
+            canGoPrev={mobileFlow.canGoPrev}
+            canGoNext={mobileFlow.canGoNext && !isCurrentFieldBlocked}
+            onPrev={mobileFlow.goPrev}
+            onNext={mobileFlow.goNext}
+          />
         </div>
 
         {hasErrors ? (
