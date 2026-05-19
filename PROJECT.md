@@ -116,6 +116,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `next.config.ts`: standaard Next-config + GitHub Pages static export in Actions
 - GitHub Pages draait als project-site onder `/projectwebsite` (basePath/assetPrefix worden in Actions automatisch gezet)
 - `.github/workflows/ci.yml`: sequentiële CI-checks voor generate/test/lint/typecheck/build
+- `.github/workflows/deploy-pages.yml`: deploy draait pas na succesvolle `CI` (`workflow_run`) op `main`; handmatige deploy via `workflow_dispatch` blijft mogelijk
 
 ## Huidige tools
 
