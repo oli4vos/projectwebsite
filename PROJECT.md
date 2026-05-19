@@ -111,6 +111,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/lib/duo/calculations.test.ts`: regressietests voor centrale DUO-berekenfuncties
 - `src/lib/tax/`: centrale indicatieve tax-laag voor box 1, hypotheekrenteaftrek en box 3
 - `next.config.ts`: standaard Next-config + GitHub Pages static export in Actions
+- GitHub Pages draait als project-site onder `/projectwebsite` (basePath/assetPrefix worden in Actions automatisch gezet)
 - `.github/workflows/ci.yml`: sequentiële CI-checks voor generate/test/lint/typecheck/build
 
 ## Huidige tools
@@ -180,6 +181,8 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - Alle gebruikersgerichte frontend-copy is standaard Nederlands. Engelse tekst mag alleen in code, technische namen of wanneer expliciet gekozen.
 - Mobile-first is verplicht: elke nieuwe component of tool moet standaard goed werken op mobiel.
 - Uitvoerige QA-rondes of brede responsive testmatrices alleen uitvoeren als de gebruiker daarom vraagt én dit bevestigt.
+- Bij runtime laadproblemen na deploy is er een Nederlandse error-fallback via `src/app/error.tsx` en `src/app/global-error.tsx`.
+- Bij “Deze pagina kon niet goed laden”: eerst hard refresh (`Cmd+Shift+R`) of sitegegevens wissen voor `oli4vos.github.io`.
 - UX-standaard voor rekentools:
   - eerst invulvelden
   - dan een beknopte samenvatting met kernuitkomst in gewone taal
@@ -207,6 +210,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/lib/categories.ts` is nu heuristisch op string-matching gebaseerd; bij meer tools kan dat te grof worden.
 - `apps/annuitair-lineair/` mixt TypeScript wrappercode met oudere `.js` rekenscripts; dat maakt uniform onderhoud lastiger.
 - Manifesten ondersteunen nu alleen één entry-component per tool; geen subpagina's of complexere toolmodules.
+- Cache/chunk mismatches na GitHub Pages deploy kunnen bij sommige browsers tijdelijk voorkomen; error-fallback probeert éénmalig auto-reload bij bekende chunk-load errors.
 
 ## Aanbevolen uitbreidingsrichting
 
