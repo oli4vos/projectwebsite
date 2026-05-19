@@ -19,6 +19,8 @@ export type DuoPaymentSource =
   | "incomeBased"
   | "mixed";
 
+export type ExtraRepaymentStrategy = "lowerMonthlyPayment" | "shortenTerm";
+
 export type DuoRepaymentInput = {
   remainingDebt?: number;
   annualInterestRate?: number;
@@ -67,6 +69,40 @@ export type ExtraRepaymentVsInvestingInput = {
 
 export type DuoMonthlyPaymentAfterExtraRepaymentInput = DuoRepaymentInput & {
   extraRepaymentAmount?: number;
+};
+
+export type DuoPayoffTimingInput = DuoRepaymentInput & {
+  monthlyPayment?: number;
+  startDate?: string;
+};
+
+export type DuoPayoffTimingResult = {
+  monthsRemaining: number;
+  yearsRemaining: number;
+  payoffDate: string | null;
+  explanation: string;
+  warnings: string[];
+};
+
+export type ExtraRepaymentPayoffImpactInput = DuoPayoffTimingInput & {
+  extraRepaymentAmount?: number;
+  strategy?: ExtraRepaymentStrategy;
+};
+
+export type ExtraRepaymentPayoffImpactResult = {
+  strategy: ExtraRepaymentStrategy;
+  extraRepaymentUsed: number;
+  originalMonthsRemaining: number;
+  newMonthsRemaining: number;
+  monthsSaved: number;
+  yearsSaved: number;
+  originalPayoffDate: string | null;
+  newPayoffDate: string | null;
+  newRemainingDebt: number;
+  oldMonthlyPayment: number;
+  newMonthlyPayment: number;
+  explanation: string;
+  warnings: string[];
 };
 
 export type RelevantDuoPaymentResult = {

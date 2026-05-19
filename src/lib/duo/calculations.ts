@@ -7,7 +7,12 @@ import {
 import type {
   DuoIncomeBasedMonthlyPaymentResult,
   DuoMonthlyPaymentAfterExtraRepaymentInput,
+  DuoPayoffTimingInput,
+  DuoPayoffTimingResult,
   DuoRelevantPaymentInput,
+  ExtraRepaymentPayoffImpactInput,
+  ExtraRepaymentPayoffImpactResult,
+  ExtraRepaymentStrategy,
   ExtraRepaymentVsInvestingInput,
   RelevantDuoPaymentResult,
   RepaymentRule,
@@ -16,6 +21,8 @@ import type {
 const DEFAULT_YEAR = getDefaultFinancialYear();
 const DUO_DRAAGKRACHT_SOURCE_URL =
   "https://duo.nl/particulier/studieschuld-terugbetalen/berekening-maandbedrag.jsp";
+const DUO_PAYOFF_STRATEGY_WARNING =
+  "Deze berekening is indicatief. Als DUO je maandbedrag na extra aflossen verlaagt, ben je niet automatisch eerder klaar; je betaalt dan vooral per maand minder. Als je maandbedrag gelijk blijft, kan extra aflossen juist de looptijd verkorten. Controleer dit altijd in Mijn DUO.";
 
 function safeFinite(value: number | undefined, fallback = 0) {
   return Number.isFinite(value) ? (value as number) : fallback;
@@ -58,6 +65,34 @@ function resolveDuoTerm(input: {
     return defaultTerm;
   }
   return sanitizeYears(input.remainingTermYears, defaultTerm);
+}
+
+function createDefaultStartDate() {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), 1);
+}
+
+function parseStartDate(startDate?: string) {
+  if (!startDate) {
+    return createDefaultStartDate();
+  }
+
+  const parsed = new Date(startDate);
+  if (Number.isNaN(parsed.getTime())) {
+    return createDefaultStartDate();
+  }
+
+  return new Date(parsed.getFullYear(), parsed.getMonth(), 1);
+}
+
+function addMonths(date: Date, months: number) {
+  return new Date(date.getFullYear(), date.getMonth() + months, 1);
+}
+
+function formatYearMonth(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  return `${year}-${month}`;
 }
 
 function calculateAnnuityMonthlyPayment(
@@ -273,6 +308,233 @@ export function calculateDuoMonthlyPaymentAfterExtraRepayment(
     newStatutoryMonthlyPayment,
     monthlyPaymentReduction,
     newRemainingDebt,
+  };
+}
+
+export function calculateRemainingMonthsToPayOff(input: DuoPayoffTimingInput) {
+  const remainingDebt = sanitizeDuoMoney(input.remainingDebt);
+  if (remainingDebt <= 0) {
+    return 0;
+  }
+
+  const repaymentRule = resolveRepaymentRule(input.repaymentRule);
+  const annualInterestRate = resolveDuoRate({
+    annualInterestRate: input.annualInterestRate,
+    repaymentRule,
+  });
+  const remainingTermYears = resolveDuoTerm({
+    remainingTermYears: input.remainingTermYears,
+    repaymentRule,
+  });
+  const maxMonths = Math.max(Math.round(remainingTermYears * 12), 0);
+
+  if (maxMonths <= 0) {
+    return 0;
+  }
+
+  const statutoryMonthlyPayment = calculateStatutoryDuoMonthlyPayment({
+    remainingDebt,
+    annualInterestRate,
+    remainingTermYears,
+    repaymentRule,
+  });
+
+  const monthlyPaymentInput = sanitizeDuoMoney(input.monthlyPayment);
+  const monthlyPayment =
+    monthlyPaymentInput > 0 ? monthlyPaymentInput : statutoryMonthlyPayment;
+
+  if (monthlyPayment <= 0) {
+    return maxMonths;
+  }
+
+  if (annualInterestRate === 0) {
+    return Math.min(Math.ceil(remainingDebt / monthlyPayment), maxMonths);
+  }
+
+  const monthlyRate = annualInterestRate / 100 / 12;
+  let balance = remainingDebt;
+
+  for (let month = 1; month <= maxMonths; month += 1) {
+    const interest = balance * monthlyRate;
+    const principalPaid = monthlyPayment - interest;
+
+    if (principalPaid <= 0) {
+      return maxMonths;
+    }
+
+    balance = Math.max(balance - principalPaid, 0);
+    if (balance <= 0) {
+      return month;
+    }
+  }
+
+  return maxMonths;
+}
+
+export function calculatePayoffDate(input: DuoPayoffTimingInput): DuoPayoffTimingResult {
+  const remainingDebt = sanitizeDuoMoney(input.remainingDebt);
+  const repaymentRule = resolveRepaymentRule(input.repaymentRule);
+  const annualInterestRate = resolveDuoRate({
+    annualInterestRate: input.annualInterestRate,
+    repaymentRule,
+  });
+  const remainingTermYears = resolveDuoTerm({
+    remainingTermYears: input.remainingTermYears,
+    repaymentRule,
+  });
+  const statutoryMonthlyPayment = calculateStatutoryDuoMonthlyPayment({
+    remainingDebt,
+    annualInterestRate,
+    remainingTermYears,
+    repaymentRule,
+  });
+  const monthlyPaymentInput = sanitizeDuoMoney(input.monthlyPayment);
+  const monthlyPayment =
+    monthlyPaymentInput > 0 ? monthlyPaymentInput : statutoryMonthlyPayment;
+  const warnings: string[] = [];
+  const startDate = parseStartDate(input.startDate);
+
+  if (remainingDebt === 0) {
+    return {
+      monthsRemaining: 0,
+      yearsRemaining: 0,
+      payoffDate: null,
+      explanation: "Je resterende studieschuld staat op nul.",
+      warnings,
+    };
+  }
+
+  if (monthlyPaymentInput <= 0) {
+    warnings.push(
+      "Maandbedrag ontbrak of was ongeldig; voor de aflosdatum gebruiken we een annuïtaire schatting.",
+    );
+  }
+
+  const monthsRemaining = calculateRemainingMonthsToPayOff({
+    remainingDebt,
+    annualInterestRate,
+    remainingTermYears,
+    repaymentRule,
+    monthlyPayment,
+  });
+  const yearsRemaining = roundMoney(monthsRemaining / 12);
+  const payoffDate = monthsRemaining > 0 ? formatYearMonth(addMonths(startDate, monthsRemaining)) : null;
+  const maxMonths = Math.max(Math.round(remainingTermYears * 12), 0);
+
+  if (monthsRemaining >= maxMonths && monthlyPaymentInput > 0 && monthlyPayment < statutoryMonthlyPayment) {
+    warnings.push(
+      "Je maandbedrag ligt lager dan de wettelijke annuïtaire schatting. Daardoor is de echte aflosdatum onzeker.",
+    );
+  }
+
+  return {
+    monthsRemaining,
+    yearsRemaining,
+    payoffDate,
+    explanation:
+      "Aflosdatum is indicatief berekend vanaf deze maand op basis van schuld, rente en maandbedrag.",
+    warnings,
+  };
+}
+
+export function calculateExtraRepaymentPayoffImpact(
+  input: ExtraRepaymentPayoffImpactInput,
+): ExtraRepaymentPayoffImpactResult {
+  const strategy: ExtraRepaymentStrategy =
+    input.strategy ?? "lowerMonthlyPayment";
+  const repaymentRule = resolveRepaymentRule(input.repaymentRule);
+  const remainingDebt = sanitizeDuoMoney(input.remainingDebt);
+  const annualInterestRate = resolveDuoRate({
+    annualInterestRate: input.annualInterestRate,
+    repaymentRule,
+  });
+  const remainingTermYears = resolveDuoTerm({
+    remainingTermYears: input.remainingTermYears,
+    repaymentRule,
+  });
+  const extraRepaymentInput = sanitizeDuoMoney(input.extraRepaymentAmount);
+  const extraRepaymentUsed = Math.min(extraRepaymentInput, remainingDebt);
+  const newRemainingDebt = calculateRemainingDebtAfterExtraRepayment(
+    remainingDebt,
+    extraRepaymentUsed,
+  );
+  const warnings: string[] = [];
+
+  const oldMonthlyPaymentInput = sanitizeDuoMoney(input.monthlyPayment);
+  const statutoryOldMonthlyPayment = calculateStatutoryDuoMonthlyPayment({
+    remainingDebt,
+    annualInterestRate,
+    remainingTermYears,
+    repaymentRule,
+  });
+  const oldMonthlyPayment =
+    oldMonthlyPaymentInput > 0
+      ? oldMonthlyPaymentInput
+      : statutoryOldMonthlyPayment;
+  const originalTiming = calculatePayoffDate({
+    remainingDebt,
+    annualInterestRate,
+    remainingTermYears,
+    repaymentRule,
+    monthlyPayment: oldMonthlyPayment,
+    startDate: input.startDate,
+  });
+
+  const newMonthlyPayment =
+    strategy === "lowerMonthlyPayment"
+      ? calculateStatutoryDuoMonthlyPayment({
+          remainingDebt: newRemainingDebt,
+          annualInterestRate,
+          remainingTermYears,
+          repaymentRule,
+        })
+      : oldMonthlyPayment;
+  const newTiming = calculatePayoffDate({
+    remainingDebt: newRemainingDebt,
+    annualInterestRate,
+    remainingTermYears,
+    repaymentRule,
+    monthlyPayment: newMonthlyPayment,
+    startDate: input.startDate,
+  });
+
+  if (extraRepaymentInput > remainingDebt && remainingDebt > 0) {
+    warnings.push(
+      "Extra aflossen is begrensd op je ingevulde resterende studieschuld.",
+    );
+  }
+
+  warnings.push(DUO_PAYOFF_STRATEGY_WARNING);
+  warnings.push(...originalTiming.warnings);
+  warnings.push(...newTiming.warnings);
+
+  const originalMonthsRemaining = originalTiming.monthsRemaining;
+  const newMonthsRemaining =
+    strategy === "lowerMonthlyPayment"
+      ? originalMonthsRemaining
+      : newTiming.monthsRemaining;
+  const monthsSaved = Math.max(originalMonthsRemaining - newMonthsRemaining, 0);
+  const yearsSaved = roundMoney(monthsSaved / 12);
+
+  const explanation =
+    strategy === "lowerMonthlyPayment"
+      ? "Scenario maandbedrag daalt: extra aflossen verlaagt vooral je maandlast en laat de indicatieve einddatum grotendeels gelijk."
+      : "Scenario looptijd korter: je maandbedrag blijft gelijk waardoor je indicatief sneller schuldenvrij bent.";
+
+  return {
+    strategy,
+    extraRepaymentUsed: roundMoney(extraRepaymentUsed),
+    originalMonthsRemaining,
+    newMonthsRemaining,
+    monthsSaved,
+    yearsSaved,
+    originalPayoffDate: originalTiming.payoffDate,
+    newPayoffDate: newTiming.payoffDate,
+    newRemainingDebt,
+    oldMonthlyPayment: roundMoney(oldMonthlyPayment),
+    newMonthlyPayment: roundMoney(newMonthlyPayment),
+    explanation,
+    warnings: [...new Set(warnings)],
   };
 }
 

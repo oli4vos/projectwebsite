@@ -1,4 +1,8 @@
-import { calculateExtraRepaymentVsInvesting } from "@/lib/duo";
+import {
+  calculateExtraRepaymentPayoffImpact,
+  calculateExtraRepaymentVsInvesting,
+  type ExtraRepaymentPayoffImpactResult,
+} from "@/lib/duo";
 import {
   getDefaultFinancialYear,
   getFinancialConstants,
@@ -26,6 +30,10 @@ export type CalculatorResult = {
   expectedInvestmentValue: number;
   difference: number;
   projections: ProjectionPoint[];
+  payoffTiming: {
+    lowerMonthlyPayment: ExtraRepaymentPayoffImpactResult;
+    shortenTerm: ExtraRepaymentPayoffImpactResult;
+  };
   box3Scenario?: Box3ScenarioResult;
 };
 
@@ -168,6 +176,22 @@ export function calculateStudyDebtVsInvesting(
   );
   const difference = roundMoney(expectedInvestmentValue - debtStrategyValue);
   const box3Method = safeInput.box3Method ?? "actual";
+  const payoffTiming = {
+    lowerMonthlyPayment: calculateExtraRepaymentPayoffImpact({
+      remainingDebt: totalExtraRepayment,
+      annualInterestRate: safeInput.annualDebtRate,
+      remainingTermYears: safeInput.years,
+      extraRepaymentAmount: totalExtraRepayment,
+      strategy: "lowerMonthlyPayment",
+    }),
+    shortenTerm: calculateExtraRepaymentPayoffImpact({
+      remainingDebt: totalExtraRepayment,
+      annualInterestRate: safeInput.annualDebtRate,
+      remainingTermYears: safeInput.years,
+      extraRepaymentAmount: totalExtraRepayment,
+      strategy: "shortenTerm",
+    }),
+  };
 
   const box3Scenario = (() => {
     if (!safeInput.box3EffectEnabled) {
@@ -302,6 +326,7 @@ export function calculateStudyDebtVsInvesting(
     expectedInvestmentValue,
     difference,
     projections,
+    payoffTiming,
     box3Scenario,
   };
 }

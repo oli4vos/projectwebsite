@@ -134,6 +134,16 @@ function formatDecimal(value: number, digits = 2) {
   }).format(value);
 }
 
+function formatMonthsAndYears(months: number) {
+  if (!Number.isFinite(months) || months <= 0) {
+    return "0 maanden";
+  }
+
+  const roundedMonths = Math.round(months);
+  const years = roundedMonths / 12;
+  return `${roundedMonths} maanden (${formatDecimal(years, 1)} jaar)`;
+}
+
 function normalizeNumericInput(value: string) {
   return value.replace(/\s+/g, "").replace(",", ".");
 }
@@ -1324,6 +1334,47 @@ function CalculatorContent({
                       : "n.v.t."
                   }
                   sub="Hoeveel extra hypotheekruimte elke extra afgeloste euro hier grofweg oplevert"
+                />
+                <ResultRow
+                  label="Oorspronkelijke indicatieve aflosdatum"
+                  value={
+                    result.extraRepaymentScenario.payoffWithShorterTerm.originalPayoffDate
+                      ? formatIsoDateLabel(
+                          `${result.extraRepaymentScenario.payoffWithShorterTerm.originalPayoffDate}-01`,
+                        )
+                      : "n.v.t."
+                  }
+                  sub="Zonder extra aflossing en met hetzelfde maandbedrag als startpunt"
+                />
+                <ResultRow
+                  label="Aflosdatum als maandbedrag daalt"
+                  value={
+                    result.extraRepaymentScenario.payoffWithLowerMonthlyPayment.newPayoffDate
+                      ? formatIsoDateLabel(
+                          `${result.extraRepaymentScenario.payoffWithLowerMonthlyPayment.newPayoffDate}-01`,
+                        )
+                      : "n.v.t."
+                  }
+                  sub="Scenario lowerMonthlyPayment: vooral lagere maandlast, einddatum blijft meestal vergelijkbaar"
+                />
+                <ResultRow
+                  label="Aflosdatum bij gelijk maandbedrag"
+                  value={
+                    result.extraRepaymentScenario.payoffWithShorterTerm.newPayoffDate
+                      ? formatIsoDateLabel(
+                          `${result.extraRepaymentScenario.payoffWithShorterTerm.newPayoffDate}-01`,
+                        )
+                      : "n.v.t."
+                  }
+                  sub="Scenario shortenTerm: je houdt hetzelfde maandbedrag aan om sneller klaar te zijn"
+                />
+                <ResultRow
+                  label="Indicatief eerder klaar bij gelijk maandbedrag"
+                  value={formatMonthsAndYears(
+                    result.extraRepaymentScenario.payoffWithShorterTerm.monthsSaved,
+                  )}
+                  sub="Alleen van toepassing in het shortenTerm-scenario: DUO-maandbedrag blijft dan gelijk."
+                  accent
                 />
               </div>
             ) : (

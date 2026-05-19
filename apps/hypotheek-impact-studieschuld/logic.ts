@@ -9,10 +9,12 @@ import {
 import {
   calculateIndicativeIncomeBasedMonthlyPayment,
   calculateDuoMonthlyPaymentAfterExtraRepayment as calculateDuoMonthlyPaymentAfterExtraRepaymentCentral,
+  calculateExtraRepaymentPayoffImpact,
   determineRelevantDuoPayment as determineRelevantDuoPaymentCentral,
   sanitizeDuoMoney,
   sanitizeDuoPercent,
   type DuoSituation as CentralDuoSituation,
+  type ExtraRepaymentPayoffImpactResult,
   type DuoPaymentSource as CentralDuoPaymentSource,
   type RepaymentRule as CentralRepaymentRule,
 } from "@/lib/duo";
@@ -77,6 +79,8 @@ export type ExtraRepaymentScenarioResult = {
   grossMonthlyImpactReduction: number;
   extraMortgageRoomIndicative: number;
   ratio: number | null;
+  payoffWithLowerMonthlyPayment: ExtraRepaymentPayoffImpactResult;
+  payoffWithShorterTerm: ExtraRepaymentPayoffImpactResult;
   warnings: string[];
 };
 
@@ -421,6 +425,24 @@ export function calculateExtraRepaymentScenario(
     mortgageTermYears,
   );
   const warnings: string[] = [];
+  const payoffWithLowerMonthlyPayment = calculateExtraRepaymentPayoffImpact({
+    repaymentRule: input.repaymentRule,
+    remainingDebt: remainingStudentDebt,
+    annualInterestRate: duoRate,
+    remainingTermYears: duoTermYears,
+    monthlyPayment: oldEstimatedMonthlyPayment,
+    extraRepaymentAmount: extraRepaymentInput,
+    strategy: "lowerMonthlyPayment",
+  });
+  const payoffWithShorterTerm = calculateExtraRepaymentPayoffImpact({
+    repaymentRule: input.repaymentRule,
+    remainingDebt: remainingStudentDebt,
+    annualInterestRate: duoRate,
+    remainingTermYears: duoTermYears,
+    monthlyPayment: oldEstimatedMonthlyPayment,
+    extraRepaymentAmount: extraRepaymentInput,
+    strategy: "shortenTerm",
+  });
 
   if (remainingStudentDebt === 0) {
     warnings.push(
@@ -444,6 +466,9 @@ export function calculateExtraRepaymentScenario(
     warnings.push(
       "Extra aflossen is niet automatisch slim: buffer, aankoopkosten, verduurzaming of lagere hypotheek kunnen ook waardevoller zijn.",
     );
+    warnings.push(
+      "Als DUO je maandbedrag verlaagt, zit het voordeel vooral in lagere maandlast. Alleen bij gelijk maandbedrag ben je duidelijk eerder klaar.",
+    );
   }
 
   return {
@@ -458,7 +483,15 @@ export function calculateExtraRepaymentScenario(
       extraRepaymentUsed > 0
         ? roundRatio(extraMortgageRoomIndicative / extraRepaymentUsed)
         : null,
-    warnings,
+    payoffWithLowerMonthlyPayment,
+    payoffWithShorterTerm,
+    warnings: [
+      ...new Set([
+        ...warnings,
+        ...payoffWithLowerMonthlyPayment.warnings,
+        ...payoffWithShorterTerm.warnings,
+      ]),
+    ],
   };
 }
 

@@ -602,6 +602,12 @@ function CalculatorContent({
                   lager.
                 </p>
               ) : null}
+              <p className="mt-3 max-w-[56ch] text-[13px] leading-[1.65] text-white/70">
+                Als je extra aflost en DUO je maandbedrag gelijk laat, ben je in dit
+                scenario indicatief ongeveer{" "}
+                {formatPercent(result.payoffTiming.shortenTerm.yearsSaved)} jaar
+                eerder schuldenvrij.
+              </p>
             </>
           ) : (
             <p className="mt-4 text-[14px] leading-[1.7] text-white/75">
@@ -643,6 +649,44 @@ function CalculatorContent({
                 sub="De kernuitkomst van deze vergelijking"
                 accent={result.difference >= 0}
               />
+              <ResultRow
+                label="Aflosdatum zonder extra aflossing"
+                value={
+                  result.payoffTiming.shortenTerm.originalPayoffDate
+                    ? result.payoffTiming.shortenTerm.originalPayoffDate
+                    : "n.v.t."
+                }
+                sub="Indicatieve eindmaand op basis van wettelijk maandbedrag"
+              />
+              <ResultRow
+                label="Aflosdatum bij gelijk maandbedrag"
+                value={
+                  result.payoffTiming.shortenTerm.newPayoffDate
+                    ? result.payoffTiming.shortenTerm.newPayoffDate
+                    : "n.v.t."
+                }
+                sub="Scenario shortenTerm: zelfde maandbedrag, kortere looptijd"
+              />
+              <ResultRow
+                label="Indicatief eerder schuldenvrij"
+                value={`${result.payoffTiming.shortenTerm.monthsSaved} maanden (${formatPercent(result.payoffTiming.shortenTerm.yearsSaved)} jaar)`}
+                sub="Alleen als DUO je maandbedrag gelijk laat na extra aflossing"
+                accent
+              />
+              <ResultRow
+                label="Scenario maandbedrag daalt"
+                value={formatCurrency(
+                  result.payoffTiming.lowerMonthlyPayment.newMonthlyPayment,
+                )}
+                sub="Als DUO herberekent, zit het voordeel vooral in lagere maandlast in plaats van een veel eerdere einddatum"
+              />
+              {result.payoffTiming.shortenTerm.warnings.length > 0 ? (
+                <ul className="mt-2 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[12.5px] leading-[1.6] text-[var(--muted)]">
+                  {result.payoffTiming.shortenTerm.warnings.map((warning) => (
+                    <li key={warning}>{warning}</li>
+                  ))}
+                </ul>
+              ) : null}
               {result.box3Scenario ? (
                 <>
                   <ResultRow
