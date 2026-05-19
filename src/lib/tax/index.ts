@@ -4,6 +4,7 @@ export { calculateMortgageInterestDeduction } from "@/lib/tax/mortgage-interest-
 export type {
   Box1IncomeInput,
   Box1TaxResult,
+  Box3Method,
   Box3Input,
   Box3Result,
   MortgageInterestDeductionInput,

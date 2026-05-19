@@ -21,17 +21,26 @@ export type RepaymentRuleKey =
   | "SF15_LLLK"
   | "UNKNOWN";
 
+export type DuoIncomeBasedRule = {
+  singleAllowance: number;
+  partnerOrSingleParentAllowance: number;
+  percentage: number | null;
+  notes?: string;
+};
+
 export type AnnualFinancialConstants = {
   year: number;
   duo: {
     meta: AssumptionMeta;
     rates: Record<RepaymentRuleKey, number>;
     defaultTerms: Record<RepaymentRuleKey, number>;
+    incomeBasedRules: Record<RepaymentRuleKey, DuoIncomeBasedRule>;
   };
   mortgage: {
     meta: AssumptionMeta;
     defaultMortgageRate: number;
     defaultMortgageTermYears: number;
+    indicativeIncomeHousingCostRatio: number;
     studentDebtGrossUpFactors: GrossUpFactorBand[];
   };
   box1: {

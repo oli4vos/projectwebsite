@@ -26,6 +26,37 @@ export const FINANCIAL_CONSTANTS_BY_YEAR: Record<number, AnnualFinancialConstant
           SF15_LLLK: 15,
           UNKNOWN: 35,
         },
+        incomeBasedRules: {
+          SF35: {
+            singleAllowance: 26819.42,
+            partnerOrSingleParentAllowance: 38351.77,
+            percentage: 4,
+          },
+          SF15: {
+            singleAllowance: 22528.31,
+            partnerOrSingleParentAllowance: 32183.3,
+            percentage: 12,
+          },
+          SF15_OLD: {
+            singleAllowance: 13409.71,
+            partnerOrSingleParentAllowance: 26819.42,
+            percentage: null,
+            notes:
+              "SF15-oud gebruikt schijven met oplopende percentages in plaats van één vast percentage.",
+          },
+          SF15_LLLK: {
+            singleAllowance: 22528.31,
+            partnerOrSingleParentAllowance: 32183.3,
+            percentage: 12,
+          },
+          UNKNOWN: {
+            singleAllowance: 26819.42,
+            partnerOrSingleParentAllowance: 38351.77,
+            percentage: 4,
+            notes:
+              "Onbekende regeling valt indicatief terug op SF35-draagkrachtregels.",
+          },
+        },
       },
       mortgage: {
         meta: {
@@ -35,6 +66,7 @@ export const FINANCIAL_CONSTANTS_BY_YEAR: Record<number, AnnualFinancialConstant
         },
         defaultMortgageRate: 4.0,
         defaultMortgageTermYears: 30,
+        indicativeIncomeHousingCostRatio: 24,
         studentDebtGrossUpFactors: [
           { minRate: 0, maxRate: 2.0, factor: 1.05, label: "2,0% of lager" },
           {

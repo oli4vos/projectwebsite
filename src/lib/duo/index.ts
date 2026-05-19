@@ -1,4 +1,5 @@
 export {
+  calculateIndicativeIncomeBasedMonthlyPayment,
   calculateDuoMonthlyPaymentAfterExtraRepayment,
   calculateExtraRepaymentVsInvesting,
   calculateRemainingDebtAfterExtraRepayment,
@@ -8,6 +9,7 @@ export {
   sanitizeDuoPercent,
 } from "@/lib/duo/calculations";
 export type {
+  DuoIncomeBasedMonthlyPaymentResult,
   DuoIncomeBasedInput,
   DuoMonthlyPaymentAfterExtraRepaymentInput,
   DuoPaymentSource,

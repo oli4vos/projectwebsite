@@ -119,6 +119,10 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - eenvoudige frontend calculator
   - pure berekening in `logic.ts`
   - gebruikt optioneel centrale tax-laag voor een indicatieve box 3-correctie in de verdiepingslaag
+  - box 3-methode is instelbaar: `werkelijk` (default) of `forfaitair`
+  - box 3-effect wordt jaarlijks toegepast; jaarlijkse heffing wordt uit het beleggingsscenario betaald en telt daarna niet mee in verdere compoundgroei
+  - detailweergave bevat een extra uitklaplaag met box 3-betalingen per jaar
+  - grafiek gebruikt adaptieve jaar- en euro-assen voor leesbaarheid op mobiel en desktop
 - `apps/annuitair-lineair`
   - wrapper rond bestaande JS-logica
   - bevat oudere rekenscripts in `.js`
@@ -126,6 +130,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - indicatieve tool voor de impact van een DUO-maandlast op hypotheekruimte
   - v2 rekent primair via relevante DUO-maandlast -> brutering -> annuïtaire hypotheekimpact
   - verwerkt DUO-situaties zoals aanloopfase, draagkrachtverlaging en betaalpauze
+  - bevat nu ook indicatie van DUO-verplichting op inkomen (draagkracht) versus vrijwillige extra ruimte
   - bevat checklist voor Mijn DUO, uitleg van SF35/SF15-varianten en een nauwkeuriger aflosscenario
 - `apps/compensatie-pechgeneratie`
   - staat als draft in de codebase met `visibility: "hidden"`
@@ -137,6 +142,11 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - Profieldata wordt alleen lokaal opgeslagen in de browser via `localStorage`.
 - Storage key: `project-site:user-profile:v1`.
 - Privacy-uitgangspunt: geen server-opslag, geen auth, geen cookies, geen cloud sync.
+- Profiel bevat naast inkomen/schuld/wonen/sparen nu ook:
+  - werksituatie (loondienst/zzp/mix)
+  - AOV-indicatie
+  - pensioenopbouw-indicatie
+  - box 3-voorkeuren (werkelijk of forfaitair, fiscale partner, voorkeursjaar)
 - Gekoppelde tools:
   - `apps/hypotheek-impact-studieschuld`
   - `apps/studieschuld-vs-beleggen`
@@ -177,6 +187,10 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - Jaarlijkse financiële aannames komen centraal uit `src/lib/financial-constants`.
 - Toolverdieping mag die centrale aannames tonen, maar light-gebruikers worden niet gedwongen die details te openen.
 - In `studieschuld-vs-beleggen` blijft box 3 een optionele verdieping (toggle + disclosure); de hoofdflow blijft licht en bruikbaar zonder fiscale invoer.
+- In `studieschuld-vs-beleggen` wordt box 3 nu jaarlijks toegepast in het scenario; belasting wordt per jaar betaald en groeit daarna niet mee in compound.
+- Mobiele header schakelt bij omlaag scrollen naar compacte modus (logo + Rekentools/Mijn profiel) en klapt terug open bij omhoog scrollen.
+- In `hypotheek-impact-studieschuld` is de oude snelle vuistregel verwijderd; de kern blijft netto DUO-last -> brutering -> annuïtaire impact.
+- `hypotheek-impact-studieschuld` toont nu ook een indicatieve inkomens-naar-hypotheek-capaciteit als context (geen officiële leennormberekening).
 - Er zijn nu meerdere pechgeneratie/studieschuld-tools; hou tone of voice en disclaimerstijl tussen die modules consistent.
 - Partnerstudieschuld zit nog niet als aparte invoer in `apps/hypotheek-impact-studieschuld`; alleen copy/context. Dat is een logische v3-uitbreiding.
 - Toekomstige profielstap:
@@ -202,7 +216,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - Toekomstige tax-engine kan deze centrale constantslaag hergebruiken, maar is nu bewust nog niet gebouwd.
 - Volgende DUO-stap: officiële draagkrachtberekening pas toevoegen zodra alle actuele draagkrachtparameters betrouwbaar in de constantslaag staan.
 - Volgende teststap: tax-engine en chart-utils pas opnemen in testlaag zodra die modules stabiel zijn.
-- Volgende inhoudelijke stap: tax-laag gecontroleerd koppelen aan relevante tools (o.a. aflossen-vs-beleggen en toekomstige box 3-scenario's).
+- Volgende inhoudelijke stap: DUO-draagkrachtlogica verder verdiepen zodra actuele officiële parameters stabiel en centraal beschikbaar zijn.
 - Toekomstige tax-verdieping: meerjarige box 3-projectie of aparte box 3-tool, pas na validatie van gebruikservaring in de huidige optionele v1-koppeling.
 - CI controleert expliciet dat `src/lib/app-registry.ts` en `src/lib/app-components.tsx` na `generate:apps` geen diff hebben.
 

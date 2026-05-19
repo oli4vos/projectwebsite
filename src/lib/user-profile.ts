@@ -15,6 +15,9 @@ export type ProfileDuoSituation =
   | "paymentPause"
   | "unknown";
 export type RiskProfile = "conservative" | "neutral" | "offensive";
+export type EmploymentType = "employee" | "selfEmployed" | "mixed" | "unknown";
+export type PensionBuildUp = "active" | "limited" | "none" | "unknown";
+export type Box3MethodPreference = "actual" | "forfaitary";
 
 export type UserProfile = {
   updatedAt?: string;
@@ -22,6 +25,7 @@ export type UserProfile = {
     grossAnnualIncome?: number;
     partnerGrossAnnualIncome?: number;
     householdType?: HouseholdType;
+    employmentType?: EmploymentType;
   };
   studentDebt?: {
     remainingDebt?: number;
@@ -46,6 +50,13 @@ export type UserProfile = {
     expectedAnnualReturn?: number;
     investmentHorizonYears?: number;
     riskProfile?: RiskProfile;
+    hasAov?: boolean;
+    pensionBuildUp?: PensionBuildUp;
+  };
+  tax?: {
+    preferredBox3Method?: Box3MethodPreference;
+    hasFiscalPartner?: boolean;
+    preferredTaxYear?: number;
   };
 };
 
@@ -78,6 +89,22 @@ const riskProfiles = new Set<RiskProfile>([
   "conservative",
   "neutral",
   "offensive",
+]);
+const employmentTypes = new Set<EmploymentType>([
+  "employee",
+  "selfEmployed",
+  "mixed",
+  "unknown",
+]);
+const pensionBuildUpOptions = new Set<PensionBuildUp>([
+  "active",
+  "limited",
+  "none",
+  "unknown",
+]);
+const box3MethodPreferences = new Set<Box3MethodPreference>([
+  "actual",
+  "forfaitary",
 ]);
 
 function sanitizeFiniteNumber(value: number, fallback = 0) {
@@ -137,6 +164,7 @@ export function sanitizeUserProfile(profile: UserProfile): UserProfile {
       profile.income?.partnerGrossAnnualIncome,
     ),
     householdType: sanitizeEnum(profile.income?.householdType, householdTypes),
+    employmentType: sanitizeEnum(profile.income?.employmentType, employmentTypes),
   };
 
   const studentDebt = {
@@ -178,6 +206,26 @@ export function sanitizeUserProfile(profile: UserProfile): UserProfile {
       profile.savingInvesting?.investmentHorizonYears,
     ),
     riskProfile: sanitizeEnum(profile.savingInvesting?.riskProfile, riskProfiles),
+    hasAov:
+      typeof profile.savingInvesting?.hasAov === "boolean"
+        ? profile.savingInvesting.hasAov
+        : undefined,
+    pensionBuildUp: sanitizeEnum(
+      profile.savingInvesting?.pensionBuildUp,
+      pensionBuildUpOptions,
+    ),
+  };
+
+  const tax = {
+    preferredBox3Method: sanitizeEnum(
+      profile.tax?.preferredBox3Method,
+      box3MethodPreferences,
+    ),
+    hasFiscalPartner:
+      typeof profile.tax?.hasFiscalPartner === "boolean"
+        ? profile.tax.hasFiscalPartner
+        : undefined,
+    preferredTaxYear: sanitizePositiveYears(profile.tax?.preferredTaxYear),
   };
 
   return {
@@ -191,6 +239,7 @@ export function sanitizeUserProfile(profile: UserProfile): UserProfile {
     savingInvesting: hasSectionValues(savingInvesting)
       ? savingInvesting
       : undefined,
+    tax: hasSectionValues(tax) ? tax : undefined,
   };
 }
 
@@ -199,7 +248,8 @@ export function profileHasValues(profile: UserProfile) {
     hasSectionValues(profile.income) ||
       hasSectionValues(profile.studentDebt) ||
       hasSectionValues(profile.housing) ||
-      hasSectionValues(profile.savingInvesting),
+      hasSectionValues(profile.savingInvesting) ||
+      hasSectionValues(profile.tax),
   );
 }
 
@@ -225,6 +275,10 @@ export function mergeProfilePatch(
     savingInvesting: {
       ...profile.savingInvesting,
       ...patch.savingInvesting,
+    },
+    tax: {
+      ...profile.tax,
+      ...patch.tax,
     },
   });
 }

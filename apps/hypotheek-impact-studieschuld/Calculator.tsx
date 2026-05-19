@@ -13,7 +13,6 @@ import {
 import { getMortgageImpactDefaultsFromProfile } from "@/lib/profile-tool-mapping";
 import {
   LAST_CHECKED,
-  QUICK_RULE_SCENARIOS,
   calculateHypotheekImpact,
   getDefaultDuoRate,
   getDefaultTerm,
@@ -419,6 +418,7 @@ function CalculatorContent({
   profilePatch,
 }: CalculatorContentProps) {
   const [formValues, setFormValues] = useState<FormState>(initialValues);
+  const [mobileStep, setMobileStep] = useState<1 | 2 | 3 | 4>(1);
   const { errors, parsedValues } = validateForm(formValues);
   const result = parsedValues ? calculateHypotheekImpact(parsedValues) : null;
   const hasErrors = Object.keys(errors).length > 0;
@@ -494,7 +494,7 @@ function CalculatorContent({
           </div>
         ) : null}
 
-        <div className="mt-7">
+        <div className={mobileStep === 1 ? "mt-7" : "mt-7 hidden md:block"}>
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
             Stap 1
           </div>
@@ -547,9 +547,18 @@ function CalculatorContent({
               </p>
             </label>
           </div>
+          <div className="mt-5 flex gap-2 md:hidden">
+            <button
+              type="button"
+              onClick={() => setMobileStep(2)}
+              className="ring-focus hair inline-flex h-11 flex-1 items-center justify-center rounded-full border bg-[var(--paper-soft)] px-4 text-[14px] text-[var(--ink)]"
+            >
+              Volgende stap
+            </button>
+          </div>
         </div>
 
-        <div className="mt-7">
+        <div className={mobileStep === 2 ? "mt-7" : "mt-7 hidden md:block"}>
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
             Stap 2
           </div>
@@ -679,9 +688,25 @@ function CalculatorContent({
               <FieldError message={errors.extraRepayment} />
             </label>
           </div>
+          <div className="mt-5 flex gap-2 md:hidden">
+            <button
+              type="button"
+              onClick={() => setMobileStep(1)}
+              className="ring-focus hair inline-flex h-11 flex-1 items-center justify-center rounded-full border bg-white px-4 text-[14px] text-[var(--ink)]"
+            >
+              Terug
+            </button>
+            <button
+              type="button"
+              onClick={() => setMobileStep(3)}
+              className="ring-focus hair inline-flex h-11 flex-1 items-center justify-center rounded-full border bg-[var(--paper-soft)] px-4 text-[14px] text-[var(--ink)]"
+            >
+              Volgende stap
+            </button>
+          </div>
         </div>
 
-        <div className="mt-7">
+        <div className={mobileStep === 3 ? "mt-7" : "mt-7 hidden md:block"}>
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
             Stap 3
           </div>
@@ -775,9 +800,25 @@ function CalculatorContent({
               <FieldError message={errors.maxMortgageWithoutStudentDebt} />
             </label>
           </div>
+          <div className="mt-5 flex gap-2 md:hidden">
+            <button
+              type="button"
+              onClick={() => setMobileStep(2)}
+              className="ring-focus hair inline-flex h-11 flex-1 items-center justify-center rounded-full border bg-white px-4 text-[14px] text-[var(--ink)]"
+            >
+              Terug
+            </button>
+            <button
+              type="button"
+              onClick={() => setMobileStep(4)}
+              className="ring-focus hair inline-flex h-11 flex-1 items-center justify-center rounded-full border bg-[var(--paper-soft)] px-4 text-[14px] text-[var(--ink)]"
+            >
+              Volgende stap
+            </button>
+          </div>
         </div>
 
-        <div className="mt-7">
+        <div className={mobileStep === 4 ? "mt-7" : "mt-7 hidden md:block"}>
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
             Stap 4
           </div>
@@ -839,6 +880,15 @@ function CalculatorContent({
               ) : null}
             </label>
           </div>
+          <div className="mt-5 flex gap-2 md:hidden">
+            <button
+              type="button"
+              onClick={() => setMobileStep(3)}
+              className="ring-focus hair inline-flex h-11 flex-1 items-center justify-center rounded-full border bg-white px-4 text-[14px] text-[var(--ink)]"
+            >
+              Terug
+            </button>
+          </div>
         </div>
 
         {hasErrors ? (
@@ -869,6 +919,11 @@ function CalculatorContent({
                 {formatCurrency(result.mortgageImpact.grossDuoMonthlyImpact)} bruto
                 maandlast. Dat kan je hypotheekruimte indicatief met ongeveer{" "}
                 {formatCurrency(result.mortgageImpact.principalImpact)} drukken.
+              </p>
+              <p className="mt-3 max-w-[58ch] text-[13px] leading-[1.65] text-white/72">
+                Indicatief verplicht DUO-bedrag op basis van inkomen en wettelijk
+                maandbedrag: {formatCurrency(result.duoMandatoryPayment.requiredMonthlyPayment)} p/m.
+                Wat je daarboven betaalt ({formatCurrency(result.duoMandatoryPayment.remainingChoiceBudgetMonthly)} p/m in dit scenario) is je keuzezone.
               </p>
               {formValues.situation === "incomeBasedReduction" ? (
                 <p className="mt-3 text-[13px] leading-[1.65] text-white/72">
@@ -949,6 +1004,69 @@ function CalculatorContent({
         </div>
 
         <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
+          <h3 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
+            Verplicht DUO-bedrag vs keuzebedrag
+          </h3>
+          <p className="mt-3 text-[13.5px] leading-[1.65] text-[var(--muted)]">
+            DUO werkt met twee lagen: eerst een wettelijk maandbedrag op basis van
+            schuld, rente en looptijd. Daarna een draagkrachttoets op inkomen. Je
+            betaalt in de praktijk het laagste van die twee. Alles wat je daarboven
+            vrijwillig extra betaalt is een keuze en kun je ook als alternatief
+            scenario (buffer, woning of beleggen) vergelijken.
+          </p>
+          {result ? (
+            <div className="mt-5">
+              <ResultRow
+                label="Inkomen gebruikt voor draagkracht"
+                value={formatCurrency(result.duoMandatoryPayment.annualIncomeUsed)}
+                sub="Bruto jaarinkomen gebruiker + partner (indien ingevuld)"
+              />
+              <ResultRow
+                label="Vrijstelling (draagkrachtvrije voet)"
+                value={formatCurrency(result.duoMandatoryPayment.allowanceUsed)}
+                sub="Indicatieve vrijstelling volgens gekozen regeling"
+              />
+              <ResultRow
+                label="Inkomen boven vrijstelling"
+                value={formatCurrency(result.duoMandatoryPayment.amountAboveAllowance)}
+                sub="Hierover wordt het DUO-percentage toegepast"
+              />
+              <ResultRow
+                label="DUO-percentage"
+                value={
+                  result.duoMandatoryPayment.percentageUsed === null
+                    ? "n.v.t."
+                    : `${formatDecimal(result.duoMandatoryPayment.percentageUsed)}%`
+                }
+                sub="SF35 rekent indicatief met 4%, SF15/SF15-lllk met 12%"
+              />
+              <ResultRow
+                label="Draagkrachtbedrag per maand"
+                value={formatCurrency(result.duoMandatoryPayment.incomeBasedMonthlyPayment)}
+                sub="Indicatief bedrag vanuit inkomen"
+              />
+              <ResultRow
+                label="Wettelijk maandbedrag"
+                value={formatCurrency(result.duoMandatoryPayment.statutoryMonthlyPayment)}
+                sub="Indicatie uit annuïtaire DUO-berekening"
+              />
+              <ResultRow
+                label="Verplicht bedrag per maand"
+                value={formatCurrency(result.duoMandatoryPayment.requiredMonthlyPayment)}
+                sub="Laagste van draagkracht en wettelijk maandbedrag"
+                accent
+              />
+              <ResultRow
+                label="Keuzeruimte boven verplicht bedrag"
+                value={formatCurrency(result.duoMandatoryPayment.remainingChoiceBudgetMonthly)}
+                sub="Bedrag dat in dit scenario boven verplicht aflossen uitkomt"
+              />
+            </div>
+          ) : null}
+          <InfoList items={result?.duoMandatoryPayment.warnings ?? []} tone="warning" />
+        </div>
+
+        <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h3 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
               Wat is brutering?
@@ -1004,6 +1122,26 @@ function CalculatorContent({
                 label="Totaal bruto jaarinkomen"
                 value={formatCurrency(result.grossIncomeTotal)}
                 sub="Alleen context, geen officiële maximale hypotheekberekening"
+              />
+              <ResultRow
+                label="Indicatieve maximale hypotheek op basis van inkomen"
+                value={formatCurrency(
+                  result.incomeCapacity.incomeBasedMaxMortgageIndicative,
+                )}
+                sub={`Benadering met ${formatDecimal(
+                  result.incomeCapacity.incomeToHousingCostRatioUsed,
+                )}% van bruto inkomen als maandlastruimte (${formatCurrency(
+                  result.incomeCapacity.monthlyBudgetFromIncome,
+                )} p/m)`}
+              />
+              <ResultRow
+                label="Indicatief met studieschuldimpact"
+                value={formatCurrency(
+                  result.incomeCapacity
+                    .incomeBasedMaxMortgageWithStudentDebtIndicative,
+                )}
+                sub="Zelfde inkomensruimte minus de gebruteerde DUO-maandlast"
+                accent
               />
               {result.debtToIncomeRatio !== undefined ? (
                 <ResultRow
@@ -1254,30 +1392,15 @@ function CalculatorContent({
         </div>
 
         <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <h3 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
-              Snelle vuistregel
-            </h3>
-            <Pill tone="default">Grove ordegrootte</Pill>
-          </div>
+          <h3 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
+            Waarom geen snelle vuistregel meer?
+          </h3>
           <p className="mt-3 text-[13.5px] leading-[1.65] text-[var(--muted)]">
-            Dit is de oude, grovere methode op basis van netto DUO-maandlast × 12 × factor.
-            Handig als snelle check, maar ondergeschikt aan de hoofdconclusie met brutering
-            en annuïtaire impact.
+            Deze tool gebruikt bewust geen losse jaarfactor meer als hoofdroute.
+            De uitkomst komt uit netto DUO-last, indicatieve brutering en daarna
+            annuïtaire vertaling naar hoofdsom-impact. Dat geeft een betrouwbaardere
+            ordegrootte dan een vaste vuistregel.
           </p>
-          {result ? (
-            <div className="mt-5">
-              {result.quickRuleImpactScenarios.map((scenario, index) => (
-                <ResultRow
-                  key={scenario.key}
-                  label={`Vuistregel ${QUICK_RULE_SCENARIOS[index].label}`}
-                  value={formatCurrency(scenario.impact)}
-                  sub={`Netto DUO-last × 12 × factor ${formatDecimal(scenario.factor, 1)}`}
-                  accent={scenario.key === "middle"}
-                />
-              ))}
-            </div>
-          ) : null}
         </div>
 
         <InfoList items={result?.warnings ?? []} tone="warning" />

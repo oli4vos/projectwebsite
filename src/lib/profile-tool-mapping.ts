@@ -29,6 +29,9 @@ export const PROFILE_FIELDS_STUDENT_DEBT_VS_INVESTING = [
   "savingInvesting.currentSavings",
   "income.householdType",
   "income.partnerGrossAnnualIncome",
+  "tax.hasFiscalPartner",
+  "tax.preferredTaxYear",
+  "tax.preferredBox3Method",
 ] as const;
 
 type MortgageImpactDefaults = Partial<{
@@ -55,6 +58,8 @@ type StudentDebtVsInvestingDefaults = Partial<{
   years: string;
   box3BankDeposits: string;
   hasFiscalPartner: boolean;
+  taxYear: string;
+  box3Method: "actual" | "forfaitary";
 }>;
 
 function toStringValue(value?: number) {
@@ -178,14 +183,26 @@ export function getStudentDebtVsInvestingDefaultsFromProfile(
   }
 
   if (
+    profile.tax?.hasFiscalPartner !== undefined ||
     profile.income?.householdType !== undefined ||
     profile.income?.partnerGrossAnnualIncome !== undefined
   ) {
-    defaults.hasFiscalPartner = Boolean(
-      profile.income?.householdType === "withPartner" ||
-        profile.income?.householdType === "family" ||
-        (profile.income?.partnerGrossAnnualIncome ?? 0) > 0,
-    );
+    defaults.hasFiscalPartner =
+      profile.tax?.hasFiscalPartner ??
+      Boolean(
+        profile.income?.householdType === "withPartner" ||
+          profile.income?.householdType === "family" ||
+          (profile.income?.partnerGrossAnnualIncome ?? 0) > 0,
+      );
+  }
+
+  const preferredTaxYear = toStringValue(profile.tax?.preferredTaxYear);
+  if (preferredTaxYear !== undefined) {
+    defaults.taxYear = preferredTaxYear;
+  }
+
+  if (profile.tax?.preferredBox3Method !== undefined) {
+    defaults.box3Method = profile.tax.preferredBox3Method;
   }
 
   return defaults;

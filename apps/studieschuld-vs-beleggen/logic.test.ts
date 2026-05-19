@@ -50,7 +50,27 @@ describe("calculateStudyDebtVsInvesting", () => {
     });
 
     expect(result.box3Scenario).toBeDefined();
+    expect(result.box3Scenario?.box3Method).toBe("actual");
     expect(result.box3Scenario?.additionalBox3TaxIndicative ?? -1).toBeGreaterThanOrEqual(0);
+    expect(
+      result.box3Scenario?.cumulativeAdditionalBox3TaxIndicative ?? -1,
+    ).toBeGreaterThanOrEqual(result.box3Scenario?.additionalBox3TaxIndicative ?? 0);
+    expect(result.box3Scenario?.yearlyBreakdown.length ?? 0).toBe(10);
+  });
+
+  it("supports forfaitary box 3 method when explicitly selected", () => {
+    const result = calculateStudyDebtVsInvesting({
+      ...baseInput,
+      box3EffectEnabled: true,
+      taxYear: 2026,
+      box3Method: "forfaitary",
+      box3BankDeposits: 70000,
+      box3InvestmentsAndOtherAssets: 60000,
+      box3Debts: 5000,
+    });
+
+    expect(result.box3Scenario?.box3Method).toBe("forfaitary");
+    expect(result.box3Scenario?.additionalBox3TaxIndicative ?? 0).toBeGreaterThanOrEqual(0);
   });
 
   it("keeps additional box 3 effect low when wealth is below allowance", () => {
@@ -65,7 +85,9 @@ describe("calculateStudyDebtVsInvesting", () => {
     });
 
     expect(result.box3Scenario?.additionalBox3TaxIndicative ?? 0).toBeGreaterThanOrEqual(0);
-    expect(result.box3Scenario?.additionalBox3TaxIndicative ?? 0).toBeLessThan(500);
+    expect(result.box3Scenario?.cumulativeAdditionalBox3TaxIndicative ?? 0).toBeLessThan(
+      5000,
+    );
   });
 
   it("sanitizes negative box 3 input values safely", () => {
@@ -82,6 +104,9 @@ describe("calculateStudyDebtVsInvesting", () => {
     const box3 = result.box3Scenario;
     expect(box3).toBeDefined();
     expect(Number.isFinite(box3?.additionalBox3TaxIndicative ?? Number.NaN)).toBe(true);
+    expect(
+      Number.isFinite(box3?.cumulativeAdditionalBox3TaxIndicative ?? Number.NaN),
+    ).toBe(true);
     expect(box3?.additionalBox3TaxIndicative ?? -1).toBeGreaterThanOrEqual(0);
   });
 
@@ -108,8 +133,33 @@ describe("calculateStudyDebtVsInvesting", () => {
     expect((partner.box3Scenario?.taxFreeAllowance ?? 0)).toBeGreaterThan(
       single.box3Scenario?.taxFreeAllowance ?? 0,
     );
-    expect((partner.box3Scenario?.additionalBox3TaxIndicative ?? 0)).toBeLessThanOrEqual(
-      single.box3Scenario?.additionalBox3TaxIndicative ?? 0,
+    expect(
+      (partner.box3Scenario?.cumulativeAdditionalBox3TaxIndicative ?? 0),
+    ).toBeLessThanOrEqual(single.box3Scenario?.cumulativeAdditionalBox3TaxIndicative ?? 0);
+  });
+
+  it("applies box 3 yearly so paid tax does not continue compounding", () => {
+    const result = calculateStudyDebtVsInvesting({
+      ...baseInput,
+      box3EffectEnabled: true,
+      taxYear: 2026,
+      box3Method: "actual",
+      box3BankDeposits: 0,
+      box3InvestmentsAndOtherAssets: 80000,
+      box3Debts: 0,
+    });
+
+    expect(result.box3Scenario).toBeDefined();
+    expect(result.box3Scenario?.yearlyBreakdown.length).toBe(10);
+    expect(
+      result.box3Scenario?.cumulativeAdditionalBox3TaxIndicative ?? 0,
+    ).toBeGreaterThan(0);
+    const lastYear =
+      result.box3Scenario?.yearlyBreakdown[
+        (result.box3Scenario?.yearlyBreakdown.length ?? 1) - 1
+      ];
+    expect((lastYear?.portfolioAfterTax ?? 0)).toBeLessThanOrEqual(
+      lastYear?.portfolioBeforeTax ?? 0,
     );
   });
 });

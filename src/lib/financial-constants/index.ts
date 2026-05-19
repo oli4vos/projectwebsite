@@ -45,6 +45,17 @@ export function getDuoDefaultTermForRule(rule: RepaymentRuleKey, year?: number) 
   return constants.duo.defaultTerms[rule] ?? constants.duo.defaultTerms.UNKNOWN;
 }
 
+export function getDuoIncomeBasedRuleForRepaymentRule(
+  rule: RepaymentRuleKey,
+  year?: number,
+) {
+  const constants = getFinancialConstants(year);
+  return (
+    constants.duo.incomeBasedRules[rule] ??
+    constants.duo.incomeBasedRules.UNKNOWN
+  );
+}
+
 export function getStudentDebtGrossUpFactor(
   mortgageRate: number,
   year?: number,
@@ -73,10 +84,15 @@ export function getBox3Constants(year?: number) {
   return getFinancialConstants(year).box3;
 }
 
+export function getIndicativeIncomeHousingCostRatio(year?: number) {
+  return getFinancialConstants(year).mortgage.indicativeIncomeHousingCostRatio;
+}
+
 export type {
   AnnualFinancialConstants,
   AssumptionMeta,
   AssumptionStatus,
+  DuoIncomeBasedRule,
   GrossUpFactorBand,
   RepaymentRuleKey,
 } from "@/lib/financial-constants/types";

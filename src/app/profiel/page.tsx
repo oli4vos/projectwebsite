@@ -6,7 +6,10 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { Btn } from "@/components/ui";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import type {
+  Box3MethodPreference,
+  EmploymentType,
   HouseholdType,
+  PensionBuildUp,
   ProfileDuoSituation,
   ProfileRepaymentRule,
   RiskProfile,
@@ -17,6 +20,7 @@ type ProfileFormState = {
   grossAnnualIncome: string;
   partnerGrossAnnualIncome: string;
   householdType: HouseholdType;
+  employmentType: EmploymentType;
   remainingDebt: string;
   currentMonthlyPayment: string;
   statutoryMonthlyPayment: string;
@@ -35,6 +39,11 @@ type ProfileFormState = {
   expectedAnnualReturn: string;
   investmentHorizonYears: string;
   riskProfile: RiskProfile;
+  hasAov: boolean;
+  pensionBuildUp: PensionBuildUp;
+  preferredBox3Method: Box3MethodPreference;
+  hasFiscalPartnerTax: boolean;
+  preferredTaxYear: string;
 };
 
 type ValidationErrors = Partial<Record<keyof ProfileFormState, string>>;
@@ -43,6 +52,7 @@ const defaultFormState: ProfileFormState = {
   grossAnnualIncome: "",
   partnerGrossAnnualIncome: "",
   householdType: "unknown",
+  employmentType: "unknown",
   remainingDebt: "",
   currentMonthlyPayment: "",
   statutoryMonthlyPayment: "",
@@ -61,6 +71,11 @@ const defaultFormState: ProfileFormState = {
   expectedAnnualReturn: "",
   investmentHorizonYears: "",
   riskProfile: "neutral",
+  hasAov: false,
+  pensionBuildUp: "unknown",
+  preferredBox3Method: "actual",
+  hasFiscalPartnerTax: false,
+  preferredTaxYear: "",
 };
 
 function formatUpdatedAt(value?: string) {
@@ -89,6 +104,7 @@ function profileToFormState(profile: UserProfile): ProfileFormState {
     grossAnnualIncome: toFormValue(profile.income?.grossAnnualIncome),
     partnerGrossAnnualIncome: toFormValue(profile.income?.partnerGrossAnnualIncome),
     householdType: profile.income?.householdType ?? "unknown",
+    employmentType: profile.income?.employmentType ?? "unknown",
     remainingDebt: toFormValue(profile.studentDebt?.remainingDebt),
     currentMonthlyPayment: toFormValue(profile.studentDebt?.currentMonthlyPayment),
     statutoryMonthlyPayment: toFormValue(
@@ -113,6 +129,11 @@ function profileToFormState(profile: UserProfile): ProfileFormState {
       profile.savingInvesting?.investmentHorizonYears,
     ),
     riskProfile: profile.savingInvesting?.riskProfile ?? "neutral",
+    hasAov: profile.savingInvesting?.hasAov ?? false,
+    pensionBuildUp: profile.savingInvesting?.pensionBuildUp ?? "unknown",
+    preferredBox3Method: profile.tax?.preferredBox3Method ?? "actual",
+    hasFiscalPartnerTax: profile.tax?.hasFiscalPartner ?? false,
+    preferredTaxYear: toFormValue(profile.tax?.preferredTaxYear),
   };
 }
 
@@ -180,12 +201,17 @@ function formStateToProfile(formValues: ProfileFormState) {
   const investmentHorizonYears = parseOptionalNumber(
     formValues.investmentHorizonYears,
   );
+  const preferredTaxYear = parseOptionalNumber(formValues.preferredTaxYear);
   const hasSavingNumbers =
     currentSavings !== undefined ||
     targetEmergencyFund !== undefined ||
     monthlyFreeCashflow !== undefined ||
     expectedAnnualReturn !== undefined ||
     investmentHorizonYears !== undefined;
+  const hasTaxPreferences =
+    formValues.preferredBox3Method !== "actual" ||
+    formValues.hasFiscalPartnerTax ||
+    preferredTaxYear !== undefined;
 
   validateNonNegative(
     "grossAnnualIncome",
@@ -296,6 +322,14 @@ function formStateToProfile(formValues: ProfileFormState) {
     errors,
     "Gebruik een beleggingshorizon groter dan 0.",
   );
+  if (
+    preferredTaxYear !== undefined &&
+    (!Number.isFinite(preferredTaxYear) ||
+      preferredTaxYear < 2000 ||
+      preferredTaxYear > 2200)
+  ) {
+    errors.preferredTaxYear = "Gebruik een jaartal tussen 2000 en 2200.";
+  }
 
   const profile: UserProfile | null =
     Object.keys(errors).length === 0
@@ -307,6 +341,10 @@ function formStateToProfile(formValues: ProfileFormState) {
               formValues.householdType === "unknown"
                 ? undefined
                 : formValues.householdType,
+            employmentType:
+              formValues.employmentType === "unknown"
+                ? undefined
+                : formValues.employmentType,
           },
           studentDebt: {
             remainingDebt,
@@ -340,6 +378,19 @@ function formStateToProfile(formValues: ProfileFormState) {
               hasSavingNumbers || formValues.riskProfile !== "neutral"
                 ? formValues.riskProfile
                 : undefined,
+            hasAov: formValues.hasAov ? true : undefined,
+            pensionBuildUp:
+              formValues.pensionBuildUp === "unknown"
+                ? undefined
+                : formValues.pensionBuildUp,
+          },
+          tax: {
+            preferredBox3Method:
+              hasTaxPreferences || formValues.preferredBox3Method !== "actual"
+                ? formValues.preferredBox3Method
+                : undefined,
+            hasFiscalPartner: formValues.hasFiscalPartnerTax ? true : undefined,
+            preferredTaxYear,
           },
         }
       : null;
@@ -449,9 +500,15 @@ function ProfileEditor({
       return;
     }
 
-    const savedProfile = onSave(parsedProfile);
-    setFormValues(profileToFormState(savedProfile));
-    onSaveMessageChange("Profiel lokaal opgeslagen in deze browser.");
+    try {
+      const savedProfile = onSave(parsedProfile);
+      setFormValues(profileToFormState(savedProfile));
+      onSaveMessageChange("Profiel lokaal opgeslagen in deze browser.");
+    } catch {
+      onSaveMessageChange(
+        "Opslaan is niet gelukt. Controleer of lokale opslag in je browser is toegestaan.",
+      );
+    }
   }
 
   function handleClear() {
@@ -514,6 +571,24 @@ function ProfileEditor({
                   <option value="single">Alleenstaand</option>
                   <option value="withPartner">Met partner</option>
                   <option value="family">Gezin</option>
+                </select>
+              </label>
+
+              <label className="grid gap-2 md:col-span-2">
+                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                  Werksituatie
+                </span>
+                <select
+                  value={formValues.employmentType}
+                  onChange={(event) =>
+                    updateField("employmentType", event.target.value as EmploymentType)
+                  }
+                  className="ring-focus hair h-12 rounded-md border bg-white px-4 text-[15px] text-[var(--ink)] outline-none"
+                >
+                  <option value="unknown">Onbekend / nog niet ingevuld</option>
+                  <option value="employee">In loondienst</option>
+                  <option value="selfEmployed">ZZP / ondernemer</option>
+                  <option value="mixed">Combinatie loondienst + zelfstandig</option>
                 </select>
               </label>
             </div>
@@ -821,6 +896,96 @@ function ProfileEditor({
                   <option value="neutral">Neutraal</option>
                   <option value="offensive">Offensief</option>
                 </select>
+              </label>
+
+              <label className="grid gap-2">
+                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                  Arbeidsongeschiktheidsverzekering (AOV)
+                </span>
+                <span className="flex items-center gap-3 text-[14px] text-[var(--ink)]">
+                  <input
+                    type="checkbox"
+                    checked={formValues.hasAov}
+                    onChange={(event) => updateField("hasAov", event.target.checked)}
+                    className="size-4 accent-[var(--accent)]"
+                  />
+                  Ja, ik houd rekening met AOV in mijn planning
+                </span>
+              </label>
+
+              <label className="grid gap-2">
+                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                  Pensioenopbouw
+                </span>
+                <select
+                  value={formValues.pensionBuildUp}
+                  onChange={(event) =>
+                    updateField("pensionBuildUp", event.target.value as PensionBuildUp)
+                  }
+                  className="ring-focus hair h-12 rounded-md border bg-white px-4 text-[15px] text-[var(--ink)] outline-none"
+                >
+                  <option value="unknown">Onbekend / nog niet ingevuld</option>
+                  <option value="active">Actief via werkgever of regeling</option>
+                  <option value="limited">Beperkt of onregelmatig</option>
+                  <option value="none">Nog geen opbouw</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
+            <h2 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
+              Belastingvoorkeuren
+            </h2>
+            <div className="mt-5 grid gap-5 md:grid-cols-2">
+              <label className="grid gap-2">
+                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                  Box 3-methode (default in tools)
+                </span>
+                <select
+                  value={formValues.preferredBox3Method}
+                  onChange={(event) =>
+                    updateField(
+                      "preferredBox3Method",
+                      event.target.value as Box3MethodPreference,
+                    )
+                  }
+                  className="ring-focus hair h-12 rounded-md border bg-white px-4 text-[15px] text-[var(--ink)] outline-none"
+                >
+                  <option value="actual">Werkelijk rendement (default)</option>
+                  <option value="forfaitary">Forfaitair rendement</option>
+                </select>
+              </label>
+
+              <label className="grid gap-2">
+                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                  Fiscale partner voor box 3
+                </span>
+                <span className="flex items-center gap-3 text-[14px] text-[var(--ink)]">
+                  <input
+                    type="checkbox"
+                    checked={formValues.hasFiscalPartnerTax}
+                    onChange={(event) =>
+                      updateField("hasFiscalPartnerTax", event.target.checked)
+                    }
+                    className="size-4 accent-[var(--accent)]"
+                  />
+                  Ja, reken standaard met partnervrijstelling
+                </span>
+              </label>
+
+              <label className="grid gap-2 md:col-span-2">
+                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                  Voorkeursjaar belastingaannames
+                </span>
+                <input
+                  inputMode="numeric"
+                  value={formValues.preferredTaxYear}
+                  onChange={(event) => updateField("preferredTaxYear", event.target.value)}
+                  placeholder="Bijvoorbeeld 2026"
+                  className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
+                />
+                <FieldError message={errors.preferredTaxYear} />
               </label>
             </div>
           </div>

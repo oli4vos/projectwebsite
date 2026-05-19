@@ -129,6 +129,18 @@ export default function VariabelenPage() {
                 name="Default looptijd UNKNOWN"
                 value={`${constants.duo.defaultTerms.UNKNOWN} jaar`}
               />
+              <ValueRow
+                name="Draagkracht SF35 (alleenstaand)"
+                value={`${formatCurrency(constants.duo.incomeBasedRules.SF35.singleAllowance)} vrijstelling, ${formatPercent(constants.duo.incomeBasedRules.SF35.percentage ?? 0)}% over restant`}
+              />
+              <ValueRow
+                name="Draagkracht SF35 (partner/ouder)"
+                value={`${formatCurrency(constants.duo.incomeBasedRules.SF35.partnerOrSingleParentAllowance)} vrijstelling, ${formatPercent(constants.duo.incomeBasedRules.SF35.percentage ?? 0)}% over restant`}
+              />
+              <ValueRow
+                name="Draagkracht SF15/SF15-lllk"
+                value={`${formatCurrency(constants.duo.incomeBasedRules.SF15.singleAllowance)} vrijstelling alleenstaand, ${formatPercent(constants.duo.incomeBasedRules.SF15.percentage ?? 0)}% over restant`}
+              />
             </div>
             <MetaBlock year={year} {...constants.duo.meta} />
           </article>
@@ -145,6 +157,12 @@ export default function VariabelenPage() {
               <ValueRow
                 name="Default hypotheeklooptijd"
                 value={`${constants.mortgage.defaultMortgageTermYears} jaar`}
+              />
+              <ValueRow
+                name="Indicatieve inkomensruimte voor hypotheeklast"
+                value={`${formatPercent(
+                  constants.mortgage.indicativeIncomeHousingCostRatio,
+                )}% van bruto jaarinkomen`}
               />
               {constants.mortgage.studentDebtGrossUpFactors.map((band) => (
                 <ValueRow
@@ -201,6 +219,10 @@ export default function VariabelenPage() {
               <ValueRow
                 name="Forfait schulden"
                 value={`${formatPercent(constants.box3.deemedReturns.debts)}%`}
+              />
+              <ValueRow
+                name="Standaard methode in tools"
+                value="Werkelijk rendement (aanpasbaar naar forfaitair)"
               />
             </div>
             <MetaBlock year={year} {...constants.box3.meta} />

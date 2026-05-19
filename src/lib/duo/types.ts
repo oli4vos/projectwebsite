@@ -34,6 +34,17 @@ export type DuoIncomeBasedInput = {
   statutoryMonthlyPayment?: number;
 };
 
+export type DuoIncomeBasedMonthlyPaymentResult = {
+  annualIncomeUsed: number;
+  allowanceUsed: number;
+  amountAboveAllowance: number;
+  percentageUsed: number | null;
+  incomeBasedMonthlyPayment: number;
+  requiredMonthlyPayment: number;
+  source: "incomeBased" | "statutoryOnly" | "unknownRuleFallback";
+  warnings: string[];
+};
+
 export type DuoRelevantPaymentInput = DuoRepaymentInput & {
   situation?: DuoSituation;
   currentMonthlyPayment?: number;

@@ -1,4 +1,5 @@
 export type TaxYear = number;
+export type Box3Method = "actual" | "forfaitary";
 
 export type Box1IncomeInput = {
   taxableIncome: number;
@@ -41,6 +42,8 @@ export type Box3Input = {
   investmentsAndOtherAssets?: number;
   debts?: number;
   hasFiscalPartner?: boolean;
+  method?: Box3Method;
+  actualAnnualReturnRate?: number;
   year?: TaxYear;
 };
 
@@ -56,5 +59,6 @@ export type Box3Result = {
   taxableDeemedReturn: number;
   box3Tax: number;
   effectiveTaxRateOnNetWorth: number;
+  method: Box3Method;
   warnings: string[];
 };

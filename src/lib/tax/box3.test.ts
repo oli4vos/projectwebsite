@@ -7,6 +7,8 @@ describe("calculateBox3Tax", () => {
       bankDeposits: 0,
       investmentsAndOtherAssets: 0,
       debts: 0,
+      method: "actual",
+      actualAnnualReturnRate: 5,
       year: 2026,
     });
 
@@ -20,6 +22,8 @@ describe("calculateBox3Tax", () => {
       investmentsAndOtherAssets: 0,
       debts: 0,
       hasFiscalPartner: false,
+      method: "actual",
+      actualAnnualReturnRate: 5,
       year: 2026,
     });
 
@@ -33,6 +37,8 @@ describe("calculateBox3Tax", () => {
       investmentsAndOtherAssets: 0,
       debts: 0,
       hasFiscalPartner: false,
+      method: "actual",
+      actualAnnualReturnRate: 5,
       year: 2026,
     });
 
@@ -46,6 +52,8 @@ describe("calculateBox3Tax", () => {
       investmentsAndOtherAssets: 200000,
       debts: 0,
       hasFiscalPartner: false,
+      method: "actual",
+      actualAnnualReturnRate: 6,
       year: 2026,
     });
 
@@ -58,6 +66,8 @@ describe("calculateBox3Tax", () => {
       investmentsAndOtherAssets: 0,
       debts: 0,
       hasFiscalPartner: false,
+      method: "actual",
+      actualAnnualReturnRate: 4,
       year: 2026,
     });
     const partners = calculateBox3Tax({
@@ -65,6 +75,8 @@ describe("calculateBox3Tax", () => {
       investmentsAndOtherAssets: 0,
       debts: 0,
       hasFiscalPartner: true,
+      method: "actual",
+      actualAnnualReturnRate: 4,
       year: 2026,
     });
 
@@ -78,6 +90,8 @@ describe("calculateBox3Tax", () => {
       investmentsAndOtherAssets: 50000,
       debts: 120000,
       hasFiscalPartner: false,
+      method: "actual",
+      actualAnnualReturnRate: 5,
       year: 2026,
     });
 
@@ -92,11 +106,28 @@ describe("calculateBox3Tax", () => {
       investmentsAndOtherAssets: -5000,
       debts: -2000,
       hasFiscalPartner: false,
+      method: "actual",
+      actualAnnualReturnRate: 5,
       year: 2026,
     });
 
     expect(result.assetsTotal).toBe(0);
     expect(result.debtsTotal).toBe(0);
     expect(result.box3Tax).toBe(0);
+  });
+
+  it("supports forfaitary mode explicitly", () => {
+    const result = calculateBox3Tax({
+      bankDeposits: 100000,
+      investmentsAndOtherAssets: 100000,
+      debts: 0,
+      hasFiscalPartner: false,
+      method: "forfaitary",
+      year: 2026,
+    });
+
+    expect(result.method).toBe("forfaitary");
+    expect(result.deemedReturnInvestments).toBeGreaterThan(0);
+    expect(result.box3Tax).toBeGreaterThan(0);
   });
 });

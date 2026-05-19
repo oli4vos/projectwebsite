@@ -1,9 +1,11 @@
 import {
   getDefaultFinancialYear,
   getDuoDefaultTermForRule,
+  getDuoIncomeBasedRuleForRepaymentRule,
   getDuoRateForRule,
 } from "@/lib/financial-constants";
 import type {
+  DuoIncomeBasedMonthlyPaymentResult,
   DuoMonthlyPaymentAfterExtraRepaymentInput,
   DuoRelevantPaymentInput,
   ExtraRepaymentVsInvestingInput,
@@ -148,6 +150,76 @@ export function calculateStatutoryDuoMonthlyPayment(input: DuoRelevantPaymentInp
     annualInterestRate,
     remainingTermYears,
   );
+}
+
+export function calculateIndicativeIncomeBasedMonthlyPayment(input: {
+  grossAnnualIncome?: number;
+  partnerGrossAnnualIncome?: number;
+  hasPartner?: boolean;
+  repaymentRule?: RepaymentRule;
+  statutoryMonthlyPayment?: number;
+}): DuoIncomeBasedMonthlyPaymentResult {
+  const rule = resolveRepaymentRule(input.repaymentRule);
+  const ruleConfig = getDuoIncomeBasedRuleForRepaymentRule(rule, DEFAULT_YEAR);
+  const hasPartner =
+    input.hasPartner ?? sanitizeDuoMoney(input.partnerGrossAnnualIncome) > 0;
+  const annualIncomeUsed = roundMoney(
+    sanitizeDuoMoney(input.grossAnnualIncome) +
+      sanitizeDuoMoney(input.partnerGrossAnnualIncome),
+  );
+  const allowanceUsed = hasPartner
+    ? ruleConfig.partnerOrSingleParentAllowance
+    : ruleConfig.singleAllowance;
+  const amountAboveAllowance = roundMoney(Math.max(annualIncomeUsed - allowanceUsed, 0));
+  const warnings: string[] = [];
+
+  if (rule === "SF15_OLD") {
+    warnings.push(
+      "SF15-oud gebruikt schijven met oplopende percentages. Deze tool toont daarom alleen een richting op basis van je wettelijke maandbedrag.",
+    );
+  }
+
+  if (rule === "UNKNOWN") {
+    warnings.push(
+      "Onbekende terugbetalingsregel: draagkrachtberekening valt indicatief terug op SF35-aannames.",
+    );
+  }
+
+  const statutoryMonthlyPayment = sanitizeDuoMoney(input.statutoryMonthlyPayment);
+  const incomeBasedMonthlyPayment =
+    ruleConfig.percentage === null
+      ? 0
+      : roundMoney((amountAboveAllowance * (ruleConfig.percentage / 100)) / 12);
+  const requiredMonthlyPayment =
+    statutoryMonthlyPayment > 0
+      ? roundMoney(Math.min(incomeBasedMonthlyPayment, statutoryMonthlyPayment))
+      : incomeBasedMonthlyPayment;
+
+  if (statutoryMonthlyPayment > 0) {
+    warnings.push(
+      "DUO vergelijkt draagkracht met je wettelijke maandbedrag. Je betaalt het laagste van die twee.",
+    );
+  }
+
+  warnings.push(
+    "Extra aflossen boven je verplichte bedrag blijft een keuze. Dat deel kun je ook als alternatiefscenario inzetten voor buffer of beleggen.",
+  );
+
+  return {
+    annualIncomeUsed,
+    allowanceUsed: roundMoney(allowanceUsed),
+    amountAboveAllowance,
+    percentageUsed: ruleConfig.percentage,
+    incomeBasedMonthlyPayment,
+    requiredMonthlyPayment,
+    source:
+      rule === "UNKNOWN"
+        ? "unknownRuleFallback"
+        : ruleConfig.percentage === null
+          ? "statutoryOnly"
+          : "incomeBased",
+    warnings,
+  };
 }
 
 export function calculateRemainingDebtAfterExtraRepayment(

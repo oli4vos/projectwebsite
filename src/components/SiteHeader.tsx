@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { BtnLink, Logo } from "@/components/ui";
 
 const navItems = [
@@ -18,6 +19,43 @@ export function SiteHeader() {
   const pathname = usePathname();
   const onHome = pathname === "/";
   const onToolPage = pathname.startsWith("/apps/");
+  const [isMobileCompact, setIsMobileCompact] = useState(false);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    function handleScroll() {
+      if (window.innerWidth >= 768) {
+        if (isMobileCompact) {
+          setIsMobileCompact(false);
+        }
+        lastScrollY.current = window.scrollY;
+        return;
+      }
+
+      const currentY = window.scrollY;
+
+      if (currentY <= 40) {
+        setIsMobileCompact(false);
+        lastScrollY.current = currentY;
+        return;
+      }
+
+      if (currentY > lastScrollY.current + 8 && currentY > 90) {
+        setIsMobileCompact(true);
+      } else if (currentY < lastScrollY.current - 8) {
+        setIsMobileCompact(false);
+      }
+
+      lastScrollY.current = currentY;
+    }
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [isMobileCompact]);
 
   return (
     <header className="hair-b sticky top-0 z-20 bg-[rgba(245,241,234,0.78)] backdrop-blur-md">
@@ -42,6 +80,9 @@ export function SiteHeader() {
             <BtnLink href="/profiel" kind={pathname === "/profiel" ? "outline" : "ghost"} size="sm">
               Mijn profiel
             </BtnLink>
+            <BtnLink href="/variabelen" kind={pathname === "/variabelen" ? "outline" : "ghost"} size="sm">
+              Variabelen
+            </BtnLink>
             <BtnLink href="/#apps" kind={onHome ? "outline" : "ghost"} size="sm">
               Overzicht
             </BtnLink>
@@ -55,30 +96,75 @@ export function SiteHeader() {
           </div>
         </div>
 
-        <nav className="mt-3 flex min-h-11 items-center gap-2 overflow-x-auto pb-1 text-[13.5px] md:hidden">
-          {navItems.map((item) => (
-            <Link key={item.href} href={item.href} className={`${navClassName()} shrink-0`}>
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+        {isMobileCompact ? (
+          <div className="mt-3 flex items-center justify-between gap-2 md:hidden">
+            <BtnLink
+              href="/#apps"
+              kind={onHome ? "outline" : "ghost"}
+              size="sm"
+              className="min-w-0 flex-1 justify-center"
+            >
+              Rekentools
+            </BtnLink>
+            <BtnLink
+              href="/profiel"
+              kind={pathname === "/profiel" ? "outline" : "ghost"}
+              size="sm"
+              className="min-w-0 flex-1 justify-center"
+            >
+              Mijn profiel
+            </BtnLink>
+          </div>
+        ) : (
+          <>
+            <nav className="mt-3 flex min-h-11 items-center gap-2 overflow-x-auto pb-1 text-[13.5px] md:hidden">
+              {navItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`${navClassName()} shrink-0`}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
 
-        <div className="mt-3 grid grid-cols-2 gap-2 md:hidden">
-          <BtnLink href="/profiel" kind={pathname === "/profiel" ? "outline" : "ghost"} size="sm">
-            Mijn profiel
-          </BtnLink>
-          <BtnLink href="/#apps" kind={onHome ? "outline" : "ghost"} size="sm">
-            Overzicht
-          </BtnLink>
-          <BtnLink
-            href="/apps/studieschuld-vs-beleggen"
-            kind={onToolPage ? "outline" : "primary"}
-            size="sm"
-            className="col-span-2"
-          >
-            Open voorbeeldtool
-          </BtnLink>
-        </div>
+            <div className="mt-3 grid grid-cols-1 gap-2 md:hidden">
+              <BtnLink
+                href="/profiel"
+                kind={pathname === "/profiel" ? "outline" : "ghost"}
+                size="sm"
+                className="w-full justify-center"
+              >
+                Mijn profiel
+              </BtnLink>
+              <BtnLink
+                href="/variabelen"
+                kind={pathname === "/variabelen" ? "outline" : "ghost"}
+                size="sm"
+                className="w-full justify-center"
+              >
+                Variabelen
+              </BtnLink>
+              <BtnLink
+                href="/#apps"
+                kind={onHome ? "outline" : "ghost"}
+                size="sm"
+                className="w-full justify-center"
+              >
+                Overzicht
+              </BtnLink>
+              <BtnLink
+                href="/apps/studieschuld-vs-beleggen"
+                kind={onToolPage ? "outline" : "primary"}
+                size="sm"
+                className="w-full justify-center"
+              >
+                Open voorbeeldtool
+              </BtnLink>
+            </div>
+          </>
+        )}
       </div>
     </header>
   );

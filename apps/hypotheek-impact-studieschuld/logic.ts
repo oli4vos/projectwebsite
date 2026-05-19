@@ -3,9 +3,11 @@ import {
   getDuoDefaultTermForRule,
   getDuoRateForRule,
   getFinancialConstants,
+  getIndicativeIncomeHousingCostRatio,
   getStudentDebtGrossUpFactor,
 } from "@/lib/financial-constants";
 import {
+  calculateIndicativeIncomeBasedMonthlyPayment,
   calculateDuoMonthlyPaymentAfterExtraRepayment as calculateDuoMonthlyPaymentAfterExtraRepaymentCentral,
   determineRelevantDuoPayment as determineRelevantDuoPaymentCentral,
   sanitizeDuoMoney,
@@ -43,14 +45,6 @@ export const BRUTERING_FACTORS: ReadonlyArray<{
   ...band,
   maxRate: band.maxRate === null ? Number.POSITIVE_INFINITY : band.maxRate,
 }));
-
-export const QUICK_RULE_SCENARIOS = [
-  { key: "careful", label: "Voorzichtig", factor: 4.5 },
-  { key: "middle", label: "Midden", factor: 5.0 },
-  { key: "wide", label: "Ruim", factor: 5.5 },
-] as const;
-
-export type QuickRuleScenarioKey = (typeof QUICK_RULE_SCENARIOS)[number]["key"];
 
 export type RelevantDuoPaymentResult = {
   primaryNetMonthlyPayment: number;
@@ -91,17 +85,32 @@ export type HousingTargetSummary = {
   ownMoney: number;
   neededMortgage: number;
   indicativeMortgageNeedWithStudentDebt: number;
+  incomeBasedMaxMortgageIndicative: number;
+  incomeBasedMaxMortgageWithStudentDebtIndicative: number;
+  incomeToHousingCostRatioUsed: number;
   maxMortgageWithoutStudentDebt?: number;
   maxMortgageWithStudentDebtIndicative?: number;
   gapToTargetIfMaxProvided?: number;
   ownMoneyCoversHomePrice: boolean;
 };
 
-export type QuickRuleImpactScenario = {
-  key: QuickRuleScenarioKey;
-  label: string;
-  factor: number;
-  impact: number;
+export type IncomeCapacitySummary = {
+  incomeBasedMaxMortgageIndicative: number;
+  incomeBasedMaxMortgageWithStudentDebtIndicative: number;
+  incomeToHousingCostRatioUsed: number;
+  monthlyBudgetFromIncome: number;
+};
+
+export type DuoMandatoryPaymentSummary = {
+  annualIncomeUsed: number;
+  allowanceUsed: number;
+  amountAboveAllowance: number;
+  percentageUsed: number | null;
+  incomeBasedMonthlyPayment: number;
+  statutoryMonthlyPayment: number;
+  requiredMonthlyPayment: number;
+  remainingChoiceBudgetMonthly: number;
+  warnings: string[];
 };
 
 export type HypotheekImpactInput = {
@@ -127,9 +136,10 @@ export type HypotheekImpactResult = {
   mortgageImpact: MortgageImpactResult;
   extraRepaymentScenario: ExtraRepaymentScenarioResult;
   grossIncomeTotal: number;
+  incomeCapacity: IncomeCapacitySummary;
+  duoMandatoryPayment: DuoMandatoryPaymentSummary;
   debtToIncomeRatio?: number;
   housingTarget?: HousingTargetSummary;
-  quickRuleImpactScenarios: QuickRuleImpactScenario[];
   duoRateUsed: number;
   duoTermYearsUsed: number;
   remainingStudentDebt: number;
@@ -452,17 +462,6 @@ export function calculateExtraRepaymentScenario(
   };
 }
 
-function calculateQuickRuleScenarios(
-  netMonthlyPayment: number,
-): QuickRuleImpactScenario[] {
-  const duoYearlyPayment = sanitizeMoney(netMonthlyPayment) * 12;
-
-  return QUICK_RULE_SCENARIOS.map((scenario) => ({
-    ...scenario,
-    impact: roundMoney(duoYearlyPayment * scenario.factor),
-  }));
-}
-
 export function calculateHypotheekImpact(
   input: HypotheekImpactInput,
 ): HypotheekImpactResult {
@@ -482,6 +481,20 @@ export function calculateHypotheekImpact(
     duoInterestRate: duoRateUsed,
     remainingTermYears: duoTermYearsUsed,
   });
+  const duoMandatoryBase = calculateIndicativeIncomeBasedMonthlyPayment({
+    grossAnnualIncome: grossIncomeUser,
+    partnerGrossAnnualIncome: grossIncomePartner,
+    hasPartner: grossIncomePartner > 0,
+    repaymentRule: input.repaymentRule,
+    statutoryMonthlyPayment: duoPayment.estimatedStatutoryPayment,
+  });
+  const statutoryMonthlyPayment = roundMoney(duoPayment.estimatedStatutoryPayment);
+  const requiredMonthlyPayment = roundMoney(
+    Math.min(duoMandatoryBase.requiredMonthlyPayment, statutoryMonthlyPayment),
+  );
+  const remainingChoiceBudgetMonthly = roundMoney(
+    Math.max(duoPayment.primaryNetMonthlyPayment - requiredMonthlyPayment, 0),
+  );
   const mortgageImpact = calculateMortgageImpact({
     ...input,
     duoInterestRate: duoRateUsed,
@@ -492,13 +505,31 @@ export function calculateHypotheekImpact(
     duoInterestRate: duoRateUsed,
     remainingTermYears: duoTermYearsUsed,
   });
-  const quickRuleImpactScenarios = calculateQuickRuleScenarios(
-    duoPayment.primaryNetMonthlyPayment,
-  );
   const debtToIncomeRatio =
     remainingStudentDebt > 0
       ? safeRatio(remainingStudentDebt, grossIncomeTotal)
       : undefined;
+  const incomeToHousingCostRatioUsed = getIndicativeIncomeHousingCostRatio(DEFAULT_YEAR);
+  const monthlyBudgetFromIncome = roundMoney(
+    (grossIncomeTotal * (incomeToHousingCostRatioUsed / 100)) / 12,
+  );
+  const incomeBasedMaxMortgageIndicative = calculatePresentValueFromMonthlyPayment(
+    monthlyBudgetFromIncome,
+    sanitizePercent(input.mortgageRate),
+    sanitizeYears(
+      input.mortgageTermYears,
+      FINANCIAL_CONSTANTS.mortgage.defaultMortgageTermYears,
+    ),
+  );
+  const incomeBasedMaxMortgageWithStudentDebtIndicative =
+    calculatePresentValueFromMonthlyPayment(
+      Math.max(monthlyBudgetFromIncome - mortgageImpact.grossDuoMonthlyImpact, 0),
+      sanitizePercent(input.mortgageRate),
+      sanitizeYears(
+        input.mortgageTermYears,
+        FINANCIAL_CONSTANTS.mortgage.defaultMortgageTermYears,
+      ),
+    );
 
   const housingTarget = (() => {
     if (desiredHomePrice === undefined) {
@@ -510,12 +541,14 @@ export function calculateHypotheekImpact(
     const indicativeMortgageNeedWithStudentDebt = ownMoneyCoversHomePrice
       ? 0
       : roundMoney(neededMortgage + mortgageImpact.principalImpact);
-
     const summary: HousingTargetSummary = {
       desiredHomePrice,
       ownMoney,
       neededMortgage,
       indicativeMortgageNeedWithStudentDebt,
+      incomeBasedMaxMortgageIndicative,
+      incomeBasedMaxMortgageWithStudentDebtIndicative,
+      incomeToHousingCostRatioUsed,
       ownMoneyCoversHomePrice,
     };
 
@@ -542,6 +575,7 @@ export function calculateHypotheekImpact(
     `Bedragen en aannames gecontroleerd op ${LAST_CHECKED}.`,
     `Voor ${input.repaymentRule === "UNKNOWN" ? "de onbekende terugbetalingsregel" : input.repaymentRule} rekenen we standaard met ${duoRateUsed.toFixed(2).replace(".", ",")}% DUO-rente en ${duoTermYearsUsed} jaar als je geen eigen waarden invult.`,
     "De hoofdconclusie gebruikt netto DUO-last -> brutering -> indicatieve annuïtaire hypotheekimpact, niet alleen een grove jaarfactor.",
+    "DUO-verplichting is indicatief benaderd als het laagste van wettelijk maandbedrag en draagkracht op basis van inkomen.",
   ];
 
   const warnings = [
@@ -555,9 +589,25 @@ export function calculateHypotheekImpact(
     mortgageImpact,
     extraRepaymentScenario,
     grossIncomeTotal,
+    incomeCapacity: {
+      incomeBasedMaxMortgageIndicative,
+      incomeBasedMaxMortgageWithStudentDebtIndicative,
+      incomeToHousingCostRatioUsed,
+      monthlyBudgetFromIncome,
+    },
+    duoMandatoryPayment: {
+      annualIncomeUsed: duoMandatoryBase.annualIncomeUsed,
+      allowanceUsed: duoMandatoryBase.allowanceUsed,
+      amountAboveAllowance: duoMandatoryBase.amountAboveAllowance,
+      percentageUsed: duoMandatoryBase.percentageUsed,
+      incomeBasedMonthlyPayment: duoMandatoryBase.incomeBasedMonthlyPayment,
+      statutoryMonthlyPayment,
+      requiredMonthlyPayment,
+      remainingChoiceBudgetMonthly,
+      warnings: duoMandatoryBase.warnings,
+    },
     debtToIncomeRatio,
     housingTarget,
-    quickRuleImpactScenarios,
     duoRateUsed,
     duoTermYearsUsed,
     remainingStudentDebt,

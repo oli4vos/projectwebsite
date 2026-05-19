@@ -1,12 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { AreaChart } from "@/components/charts";
+import {
+  AreaChart,
+  getAdaptiveEuroTicks,
+  getAdaptiveYearTicks,
+} from "@/components/charts";
 import { ResultRow } from "@/components/ResultRow";
 import { ToolDisclosure } from "@/components/ToolDisclosure";
 import { Pill } from "@/components/ui";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { getDefaultFinancialYear } from "@/lib/financial-constants";
+import type { Box3Method } from "@/lib/tax";
 import {
   createProfilePrefillState,
   mergeProfilePatchIntoValues,
@@ -27,6 +32,7 @@ type FormState = {
   box3EffectEnabled: boolean;
   taxYear: string;
   hasFiscalPartner: boolean;
+  box3Method: Box3Method;
   box3BankDeposits: string;
   box3InvestmentsAndOtherAssets: string;
   box3Debts: string;
@@ -42,6 +48,7 @@ const defaultValues: FormState = {
   box3EffectEnabled: false,
   taxYear: String(DEFAULT_FINANCIAL_YEAR),
   hasFiscalPartner: false,
+  box3Method: "actual",
   box3BankDeposits: "0",
   box3InvestmentsAndOtherAssets: "0",
   box3Debts: "0",
@@ -65,6 +72,15 @@ function formatPercent(value: number) {
   return new Intl.NumberFormat("nl-NL", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
+  }).format(value);
+}
+
+function formatCompactEuro(value: number) {
+  return new Intl.NumberFormat("nl-NL", {
+    style: "currency",
+    currency: "EUR",
+    notation: "compact",
+    maximumFractionDigits: 1,
   }).format(value);
 }
 
@@ -136,6 +152,7 @@ function validateForm(values: FormState) {
           box3EffectEnabled: values.box3EffectEnabled,
           taxYear: values.box3EffectEnabled ? taxYear : undefined,
           hasFiscalPartner: values.hasFiscalPartner,
+          box3Method: values.box3Method,
           box3BankDeposits: values.box3EffectEnabled ? box3BankDeposits : undefined,
           box3InvestmentsAndOtherAssets: values.box3EffectEnabled
             ? box3InvestmentsAndOtherAssets
@@ -185,21 +202,48 @@ function CalculatorContent({
   profilePatch,
 }: CalculatorContentProps) {
   const [formValues, setFormValues] = useState<FormState>(initialValues);
+  const [mobileStep, setMobileStep] = useState<1 | 2>(1);
   const { errors, parsedValues } = validateForm(formValues);
   const result = parsedValues ? calculateStudyDebtVsInvesting(parsedValues) : null;
   const hasErrors = Object.keys(errors).length > 0;
   const chartSeries = result
-    ? [
-        {
-          color: "oklch(46% 0.07 232)",
-          points: result.projections.map((item) => item.expectedInvestmentValue),
-        },
-        {
-          color: "oklch(54% 0.10 152)",
-          points: result.projections.map((item) => item.debtStrategyValue),
-        },
-      ]
+    ? (() => {
+        const series = [
+          {
+            color: "oklch(46% 0.07 232)",
+            points: result.projections.map((item) => item.expectedInvestmentValue),
+          },
+          {
+            color: "oklch(54% 0.10 152)",
+            points: result.projections.map((item) => item.debtStrategyValue),
+          },
+        ];
+
+        if (result.box3Scenario) {
+          series.push({
+            color: "oklch(62% 0.12 38)",
+            points: [
+              0,
+              ...result.box3Scenario.yearlyBreakdown.map(
+                (row) => row.portfolioAfterTax,
+              ),
+            ],
+          });
+        }
+
+        return series;
+      })()
     : null;
+  const xTicks = result ? getAdaptiveYearTicks(result.projections.length - 1) : [];
+  const yTicks = result
+    ? getAdaptiveEuroTicks(
+        Math.max(
+          ...result.projections.map((point) =>
+            Math.max(point.expectedInvestmentValue, point.debtStrategyValue),
+          ),
+        ),
+      )
+    : [];
 
   function updateField<K extends keyof FormState>(field: K, value: FormState[K]) {
     setFormValues((current) => ({
@@ -243,7 +287,7 @@ function CalculatorContent({
           </div>
         ) : null}
 
-        <div className="mt-6 grid gap-5">
+        <div className={`mt-6 grid gap-5 ${mobileStep === 1 ? "block" : "hidden"} md:block`}>
           <label className="grid gap-2">
             <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
               Maandbedrag
@@ -301,6 +345,23 @@ function CalculatorContent({
             />
             <FieldError message={errors.years} />
           </label>
+          <button
+            type="button"
+            onClick={() => setMobileStep(2)}
+            className="ring-focus hair inline-flex h-11 items-center justify-center rounded-full border bg-[var(--paper-soft)] px-4 text-[14px] text-[var(--ink)] md:hidden"
+          >
+            Volgende stap: aannames
+          </button>
+        </div>
+
+        <div className={`mt-5 grid gap-5 ${mobileStep === 2 ? "block" : "hidden"} md:mt-0 md:block`}>
+          <button
+            type="button"
+            onClick={() => setMobileStep(1)}
+            className="ring-focus hair inline-flex h-11 items-center justify-center rounded-full border bg-white px-4 text-[14px] text-[var(--ink)] md:hidden"
+          >
+            Terug naar basisvelden
+          </button>
 
           <label className="grid gap-2 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3">
             <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
@@ -354,6 +415,30 @@ function CalculatorContent({
                   />
                   Ja, reken met partnervrijstelling
                 </span>
+              </label>
+
+              <label className="grid gap-2">
+                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                  Box 3-methode
+                </span>
+                <span className="flex items-center gap-3 text-[14px] text-[var(--ink)]">
+                  <input
+                    type="checkbox"
+                    checked={formValues.box3Method === "forfaitary"}
+                    onChange={(event) =>
+                      updateField(
+                        "box3Method",
+                        event.target.checked ? "forfaitary" : "actual",
+                      )
+                    }
+                    className="size-4 accent-[var(--accent)]"
+                  />
+                  Gebruik forfaitair rendement (anders werkelijk rendement)
+                </span>
+                <p className="text-[12px] leading-[1.5] text-[var(--soft)]">
+                  Default is werkelijk rendement. Alleen als je dit aanvinkt rekent
+                  de tool met forfaitair rendement.
+                </p>
               </label>
 
               <label className="grid gap-2">
@@ -447,8 +532,12 @@ function CalculatorContent({
               </p>
               {result.box3Scenario ? (
                 <p className="mt-3 max-w-[56ch] text-[13px] leading-[1.65] text-white/70">
-                  Met indicatief box 3-effect wordt het beleggingsscenario ongeveer{" "}
-                  {formatCurrency(result.box3Scenario.additionalBox3TaxIndicative)} lager.
+                  Met jaarlijkse box 3-heffing wordt het beleggingsscenario over de
+                  hele looptijd indicatief ongeveer{" "}
+                  {formatCurrency(
+                    result.box3Scenario.cumulativeAdditionalBox3TaxIndicative,
+                  )}{" "}
+                  lager.
                 </p>
               ) : null}
             </>
@@ -495,9 +584,25 @@ function CalculatorContent({
               {result.box3Scenario ? (
                 <>
                   <ResultRow
-                    label="Indicatieve extra box 3-heffing"
-                    value={formatCurrency(result.box3Scenario.additionalBox3TaxIndicative)}
-                    sub="Verschil tussen box 3 zonder en met beleggingsscenario"
+                    label="Extra box 3-heffing in laatste jaar"
+                    value={formatCurrency(
+                      result.box3Scenario.additionalBox3TaxIndicative,
+                    )}
+                    sub="Verschil tussen box 3 zonder en met beleggingsscenario in het eindjaar"
+                  />
+                  <ResultRow
+                    label="Cumulatieve box 3-heffing over looptijd"
+                    value={formatCurrency(
+                      result.box3Scenario.cumulativeAdditionalBox3TaxIndicative,
+                    )}
+                    sub="Som van jaarlijkse extra box 3-heffing die uit het beleggingsscenario wordt betaald"
+                  />
+                  <ResultRow
+                    label="Netto beleggingsuitkomst na jaarlijkse box 3"
+                    value={formatCurrency(
+                      result.box3Scenario.netInvestingOutcomeAfterBox3,
+                    )}
+                    sub="Jaarlijkse box 3-heffing wordt telkens eerst betaald en telt daarna niet meer mee in compound"
                   />
                   <ResultRow
                     label="Verschil na box 3-indicatie"
@@ -533,14 +638,30 @@ function CalculatorContent({
                   <span className="inline-block h-[2px] w-3 bg-[oklch(54%_0.10_152)]" />
                   Aflossen
                 </span>
+                {result.box3Scenario ? (
+                  <span className="flex items-center gap-1.5">
+                    <span className="inline-block h-[2px] w-3 bg-[oklch(62%_0.12_38)]" />
+                    Beleggen na box 3
+                  </span>
+                ) : null}
               </div>
             </div>
-            <div className="mt-5 overflow-x-auto">
-              <AreaChart width={620} height={220} series={chartSeries} />
-              <div className="axis mt-1 flex items-center justify-between">
-                {result.projections.map((point) => (
-                  <span key={point.year}>jaar {point.year}</span>
-                ))}
+            <div className="mt-5 grid gap-3 sm:grid-cols-[68px_minmax(0,1fr)]">
+              <div className="hidden flex-col justify-between text-right text-[11px] text-[var(--soft)] sm:flex">
+                {yTicks
+                  .slice()
+                  .reverse()
+                  .map((tick) => (
+                    <span key={tick}>{formatCompactEuro(tick)}</span>
+                  ))}
+              </div>
+              <div className="min-w-0">
+                <AreaChart width={620} height={220} series={chartSeries} yTicks={yTicks} />
+                <div className="axis mt-1 flex items-center justify-between">
+                  {xTicks.map((tick) => (
+                    <span key={tick}>jaar {tick}</span>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -561,6 +682,15 @@ function CalculatorContent({
                   label="Belastingjaar"
                   value={String(result.box3Scenario.year)}
                   sub="Gebruikt voor de forfaitaire box 3-aannames"
+                />
+                <ResultRow
+                  label="Gekozen methode"
+                  value={
+                    result.box3Scenario.box3Method === "actual"
+                      ? "Werkelijk rendement"
+                      : "Forfaitair rendement"
+                  }
+                  sub="Deze keuze bepaalt hoe het belastbare rendement indicatief wordt benaderd"
                 />
                 <ResultRow
                   label="Fiscale partner"
@@ -592,17 +722,29 @@ function CalculatorContent({
                 <ResultRow
                   label="Forfait banktegoeden"
                   value={`${formatPercent(result.box3Scenario.deemedReturnBankDepositsRate)}%`}
-                  sub="Indicatief percentage voor banktegoeden"
+                  sub={
+                    result.box3Scenario.box3Method === "forfaitary"
+                      ? "Indicatief percentage voor banktegoeden"
+                      : "Achtergrondwaarde uit aannames (niet leidend bij werkelijk rendement)"
+                  }
                 />
                 <ResultRow
                   label="Forfait beleggingen"
                   value={`${formatPercent(result.box3Scenario.deemedReturnInvestmentsRate)}%`}
-                  sub="Indicatief percentage voor beleggingen/overige bezittingen"
+                  sub={
+                    result.box3Scenario.box3Method === "forfaitary"
+                      ? "Indicatief percentage voor beleggingen/overige bezittingen"
+                      : "Achtergrondwaarde uit aannames (niet leidend bij werkelijk rendement)"
+                  }
                 />
                 <ResultRow
                   label="Forfait schulden"
                   value={`${formatPercent(result.box3Scenario.deemedReturnDebtsRate)}%`}
-                  sub="Indicatieve schuldcorrectie in box 3"
+                  sub={
+                    result.box3Scenario.box3Method === "forfaitary"
+                      ? "Indicatieve schuldcorrectie in box 3"
+                      : "Achtergrondwaarde uit aannames (niet leidend bij werkelijk rendement)"
+                  }
                 />
                 <ResultRow
                   label="Box 3-tarief"
@@ -612,24 +754,75 @@ function CalculatorContent({
                 <ResultRow
                   label="Box 3 zonder beleggingsscenario"
                   value={formatCurrency(result.box3Scenario.box3TaxWithoutScenario)}
-                  sub="Indicatieve heffing op bestaande invoer"
+                  sub="Indicatieve heffing op bestaande invoer (laatste jaar)"
                 />
                 <ResultRow
                   label="Box 3 met beleggingsscenario"
                   value={formatCurrency(result.box3Scenario.box3TaxWithInvestingScenario)}
-                  sub="Indicatieve heffing inclusief beleggingsscenario"
+                  sub="Indicatieve heffing inclusief beleggingsscenario (laatste jaar)"
                 />
                 <ResultRow
-                  label="Extra box 3-heffing indicatief"
+                  label="Extra box 3-heffing laatste jaar"
                   value={formatCurrency(result.box3Scenario.additionalBox3TaxIndicative)}
-                  sub="Verschil tussen beide indicatieve box 3-uitkomsten"
+                  sub="Verschil tussen beide indicatieve box 3-uitkomsten in het eindjaar"
+                />
+                <ResultRow
+                  label="Cumulatieve extra box 3-heffing"
+                  value={formatCurrency(
+                    result.box3Scenario.cumulativeAdditionalBox3TaxIndicative,
+                  )}
+                  sub="Jaarlijkse extra box 3-heffing opgeteld over de hele looptijd"
                 />
                 <ResultRow
                   label="Netto beleggingsuitkomst na box 3-indicatie"
                   value={formatCurrency(result.box3Scenario.netInvestingOutcomeAfterBox3)}
-                  sub="Verwachte beleggingswaarde minus indicatieve extra box 3-heffing"
+                  sub="Waarde nadat jaarlijkse box 3-heffing elk jaar uit het scenario is betaald"
                 />
               </div>
+              <ToolDisclosure
+                title="Jaarlijkse box 3-betalingen"
+                subtitle="Detail per jaar: ingelegd, rendement, box 3-heffing en waarde na belasting."
+              >
+                <div className="space-y-2">
+                  {result.box3Scenario.yearlyBreakdown.map((row) => (
+                    <div
+                      key={row.year}
+                      className="rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3"
+                    >
+                      <div className="text-[12px] uppercase tracking-[0.08em] text-[var(--muted)]">
+                        Jaar {row.year}
+                      </div>
+                      <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                        <ResultRow
+                          label="Startwaarde"
+                          value={formatCurrency(row.startPortfolio)}
+                        />
+                        <ResultRow
+                          label="Inleg in dit jaar"
+                          value={formatCurrency(row.yearlyContribution)}
+                        />
+                        <ResultRow
+                          label="Bruto rendement"
+                          value={formatCurrency(row.grossReturn)}
+                        />
+                        <ResultRow
+                          label="Waarde voor box 3"
+                          value={formatCurrency(row.portfolioBeforeTax)}
+                        />
+                        <ResultRow
+                          label="Extra box 3 in dit jaar"
+                          value={formatCurrency(row.additionalBox3Tax)}
+                        />
+                        <ResultRow
+                          label="Waarde na box 3"
+                          value={formatCurrency(row.portfolioAfterTax)}
+                          accent
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </ToolDisclosure>
               {result.box3Scenario.warnings.length > 0 ? (
                 <ul className="space-y-2 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3">
                   {result.box3Scenario.warnings.map((warning) => (
