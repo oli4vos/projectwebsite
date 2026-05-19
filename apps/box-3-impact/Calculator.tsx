@@ -228,7 +228,10 @@ function CalculatorContent({
     ? [
         {
           color: "oklch(45% 0.08 236)",
-          points: [result.netWorth, ...result.horizon.points.map((point) => point.endNetWorthBeforeTax)],
+          points: [
+            result.netWorth,
+            ...result.horizon.points.map((point) => point.endNetWorthWithoutBox3),
+          ],
         },
         {
           color: "oklch(62% 0.11 35)",
@@ -241,7 +244,8 @@ function CalculatorContent({
     ? getAdaptiveEuroTicks(
         Math.max(
           result.netWorth,
-          ...result.horizon.points.map((point) => point.endNetWorthBeforeTax),
+          ...result.horizon.points.map((point) => point.endNetWorthWithoutBox3),
+          ...result.horizon.points.map((point) => point.endNetWorthAfterTax),
         ),
       )
     : [];
@@ -545,6 +549,14 @@ function CalculatorContent({
                 Eindvermogen na box 3 in dit scenario:{" "}
                 {formatCurrency(result.horizon.endNetWorthAfterTax)}.
               </p>
+              <p className="mt-2 text-[13px] leading-[1.65] text-white/70">
+                Eindvermogen zonder box 3 (volledige compound):{" "}
+                {formatCurrency(result.horizon.endNetWorthWithoutBox3)}.
+              </p>
+              <p className="mt-2 text-[13px] leading-[1.65] text-white/70">
+                Verschil op eindhorizon door box 3:{" "}
+                {formatCurrency(result.horizon.wealthGapVsNoBox3)}.
+              </p>
             </>
           ) : null}
         </div>
@@ -575,6 +587,19 @@ function CalculatorContent({
                   value={formatCurrency(result.horizon.totalBox3TaxOverHorizon)}
                   sub={`Over ${result.horizon.years} jaar met ${result.horizon.contributionFrequency === "monthly" ? "maandelijkse" : "jaarlijkse"} inleg`}
                 />
+                <ResultRow
+                  label="Eindvermogen zonder box 3"
+                  value={formatCurrency(result.horizon.endNetWorthWithoutBox3)}
+                />
+                <ResultRow
+                  label="Eindvermogen met box 3"
+                  value={formatCurrency(result.horizon.endNetWorthAfterTax)}
+                  accent
+                />
+                <ResultRow
+                  label="Vermogensverschil door box 3"
+                  value={formatCurrency(result.horizon.wealthGapVsNoBox3)}
+                />
                 {result.expectedGrossReturn !== undefined ? (
                   <>
                     <ResultRow label="Verwacht bruto rendement (jaar 1)" value={formatCurrency(result.expectedGrossReturn)} />
@@ -592,17 +617,17 @@ function CalculatorContent({
                       Beleggingshorizon
                     </div>
                     <div className="mt-1 font-serif text-[20px] tracking-[-0.015em] text-[var(--ink)]">
-                      Vermogenslijn vóór en na box 3
+                      Vermogenslijn met box 3 versus zonder box 3
                     </div>
                   </div>
                   <div className="flex items-center gap-4 text-[12px] text-[var(--muted)]">
                     <span className="flex items-center gap-1.5">
                       <span className="inline-block h-[2px] w-3 bg-[oklch(45%_0.08_236)]" />
-                      Voor box 3
+                      Zonder box 3 (full compound)
                     </span>
                     <span className="flex items-center gap-1.5">
                       <span className="inline-block h-[2px] w-3 bg-[oklch(62%_0.11_35)]" />
-                      Na box 3
+                      Met box 3
                     </span>
                   </div>
                 </div>
@@ -664,8 +689,10 @@ function CalculatorContent({
                     <ResultRow label="Bruto rendement sparen" value={formatCurrency(point.grossReturnSavings)} />
                     <ResultRow label="Bruto rendement beleggen" value={formatCurrency(point.grossReturnInvestments)} />
                     <ResultRow label="Vermogen voor box 3" value={formatCurrency(point.endNetWorthBeforeTax)} />
+                    <ResultRow label="Vermogen zonder box 3" value={formatCurrency(point.endNetWorthWithoutBox3)} />
                     <ResultRow label="Box 3-heffing in dit jaar" value={formatCurrency(point.box3Tax)} />
                     <ResultRow label="Vermogen na box 3" value={formatCurrency(point.endNetWorthAfterTax)} accent />
+                    <ResultRow label="Verschil t.o.v. zonder box 3" value={formatCurrency(point.wealthGapVsNoBox3)} />
                     <ResultRow label="Cumulatieve box 3" value={formatCurrency(point.cumulativeBox3Tax)} />
                   </div>
                 </div>

@@ -131,9 +131,21 @@ describe("calculateBox3ImpactScenario", () => {
     expect(result.horizon.points).toHaveLength(5);
     expect(result.horizon.totalBox3TaxOverHorizon).toBeGreaterThanOrEqual(0);
     expect(result.horizon.endNetWorthAfterTax).toBeGreaterThanOrEqual(0);
+    expect(result.horizon.endNetWorthWithoutBox3).toBeGreaterThanOrEqual(
+      result.horizon.endNetWorthAfterTax,
+    );
+    expect(result.horizon.wealthGapVsNoBox3).toBeCloseTo(
+      result.horizon.endNetWorthWithoutBox3 - result.horizon.endNetWorthAfterTax,
+      2,
+    );
     expect(
       result.horizon.points.every(
         (point) => Number.isFinite(point.box3Tax) && point.box3Tax >= 0,
+      ),
+    ).toBe(true);
+    expect(
+      result.horizon.points.every(
+        (point) => point.endNetWorthWithoutBox3 >= point.endNetWorthAfterTax,
       ),
     ).toBe(true);
   });

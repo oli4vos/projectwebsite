@@ -25,6 +25,7 @@ export type Box3HorizonPoint = {
   startBankDeposits: number;
   startInvestments: number;
   startNetWorth: number;
+  startNetWorthWithoutBox3: number;
   contributionSavings: number;
   contributionInvestments: number;
   grossReturnSavings: number;
@@ -34,6 +35,8 @@ export type Box3HorizonPoint = {
   endNetWorthBeforeTax: number;
   box3Tax: number;
   endNetWorthAfterTax: number;
+  endNetWorthWithoutBox3: number;
+  wealthGapVsNoBox3: number;
   cumulativeBox3Tax: number;
 };
 
@@ -61,6 +64,8 @@ export type Box3ImpactResult = {
     points: Box3HorizonPoint[];
     totalBox3TaxOverHorizon: number;
     endNetWorthAfterTax: number;
+    endNetWorthWithoutBox3: number;
+    wealthGapVsNoBox3: number;
   };
   assumptions: {
     sourceLabel: string;
@@ -165,6 +170,8 @@ function calculateHorizonPoints(input: {
   const points: Box3HorizonPoint[] = [];
   let bank = roundMoney(input.bankDeposits);
   let investments = roundMoney(input.investmentsAndOtherAssets);
+  let bankWithoutBox3 = roundMoney(input.bankDeposits);
+  let investmentsWithoutBox3 = roundMoney(input.investmentsAndOtherAssets);
   const debts = roundMoney(input.debts);
   let cumulativeBox3Tax = 0;
 
@@ -172,6 +179,9 @@ function calculateHorizonPoints(input: {
     const startBankDeposits = roundMoney(bank);
     const startInvestments = roundMoney(investments);
     const startNetWorth = roundMoney(Math.max(startBankDeposits + startInvestments - debts, 0));
+    const startNetWorthWithoutBox3 = roundMoney(
+      Math.max(bankWithoutBox3 + investmentsWithoutBox3 - debts, 0),
+    );
 
     const contributionSavings = roundMoney(input.yearlySavingsContribution);
     const contributionInvestments = roundMoney(input.yearlyInvestmentsContribution);
@@ -219,6 +229,24 @@ function calculateHorizonPoints(input: {
     investments = roundMoney(endInvestmentsBeforeTax * assetsSplitFactor);
 
     const endNetWorthAfterTax = roundMoney(Math.max(totalAssetsAfterTax - debts, 0));
+    const grossReturnSavingsWithoutBox3 = roundMoney(
+      (bankWithoutBox3 + contributionSavings) * (input.expectedSavingsReturn / 100),
+    );
+    const grossReturnInvestmentsWithoutBox3 = roundMoney(
+      (investmentsWithoutBox3 + contributionInvestments) * (input.expectedInvestmentReturn / 100),
+    );
+    bankWithoutBox3 = roundMoney(
+      bankWithoutBox3 + contributionSavings + grossReturnSavingsWithoutBox3,
+    );
+    investmentsWithoutBox3 = roundMoney(
+      investmentsWithoutBox3 + contributionInvestments + grossReturnInvestmentsWithoutBox3,
+    );
+    const endNetWorthWithoutBox3 = roundMoney(
+      Math.max(bankWithoutBox3 + investmentsWithoutBox3 - debts, 0),
+    );
+    const wealthGapVsNoBox3 = roundMoney(
+      Math.max(endNetWorthWithoutBox3 - endNetWorthAfterTax, 0),
+    );
     cumulativeBox3Tax = roundMoney(cumulativeBox3Tax + box3Tax);
 
     points.push({
@@ -227,6 +255,7 @@ function calculateHorizonPoints(input: {
       startBankDeposits,
       startInvestments,
       startNetWorth,
+      startNetWorthWithoutBox3,
       contributionSavings,
       contributionInvestments,
       grossReturnSavings,
@@ -236,6 +265,8 @@ function calculateHorizonPoints(input: {
       endNetWorthBeforeTax,
       box3Tax,
       endNetWorthAfterTax,
+      endNetWorthWithoutBox3,
+      wealthGapVsNoBox3,
       cumulativeBox3Tax,
     });
   }
@@ -346,6 +377,9 @@ export function calculateBox3ImpactScenario(input: Box3ImpactInput): Box3ImpactR
       points,
       totalBox3TaxOverHorizon: points[points.length - 1]?.cumulativeBox3Tax ?? 0,
       endNetWorthAfterTax: points[points.length - 1]?.endNetWorthAfterTax ?? netWorth,
+      endNetWorthWithoutBox3:
+        points[points.length - 1]?.endNetWorthWithoutBox3 ?? netWorth,
+      wealthGapVsNoBox3: points[points.length - 1]?.wealthGapVsNoBox3 ?? 0,
     },
     assumptions: {
       sourceLabel: constants.meta.sourceLabel,
