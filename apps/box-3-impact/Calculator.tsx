@@ -249,6 +249,26 @@ function CalculatorContent({
         ),
       )
     : [];
+  const saleExampleSeries = result
+    ? [
+        {
+          color: "oklch(45% 0.08 236)",
+          points: result.horizon.endSaleExample.pointsWithoutBox3.map((point) => point.value),
+        },
+        {
+          color: "oklch(70% 0.12 20)",
+          points: result.horizon.endSaleExample.pointsEndSaleTax.map((point) => point.value),
+        },
+      ]
+    : null;
+  const saleExampleYTicks = result
+    ? getAdaptiveEuroTicks(
+        Math.max(
+          ...result.horizon.endSaleExample.pointsWithoutBox3.map((point) => point.value),
+          ...result.horizon.endSaleExample.pointsEndSaleTax.map((point) => point.value),
+        ),
+      )
+    : [];
 
   const mobileFlow = useMobileFieldFlow([
     "year",
@@ -697,6 +717,90 @@ function CalculatorContent({
                   </div>
                 </div>
               ))}
+            </div>
+          ) : null}
+        </ToolDisclosure>
+
+        <ToolDisclosure
+          title="Hypothetisch: alleen kopen, verkoop op eindhorizon"
+          subtitle="Verdieping: voorbeeld waarin belasting pas bij eindverkoop wordt afgerekend."
+        >
+          {result ? (
+            <div className="space-y-4">
+              <p className="text-[13px] leading-[1.65] text-[var(--muted)]">
+                Dit is een extra voorbeeldscenario: je verkoopt niets tussentijds, en rekent
+                alleen op de einddatum af over de gerealiseerde winst. Dit is niet hoe box 3 nu
+                jaarlijks werkt, maar helpt om het verschil in timing van belasting te zien.
+              </p>
+              <div className="rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3">
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <ResultRow
+                    label="Totale inleg + startvermogen"
+                    value={formatCurrency(result.horizon.endSaleExample.totalPrincipalInflow)}
+                  />
+                  <ResultRow
+                    label="Winst bij verkoop op eindhorizon"
+                    value={formatCurrency(result.horizon.endSaleExample.taxableGainAtEndSale)}
+                  />
+                  <ResultRow
+                    label="Voorbeeldheffing bij eindverkoop"
+                    value={formatCurrency(result.horizon.endSaleExample.taxDueAtEndSale)}
+                    sub={`${formatPercent(result.horizon.endSaleExample.taxRateUsed)}% over winst`}
+                  />
+                  <ResultRow
+                    label="Eindvermogen na eindverkoop-heffing"
+                    value={formatCurrency(result.horizon.endSaleExample.endNetWorthAfterEndSaleTax)}
+                    accent
+                  />
+                </div>
+              </div>
+              {saleExampleSeries ? (
+                <div className="rounded-xl border border-[var(--hair)] bg-white px-4 py-4">
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="text-[12px] uppercase tracking-[0.08em] text-[var(--muted)]">
+                      Timingvergelijking belasting
+                    </div>
+                    <div className="flex items-center gap-4 text-[12px] text-[var(--muted)]">
+                      <span className="flex items-center gap-1.5">
+                        <span className="inline-block h-[2px] w-3 bg-[oklch(45%_0.08_236)]" />
+                        Zonder belasting
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <span className="inline-block h-[2px] w-3 bg-[oklch(70%_0.12_20)]" />
+                        Alleen eindverkoop-heffing
+                      </span>
+                    </div>
+                  </div>
+                  <div className="mt-4 grid gap-3 sm:grid-cols-[68px_minmax(0,1fr)]">
+                    <div className="hidden flex-col justify-between text-right text-[11px] text-[var(--soft)] sm:flex">
+                      {saleExampleYTicks
+                        .slice()
+                        .reverse()
+                        .map((tick) => (
+                          <span key={tick}>{formatCompactEuro(tick)}</span>
+                        ))}
+                    </div>
+                    <div className="min-w-0">
+                      <AreaChart
+                        width={620}
+                        height={220}
+                        series={saleExampleSeries}
+                        yTicks={saleExampleYTicks}
+                      />
+                      <div className="axis mt-1 flex items-center justify-between gap-2 overflow-hidden">
+                        {[0, ...xTicks].map((tick) => (
+                          <span
+                            key={tick}
+                            className="min-w-0 truncate first:text-left last:text-right"
+                          >
+                            jaar {tick}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
             </div>
           ) : null}
         </ToolDisclosure>

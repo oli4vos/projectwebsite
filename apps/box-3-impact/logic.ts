@@ -66,6 +66,15 @@ export type Box3ImpactResult = {
     endNetWorthAfterTax: number;
     endNetWorthWithoutBox3: number;
     wealthGapVsNoBox3: number;
+    endSaleExample: {
+      taxRateUsed: number;
+      totalPrincipalInflow: number;
+      taxableGainAtEndSale: number;
+      taxDueAtEndSale: number;
+      endNetWorthAfterEndSaleTax: number;
+      pointsWithoutBox3: Array<{ yearIndex: number; value: number }>;
+      pointsEndSaleTax: Array<{ yearIndex: number; value: number }>;
+    };
   };
   assumptions: {
     sourceLabel: string;
@@ -353,6 +362,36 @@ export function calculateBox3ImpactScenario(input: Box3ImpactInput): Box3ImpactR
     yearlyInvestmentsContribution,
   });
 
+  const totalPrincipalInflow = roundMoney(
+    bankDeposits +
+      investmentsAndOtherAssets +
+      (yearlySavingsContribution + yearlyInvestmentsContribution) * horizonYears,
+  );
+  const endNetWorthWithoutBox3 = points[points.length - 1]?.endNetWorthWithoutBox3 ?? netWorth;
+  const taxableGainAtEndSale = roundMoney(
+    Math.max(endNetWorthWithoutBox3 - totalPrincipalInflow, 0),
+  );
+  const taxDueAtEndSale = roundMoney(
+    taxableGainAtEndSale * (constants.taxRate / 100),
+  );
+  const endNetWorthAfterEndSaleTax = roundMoney(
+    Math.max(endNetWorthWithoutBox3 - taxDueAtEndSale, 0),
+  );
+  const pointsWithoutBox3 = [
+    { yearIndex: 0, value: netWorth },
+    ...points.map((point) => ({
+      yearIndex: point.yearIndex,
+      value: point.endNetWorthWithoutBox3,
+    })),
+  ];
+  const pointsEndSaleTax = [
+    ...pointsWithoutBox3.slice(0, -1),
+    {
+      yearIndex: horizonYears,
+      value: endNetWorthAfterEndSaleTax,
+    },
+  ];
+
   return {
     year: base.year,
     method: base.method,
@@ -377,9 +416,17 @@ export function calculateBox3ImpactScenario(input: Box3ImpactInput): Box3ImpactR
       points,
       totalBox3TaxOverHorizon: points[points.length - 1]?.cumulativeBox3Tax ?? 0,
       endNetWorthAfterTax: points[points.length - 1]?.endNetWorthAfterTax ?? netWorth,
-      endNetWorthWithoutBox3:
-        points[points.length - 1]?.endNetWorthWithoutBox3 ?? netWorth,
+      endNetWorthWithoutBox3,
       wealthGapVsNoBox3: points[points.length - 1]?.wealthGapVsNoBox3 ?? 0,
+      endSaleExample: {
+        taxRateUsed: constants.taxRate,
+        totalPrincipalInflow,
+        taxableGainAtEndSale,
+        taxDueAtEndSale,
+        endNetWorthAfterEndSaleTax,
+        pointsWithoutBox3,
+        pointsEndSaleTax,
+      },
     },
     assumptions: {
       sourceLabel: constants.meta.sourceLabel,
@@ -394,6 +441,7 @@ export function calculateBox3ImpactScenario(input: Box3ImpactInput): Box3ImpactR
       ...base.warnings,
       "Horizon-simulatie is indicatief; regels, forfaits en persoonlijke fiscale situatie kunnen wijzigen.",
       "Jaarlijkse box 3-heffing wordt in deze simulatie ieder jaar betaald en gaat niet mee in volgende compoundjaren.",
+      "De eindverkoop-vergelijking is een hypothetisch voorbeeld op gerealiseerde winst en is geen weergave van de huidige Nederlandse box 3-systematiek.",
       "Deze tool is indicatief en geen officiële aangifteberekening.",
     ],
   };
