@@ -1,0 +1,22 @@
+{
+  "slug": "box-3-impact",
+  "title": "Box 3-impact calculator",
+  "description": "Bereken indicatief wat spaargeld, beleggingen en schulden doen in box 3.",
+  "type": "frontend",
+  "category": "Belasting",
+  "tags": ["box 3", "belasting", "sparen", "beleggen", "vermogen"],
+  "status": "beta",
+  "visibility": "public",
+  "requiredProfileFields": [
+    "savingInvesting.currentSavings",
+    "tax.hasFiscalPartner",
+    "tax.preferredTaxYear"
+  ],
+  "assumptionsUsed": ["tax", "box3"],
+  "calculationDomains": ["tax", "saving", "investing"],
+  "riskLevel": "medium",
+  "disclaimerType": "taxIndicative",
+  "outputType": "singleResult",
+  "version": "1.0.0",
+  "entry": "Calculator.tsx"
+}

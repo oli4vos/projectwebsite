@@ -79,6 +79,17 @@ type Box3IndicatieDefaults = Partial<{
   actualAnnualReturnRate: string;
 }>;
 
+type Box3ImpactDefaults = Partial<{
+  method: "actual" | "forfaitary";
+  year: string;
+  bankDeposits: string;
+  investmentsAndOtherAssets: string;
+  debts: string;
+  hasFiscalPartner: boolean;
+  expectedSavingsReturn: string;
+  expectedInvestmentReturn: string;
+}>;
+
 function toStringValue(value?: number) {
   return value === undefined ? undefined : String(value);
 }
@@ -283,6 +294,34 @@ export function getBox3IndicatieDefaultsFromProfile(
     defaults.actualAnnualReturnRate = toStringValue(
       profile.savingInvesting.expectedAnnualReturn,
     );
+  }
+
+  return defaults;
+}
+
+export function getBox3ImpactDefaultsFromProfile(
+  profile: UserProfile,
+): Box3ImpactDefaults {
+  const indicatieDefaults = getBox3IndicatieDefaultsFromProfile(profile);
+  const defaults: Box3ImpactDefaults = {};
+
+  if (indicatieDefaults.method !== undefined) {
+    defaults.method = indicatieDefaults.method;
+  }
+  if (indicatieDefaults.year !== undefined) {
+    defaults.year = indicatieDefaults.year;
+  }
+  if (indicatieDefaults.bankDeposits !== undefined) {
+    defaults.bankDeposits = indicatieDefaults.bankDeposits;
+  }
+  if (indicatieDefaults.hasFiscalPartner !== undefined) {
+    defaults.hasFiscalPartner = indicatieDefaults.hasFiscalPartner;
+  }
+
+  if (profile.savingInvesting?.expectedAnnualReturn !== undefined) {
+    const expected = toStringValue(profile.savingInvesting.expectedAnnualReturn);
+    defaults.expectedSavingsReturn = expected;
+    defaults.expectedInvestmentReturn = expected;
   }
 
   return defaults;

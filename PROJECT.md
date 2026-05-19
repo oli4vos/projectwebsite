@@ -138,6 +138,10 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - aparte box 3-tool met light invoer + beknopte samenvatting + uitklapbare verdieping
   - ondersteunt werkelijk rendement (default) en forfaitair scenario
   - rekent via centrale tax-laag en toont gebruikte tarieven/aannames uit centrale constants
+- `apps/box-3-impact`
+  - box 3-impact calculator met focus op vrijstelling, belastbare grondslag en effectieve druk
+  - toont indicatief effect van spaargeld, beleggingen en schulden via centrale `calculateBox3Tax`
+  - ondersteunt optioneel netto rendement na box 3 op basis van ingevulde rendementsverwachtingen
 - `apps/annuitair-lineair`
   - wrapper rond bestaande JS-logica
   - bevat oudere rekenscripts in `.js`

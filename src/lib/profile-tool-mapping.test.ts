@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  getBox3ImpactDefaultsFromProfile,
   getBox3IndicatieDefaultsFromProfile,
   getMortgageImpactDefaultsFromProfile,
   getStudentDebtVsInvestingDefaultsFromProfile,
@@ -75,6 +76,7 @@ describe("profile tool mapping", () => {
     expect(getMortgageImpactDefaultsFromProfile({})).toEqual({});
     expect(getStudentDebtVsInvestingDefaultsFromProfile({})).toEqual({});
     expect(getBox3IndicatieDefaultsFromProfile({})).toEqual({});
+    expect(getBox3ImpactDefaultsFromProfile({})).toEqual({});
   });
 
   it("maps box3 indicatie defaults from profile values", () => {
@@ -98,5 +100,27 @@ describe("profile tool mapping", () => {
     expect(mapped.bankDeposits).toBe("23000");
     expect(mapped.actualAnnualReturnRate).toBe("4.5");
     expect(mapped.hasFiscalPartner).toBe(true);
+  });
+
+  it("maps box3 impact defaults from profile values", () => {
+    const profile: UserProfile = {
+      savingInvesting: {
+        currentSavings: 15000,
+        expectedAnnualReturn: 5.2,
+      },
+      tax: {
+        hasFiscalPartner: true,
+        preferredTaxYear: 2026,
+        preferredBox3Method: "actual",
+      },
+    };
+
+    const mapped = getBox3ImpactDefaultsFromProfile(profile);
+    expect(mapped.method).toBe("actual");
+    expect(mapped.year).toBe("2026");
+    expect(mapped.bankDeposits).toBe("15000");
+    expect(mapped.hasFiscalPartner).toBe(true);
+    expect(mapped.expectedSavingsReturn).toBe("5.2");
+    expect(mapped.expectedInvestmentReturn).toBe("5.2");
   });
 });
