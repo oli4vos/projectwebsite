@@ -22,13 +22,16 @@ export const PROFILE_FIELDS_MORTGAGE_IMPACT = [
 ] as const;
 
 export const PROFILE_FIELDS_STUDENT_DEBT_VS_INVESTING = [
+  "studentDebt.remainingDebt",
+  "studentDebt.remainingTermYears",
+  "income.grossAnnualIncome",
+  "income.partnerGrossAnnualIncome",
   "savingInvesting.monthlyFreeCashflow",
   "studentDebt.duoInterestRate",
   "savingInvesting.expectedAnnualReturn",
   "savingInvesting.investmentHorizonYears",
   "savingInvesting.currentSavings",
   "income.householdType",
-  "income.partnerGrossAnnualIncome",
   "tax.hasFiscalPartner",
   "tax.preferredTaxYear",
   "tax.preferredBox3Method",
@@ -52,14 +55,28 @@ type MortgageImpactDefaults = Partial<{
 }>;
 
 type StudentDebtVsInvestingDefaults = Partial<{
-  monthlyAmount: string;
+  remainingDebt: string;
   annualDebtRate: string;
+  remainingTermYears: string;
+  grossAnnualIncome: string;
+  partnerGrossAnnualIncome: string;
+  voluntaryExtraMonthly: string;
   annualInvestmentReturn: string;
   years: string;
   box3BankDeposits: string;
   hasFiscalPartner: boolean;
   taxYear: string;
   box3Method: "actual" | "forfaitary";
+}>;
+
+type Box3IndicatieDefaults = Partial<{
+  method: "actual" | "forfaitary";
+  year: string;
+  bankDeposits: string;
+  investmentsAndOtherAssets: string;
+  debts: string;
+  hasFiscalPartner: boolean;
+  actualAnnualReturnRate: string;
 }>;
 
 function toStringValue(value?: number) {
@@ -155,14 +172,38 @@ export function getStudentDebtVsInvestingDefaultsFromProfile(
 ): StudentDebtVsInvestingDefaults {
   const defaults: StudentDebtVsInvestingDefaults = {};
 
-  const monthlyAmount = toStringValue(profile.savingInvesting?.monthlyFreeCashflow);
-  if (monthlyAmount !== undefined) {
-    defaults.monthlyAmount = monthlyAmount;
+  const remainingDebt = toStringValue(profile.studentDebt?.remainingDebt);
+  if (remainingDebt !== undefined) {
+    defaults.remainingDebt = remainingDebt;
   }
 
   const annualDebtRate = toStringValue(profile.studentDebt?.duoInterestRate);
   if (annualDebtRate !== undefined) {
     defaults.annualDebtRate = annualDebtRate;
+  }
+
+  const remainingTermYears = toStringValue(profile.studentDebt?.remainingTermYears);
+  if (remainingTermYears !== undefined) {
+    defaults.remainingTermYears = remainingTermYears;
+  }
+
+  const grossAnnualIncome = toStringValue(profile.income?.grossAnnualIncome);
+  if (grossAnnualIncome !== undefined) {
+    defaults.grossAnnualIncome = grossAnnualIncome;
+  }
+
+  const partnerGrossAnnualIncome = toStringValue(
+    profile.income?.partnerGrossAnnualIncome,
+  );
+  if (partnerGrossAnnualIncome !== undefined) {
+    defaults.partnerGrossAnnualIncome = partnerGrossAnnualIncome;
+  }
+
+  const voluntaryExtraMonthly = toStringValue(
+    profile.savingInvesting?.monthlyFreeCashflow,
+  );
+  if (voluntaryExtraMonthly !== undefined) {
+    defaults.voluntaryExtraMonthly = voluntaryExtraMonthly;
   }
 
   const annualInvestmentReturn = toStringValue(
@@ -203,6 +244,45 @@ export function getStudentDebtVsInvestingDefaultsFromProfile(
 
   if (profile.tax?.preferredBox3Method !== undefined) {
     defaults.box3Method = profile.tax.preferredBox3Method;
+  }
+
+  return defaults;
+}
+
+export function getBox3IndicatieDefaultsFromProfile(
+  profile: UserProfile,
+): Box3IndicatieDefaults {
+  const defaults: Box3IndicatieDefaults = {};
+
+  const method = profile.tax?.preferredBox3Method;
+  if (method !== undefined) {
+    defaults.method = method;
+  }
+
+  const year = toStringValue(profile.tax?.preferredTaxYear);
+  if (year !== undefined) {
+    defaults.year = year;
+  }
+
+  const bankDeposits = toStringValue(profile.savingInvesting?.currentSavings);
+  if (bankDeposits !== undefined) {
+    defaults.bankDeposits = bankDeposits;
+  }
+
+  if (profile.tax?.hasFiscalPartner !== undefined) {
+    defaults.hasFiscalPartner = profile.tax.hasFiscalPartner;
+  } else if (
+    profile.income?.householdType === "withPartner" ||
+    profile.income?.householdType === "family" ||
+    (profile.income?.partnerGrossAnnualIncome ?? 0) > 0
+  ) {
+    defaults.hasFiscalPartner = true;
+  }
+
+  if (profile.savingInvesting?.expectedAnnualReturn !== undefined) {
+    defaults.actualAnnualReturnRate = toStringValue(
+      profile.savingInvesting.expectedAnnualReturn,
+    );
   }
 
   return defaults;

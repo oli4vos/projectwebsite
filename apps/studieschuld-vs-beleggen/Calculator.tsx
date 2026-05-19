@@ -2,18 +2,14 @@
 
 import { useState } from "react";
 import { MobileFieldFlowControls } from "@/components/MobileFieldFlowControls";
-import {
-  AreaChart,
-  getAdaptiveEuroTicks,
-  getAdaptiveYearTicks,
-} from "@/components/charts";
 import { ResultRow } from "@/components/ResultRow";
 import { ToolDisclosure } from "@/components/ToolDisclosure";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
 import { Pill } from "@/components/ui";
 import { useMobileFieldFlow } from "@/hooks/useMobileFieldFlow";
 import { useUserProfile } from "@/hooks/useUserProfile";
-import { getDefaultFinancialYear } from "@/lib/financial-constants";
+import { getDefaultFinancialYear, getDuoRateForRule } from "@/lib/financial-constants";
+import type { RepaymentRule } from "@/lib/duo";
 import type { Box3Method } from "@/lib/tax";
 import {
   createProfilePrefillState,
@@ -25,11 +21,16 @@ import {
   type CalculatorInput,
 } from "./logic";
 
-const DEFAULT_FINANCIAL_YEAR = getDefaultFinancialYear();
+const DEFAULT_YEAR = getDefaultFinancialYear();
 
 type FormState = {
-  monthlyAmount: string;
+  repaymentRule: RepaymentRule;
+  remainingDebt: string;
   annualDebtRate: string;
+  remainingTermYears: string;
+  grossAnnualIncome: string;
+  partnerGrossAnnualIncome: string;
+  voluntaryExtraMonthly: string;
   annualInvestmentReturn: string;
   years: string;
   box3EffectEnabled: boolean;
@@ -44,12 +45,17 @@ type FormState = {
 type ValidationErrors = Partial<Record<keyof FormState, string>>;
 
 const defaultValues: FormState = {
-  monthlyAmount: "150",
-  annualDebtRate: "2.56",
+  repaymentRule: "SF35",
+  remainingDebt: "25000",
+  annualDebtRate: String(getDuoRateForRule("SF35", DEFAULT_YEAR)),
+  remainingTermYears: "35",
+  grossAnnualIncome: "45000",
+  partnerGrossAnnualIncome: "",
+  voluntaryExtraMonthly: "150",
   annualInvestmentReturn: "6",
   years: "10",
   box3EffectEnabled: false,
-  taxYear: String(DEFAULT_FINANCIAL_YEAR),
+  taxYear: String(DEFAULT_YEAR),
   hasFiscalPartner: false,
   box3Method: "actual",
   box3BankDeposits: "0",
@@ -63,6 +69,14 @@ type CalculatorContentProps = {
   profilePatch: Partial<FormState>;
 };
 
+const repaymentRuleLabels: Record<RepaymentRule, string> = {
+  SF35: "SF35",
+  SF15: "SF15",
+  SF15_OLD: "SF15-oud",
+  SF15_LLLK: "SF15 levenlanglerenkrediet",
+  UNKNOWN: "Onbekend (fallback SF35)",
+};
+
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("nl-NL", {
     style: "currency",
@@ -71,85 +85,155 @@ function formatCurrency(value: number) {
   }).format(value);
 }
 
-function formatPercent(value: number) {
+function formatDecimal(value: number, digits = 2) {
   return new Intl.NumberFormat("nl-NL", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
   }).format(value);
 }
 
-function formatCompactEuro(value: number) {
-  return new Intl.NumberFormat("nl-NL", {
-    style: "currency",
-    currency: "EUR",
-    notation: "compact",
-    maximumFractionDigits: 1,
-  }).format(value);
+function normalizeNumericInput(value: string) {
+  return value.replace(/\s+/g, "").replace(",", ".");
+}
+
+function parseOptionalNumber(value: string) {
+  const normalized = normalizeNumericInput(value);
+  if (normalized.length === 0) {
+    return undefined;
+  }
+  return Number(normalized);
+}
+
+function parseRequiredNumber(value: string) {
+  const normalized = normalizeNumericInput(value);
+  if (normalized.length === 0) {
+    return Number.NaN;
+  }
+  return Number(normalized);
+}
+
+function formatYearMonth(value: string | null) {
+  if (!value) {
+    return "n.v.t.";
+  }
+  const parsed = new Date(`${value}-01T00:00:00`);
+  if (Number.isNaN(parsed.getTime())) {
+    return value;
+  }
+  return new Intl.DateTimeFormat("nl-NL", {
+    month: "long",
+    year: "numeric",
+  }).format(parsed);
 }
 
 function validateForm(values: FormState) {
   const errors: ValidationErrors = {};
+  const remainingDebt = parseRequiredNumber(values.remainingDebt);
+  const annualDebtRate = parseOptionalNumber(values.annualDebtRate);
+  const remainingTermYears = parseOptionalNumber(values.remainingTermYears);
+  const grossAnnualIncome = parseRequiredNumber(values.grossAnnualIncome);
+  const partnerGrossAnnualIncome = parseOptionalNumber(values.partnerGrossAnnualIncome);
+  const voluntaryExtraMonthly = parseRequiredNumber(values.voluntaryExtraMonthly);
+  const annualInvestmentReturn = parseRequiredNumber(values.annualInvestmentReturn);
+  const years = parseRequiredNumber(values.years);
+  const taxYear = parseOptionalNumber(values.taxYear);
+  const box3BankDeposits = parseOptionalNumber(values.box3BankDeposits);
+  const box3InvestmentsAndOtherAssets = parseOptionalNumber(
+    values.box3InvestmentsAndOtherAssets,
+  );
+  const box3Debts = parseOptionalNumber(values.box3Debts);
 
-  const monthlyAmount = Number(values.monthlyAmount);
-  if (!Number.isFinite(monthlyAmount) || monthlyAmount < 0) {
-    errors.monthlyAmount = "Voer een geldig maandbedrag van 0 of hoger in.";
+  if (!Number.isFinite(remainingDebt) || remainingDebt < 0) {
+    errors.remainingDebt = "Gebruik 0 of een hogere resterende studieschuld.";
   }
 
-  const annualDebtRate = Number(values.annualDebtRate);
-  if (!Number.isFinite(annualDebtRate) || annualDebtRate < 0 || annualDebtRate > 100) {
-    errors.annualDebtRate = "Gebruik een rentepercentage tussen 0 en 100.";
+  if (
+    annualDebtRate !== undefined &&
+    (!Number.isFinite(annualDebtRate) || annualDebtRate < 0 || annualDebtRate > 100)
+  ) {
+    errors.annualDebtRate = "Gebruik een rente tussen 0 en 100.";
   }
 
-  const annualInvestmentReturn = Number(values.annualInvestmentReturn);
+  if (
+    remainingTermYears !== undefined &&
+    (!Number.isFinite(remainingTermYears) || remainingTermYears <= 0 || remainingTermYears > 40)
+  ) {
+    errors.remainingTermYears = "Gebruik een resterende looptijd tussen 1 en 40 jaar.";
+  }
+
+  if (!Number.isFinite(grossAnnualIncome) || grossAnnualIncome < 0) {
+    errors.grossAnnualIncome = "Gebruik 0 of een hoger bruto jaarinkomen.";
+  }
+
+  if (
+    partnerGrossAnnualIncome !== undefined &&
+    (!Number.isFinite(partnerGrossAnnualIncome) || partnerGrossAnnualIncome < 0)
+  ) {
+    errors.partnerGrossAnnualIncome = "Gebruik 0 of een hoger partnerinkomen.";
+  }
+
+  if (
+    !Number.isFinite(voluntaryExtraMonthly) ||
+    voluntaryExtraMonthly < 0 ||
+    voluntaryExtraMonthly > 5000
+  ) {
+    errors.voluntaryExtraMonthly =
+      "Gebruik een vrijwillige extra aflossing tussen 0 en 5.000 per maand.";
+  }
+
   if (
     !Number.isFinite(annualInvestmentReturn) ||
     annualInvestmentReturn < 0 ||
     annualInvestmentReturn > 100
   ) {
-    errors.annualInvestmentReturn =
-      "Gebruik een verwacht rendement tussen 0 en 100.";
+    errors.annualInvestmentReturn = "Gebruik een rendement tussen 0 en 100.";
   }
 
-  const years = Number(values.years);
-  if (!Number.isFinite(years) || years <= 0 || years > 60) {
-    errors.years = "Kies een looptijd groter dan 0 en maximaal 60 jaar.";
+  if (!Number.isFinite(years) || years <= 0 || years > 40) {
+    errors.years = "Gebruik een horizon tussen 1 en 40 jaar.";
   }
 
-  const taxYear = Number(values.taxYear);
   if (
     values.box3EffectEnabled &&
-    (!Number.isFinite(taxYear) || taxYear < 2000 || taxYear > 2200)
+    (taxYear === undefined || !Number.isFinite(taxYear) || taxYear < 2000 || taxYear > 2200)
   ) {
     errors.taxYear = "Gebruik een geldig belastingjaar.";
   }
 
-  const box3BankDeposits = Number(values.box3BankDeposits);
   if (
     values.box3EffectEnabled &&
-    (!Number.isFinite(box3BankDeposits) || box3BankDeposits < 0)
+    (box3BankDeposits === undefined || !Number.isFinite(box3BankDeposits) || box3BankDeposits < 0)
   ) {
     errors.box3BankDeposits = "Gebruik 0 of een hoger bedrag.";
   }
 
-  const box3InvestmentsAndOtherAssets = Number(values.box3InvestmentsAndOtherAssets);
   if (
     values.box3EffectEnabled &&
-    (!Number.isFinite(box3InvestmentsAndOtherAssets) ||
+    (box3InvestmentsAndOtherAssets === undefined ||
+      !Number.isFinite(box3InvestmentsAndOtherAssets) ||
       box3InvestmentsAndOtherAssets < 0)
   ) {
     errors.box3InvestmentsAndOtherAssets = "Gebruik 0 of een hoger bedrag.";
   }
 
-  const box3Debts = Number(values.box3Debts);
-  if (values.box3EffectEnabled && (!Number.isFinite(box3Debts) || box3Debts < 0)) {
+  if (
+    values.box3EffectEnabled &&
+    (box3Debts === undefined || !Number.isFinite(box3Debts) || box3Debts < 0)
+  ) {
     errors.box3Debts = "Gebruik 0 of een hoger bedrag.";
   }
 
   const parsedValues: CalculatorInput | null =
     Object.keys(errors).length === 0
       ? {
-          monthlyAmount,
+          repaymentRule: values.repaymentRule,
+          remainingDebt,
           annualDebtRate,
+          remainingTermYears,
+          grossAnnualIncome,
+          partnerGrossAnnualIncome,
+          hasPartner: (partnerGrossAnnualIncome ?? 0) > 0,
+          voluntaryExtraMonthly,
           annualInvestmentReturn,
           years,
           box3EffectEnabled: values.box3EffectEnabled,
@@ -164,17 +248,13 @@ function validateForm(values: FormState) {
         }
       : null;
 
-  return {
-    errors,
-    parsedValues,
-  };
+  return { errors, parsedValues };
 }
 
 function FieldError({ message }: { message?: string }) {
   if (!message) {
     return null;
   }
-
   return <p className="text-sm text-red-700">{message}</p>;
 }
 
@@ -207,10 +287,14 @@ function CalculatorContent({
   const [formValues, setFormValues] = useState<FormState>(initialValues);
   const { errors, parsedValues } = validateForm(formValues);
   const result = parsedValues ? calculateStudyDebtVsInvesting(parsedValues) : null;
-  const hasErrors = Object.keys(errors).length > 0;
   const mobileFieldOrder = [
-    "monthlyAmount",
+    "repaymentRule",
+    "remainingDebt",
     "annualDebtRate",
+    "remainingTermYears",
+    "grossAnnualIncome",
+    "partnerGrossAnnualIncome",
+    "voluntaryExtraMonthly",
     "annualInvestmentReturn",
     "years",
     "box3EffectEnabled",
@@ -226,10 +310,15 @@ function CalculatorContent({
       : []),
   ];
   const mobileFlow = useMobileFieldFlow(mobileFieldOrder);
+
   const isCurrentFieldBlocked = Boolean(
     {
-      monthlyAmount: errors.monthlyAmount,
+      remainingDebt: errors.remainingDebt,
       annualDebtRate: errors.annualDebtRate,
+      remainingTermYears: errors.remainingTermYears,
+      grossAnnualIncome: errors.grossAnnualIncome,
+      partnerGrossAnnualIncome: errors.partnerGrossAnnualIncome,
+      voluntaryExtraMonthly: errors.voluntaryExtraMonthly,
       annualInvestmentReturn: errors.annualInvestmentReturn,
       years: errors.years,
       taxYear: errors.taxYear,
@@ -238,50 +327,9 @@ function CalculatorContent({
       box3Debts: errors.box3Debts,
     }[mobileFlow.activeFieldId],
   );
-  const chartSeries = result
-    ? (() => {
-        const series = [
-          {
-            color: "oklch(46% 0.07 232)",
-            points: result.projections.map((item) => item.expectedInvestmentValue),
-          },
-          {
-            color: "oklch(54% 0.10 152)",
-            points: result.projections.map((item) => item.debtStrategyValue),
-          },
-        ];
-
-        if (result.box3Scenario) {
-          series.push({
-            color: "oklch(62% 0.12 38)",
-            points: [
-              0,
-              ...result.box3Scenario.yearlyBreakdown.map(
-                (row) => row.portfolioAfterTax,
-              ),
-            ],
-          });
-        }
-
-        return series;
-      })()
-    : null;
-  const xTicks = result ? getAdaptiveYearTicks(result.projections.length - 1) : [];
-  const yTicks = result
-    ? getAdaptiveEuroTicks(
-        Math.max(
-          ...result.projections.map((point) =>
-            Math.max(point.expectedInvestmentValue, point.debtStrategyValue),
-          ),
-        ),
-      )
-    : [];
 
   function updateField<K extends keyof FormState>(field: K, value: FormState[K]) {
-    setFormValues((current) => ({
-      ...current,
-      [field]: value,
-    }));
+    setFormValues((current) => ({ ...current, [field]: value }));
   }
 
   function applyProfileValues() {
@@ -291,20 +339,17 @@ function CalculatorContent({
   return (
     <CalculatorShell>
       <section className="order-2 min-w-0 rounded-[1.5rem] border hair bg-white p-6 shadow-paper lg:order-1">
-        <div>
-          <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
-            Scenario
-          </div>
-          <h2 className="mt-2 font-serif text-[28px] tracking-[-0.02em] text-[var(--ink)]">
-            Vul je scenario in
-          </h2>
-          <p className="mt-3 text-[14px] leading-[1.7] text-[var(--ink-2)]">
-            Deze vergelijking helpt je om met een paar heldere aannames meer inzicht
-            te krijgen in twee routes: extra aflossen of vooruitkijken via beleggen.
-            Gebruik de uitkomst als praktische indicatie, niet als persoonlijk
-            advies.
-          </p>
+        <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
+          Scenario
         </div>
+        <h2 className="mt-2 font-serif text-[28px] tracking-[-0.02em] text-[var(--ink)]">
+          Studieschuld aflossen of beleggen
+        </h2>
+        <p className="mt-3 text-[14px] leading-[1.7] text-[var(--ink-2)]">
+          Deze tool rekent eerst met je wettelijke DUO-maandbedrag en je verplichte
+          maandbedrag op draagkracht. Alles daarboven behandelen we als vrijwillige
+          keuzeruimte: extra aflossen of beleggen.
+        </p>
 
         {hasRelevantProfileValues ? (
           <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
@@ -320,57 +365,134 @@ function CalculatorContent({
         ) : null}
 
         <div className="mt-6 grid gap-5">
-          <label className={mobileFlow.getFieldClassName("monthlyAmount")}>
+          <label className={mobileFlow.getFieldClassName("repaymentRule")}>
             <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-              Maandbedrag
+              Terugbetalingsregel
+            </span>
+            <select
+              value={formValues.repaymentRule}
+              onChange={(event) =>
+                updateField("repaymentRule", event.target.value as RepaymentRule)
+              }
+              onKeyDown={mobileFlow.handleEnterAdvance("repaymentRule")}
+              className="ring-focus hair h-12 rounded-md border bg-white px-4 text-[15px] text-[var(--ink)] outline-none"
+            >
+              {Object.entries(repaymentRuleLabels).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className={mobileFlow.getFieldClassName("remainingDebt")}>
+            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+              Resterende studieschuld
             </span>
             <input
               inputMode="decimal"
-              value={formValues.monthlyAmount}
-              onChange={(event) => updateField("monthlyAmount", event.target.value)}
-              onKeyDown={mobileFlow.handleEnterAdvance(
-                "monthlyAmount",
-                Boolean(errors.monthlyAmount),
-              )}
-              aria-invalid={Boolean(errors.monthlyAmount)}
+              value={formValues.remainingDebt}
+              onChange={(event) => updateField("remainingDebt", event.target.value)}
+              onKeyDown={mobileFlow.handleEnterAdvance("remainingDebt", Boolean(errors.remainingDebt))}
               className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
             />
-            <FieldError message={errors.monthlyAmount} />
+            <FieldError message={errors.remainingDebt} />
           </label>
 
           <label className={mobileFlow.getFieldClassName("annualDebtRate")}>
             <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-              Rente studieschuld per jaar (%)
+              DUO-rente (%)
             </span>
             <input
               inputMode="decimal"
               value={formValues.annualDebtRate}
               onChange={(event) => updateField("annualDebtRate", event.target.value)}
-              onKeyDown={mobileFlow.handleEnterAdvance(
-                "annualDebtRate",
-                Boolean(errors.annualDebtRate),
-              )}
-              aria-invalid={Boolean(errors.annualDebtRate)}
+              onKeyDown={mobileFlow.handleEnterAdvance("annualDebtRate", Boolean(errors.annualDebtRate))}
               className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
             />
             <FieldError message={errors.annualDebtRate} />
           </label>
 
+          <label className={mobileFlow.getFieldClassName("remainingTermYears")}>
+            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+              Resterende looptijd (jaren)
+            </span>
+            <input
+              inputMode="decimal"
+              value={formValues.remainingTermYears}
+              onChange={(event) => updateField("remainingTermYears", event.target.value)}
+              onKeyDown={mobileFlow.handleEnterAdvance(
+                "remainingTermYears",
+                Boolean(errors.remainingTermYears),
+              )}
+              className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
+            />
+            <FieldError message={errors.remainingTermYears} />
+          </label>
+
+          <label className={mobileFlow.getFieldClassName("grossAnnualIncome")}>
+            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+              Bruto jaarinkomen
+            </span>
+            <input
+              inputMode="decimal"
+              value={formValues.grossAnnualIncome}
+              onChange={(event) => updateField("grossAnnualIncome", event.target.value)}
+              onKeyDown={mobileFlow.handleEnterAdvance(
+                "grossAnnualIncome",
+                Boolean(errors.grossAnnualIncome),
+              )}
+              className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
+            />
+            <FieldError message={errors.grossAnnualIncome} />
+          </label>
+
+          <label className={mobileFlow.getFieldClassName("partnerGrossAnnualIncome")}>
+            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+              Partner bruto jaarinkomen (optioneel)
+            </span>
+            <input
+              inputMode="decimal"
+              value={formValues.partnerGrossAnnualIncome}
+              onChange={(event) => updateField("partnerGrossAnnualIncome", event.target.value)}
+              onKeyDown={mobileFlow.handleEnterAdvance(
+                "partnerGrossAnnualIncome",
+                Boolean(errors.partnerGrossAnnualIncome),
+              )}
+              className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
+            />
+            <FieldError message={errors.partnerGrossAnnualIncome} />
+          </label>
+
+          <label className={mobileFlow.getFieldClassName("voluntaryExtraMonthly")}>
+            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+              Vrijwillig extra per maand
+            </span>
+            <input
+              inputMode="decimal"
+              value={formValues.voluntaryExtraMonthly}
+              onChange={(event) => updateField("voluntaryExtraMonthly", event.target.value)}
+              onKeyDown={mobileFlow.handleEnterAdvance(
+                "voluntaryExtraMonthly",
+                Boolean(errors.voluntaryExtraMonthly),
+              )}
+              className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
+            />
+            <FieldError message={errors.voluntaryExtraMonthly} />
+          </label>
+
           <label className={mobileFlow.getFieldClassName("annualInvestmentReturn")}>
             <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-              Verwacht beleggingsrendement per jaar (%)
+              Verwacht rendement beleggen (%)
             </span>
             <input
               inputMode="decimal"
               value={formValues.annualInvestmentReturn}
-              onChange={(event) =>
-                updateField("annualInvestmentReturn", event.target.value)
-              }
+              onChange={(event) => updateField("annualInvestmentReturn", event.target.value)}
               onKeyDown={mobileFlow.handleEnterAdvance(
                 "annualInvestmentReturn",
                 Boolean(errors.annualInvestmentReturn),
               )}
-              aria-invalid={Boolean(errors.annualInvestmentReturn)}
               className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
             />
             <FieldError message={errors.annualInvestmentReturn} />
@@ -378,17 +500,13 @@ function CalculatorContent({
 
           <label className={mobileFlow.getFieldClassName("years")}>
             <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-              Looptijd in jaren
+              Vergelijkingshorizon (jaren)
             </span>
             <input
               inputMode="decimal"
               value={formValues.years}
               onChange={(event) => updateField("years", event.target.value)}
-              onKeyDown={mobileFlow.handleEnterAdvance(
-                "years",
-                Boolean(errors.years),
-              )}
-              aria-invalid={Boolean(errors.years)}
+              onKeyDown={mobileFlow.handleEnterAdvance("years", Boolean(errors.years))}
               className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
             />
             <FieldError message={errors.years} />
@@ -404,18 +522,12 @@ function CalculatorContent({
               <input
                 type="checkbox"
                 checked={formValues.box3EffectEnabled}
-                onChange={(event) =>
-                  updateField("box3EffectEnabled", event.target.checked)
-                }
+                onChange={(event) => updateField("box3EffectEnabled", event.target.checked)}
                 onKeyDown={mobileFlow.handleEnterAdvance("box3EffectEnabled")}
                 className="size-4 accent-[var(--accent)]"
               />
               Box 3-effect indicatief meenemen
             </span>
-            <p className="text-[12px] leading-[1.5] text-[var(--soft)]">
-              Zet dit alleen aan als je ook wilt zien wat een indicatieve box 3-heffing
-              met je beleggingsscenario kan doen.
-            </p>
           </label>
 
           {formValues.box3EffectEnabled ? (
@@ -428,11 +540,7 @@ function CalculatorContent({
                   inputMode="numeric"
                   value={formValues.taxYear}
                   onChange={(event) => updateField("taxYear", event.target.value)}
-                  onKeyDown={mobileFlow.handleEnterAdvance(
-                    "taxYear",
-                    Boolean(errors.taxYear),
-                  )}
-                  aria-invalid={Boolean(errors.taxYear)}
+                  onKeyDown={mobileFlow.handleEnterAdvance("taxYear", Boolean(errors.taxYear))}
                   className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
                 />
                 <FieldError message={errors.taxYear} />
@@ -446,13 +554,10 @@ function CalculatorContent({
                   <input
                     type="checkbox"
                     checked={formValues.hasFiscalPartner}
-                    onChange={(event) =>
-                      updateField("hasFiscalPartner", event.target.checked)
-                    }
-                    onKeyDown={mobileFlow.handleEnterAdvance("hasFiscalPartner")}
+                    onChange={(event) => updateField("hasFiscalPartner", event.target.checked)}
                     className="size-4 accent-[var(--accent)]"
                   />
-                  Ja, reken met partnervrijstelling
+                  Ja
                 </span>
               </label>
 
@@ -465,47 +570,34 @@ function CalculatorContent({
                     type="checkbox"
                     checked={formValues.box3Method === "forfaitary"}
                     onChange={(event) =>
-                      updateField(
-                        "box3Method",
-                        event.target.checked ? "forfaitary" : "actual",
-                      )
+                      updateField("box3Method", event.target.checked ? "forfaitary" : "actual")
                     }
-                    onKeyDown={mobileFlow.handleEnterAdvance("box3Method")}
                     className="size-4 accent-[var(--accent)]"
                   />
-                  Gebruik forfaitair rendement (anders werkelijk rendement)
+                  Gebruik forfaitair rendement (default = werkelijk rendement)
                 </span>
-                <p className="text-[12px] leading-[1.5] text-[var(--soft)]">
-                  Default is werkelijk rendement. Alleen als je dit aanvinkt rekent
-                  de tool met forfaitair rendement.
-                </p>
               </label>
 
               <label className={mobileFlow.getFieldClassName("box3BankDeposits")}>
                 <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-                  Box 3 banktegoeden / spaargeld
+                  Box 3 banktegoeden
                 </span>
                 <input
                   inputMode="decimal"
                   value={formValues.box3BankDeposits}
-                  onChange={(event) =>
-                    updateField("box3BankDeposits", event.target.value)
-                  }
+                  onChange={(event) => updateField("box3BankDeposits", event.target.value)}
                   onKeyDown={mobileFlow.handleEnterAdvance(
                     "box3BankDeposits",
                     Boolean(errors.box3BankDeposits),
                   )}
-                  aria-invalid={Boolean(errors.box3BankDeposits)}
                   className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
                 />
                 <FieldError message={errors.box3BankDeposits} />
               </label>
 
-              <label
-                className={mobileFlow.getFieldClassName("box3InvestmentsAndOtherAssets")}
-              >
+              <label className={mobileFlow.getFieldClassName("box3InvestmentsAndOtherAssets")}>
                 <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-                  Box 3 beleggingen / overige bezittingen
+                  Box 3 beleggingen/overige bezittingen
                 </span>
                 <input
                   inputMode="decimal"
@@ -517,7 +609,6 @@ function CalculatorContent({
                     "box3InvestmentsAndOtherAssets",
                     Boolean(errors.box3InvestmentsAndOtherAssets),
                   )}
-                  aria-invalid={Boolean(errors.box3InvestmentsAndOtherAssets)}
                   className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
                 />
                 <FieldError message={errors.box3InvestmentsAndOtherAssets} />
@@ -531,11 +622,7 @@ function CalculatorContent({
                   inputMode="decimal"
                   value={formValues.box3Debts}
                   onChange={(event) => updateField("box3Debts", event.target.value)}
-                  onKeyDown={mobileFlow.handleEnterAdvance(
-                    "box3Debts",
-                    Boolean(errors.box3Debts),
-                  )}
-                  aria-invalid={Boolean(errors.box3Debts)}
+                  onKeyDown={mobileFlow.handleEnterAdvance("box3Debts", Boolean(errors.box3Debts))}
                   className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
                 />
                 <FieldError message={errors.box3Debts} />
@@ -552,34 +639,17 @@ function CalculatorContent({
             onNext={mobileFlow.goNext}
           />
         </div>
-
-        {hasErrors ? (
-          <div className="mt-6 rounded-xl border border-[var(--neg-soft)] bg-[var(--neg-soft)]/55 px-4 py-3 text-sm text-[oklch(35%_0.13_28)]">
-            Controleer de invoervelden hierboven. Zodra alle waarden geldig zijn,
-            krijg je weer een helder scenario met vergelijkbare uitkomsten.
-          </div>
-        ) : null}
-
-        <div className="mt-6 border-t border-[var(--hair)] pt-5">
-          <div className="text-[11px] uppercase tracking-[0.12em] text-[var(--muted)]">
-            Uitgangspunt
-          </div>
-          <p className="mt-2 text-[12.5px] leading-[1.65] text-[var(--muted)]">
-            Deze tool vergelijkt twee simpele routes met hetzelfde maandbedrag. Dat
-            maakt de keuze niet automatisch makkelijk, maar wel beter uitlegbaar.
-          </p>
-        </div>
       </section>
 
       <section className="order-1 min-w-0 space-y-5 lg:order-2">
         <div className="rounded-[1.5rem] bg-[var(--deep)] p-6 text-white shadow-paper-lg">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="text-[11px] uppercase tracking-[0.12em] text-white/55">
-              Indicatieve uitkomst
+              Beknopte samenvatting
             </div>
             {result ? (
               <Pill tone={result.difference >= 0 ? "pos" : "neg"}>
-                {result.difference >= 0 ? "Beleggen hoger" : "Aflossen sterker"}
+                {result.difference >= 0 ? "Beleggen hoger" : "Extra aflossen sterker"}
               </Pill>
             ) : null}
           </div>
@@ -588,309 +658,154 @@ function CalculatorContent({
               <div className="mt-4 font-serif text-[40px] leading-none tracking-[-0.03em]">
                 {formatCurrency(result.difference)}
               </div>
-              <p className="mt-3 max-w-[56ch] text-[14px] leading-[1.7] text-white/75">
-                Verschil tussen beleggen en aflossen in dit scenario. Positief
-                betekent meer verwachte waarde bij beleggen. Negatief betekent dat
-                extra aflossen hier financieel steviger uitkomt.
+              <p className="mt-3 text-[14px] leading-[1.7] text-white/75">
+                Verschil tussen beleggen en vrijwillig extra aflossen in dit scenario.
               </p>
-              {result.box3Scenario ? (
-                <p className="mt-3 max-w-[56ch] text-[13px] leading-[1.65] text-white/70">
-                  Met jaarlijkse box 3-heffing wordt het beleggingsscenario over de
-                  hele looptijd indicatief ongeveer{" "}
-                  {formatCurrency(
-                    result.box3Scenario.cumulativeAdditionalBox3TaxIndicative,
-                  )}{" "}
-                  lager.
-                </p>
-              ) : null}
-              <p className="mt-3 max-w-[56ch] text-[13px] leading-[1.65] text-white/70">
-                Als je extra aflost en DUO je maandbedrag gelijk laat, ben je in dit
-                scenario indicatief ongeveer{" "}
-                {formatPercent(result.payoffTiming.shortenTerm.yearsSaved)} jaar
-                eerder schuldenvrij.
+              <p className="mt-3 text-[13px] leading-[1.65] text-white/70">
+                Je verplichte DUO-bedrag is ongeveer{" "}
+                {formatCurrency(result.duoContext.requiredMonthlyPayment)} per maand.
+                Alles daarboven (hier {formatCurrency(result.duoContext.voluntaryExtraMonthly)})
+                behandelen we als vrijwillige keuze.
               </p>
             </>
           ) : (
             <p className="mt-4 text-[14px] leading-[1.7] text-white/75">
-              Vul geldige invoerwaarden in om de scenariovergelijking zichtbaar te
-              maken.
+              Vul geldige invoerwaarden in om de vergelijking te tonen.
             </p>
           )}
         </div>
 
         <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
-          <h2 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
-            Wat dit scenario laat zien
-          </h2>
-          <p className="mt-3 text-[13.5px] leading-[1.65] text-[var(--muted)]">
-            De rekensom blijft bewust simpel en transparant. Aflossen wordt benaderd
-            via de schuld­rente, beleggen via hetzelfde maandbedrag met het opgegeven
-            rendement, zodat je de afweging eerlijk naast elkaar kunt zetten.
-          </p>
+          <h3 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
+            DUO-kernbedragen
+          </h3>
           {result ? (
             <div className="mt-5">
               <ResultRow
-                label="Totale extra aflossing"
-                value={formatCurrency(result.totalExtraRepayment)}
-                sub="Zelf gekozen inleg binnen de volledige looptijd"
-              />
-              <ResultRow
-                label="Indicatieve rentebesparing"
-                value={formatCurrency(result.indicativeInterestSavings)}
-                sub="Benadering van het voordeel van sneller aflossen"
-              />
-              <ResultRow
-                label="Verwachte waarde bij beleggen"
-                value={formatCurrency(result.expectedInvestmentValue)}
-                sub="Zelfde maandbedrag met het gekozen rendement"
-              />
-              <ResultRow
-                label="Verschil beleggen minus aflossen"
-                value={formatCurrency(result.difference)}
-                sub="De kernuitkomst van deze vergelijking"
-                accent={result.difference >= 0}
-              />
-              <ResultRow
-                label="Aflosdatum zonder extra aflossing"
-                value={
-                  result.payoffTiming.shortenTerm.originalPayoffDate
-                    ? result.payoffTiming.shortenTerm.originalPayoffDate
-                    : "n.v.t."
-                }
-                sub="Indicatieve eindmaand op basis van wettelijk maandbedrag"
-              />
-              <ResultRow
-                label="Aflosdatum bij gelijk maandbedrag"
-                value={
-                  result.payoffTiming.shortenTerm.newPayoffDate
-                    ? result.payoffTiming.shortenTerm.newPayoffDate
-                    : "n.v.t."
-                }
-                sub="Scenario shortenTerm: zelfde maandbedrag, kortere looptijd"
-              />
-              <ResultRow
-                label="Indicatief eerder schuldenvrij"
-                value={`${result.payoffTiming.shortenTerm.monthsSaved} maanden (${formatPercent(result.payoffTiming.shortenTerm.yearsSaved)} jaar)`}
-                sub="Alleen als DUO je maandbedrag gelijk laat na extra aflossing"
+                label="Wettelijk DUO-maandbedrag (annuïtair)"
+                value={formatCurrency(result.duoContext.statutoryMonthlyPayment)}
+                sub="Automatisch berekend uit schuld, rente en resterende looptijd"
                 accent
               />
               <ResultRow
-                label="Scenario maandbedrag daalt"
-                value={formatCurrency(
-                  result.payoffTiming.lowerMonthlyPayment.newMonthlyPayment,
-                )}
-                sub="Als DUO herberekent, zit het voordeel vooral in lagere maandlast in plaats van een veel eerdere einddatum"
+                label="Draagkrachtbedrag op inkomen"
+                value={formatCurrency(result.duoContext.incomeBasedMonthlyPayment)}
+                sub={`Inkomen gebruikt: ${formatCurrency(result.duoContext.annualIncomeUsed)}; boven vrijstelling: ${formatCurrency(result.duoContext.amountAboveAllowance)}`}
               />
-              {result.payoffTiming.shortenTerm.warnings.length > 0 ? (
-                <ul className="mt-2 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[12.5px] leading-[1.6] text-[var(--muted)]">
-                  {result.payoffTiming.shortenTerm.warnings.map((warning) => (
-                    <li key={warning}>{warning}</li>
-                  ))}
-                </ul>
-              ) : null}
-              {result.box3Scenario ? (
-                <>
-                  <ResultRow
-                    label="Extra box 3-heffing in laatste jaar"
-                    value={formatCurrency(
-                      result.box3Scenario.additionalBox3TaxIndicative,
-                    )}
-                    sub="Verschil tussen box 3 zonder en met beleggingsscenario in het eindjaar"
-                  />
-                  <ResultRow
-                    label="Cumulatieve box 3-heffing over looptijd"
-                    value={formatCurrency(
-                      result.box3Scenario.cumulativeAdditionalBox3TaxIndicative,
-                    )}
-                    sub="Som van jaarlijkse extra box 3-heffing die uit het beleggingsscenario wordt betaald"
-                  />
-                  <ResultRow
-                    label="Netto beleggingsuitkomst na jaarlijkse box 3"
-                    value={formatCurrency(
-                      result.box3Scenario.netInvestingOutcomeAfterBox3,
-                    )}
-                    sub="Jaarlijkse box 3-heffing wordt telkens eerst betaald en telt daarna niet meer mee in compound"
-                  />
-                  <ResultRow
-                    label="Verschil na box 3-indicatie"
-                    value={formatCurrency(
-                      result.box3Scenario.differenceRepaymentVsInvestingAfterBox3,
-                    )}
-                    sub="Beleggingsuitkomst minus aflossingsuitkomst, na indicatieve box 3-correctie"
-                    accent={result.box3Scenario.differenceRepaymentVsInvestingAfterBox3 >= 0}
-                  />
-                </>
-              ) : null}
+              <ResultRow
+                label="Verplicht te betalen aan DUO"
+                value={formatCurrency(result.duoContext.requiredMonthlyPayment)}
+                sub="Laagste van wettelijk maandbedrag en draagkrachtbedrag"
+                accent
+              />
+              <ResultRow
+                label="Vrijwillig extra per maand"
+                value={formatCurrency(result.duoContext.voluntaryExtraMonthly)}
+                sub="Dit bedrag is jouw keuze bovenop de verplichte DUO-betaling"
+              />
+              <ResultRow
+                label="Totaal maandbedrag aan DUO"
+                value={formatCurrency(result.duoContext.totalMonthlyToDuo)}
+                sub="Verplicht + vrijwillig extra"
+              />
+              <ResultRow
+                label="Hypotheek-relevant DUO-bedrag"
+                value={formatCurrency(result.duoContext.mortgageRelevantMonthlyPayment)}
+                sub="Indicatief wettelijk/annuïtair bedrag; niet handmatig ingevoerd"
+                accent
+              />
             </div>
           ) : null}
         </div>
 
-        {result && chartSeries ? (
-          <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <div className="text-[11px] uppercase tracking-[0.1em] text-[var(--muted)]">
-                  Ontwikkeling in de tijd
-                </div>
-                <div className="mt-1 font-serif text-[20px] tracking-[-0.015em] text-[var(--ink)]">
-                  Twee scenario&apos;s naast elkaar
-                </div>
-              </div>
-              <div className="flex items-center gap-4 text-[12px] text-[var(--muted)]">
-                <span className="flex items-center gap-1.5">
-                  <span className="inline-block h-[2px] w-3 bg-[oklch(46%_0.07_232)]" />
-                  Beleggen
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="inline-block h-[2px] w-3 bg-[oklch(54%_0.10_152)]" />
-                  Aflossen
-                </span>
-                {result.box3Scenario ? (
-                  <span className="flex items-center gap-1.5">
-                    <span className="inline-block h-[2px] w-3 bg-[oklch(62%_0.12_38)]" />
-                    Beleggen na box 3
-                  </span>
-                ) : null}
-              </div>
+        <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
+          <h3 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
+            Extra aflossen vs beleggen
+          </h3>
+          {result ? (
+            <div className="mt-5">
+              <ResultRow
+                label="Totale vrijwillige ruimte in horizon"
+                value={formatCurrency(result.totalVoluntaryAmount)}
+                sub="Vrijwillige extra maandinleg over de gekozen periode"
+              />
+              <ResultRow
+                label="Waarde bij extra aflossen"
+                value={formatCurrency(result.debtStrategyValue)}
+                sub="Vrijwillige aflossing + indicatieve rentebesparing"
+              />
+              <ResultRow
+                label="Waarde bij beleggen"
+                value={formatCurrency(result.expectedInvestmentValue)}
+                sub="Zelfde vrijwillige bedrag, maar belegd tegen je rendementsaanname"
+              />
+              <ResultRow
+                label="Verschil beleggen minus aflossen"
+                value={formatCurrency(result.difference)}
+                sub="Positief = beleggen hoger; negatief = extra aflossen sterker"
+                accent={result.difference >= 0}
+              />
+              <ResultRow
+                label="Eerder schuldenvrij door extra aflossen"
+                value={`${result.duoContext.monthsEarlierDebtFree} maanden (${formatDecimal(result.duoContext.yearsEarlierDebtFree, 1)} jaar)`}
+                sub={`Van ${formatYearMonth(result.duoContext.payoffWithoutExtraDate)} naar ${formatYearMonth(result.duoContext.payoffWithExtraDate)}`}
+              />
             </div>
-            <div className="mt-5 grid gap-3 sm:grid-cols-[68px_minmax(0,1fr)]">
-              <div className="hidden flex-col justify-between text-right text-[11px] text-[var(--soft)] sm:flex">
-                {yTicks
-                  .slice()
-                  .reverse()
-                  .map((tick) => (
-                    <span key={tick}>{formatCompactEuro(tick)}</span>
-                  ))}
-              </div>
-              <div className="min-w-0">
-                <AreaChart width={620} height={220} series={chartSeries} yTicks={yTicks} />
-                <div className="axis mt-1 flex items-center justify-between gap-2 overflow-hidden">
-                  {xTicks.map((tick) => (
-                    <span key={tick} className="min-w-0 truncate first:text-left last:text-right">
-                      jaar {tick}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
+          ) : null}
+        </div>
+
+        <ToolDisclosure
+          title="Hoe rekenen we dit?"
+          subtitle="Verdieping op leenstelsel, verplicht minimum en vrijwillige ruimte."
+        >
+          <div className="space-y-3 text-[13px] leading-[1.65] text-[var(--muted)]">
+            <p>
+              1) We berekenen eerst het wettelijke DUO-maandbedrag annuïtair op basis
+              van jouw regeling, resterende schuld, rente en resterende looptijd.
+            </p>
+            <p>
+              2) Daarna schatten we het draagkrachtbedrag op inkomen. Verplicht bedrag
+              = laagste van wettelijke maandbedrag en draagkracht.
+            </p>
+            <p>
+              3) Alles boven dat verplichte bedrag is vrijwillig. Alleen dát deel
+              vergelijken we als keuze: extra aflossen of beleggen.
+            </p>
+            <p>
+              4) Het hypotheek-relevante DUO-bedrag tonen we als indicatief wettelijk
+              annuïtair bedrag. Dat is in deze tool geen vrij invulveld.
+            </p>
           </div>
-        ) : null}
+        </ToolDisclosure>
 
         <ToolDisclosure
           title="Box 3-effect op beleggen"
-          subtitle="Optionele verdieping: indicatieve extra box 3-heffing op het beleggingsscenario."
+          subtitle="Optioneel en indicatief; de hoofdflow blijft licht."
         >
           {result?.box3Scenario ? (
             <div className="space-y-4 text-[13px] leading-[1.65] text-[var(--muted)]">
               <p>
-                Dit is een indicatie. Box 3-regels en forfaits kunnen wijzigen en je
-                volledige fiscale situatie kan anders uitpakken.
+                Dit is een indicatie. Box 3-regels kunnen wijzigen en je persoonlijke
+                fiscale situatie kan afwijken.
               </p>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <ResultRow
-                  label="Belastingjaar"
-                  value={String(result.box3Scenario.year)}
-                  sub="Gebruikt voor de forfaitaire box 3-aannames"
-                />
-                <ResultRow
-                  label="Gekozen methode"
-                  value={
-                    result.box3Scenario.box3Method === "actual"
-                      ? "Werkelijk rendement"
-                      : "Forfaitair rendement"
-                  }
-                  sub="Deze keuze bepaalt hoe het belastbare rendement indicatief wordt benaderd"
-                />
-                <ResultRow
-                  label="Fiscale partner"
-                  value={result.box3Scenario.hasFiscalPartner ? "Ja" : "Nee"}
-                  sub="Bepaalt hoogte van heffingsvrij vermogen"
-                />
-                <ResultRow
-                  label="Banktegoeden"
-                  value={formatCurrency(result.box3Scenario.usedBankDeposits)}
-                  sub="Invoer voor box 3 banktegoeden/spaargeld"
-                />
-                <ResultRow
-                  label="Beleggingen/overige bezittingen"
-                  value={formatCurrency(
-                    result.box3Scenario.usedInvestmentsAndOtherAssets,
-                  )}
-                  sub="Bestaande box 3-beleggingscomponent voor dit scenario"
-                />
-                <ResultRow
-                  label="Box 3-schulden"
-                  value={formatCurrency(result.box3Scenario.usedDebts)}
-                  sub="Verlagen indicatief de rendementsgrondslag"
-                />
-                <ResultRow
-                  label="Heffingsvrij vermogen"
-                  value={formatCurrency(result.box3Scenario.taxFreeAllowance)}
-                  sub="Afhankelijk van single/partnerstatus"
-                />
-                <ResultRow
-                  label="Forfait banktegoeden"
-                  value={`${formatPercent(result.box3Scenario.deemedReturnBankDepositsRate)}%`}
-                  sub={
-                    result.box3Scenario.box3Method === "forfaitary"
-                      ? "Indicatief percentage voor banktegoeden"
-                      : "Achtergrondwaarde uit aannames (niet leidend bij werkelijk rendement)"
-                  }
-                />
-                <ResultRow
-                  label="Forfait beleggingen"
-                  value={`${formatPercent(result.box3Scenario.deemedReturnInvestmentsRate)}%`}
-                  sub={
-                    result.box3Scenario.box3Method === "forfaitary"
-                      ? "Indicatief percentage voor beleggingen/overige bezittingen"
-                      : "Achtergrondwaarde uit aannames (niet leidend bij werkelijk rendement)"
-                  }
-                />
-                <ResultRow
-                  label="Forfait schulden"
-                  value={`${formatPercent(result.box3Scenario.deemedReturnDebtsRate)}%`}
-                  sub={
-                    result.box3Scenario.box3Method === "forfaitary"
-                      ? "Indicatieve schuldcorrectie in box 3"
-                      : "Achtergrondwaarde uit aannames (niet leidend bij werkelijk rendement)"
-                  }
-                />
-                <ResultRow
-                  label="Box 3-tarief"
-                  value={`${formatPercent(result.box3Scenario.box3TaxRate)}%`}
-                  sub="Tarief op belastbaar forfaitair rendement"
-                />
-                <ResultRow
-                  label="Box 3 zonder beleggingsscenario"
-                  value={formatCurrency(result.box3Scenario.box3TaxWithoutScenario)}
-                  sub="Indicatieve heffing op bestaande invoer (laatste jaar)"
-                />
-                <ResultRow
-                  label="Box 3 met beleggingsscenario"
-                  value={formatCurrency(result.box3Scenario.box3TaxWithInvestingScenario)}
-                  sub="Indicatieve heffing inclusief beleggingsscenario (laatste jaar)"
-                />
-                <ResultRow
-                  label="Extra box 3-heffing laatste jaar"
-                  value={formatCurrency(result.box3Scenario.additionalBox3TaxIndicative)}
-                  sub="Verschil tussen beide indicatieve box 3-uitkomsten in het eindjaar"
-                />
-                <ResultRow
-                  label="Cumulatieve extra box 3-heffing"
-                  value={formatCurrency(
-                    result.box3Scenario.cumulativeAdditionalBox3TaxIndicative,
-                  )}
-                  sub="Jaarlijkse extra box 3-heffing opgeteld over de hele looptijd"
-                />
-                <ResultRow
-                  label="Netto beleggingsuitkomst na box 3-indicatie"
-                  value={formatCurrency(result.box3Scenario.netInvestingOutcomeAfterBox3)}
-                  sub="Waarde nadat jaarlijkse box 3-heffing elk jaar uit het scenario is betaald"
-                />
-              </div>
+              <ResultRow
+                label="Extra box 3 in laatste jaar"
+                value={formatCurrency(result.box3Scenario.additionalBox3TaxIndicative)}
+              />
+              <ResultRow
+                label="Cumulatieve extra box 3-heffing"
+                value={formatCurrency(
+                  result.box3Scenario.cumulativeAdditionalBox3TaxIndicative,
+                )}
+                sub="Jaarlijks betaald uit de beleggingspot, dus niet meegecompounded"
+              />
+              <ResultRow
+                label="Netto uitkomst na box 3"
+                value={formatCurrency(result.box3Scenario.netInvestingOutcomeAfterBox3)}
+              />
               <ToolDisclosure
                 title="Jaarlijkse box 3-betalingen"
-                subtitle="Detail per jaar: ingelegd, rendement, box 3-heffing en waarde na belasting."
+                subtitle="Per jaar zie je de extra heffing en waarde na betaling."
               >
                 <div className="space-y-2">
                   {result.box3Scenario.yearlyBreakdown.map((row) => (
@@ -907,7 +822,7 @@ function CalculatorContent({
                           value={formatCurrency(row.startPortfolio)}
                         />
                         <ResultRow
-                          label="Inleg in dit jaar"
+                          label="Inleg"
                           value={formatCurrency(row.yearlyContribution)}
                         />
                         <ResultRow
@@ -915,11 +830,7 @@ function CalculatorContent({
                           value={formatCurrency(row.grossReturn)}
                         />
                         <ResultRow
-                          label="Waarde voor box 3"
-                          value={formatCurrency(row.portfolioBeforeTax)}
-                        />
-                        <ResultRow
-                          label="Extra box 3 in dit jaar"
+                          label="Extra box 3"
                           value={formatCurrency(row.additionalBox3Tax)}
                         />
                         <ResultRow
@@ -932,33 +843,23 @@ function CalculatorContent({
                   ))}
                 </div>
               </ToolDisclosure>
-              {result.box3Scenario.warnings.length > 0 ? (
-                <ul className="space-y-2 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3">
-                  {result.box3Scenario.warnings.map((warning) => (
-                    <li key={warning}>{warning}</li>
-                  ))}
-                </ul>
-              ) : null}
             </div>
           ) : (
             <p className="text-[13px] leading-[1.65] text-[var(--muted)]">
-              Zet “Box 3-effect indicatief meenemen” aan bij de geavanceerde aannames
-              om deze verdieping te tonen.
+              Zet de box 3-optie aan om dit scenario te tonen.
             </p>
           )}
         </ToolDisclosure>
 
-        <div className="rounded-[1.5rem] border hair bg-white p-5 shadow-paper">
-          <div className="text-[11px] uppercase tracking-[0.1em] text-[var(--muted)]">
-            Belangrijk om te onthouden
+        {result?.warnings?.length ? (
+          <div className="rounded-[1.5rem] border border-[var(--hair)] bg-[var(--paper-soft)] p-5 text-[12.5px] leading-[1.6] text-[var(--muted)]">
+            <ul className="space-y-2">
+              {result.warnings.map((warning) => (
+                <li key={warning}>{warning}</li>
+              ))}
+            </ul>
           </div>
-          <p className="mt-2 text-[12.5px] leading-[1.65] text-[var(--muted)]">
-            Deze tool blijft een vereenvoudigde vergelijking. Met de optionele box
-            3-indicatie krijg je extra context, maar geen volledige belastingaangifte,
-            geen koerszekerheid en geen persoonlijk advies. Het doel is vooral: betere
-            vervolgvragen en scherpere keuzes.
-          </p>
-        </div>
+        ) : null}
       </section>
     </CalculatorShell>
   );

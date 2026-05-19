@@ -129,13 +129,15 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 ## Huidige tools
 
 - `apps/studieschuld-vs-beleggen`
-  - eenvoudige frontend calculator
-  - pure berekening in `logic.ts`
+  - focust op verplichte DUO-betaling (wettelijk + draagkracht) versus vrijwillige extra ruimte
+  - wettelijk DUO-maandbedrag wordt annuïtair berekend en niet als vrij invulveld gebruikt
+  - vrijwillige ruimte boven het verplichte bedrag wordt vergeleken als keuze: extra aflossen of beleggen
   - gebruikt optioneel centrale tax-laag voor een indicatieve box 3-correctie in de verdiepingslaag
-  - box 3-methode is instelbaar: `werkelijk` (default) of `forfaitair`
   - box 3-effect wordt jaarlijks toegepast; jaarlijkse heffing wordt uit het beleggingsscenario betaald en telt daarna niet mee in verdere compoundgroei
-  - detailweergave bevat een extra uitklaplaag met box 3-betalingen per jaar
-  - grafiek gebruikt adaptieve jaar- en euro-assen voor leesbaarheid op mobiel en desktop
+- `apps/box3-indicatie`
+  - aparte box 3-tool met light invoer + beknopte samenvatting + uitklapbare verdieping
+  - ondersteunt werkelijk rendement (default) en forfaitair scenario
+  - rekent via centrale tax-laag en toont gebruikte tarieven/aannames uit centrale constants
 - `apps/annuitair-lineair`
   - wrapper rond bestaande JS-logica
   - bevat oudere rekenscripts in `.js`

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  getBox3IndicatieDefaultsFromProfile,
   getMortgageImpactDefaultsFromProfile,
   getStudentDebtVsInvestingDefaultsFromProfile,
 } from "@/lib/profile-tool-mapping";
@@ -40,6 +41,7 @@ describe("profile tool mapping", () => {
   it("maps student-debt-vs-investing defaults and falls back fiscal partner from household", () => {
     const profile: UserProfile = {
       income: {
+        grossAnnualIncome: 47000,
         householdType: "withPartner",
       },
       savingInvesting: {
@@ -49,7 +51,9 @@ describe("profile tool mapping", () => {
         currentSavings: 8000,
       },
       studentDebt: {
+        remainingDebt: 32000,
         duoInterestRate: 2.29,
+        remainingTermYears: 20,
       },
       tax: {
         preferredTaxYear: 2026,
@@ -58,7 +62,10 @@ describe("profile tool mapping", () => {
     };
 
     const mapped = getStudentDebtVsInvestingDefaultsFromProfile(profile);
-    expect(mapped.monthlyAmount).toBe("250");
+    expect(mapped.remainingDebt).toBe("32000");
+    expect(mapped.voluntaryExtraMonthly).toBe("250");
+    expect(mapped.grossAnnualIncome).toBe("47000");
+    expect(mapped.remainingTermYears).toBe("20");
     expect(mapped.annualDebtRate).toBe("2.29");
     expect(mapped.hasFiscalPartner).toBe(true);
     expect(mapped.box3Method).toBe("forfaitary");
@@ -67,5 +74,29 @@ describe("profile tool mapping", () => {
   it("returns empty mappings for an empty profile", () => {
     expect(getMortgageImpactDefaultsFromProfile({})).toEqual({});
     expect(getStudentDebtVsInvestingDefaultsFromProfile({})).toEqual({});
+    expect(getBox3IndicatieDefaultsFromProfile({})).toEqual({});
+  });
+
+  it("maps box3 indicatie defaults from profile values", () => {
+    const profile: UserProfile = {
+      income: {
+        householdType: "withPartner",
+      },
+      savingInvesting: {
+        currentSavings: 23000,
+        expectedAnnualReturn: 4.5,
+      },
+      tax: {
+        preferredTaxYear: 2026,
+        preferredBox3Method: "forfaitary",
+      },
+    };
+
+    const mapped = getBox3IndicatieDefaultsFromProfile(profile);
+    expect(mapped.method).toBe("forfaitary");
+    expect(mapped.year).toBe("2026");
+    expect(mapped.bankDeposits).toBe("23000");
+    expect(mapped.actualAnnualReturnRate).toBe("4.5");
+    expect(mapped.hasFiscalPartner).toBe(true);
   });
 });

@@ -1,7 +1,7 @@
 {
   "slug": "studieschuld-vs-beleggen",
   "title": "Studieschuld aflossen of beleggen",
-  "description": "Vergelijk of extra aflossen op je studieschuld financieel gunstiger is dan beleggen.",
+  "description": "Vergelijk vrijwillig extra aflossen versus beleggen, met wettelijk DUO-bedrag, draagkrachtminimum en optioneel box 3-effect.",
   "type": "frontend",
   "category": "Schulden",
   "tags": ["studieschuld", "beleggen", "rente"],
@@ -11,12 +11,15 @@
     "studentDebt.remainingDebt",
     "studentDebt.duoInterestRate",
     "studentDebt.remainingTermYears",
+    "income.grossAnnualIncome",
+    "income.partnerGrossAnnualIncome",
     "savingInvesting.monthlyFreeCashflow",
     "savingInvesting.expectedAnnualReturn",
     "savingInvesting.investmentHorizonYears",
     "savingInvesting.currentSavings",
-    "tax.taxYear",
-    "tax.hasFiscalPartner"
+    "tax.preferredTaxYear",
+    "tax.hasFiscalPartner",
+    "tax.preferredBox3Method"
   ],
   "assumptionsUsed": ["duo", "box3", "investment"],
   "calculationDomains": ["studentDebt", "investing", "saving", "tax"],
