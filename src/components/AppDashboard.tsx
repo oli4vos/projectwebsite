@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useDeferredValue, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import type { AppManifest } from "@/lib/app-types";
 import { CategoryDot } from "@/components/ui";
 import { BtnLink } from "@/components/ui";
@@ -14,9 +13,9 @@ type AppDashboardProps = {
 };
 
 export function AppDashboard({ apps }: AppDashboardProps) {
-  const searchParams = useSearchParams();
   const [query, setQuery] = useState("");
   const [manualCategory, setManualCategory] = useState("Alle");
+  const [ignoreUrlCategory, setIgnoreUrlCategory] = useState(false);
   const deferredQuery = useDeferredValue(query);
 
   const categories = useMemo(
@@ -24,9 +23,12 @@ export function AppDashboard({ apps }: AppDashboardProps) {
     [apps],
   );
   const requestedCategory =
-    searchParams.get("categorie") ?? searchParams.get("category");
+    typeof window === "undefined"
+      ? null
+      : new URLSearchParams(window.location.search).get("categorie") ??
+        new URLSearchParams(window.location.search).get("category");
   const selectedCategory =
-    requestedCategory && categories.includes(requestedCategory)
+    !ignoreUrlCategory && requestedCategory && categories.includes(requestedCategory)
       ? requestedCategory
       : manualCategory;
 
@@ -108,7 +110,10 @@ export function AppDashboard({ apps }: AppDashboardProps) {
           </span>
           <select
             value={selectedCategory}
-            onChange={(event) => setManualCategory(event.target.value)}
+            onChange={(event) => {
+              setIgnoreUrlCategory(true);
+              setManualCategory(event.target.value);
+            }}
             className="ring-focus hair h-12 rounded-full border bg-white px-4 text-[14px] text-[var(--ink)] outline-none"
           >
             {categories.map((category) => (
@@ -143,7 +148,10 @@ export function AppDashboard({ apps }: AppDashboardProps) {
           <button
             key={category}
             type="button"
-            onClick={() => setManualCategory(category)}
+            onClick={() => {
+              setIgnoreUrlCategory(true);
+              setManualCategory(category);
+            }}
             className={`rounded-full px-3 py-2 text-[13px] transition ${
               selectedCategory === category
                 ? "min-h-11 bg-[var(--deep)] text-white"

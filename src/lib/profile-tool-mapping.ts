@@ -37,6 +37,16 @@ export const PROFILE_FIELDS_STUDENT_DEBT_VS_INVESTING = [
   "tax.preferredBox3Method",
 ] as const;
 
+export const PROFILE_FIELDS_JAARRUIMTE_VS_VRIJ_BELEGGEN = [
+  "income.grossAnnualIncome",
+  "savingInvesting.currentSavings",
+  "savingInvesting.expectedAnnualReturn",
+  "savingInvesting.investmentHorizonYears",
+  "tax.hasFiscalPartner",
+  "tax.preferredTaxYear",
+  "savingInvesting.pensionBuildUp",
+] as const;
+
 type MortgageImpactDefaults = Partial<{
   grossIncomeUser: string;
   grossIncomePartner: string;
@@ -90,6 +100,16 @@ type Box3ImpactDefaults = Partial<{
   expectedInvestmentReturn: string;
   horizonYears: string;
   investmentsContribution: string;
+}>;
+
+type JaarruimteVsVrijBeleggenDefaults = Partial<{
+  year: string;
+  grossAnnualIncome: string;
+  currentInvestableAssets: string;
+  expectedAnnualReturn: string;
+  horizonYears: string;
+  hasFiscalPartner: boolean;
+  plannedContribution: string;
 }>;
 
 function toStringValue(value?: number) {
@@ -336,6 +356,76 @@ export function getBox3ImpactDefaultsFromProfile(
   );
   if (investmentsContribution !== undefined) {
     defaults.investmentsContribution = investmentsContribution;
+  }
+
+  return defaults;
+}
+
+export function getJaarruimteVsVrijBeleggenDefaultsFromProfile(
+  profile: UserProfile,
+): JaarruimteVsVrijBeleggenDefaults {
+  const defaults: JaarruimteVsVrijBeleggenDefaults = {};
+
+  const year = toStringValue(profile.tax?.preferredTaxYear);
+  if (year !== undefined) {
+    defaults.year = year;
+  }
+
+  const grossAnnualIncome = toStringValue(profile.income?.grossAnnualIncome);
+  if (grossAnnualIncome !== undefined) {
+    defaults.grossAnnualIncome = grossAnnualIncome;
+  }
+
+  const currentInvestableAssets = toStringValue(
+    profile.savingInvesting?.currentSavings,
+  );
+  if (currentInvestableAssets !== undefined) {
+    defaults.currentInvestableAssets = currentInvestableAssets;
+  }
+
+  const expectedAnnualReturn = toStringValue(
+    profile.savingInvesting?.expectedAnnualReturn,
+  );
+  if (expectedAnnualReturn !== undefined) {
+    defaults.expectedAnnualReturn = expectedAnnualReturn;
+  }
+
+  const horizonYears = toStringValue(
+    profile.savingInvesting?.investmentHorizonYears,
+  );
+  if (horizonYears !== undefined) {
+    defaults.horizonYears = horizonYears;
+  }
+
+  if (
+    profile.tax?.hasFiscalPartner !== undefined ||
+    profile.income?.householdType !== undefined ||
+    profile.income?.partnerGrossAnnualIncome !== undefined
+  ) {
+    defaults.hasFiscalPartner =
+      profile.tax?.hasFiscalPartner ??
+      Boolean(
+        profile.income?.householdType === "withPartner" ||
+          profile.income?.householdType === "family" ||
+          (profile.income?.partnerGrossAnnualIncome ?? 0) > 0,
+      );
+  }
+
+  const fallbackContribution = toStringValue(
+    profile.savingInvesting?.monthlyFreeCashflow,
+  );
+  if (fallbackContribution !== undefined) {
+    defaults.plannedContribution = fallbackContribution;
+  }
+
+  const employmentProfile = profile as UserProfile & {
+    employment?: { pensionContributionAnnual?: number };
+  };
+  const pensionContributionAnnual = toStringValue(
+    employmentProfile.employment?.pensionContributionAnnual,
+  );
+  if (pensionContributionAnnual !== undefined) {
+    defaults.plannedContribution = pensionContributionAnnual;
   }
 
   return defaults;

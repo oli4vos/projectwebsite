@@ -12,5 +12,6 @@ describe("generated app registry", () => {
   it("contains expected public tools", () => {
     expect(appRegistryBySlug["hypotheek-impact-studieschuld"]).toBeDefined();
     expect(appRegistryBySlug["studieschuld-vs-beleggen"]).toBeDefined();
+    expect(appRegistryBySlug["jaarruimte-vs-vrij-beleggen"]).toBeDefined();
   });
 });

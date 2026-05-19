@@ -142,6 +142,11 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - box 3-impact calculator met focus op vrijstelling, belastbare grondslag en effectieve druk
   - toont indicatief effect van spaargeld, beleggingen en schulden via centrale `calculateBox3Tax`
   - ondersteunt optioneel netto rendement na box 3 op basis van ingevulde rendementsverwachtingen
+- `apps/jaarruimte-vs-vrij-beleggen`
+  - vergelijkt pensioeninleg via jaarruimte met vrij beleggen in box 3
+  - gebruiker vult beschikbare jaarruimte zelf in; tool claimt geen officiële jaarruimteberekening
+  - gebruikt centrale box 1- en box 3-logica voor indicatief voordeel nu en netto eindwaarde
+  - benadrukt afweging tussen fiscaal voordeel en flexibiliteit (relevant voor FIRE-scenario's)
 - `apps/annuitair-lineair`
   - wrapper rond bestaande JS-logica
   - bevat oudere rekenscripts in `.js`
@@ -169,6 +174,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - Gekoppelde tools:
   - `apps/hypotheek-impact-studieschuld`
   - `apps/studieschuld-vs-beleggen`
+  - `apps/jaarruimte-vs-vrij-beleggen`
 - Die tools lezen profielwaarden als defaults, maar schrijven nog niet automatisch terug naar het profiel.
 - De mapping daarvan loopt centraal via `src/lib/profile-tool-mapping.ts`.
 - Tool-prefillgedrag (initial values, profile-key, apply profile patch) loopt gedeeld via `src/lib/profile-prefill.ts`.

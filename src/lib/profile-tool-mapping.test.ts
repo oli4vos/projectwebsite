@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   getBox3ImpactDefaultsFromProfile,
   getBox3IndicatieDefaultsFromProfile,
+  getJaarruimteVsVrijBeleggenDefaultsFromProfile,
   getMortgageImpactDefaultsFromProfile,
   getStudentDebtVsInvestingDefaultsFromProfile,
 } from "@/lib/profile-tool-mapping";
@@ -77,6 +78,7 @@ describe("profile tool mapping", () => {
     expect(getStudentDebtVsInvestingDefaultsFromProfile({})).toEqual({});
     expect(getBox3IndicatieDefaultsFromProfile({})).toEqual({});
     expect(getBox3ImpactDefaultsFromProfile({})).toEqual({});
+    expect(getJaarruimteVsVrijBeleggenDefaultsFromProfile({})).toEqual({});
   });
 
   it("maps box3 indicatie defaults from profile values", () => {
@@ -122,5 +124,35 @@ describe("profile tool mapping", () => {
     expect(mapped.hasFiscalPartner).toBe(true);
     expect(mapped.expectedSavingsReturn).toBe("5.2");
     expect(mapped.expectedInvestmentReturn).toBe("5.2");
+  });
+
+  it("maps jaarruimte-vs-vrij-beleggen defaults from profile values", () => {
+    const profile = {
+      income: {
+        grossAnnualIncome: 62000,
+        householdType: "withPartner",
+      },
+      savingInvesting: {
+        currentSavings: 40000,
+        expectedAnnualReturn: 6.1,
+        investmentHorizonYears: 18,
+        monthlyFreeCashflow: 350,
+      },
+      tax: {
+        preferredTaxYear: 2026,
+      },
+      employment: {
+        pensionContributionAnnual: 4200,
+      },
+    } as UserProfile & { employment: { pensionContributionAnnual: number } };
+
+    const mapped = getJaarruimteVsVrijBeleggenDefaultsFromProfile(profile);
+    expect(mapped.year).toBe("2026");
+    expect(mapped.grossAnnualIncome).toBe("62000");
+    expect(mapped.currentInvestableAssets).toBe("40000");
+    expect(mapped.expectedAnnualReturn).toBe("6.1");
+    expect(mapped.horizonYears).toBe("18");
+    expect(mapped.hasFiscalPartner).toBe(true);
+    expect(mapped.plannedContribution).toBe("4200");
   });
 });

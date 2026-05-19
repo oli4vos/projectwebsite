@@ -123,6 +123,47 @@ export const appRegistry = [
     "entry": "Calculator.tsx"
   },
   {
+    "slug": "jaarruimte-vs-vrij-beleggen",
+    "title": "Jaarruimte of vrij beleggen?",
+    "description": "Vergelijk pensioeninleg met vrij beleggen, inclusief indicatief belastingvoordeel en box 3-effect.",
+    "type": "frontend",
+    "category": "Belasting",
+    "tags": [
+      "jaarruimte",
+      "pensioen",
+      "box 3",
+      "beleggen",
+      "FIRE"
+    ],
+    "status": "beta",
+    "visibility": "public",
+    "requiredProfileFields": [
+      "income.grossAnnualIncome",
+      "savingInvesting.currentSavings",
+      "savingInvesting.expectedAnnualReturn",
+      "savingInvesting.investmentHorizonYears",
+      "tax.preferredTaxYear",
+      "tax.hasFiscalPartner",
+      "savingInvesting.pensionBuildUp"
+    ],
+    "assumptionsUsed": [
+      "tax",
+      "box1",
+      "box3",
+      "investment"
+    ],
+    "calculationDomains": [
+      "tax",
+      "investing",
+      "pension"
+    ],
+    "riskLevel": "high",
+    "disclaimerType": "taxIndicative",
+    "outputType": "scenarioComparison",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
     "slug": "studieschuld-vs-beleggen",
     "title": "Studieschuld aflossen of beleggen",
     "description": "Vergelijk vrijwillig extra aflossen versus beleggen, met wettelijk DUO-bedrag, draagkrachtminimum en optioneel box 3-effect.",

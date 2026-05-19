@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { BtnLink, Logo } from "@/components/ui";
 import { appRegistry } from "@/lib/app-registry";
@@ -26,10 +26,8 @@ function categoryHref(category: string) {
 
 export function SiteHeader() {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const onHome = pathname === "/";
   const onToolPage = pathname.startsWith("/apps/");
-  const activeCategory = searchParams.get("categorie");
   const [isMobileCompact, setIsMobileCompact] = useState(false);
   const lastScrollY = useRef(0);
 
@@ -83,7 +81,6 @@ export function SiteHeader() {
                 key={category}
                 href={categoryHref(category)}
                 className={navClassName()}
-                aria-current={onHome && activeCategory === category ? "page" : undefined}
               >
                 {category}
               </Link>
