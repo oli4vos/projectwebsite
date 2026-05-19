@@ -73,6 +73,13 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - `src/lib/app-registry.ts`
   - `src/lib/app-components.tsx`
 - Manifesten kunnen optioneel `visibility: "public" | "hidden"` zetten.
+- Manifesten ondersteunen daarnaast optionele schaalmetadata:
+  - `requiredProfileFields: string[]`
+  - `assumptionsUsed: ("duo" | "tax" | "box1" | "box3" | "mortgage" | "investment" | "inflation" | "charts")[]`
+  - `calculationDomains: ("studentDebt" | "mortgage" | "housing" | "tax" | "investing" | "saving" | "cashflow" | "employment" | "pension")[]`
+  - `riskLevel: "low" | "medium" | "high"`
+  - `disclaimerType: "indicative" | "financialEducation" | "taxIndicative" | "mortgageIndicative" | "duoIndicative"`
+  - `outputType: "singleResult" | "scenarioComparison" | "timeline" | "checklist" | "mixed"`
 - Alleen `visibility: "public"` wordt naar de gegenereerde registry/component-map geschreven.
 - `app-registry.ts` bevat alleen metadata.
 - `app-components.tsx` lazy-loadt calculatorcomponenten via `next/dynamic`.
@@ -163,9 +170,10 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 
 1. Maak een map `apps/<slug>/`.
 2. Voeg minimaal `app.json` en `Calculator.tsx` toe.
-3. Zet pure berekeningen in `logic.ts` als dat logisch is.
-4. Draai `npm run generate:apps`.
-5. Controleer `npm run typecheck`, `npm run lint`, `npm run build`.
+3. Vul manifestmetadata in (`requiredProfileFields`, `assumptionsUsed`, `calculationDomains`, `riskLevel`, `disclaimerType`, `outputType`) voor nieuwe publieke tools.
+4. Zet pure berekeningen in `logic.ts` als dat logisch is.
+5. Draai `npm run generate:apps`.
+6. Controleer `npm run typecheck`, `npm run lint`, `npm run build`.
 
 ## Belangrijke conventies
 
@@ -187,6 +195,8 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - Validatie gebeurt nu per calculatorcomponent in de client.
 - Dashboard haalt alleen manifestdata op uit de gegenereerde registry.
 - Verborgen tools blijven buiten dashboard en app-routes via manifestveld `visibility: "hidden"`.
+- `requiredProfileFields` is documenterend voor prefill-koppelingen; velden worden niet automatisch verplicht voor de gebruiker gemaakt.
+- Aannames die een tool gebruikt horen via centrale constants + disclosure vindbaar te zijn.
 - Donkere CTA's moeten expliciet wit contrast houden. Bronbestand: `src/components/ui.tsx`.
 - Alle gebruikersgerichte frontend-copy is standaard Nederlands. Engelse tekst mag alleen in code, technische namen of wanneer expliciet gekozen.
 - Mobile-first is verplicht: elke nieuwe component of tool moet standaard goed werken op mobiel.

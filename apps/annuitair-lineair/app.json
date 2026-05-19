@@ -6,6 +6,18 @@
   "category": "Hypotheek",
   "tags": ["hypotheek", "annuiteit", "lineair", "maandlasten"],
   "status": "active",
+  "visibility": "public",
+  "requiredProfileFields": [
+    "income.grossAnnualIncome",
+    "income.partnerGrossAnnualIncome",
+    "housing.mortgageRate",
+    "housing.mortgageTermYears"
+  ],
+  "assumptionsUsed": ["mortgage", "tax", "investment"],
+  "calculationDomains": ["mortgage", "housing", "investing"],
+  "riskLevel": "medium",
+  "disclaimerType": "mortgageIndicative",
+  "outputType": "scenarioComparison",
   "version": "1.0.0",
   "entry": "Calculator.tsx"
 }

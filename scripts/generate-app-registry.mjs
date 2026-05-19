@@ -12,6 +12,42 @@ const slugPattern = /^[a-z0-9-]+$/;
 const validTypes = new Set(["frontend", "api"]);
 const validStatuses = new Set(["active", "beta", "draft"]);
 const validVisibilities = new Set(["public", "hidden"]);
+const validAssumptionsUsed = new Set([
+  "duo",
+  "tax",
+  "box1",
+  "box3",
+  "mortgage",
+  "investment",
+  "inflation",
+  "charts",
+]);
+const validCalculationDomains = new Set([
+  "studentDebt",
+  "mortgage",
+  "housing",
+  "tax",
+  "investing",
+  "saving",
+  "cashflow",
+  "employment",
+  "pension",
+]);
+const validRiskLevels = new Set(["low", "medium", "high"]);
+const validDisclaimerTypes = new Set([
+  "indicative",
+  "financialEducation",
+  "taxIndicative",
+  "mortgageIndicative",
+  "duoIndicative",
+]);
+const validOutputTypes = new Set([
+  "singleResult",
+  "scenarioComparison",
+  "timeline",
+  "checklist",
+  "mixed",
+]);
 
 function fail(message) {
   throw new Error(message);
@@ -23,6 +59,62 @@ function ensureString(value, fieldName, slug) {
   }
 
   return value.trim();
+}
+
+function allowedValuesMessage(validValues) {
+  return [...validValues].map((value) => `"${value}"`).join(", ");
+}
+
+function validateOptionalStringArray(value, fieldName, slug) {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  if (!Array.isArray(value)) {
+    fail(`App "${slug}": veld "${fieldName}" moet een array van strings zijn.`);
+  }
+
+  return value.map((item, index) => {
+    if (typeof item !== "string" || item.trim().length === 0) {
+      fail(
+        `App "${slug}": veld "${fieldName}[${index}]" moet een niet-lege string zijn.`,
+      );
+    }
+
+    return item.trim();
+  });
+}
+
+function validateOptionalEnum(value, fieldName, slug, validValues) {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  const normalizedValue = ensureString(value, fieldName, slug);
+  if (!validValues.has(normalizedValue)) {
+    fail(
+      `App "${slug}": veld "${fieldName}" moet één van ${allowedValuesMessage(validValues)} zijn.`,
+    );
+  }
+
+  return normalizedValue;
+}
+
+function validateOptionalEnumArray(value, fieldName, slug, validValues) {
+  const values = validateOptionalStringArray(value, fieldName, slug);
+  if (values === undefined) {
+    return undefined;
+  }
+
+  return values.map((item, index) => {
+    if (!validValues.has(item)) {
+      fail(
+        `App "${slug}": veld "${fieldName}[${index}]" moet één van ${allowedValuesMessage(validValues)} zijn.`,
+      );
+    }
+
+    return item;
+  });
 }
 
 function validateManifest(manifest, directoryName) {
@@ -80,6 +172,41 @@ function validateManifest(manifest, directoryName) {
     manifest.version === undefined
       ? undefined
       : ensureString(manifest.version, "version", slug);
+  const requiredProfileFields = validateOptionalStringArray(
+    manifest.requiredProfileFields,
+    "requiredProfileFields",
+    slug,
+  );
+  const assumptionsUsed = validateOptionalEnumArray(
+    manifest.assumptionsUsed,
+    "assumptionsUsed",
+    slug,
+    validAssumptionsUsed,
+  );
+  const calculationDomains = validateOptionalEnumArray(
+    manifest.calculationDomains,
+    "calculationDomains",
+    slug,
+    validCalculationDomains,
+  );
+  const riskLevel = validateOptionalEnum(
+    manifest.riskLevel,
+    "riskLevel",
+    slug,
+    validRiskLevels,
+  );
+  const disclaimerType = validateOptionalEnum(
+    manifest.disclaimerType,
+    "disclaimerType",
+    slug,
+    validDisclaimerTypes,
+  );
+  const outputType = validateOptionalEnum(
+    manifest.outputType,
+    "outputType",
+    slug,
+    validOutputTypes,
+  );
 
   return {
     slug,
@@ -90,6 +217,12 @@ function validateManifest(manifest, directoryName) {
     tags,
     status,
     visibility,
+    requiredProfileFields,
+    assumptionsUsed,
+    calculationDomains,
+    riskLevel,
+    disclaimerType,
+    outputType,
     version,
     entry,
   };
