@@ -110,6 +110,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/lib/duo/`: centrale DUO-domeinlaag met wettelijk maandbedrag, relevant maandbedrag per situatie en scenariofuncties voor extra aflossen
 - `src/lib/duo/calculations.test.ts`: regressietests voor centrale DUO-berekenfuncties
 - `next.config.ts`: standaard Next-config + GitHub Pages static export in Actions
+- `.github/workflows/ci.yml`: sequentiële CI-checks voor generate/test/lint/typecheck/build
 
 ## Huidige tools
 
@@ -154,6 +155,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - Hou rekenlogica zo veel mogelijk puur en los van UI.
 - DUO-logica (wettelijk maandbedrag, situatie-afhankelijke relevantie, extra aflossen scenario's) loopt centraal via `src/lib/duo`.
 - `npm run test` draait lichte unit-tests (Vitest) voor pure domeinlogica.
+- `npm run check` draait lokaal dezelfde sequentie als CI inclusief registry-verificatie.
 - Validatie gebeurt nu per calculatorcomponent in de client.
 - Dashboard haalt alleen manifestdata op uit de gegenereerde registry.
 - Verborgen tools blijven buiten dashboard en app-routes via manifestveld `visibility: "hidden"`.
@@ -192,6 +194,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - Toekomstige tax-engine kan deze centrale constantslaag hergebruiken, maar is nu bewust nog niet gebouwd.
 - Volgende DUO-stap: officiële draagkrachtberekening pas toevoegen zodra alle actuele draagkrachtparameters betrouwbaar in de constantslaag staan.
 - Volgende teststap: tax-engine en chart-utils pas opnemen in testlaag zodra die modules stabiel zijn.
+- CI controleert expliciet dat `src/lib/app-registry.ts` en `src/lib/app-components.tsx` na `generate:apps` geen diff hebben.
 
 ## Responsive design en layout-conventies
 
