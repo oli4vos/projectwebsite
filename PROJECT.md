@@ -110,6 +110,9 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/lib/duo/`: centrale DUO-domeinlaag met wettelijk maandbedrag, relevant maandbedrag per situatie en scenariofuncties voor extra aflossen
 - `src/lib/duo/calculations.test.ts`: regressietests voor centrale DUO-berekenfuncties
 - `src/lib/tax/`: centrale indicatieve tax-laag voor box 1, hypotheekrenteaftrek en box 3
+- `src/lib/financial-constants/index.test.ts`: regressietests voor jaarkeuze/fallbacks en centrale aannames-helpers
+- `src/lib/profile-prefill.test.ts` en `src/lib/profile-tool-mapping.test.ts`: regressietests voor centrale profiel-prefill en toolmapping
+- `apps/hypotheek-impact-studieschuld/logic.test.ts`: regressietests voor tool-specifieke scenario-uitkomsten en defensieve inputafhandeling
 - `next.config.ts`: standaard Next-config + GitHub Pages static export in Actions
 - GitHub Pages draait als project-site onder `/projectwebsite` (basePath/assetPrefix worden in Actions automatisch gezet)
 - `.github/workflows/ci.yml`: sequentiële CI-checks voor generate/test/lint/typecheck/build
@@ -168,6 +171,12 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - Hou rekenlogica zo veel mogelijk puur en los van UI.
 - DUO-logica (wettelijk maandbedrag, situatie-afhankelijke relevantie, extra aflossen scenario's) loopt centraal via `src/lib/duo`.
 - `npm run test` draait lichte unit-tests (Vitest) voor pure domeinlogica.
+- Teststrategie:
+  - centrale constants altijd via `src/lib/financial-constants` en met regressietests op jaar-fallbacks;
+  - DUO-berekeningen via `src/lib/duo` testen op sanitizing, scenario's en clamping;
+  - belastingen via `src/lib/tax` testen op indicatieve box 1/box 3/mortgage-interest paden;
+  - profielkoppeling altijd via `profile-tool-mapping` + `profile-prefill` en met regressietests;
+  - tool-specifieke `logic.ts` alleen testen op gedrag dat niet al in centrale lagen zit.
 - `npm run check` draait lokaal dezelfde sequentie als CI inclusief registry-verificatie.
 - Taxfuncties in `src/lib/tax` zijn indicatief en bewust beperkt:
   - `calculateBox1Tax`
@@ -191,6 +200,12 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - op mobiel staat de samenvatting/resultaatkaart eerst
   - daarna volgt het formulier met mobile field flow
   - op desktop blijft de twee-kolomsindeling actief
+- Regels voor toekomstige tools:
+  - gebruik eerst centrale constants uit `src/lib/financial-constants`;
+  - gebruik centrale DUO-logica uit `src/lib/duo` waar DUO-input meespeelt;
+  - gebruik centrale tax-logica uit `src/lib/tax` voor box 1/box 3/aftrek-indicaties;
+  - gebruik profieldefaults uitsluitend via `profile-tool-mapping` + `profile-prefill`;
+  - volg het mobiele shell-patroon (`CalculatorShell`) en houd aannames vindbaar via disclosure.
 - Jaarlijkse financiële aannames komen centraal uit `src/lib/financial-constants`.
 - Toolverdieping mag die centrale aannames tonen, maar light-gebruikers worden niet gedwongen die details te openen.
 - In `studieschuld-vs-beleggen` blijft box 3 een optionele verdieping (toggle + disclosure); de hoofdflow blijft licht en bruikbaar zonder fiscale invoer.
