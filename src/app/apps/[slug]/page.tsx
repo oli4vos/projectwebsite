@@ -5,6 +5,13 @@ import { AppRenderer } from "@/components/AppRenderer";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { CategoryDot, Pill } from "@/components/ui";
+import type {
+  AppAssumptionDomain,
+  AppCalculationDomain,
+  AppDisclaimerType,
+  AppOutputType,
+  AppRiskLevel,
+} from "@/lib/app-types";
 import { resolveCategory } from "@/lib/categories";
 import { appRegistry, appRegistryBySlug } from "@/lib/app-registry";
 
@@ -12,6 +19,51 @@ type AppDetailPageProps = {
   params: Promise<{
     slug: string;
   }>;
+};
+
+const riskLabel: Record<AppRiskLevel, string> = {
+  low: "Laag",
+  medium: "Middel",
+  high: "Hoog",
+};
+
+const disclaimerLabel: Record<AppDisclaimerType, string> = {
+  indicative: "Indicatief",
+  financialEducation: "Financiële educatie",
+  taxIndicative: "Belasting indicatief",
+  mortgageIndicative: "Hypotheek indicatief",
+  duoIndicative: "DUO indicatief",
+};
+
+const outputTypeLabel: Record<AppOutputType, string> = {
+  singleResult: "Enkel resultaat",
+  scenarioComparison: "Scenariovergelijking",
+  timeline: "Tijdlijn",
+  checklist: "Checklist",
+  mixed: "Gemengd",
+};
+
+const calculationDomainLabel: Record<AppCalculationDomain, string> = {
+  studentDebt: "Studieschuld",
+  mortgage: "Hypotheek",
+  housing: "Wonen",
+  tax: "Belasting",
+  investing: "Beleggen",
+  saving: "Sparen",
+  cashflow: "Cashflow",
+  employment: "Werk",
+  pension: "Pensioen",
+};
+
+const assumptionDomainLabel: Record<AppAssumptionDomain, string> = {
+  duo: "DUO",
+  tax: "Belasting",
+  box1: "Box 1",
+  box3: "Box 3",
+  mortgage: "Hypotheek",
+  investment: "Beleggen",
+  inflation: "Inflatie",
+  charts: "Grafieken",
 };
 
 export async function generateStaticParams() {
@@ -107,11 +159,76 @@ export default async function AppDetailPage({ params }: AppDetailPageProps) {
                   {app.version ?? "n.v.t."}
                 </span>
               </div>
+              {app.riskLevel && (
+                <div className="flex items-center justify-between">
+                  <span className="text-[var(--muted)]">Risiconiveau</span>
+                  <span className="font-medium text-[var(--ink)]">
+                    {riskLabel[app.riskLevel]}
+                  </span>
+                </div>
+              )}
+              {app.disclaimerType && (
+                <div className="flex items-center justify-between">
+                  <span className="text-[var(--muted)]">Disclaimer</span>
+                  <span className="font-medium text-[var(--ink)]">
+                    {disclaimerLabel[app.disclaimerType]}
+                  </span>
+                </div>
+              )}
+              {app.outputType && (
+                <div className="flex items-center justify-between">
+                  <span className="text-[var(--muted)]">Output</span>
+                  <span className="font-medium text-[var(--ink)]">
+                    {outputTypeLabel[app.outputType]}
+                  </span>
+                </div>
+              )}
+              {app.requiredProfileFields && app.requiredProfileFields.length > 0 && (
+                <div className="flex items-center justify-between">
+                  <span className="text-[var(--muted)]">Profielvelden</span>
+                  <span className="font-medium text-[var(--ink)]">
+                    {app.requiredProfileFields.length}
+                  </span>
+                </div>
+              )}
             </div>
+            {app.calculationDomains && app.calculationDomains.length > 0 && (
+              <div className="mt-5 border-t border-[var(--hair)] pt-4">
+                <div className="text-[11px] uppercase tracking-[0.12em] text-[var(--muted)]">
+                  Domeinen
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {app.calculationDomains.map((domain) => (
+                    <Pill key={domain}>{calculationDomainLabel[domain]}</Pill>
+                  ))}
+                </div>
+              </div>
+            )}
+            {app.assumptionsUsed && app.assumptionsUsed.length > 0 && (
+              <div className="mt-4">
+                <div className="text-[11px] uppercase tracking-[0.12em] text-[var(--muted)]">
+                  Aannames
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {app.assumptionsUsed.map((assumption) => (
+                    <Pill key={assumption}>{assumptionDomainLabel[assumption]}</Pill>
+                  ))}
+                </div>
+              </div>
+            )}
             <div className="mt-5 border-t border-[var(--hair)] pt-4 text-[12.5px] leading-[1.6] text-[var(--muted)]">
               Heldere aannames, lokale berekening en een resultaat dat je direct kunt
               vertalen naar je eigen keuze of vervolgvraag.
             </div>
+            {app.requiredProfileFields && app.requiredProfileFields.length > 0 && (
+              <div className="mt-3 text-[12.5px] leading-[1.6] text-[var(--muted)]">
+                Voor deze tool kun je basisvelden vooraf invullen in{" "}
+                <Link href="/profiel" className="text-[var(--ink)] underline">
+                  Mijn profiel
+                </Link>
+                .
+              </div>
+            )}
           </aside>
         </section>
 

@@ -104,6 +104,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/components/AppRenderer.tsx`: pakt lazy toolcomponent op basis van slug
 - `src/components/ui.tsx`: `Btn`, `BtnLink`, `Pill`, `Logo`, `CategoryDot`
 - `src/components/ToolDisclosure.tsx`: standaard uitklapbare verdiepingssectie voor rekentools
+- `src/app/apps/[slug]/page.tsx`: toont ook manifestmetadata (domeinen, aannames, output/disclaimer/risico) zonder de dashboardflow zwaarder te maken
 
 ## Huidige data/config
 
