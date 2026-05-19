@@ -187,6 +187,10 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - eerst invulvelden
   - dan een beknopte samenvatting met kernuitkomst in gewone taal
   - daarna uitklapbare verdieping, standaard dicht, met uitleg, aannames en praktische aandachtspunten
+- Mobiele tool-layout is gecentraliseerd via `src/components/tool/CalculatorShell.tsx`:
+  - op mobiel staat de samenvatting/resultaatkaart eerst
+  - daarna volgt het formulier met mobile field flow
+  - op desktop blijft de twee-kolomsindeling actief
 - Jaarlijkse financiële aannames komen centraal uit `src/lib/financial-constants`.
 - Toolverdieping mag die centrale aannames tonen, maar light-gebruikers worden niet gedwongen die details te openen.
 - In `studieschuld-vs-beleggen` blijft box 3 een optionele verdieping (toggle + disclosure); de hoofdflow blijft licht en bruikbaar zonder fiscale invoer.

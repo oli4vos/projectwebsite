@@ -9,6 +9,7 @@ import {
 } from "@/components/charts";
 import { ResultRow } from "@/components/ResultRow";
 import { ToolDisclosure } from "@/components/ToolDisclosure";
+import { CalculatorShell } from "@/components/tool/CalculatorShell";
 import { Pill } from "@/components/ui";
 import { useMobileFieldFlow } from "@/hooks/useMobileFieldFlow";
 import { useUserProfile } from "@/hooks/useUserProfile";
@@ -288,8 +289,8 @@ function CalculatorContent({
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
-      <section className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
+    <CalculatorShell>
+      <section className="order-2 min-w-0 rounded-[1.5rem] border hair bg-white p-6 shadow-paper lg:order-1">
         <div>
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
             Scenario
@@ -570,7 +571,7 @@ function CalculatorContent({
         </div>
       </section>
 
-      <section className="space-y-5">
+      <section className="order-1 min-w-0 space-y-5 lg:order-2">
         <div className="rounded-[1.5rem] bg-[var(--deep)] p-6 text-white shadow-paper-lg">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="text-[11px] uppercase tracking-[0.12em] text-white/55">
@@ -763,9 +764,11 @@ function CalculatorContent({
               </div>
               <div className="min-w-0">
                 <AreaChart width={620} height={220} series={chartSeries} yTicks={yTicks} />
-                <div className="axis mt-1 flex items-center justify-between">
+                <div className="axis mt-1 flex items-center justify-between gap-2 overflow-hidden">
                   {xTicks.map((tick) => (
-                    <span key={tick}>jaar {tick}</span>
+                    <span key={tick} className="min-w-0 truncate first:text-left last:text-right">
+                      jaar {tick}
+                    </span>
                   ))}
                 </div>
               </div>
@@ -957,6 +960,6 @@ function CalculatorContent({
           </p>
         </div>
       </section>
-    </div>
+    </CalculatorShell>
   );
 }
