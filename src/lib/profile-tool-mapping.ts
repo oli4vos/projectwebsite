@@ -88,6 +88,8 @@ type Box3ImpactDefaults = Partial<{
   hasFiscalPartner: boolean;
   expectedSavingsReturn: string;
   expectedInvestmentReturn: string;
+  horizonYears: string;
+  investmentsContribution: string;
 }>;
 
 function toStringValue(value?: number) {
@@ -322,6 +324,18 @@ export function getBox3ImpactDefaultsFromProfile(
     const expected = toStringValue(profile.savingInvesting.expectedAnnualReturn);
     defaults.expectedSavingsReturn = expected;
     defaults.expectedInvestmentReturn = expected;
+  }
+
+  const horizonYears = toStringValue(profile.savingInvesting?.investmentHorizonYears);
+  if (horizonYears !== undefined) {
+    defaults.horizonYears = horizonYears;
+  }
+
+  const investmentsContribution = toStringValue(
+    profile.savingInvesting?.monthlyFreeCashflow,
+  );
+  if (investmentsContribution !== undefined) {
+    defaults.investmentsContribution = investmentsContribution;
   }
 
   return defaults;

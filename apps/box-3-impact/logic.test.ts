@@ -111,4 +111,52 @@ describe("calculateBox3ImpactScenario", () => {
     expect(result.expectedGrossReturn).toBeUndefined();
     expect(result.netExpectedReturnAfterBox3).toBeUndefined();
   });
+
+  it("builds a yearly horizon and keeps taxes non-negative", () => {
+    const result = calculateBox3ImpactScenario({
+      method: "actual",
+      year: 2026,
+      hasFiscalPartner: false,
+      bankDeposits: 25000,
+      investmentsAndOtherAssets: 25000,
+      debts: 0,
+      expectedSavingsReturn: 2,
+      expectedInvestmentReturn: 6,
+      horizonYears: 5,
+      contributionFrequency: "monthly",
+      savingsContribution: 100,
+      investmentsContribution: 250,
+    });
+
+    expect(result.horizon.points).toHaveLength(5);
+    expect(result.horizon.totalBox3TaxOverHorizon).toBeGreaterThanOrEqual(0);
+    expect(result.horizon.endNetWorthAfterTax).toBeGreaterThanOrEqual(0);
+    expect(
+      result.horizon.points.every(
+        (point) => Number.isFinite(point.box3Tax) && point.box3Tax >= 0,
+      ),
+    ).toBe(true);
+  });
+
+  it("supports yearly contribution frequency", () => {
+    const result = calculateBox3ImpactScenario({
+      method: "forfaitary",
+      year: 2026,
+      hasFiscalPartner: false,
+      bankDeposits: 30000,
+      investmentsAndOtherAssets: 20000,
+      debts: 0,
+      expectedSavingsReturn: 1.5,
+      expectedInvestmentReturn: 5,
+      horizonYears: 3,
+      contributionFrequency: "yearly",
+      savingsContribution: 1200,
+      investmentsContribution: 4800,
+    });
+
+    expect(result.horizon.yearlySavingsContribution).toBe(1200);
+    expect(result.horizon.yearlyInvestmentsContribution).toBe(4800);
+    expect(result.horizon.points[0]?.contributionSavings).toBe(1200);
+    expect(result.horizon.points[0]?.contributionInvestments).toBe(4800);
+  });
 });

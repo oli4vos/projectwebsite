@@ -76,42 +76,6 @@ export const appRegistry = [
     "entry": "Calculator.tsx"
   },
   {
-    "slug": "box3-indicatie",
-    "title": "Box 3 indicatie",
-    "description": "Bereken indicatief je box 3-heffing op spaargeld, beleggingen en schulden met werkelijk of forfaitair rendement.",
-    "type": "frontend",
-    "category": "Belasting",
-    "tags": [
-      "box 3",
-      "belasting",
-      "vermogen",
-      "beleggen",
-      "spaargeld"
-    ],
-    "status": "beta",
-    "visibility": "public",
-    "requiredProfileFields": [
-      "savingInvesting.currentSavings",
-      "tax.hasFiscalPartner",
-      "tax.preferredTaxYear",
-      "tax.preferredBox3Method"
-    ],
-    "assumptionsUsed": [
-      "tax",
-      "box3"
-    ],
-    "calculationDomains": [
-      "tax",
-      "saving",
-      "investing"
-    ],
-    "riskLevel": "medium",
-    "disclaimerType": "taxIndicative",
-    "outputType": "singleResult",
-    "version": "1.0.0",
-    "entry": "Calculator.tsx"
-  },
-  {
     "slug": "hypotheek-impact-studieschuld",
     "title": "Hypotheek-impact studieschuld",
     "description": "Zie welk DUO-bedrag waarschijnlijk meetelt, hoe brutering werkt en wat je studieschuld indicatief doet met je hypotheekruimte.",
