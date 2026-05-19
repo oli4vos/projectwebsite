@@ -26,6 +26,9 @@ export const PROFILE_FIELDS_STUDENT_DEBT_VS_INVESTING = [
   "studentDebt.duoInterestRate",
   "savingInvesting.expectedAnnualReturn",
   "savingInvesting.investmentHorizonYears",
+  "savingInvesting.currentSavings",
+  "income.householdType",
+  "income.partnerGrossAnnualIncome",
 ] as const;
 
 type MortgageImpactDefaults = Partial<{
@@ -50,6 +53,8 @@ type StudentDebtVsInvestingDefaults = Partial<{
   annualDebtRate: string;
   annualInvestmentReturn: string;
   years: string;
+  box3BankDeposits: string;
+  hasFiscalPartner: boolean;
 }>;
 
 function toStringValue(value?: number) {
@@ -165,6 +170,22 @@ export function getStudentDebtVsInvestingDefaultsFromProfile(
   const years = toStringValue(profile.savingInvesting?.investmentHorizonYears);
   if (years !== undefined) {
     defaults.years = years;
+  }
+
+  const box3BankDeposits = toStringValue(profile.savingInvesting?.currentSavings);
+  if (box3BankDeposits !== undefined) {
+    defaults.box3BankDeposits = box3BankDeposits;
+  }
+
+  if (
+    profile.income?.householdType !== undefined ||
+    profile.income?.partnerGrossAnnualIncome !== undefined
+  ) {
+    defaults.hasFiscalPartner = Boolean(
+      profile.income?.householdType === "withPartner" ||
+        profile.income?.householdType === "family" ||
+        (profile.income?.partnerGrossAnnualIncome ?? 0) > 0,
+    );
   }
 
   return defaults;

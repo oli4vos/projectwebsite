@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { AreaChart } from "@/components/charts";
 import { ResultRow } from "@/components/ResultRow";
+import { ToolDisclosure } from "@/components/ToolDisclosure";
 import { Pill } from "@/components/ui";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { getDefaultFinancialYear } from "@/lib/financial-constants";
 import {
   createProfilePrefillState,
   mergeProfilePatchIntoValues,
@@ -15,11 +17,19 @@ import {
   type CalculatorInput,
 } from "./logic";
 
+const DEFAULT_FINANCIAL_YEAR = getDefaultFinancialYear();
+
 type FormState = {
   monthlyAmount: string;
   annualDebtRate: string;
   annualInvestmentReturn: string;
   years: string;
+  box3EffectEnabled: boolean;
+  taxYear: string;
+  hasFiscalPartner: boolean;
+  box3BankDeposits: string;
+  box3InvestmentsAndOtherAssets: string;
+  box3Debts: string;
 };
 
 type ValidationErrors = Partial<Record<keyof FormState, string>>;
@@ -29,6 +39,12 @@ const defaultValues: FormState = {
   annualDebtRate: "2.56",
   annualInvestmentReturn: "6",
   years: "10",
+  box3EffectEnabled: false,
+  taxYear: String(DEFAULT_FINANCIAL_YEAR),
+  hasFiscalPartner: false,
+  box3BankDeposits: "0",
+  box3InvestmentsAndOtherAssets: "0",
+  box3Debts: "0",
 };
 
 type CalculatorContentProps = {
@@ -42,6 +58,13 @@ function formatCurrency(value: number) {
     style: "currency",
     currency: "EUR",
     maximumFractionDigits: 0,
+  }).format(value);
+}
+
+function formatPercent(value: number) {
+  return new Intl.NumberFormat("nl-NL", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   }).format(value);
 }
 
@@ -73,6 +96,36 @@ function validateForm(values: FormState) {
     errors.years = "Kies een looptijd groter dan 0 en maximaal 60 jaar.";
   }
 
+  const taxYear = Number(values.taxYear);
+  if (
+    values.box3EffectEnabled &&
+    (!Number.isFinite(taxYear) || taxYear < 2000 || taxYear > 2200)
+  ) {
+    errors.taxYear = "Gebruik een geldig belastingjaar.";
+  }
+
+  const box3BankDeposits = Number(values.box3BankDeposits);
+  if (
+    values.box3EffectEnabled &&
+    (!Number.isFinite(box3BankDeposits) || box3BankDeposits < 0)
+  ) {
+    errors.box3BankDeposits = "Gebruik 0 of een hoger bedrag.";
+  }
+
+  const box3InvestmentsAndOtherAssets = Number(values.box3InvestmentsAndOtherAssets);
+  if (
+    values.box3EffectEnabled &&
+    (!Number.isFinite(box3InvestmentsAndOtherAssets) ||
+      box3InvestmentsAndOtherAssets < 0)
+  ) {
+    errors.box3InvestmentsAndOtherAssets = "Gebruik 0 of een hoger bedrag.";
+  }
+
+  const box3Debts = Number(values.box3Debts);
+  if (values.box3EffectEnabled && (!Number.isFinite(box3Debts) || box3Debts < 0)) {
+    errors.box3Debts = "Gebruik 0 of een hoger bedrag.";
+  }
+
   const parsedValues: CalculatorInput | null =
     Object.keys(errors).length === 0
       ? {
@@ -80,6 +133,14 @@ function validateForm(values: FormState) {
           annualDebtRate,
           annualInvestmentReturn,
           years,
+          box3EffectEnabled: values.box3EffectEnabled,
+          taxYear: values.box3EffectEnabled ? taxYear : undefined,
+          hasFiscalPartner: values.hasFiscalPartner,
+          box3BankDeposits: values.box3EffectEnabled ? box3BankDeposits : undefined,
+          box3InvestmentsAndOtherAssets: values.box3EffectEnabled
+            ? box3InvestmentsAndOtherAssets
+            : undefined,
+          box3Debts: values.box3EffectEnabled ? box3Debts : undefined,
         }
       : null;
 
@@ -140,7 +201,7 @@ function CalculatorContent({
       ]
     : null;
 
-  function updateField(field: keyof FormState, value: string) {
+  function updateField<K extends keyof FormState>(field: K, value: FormState[K]) {
     setFormValues((current) => ({
       ...current,
       [field]: value,
@@ -240,6 +301,108 @@ function CalculatorContent({
             />
             <FieldError message={errors.years} />
           </label>
+
+          <label className="grid gap-2 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3">
+            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+              Geavanceerde aanname
+            </span>
+            <span className="flex items-center gap-3 text-[14px] text-[var(--ink)]">
+              <input
+                type="checkbox"
+                checked={formValues.box3EffectEnabled}
+                onChange={(event) =>
+                  updateField("box3EffectEnabled", event.target.checked)
+                }
+                className="size-4 accent-[var(--accent)]"
+              />
+              Box 3-effect indicatief meenemen
+            </span>
+            <p className="text-[12px] leading-[1.5] text-[var(--soft)]">
+              Zet dit alleen aan als je ook wilt zien wat een indicatieve box 3-heffing
+              met je beleggingsscenario kan doen.
+            </p>
+          </label>
+
+          {formValues.box3EffectEnabled ? (
+            <>
+              <label className="grid gap-2">
+                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                  Belastingjaar
+                </span>
+                <input
+                  inputMode="numeric"
+                  value={formValues.taxYear}
+                  onChange={(event) => updateField("taxYear", event.target.value)}
+                  aria-invalid={Boolean(errors.taxYear)}
+                  className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
+                />
+                <FieldError message={errors.taxYear} />
+              </label>
+
+              <label className="grid gap-2">
+                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                  Fiscale partner
+                </span>
+                <span className="flex items-center gap-3 text-[14px] text-[var(--ink)]">
+                  <input
+                    type="checkbox"
+                    checked={formValues.hasFiscalPartner}
+                    onChange={(event) =>
+                      updateField("hasFiscalPartner", event.target.checked)
+                    }
+                    className="size-4 accent-[var(--accent)]"
+                  />
+                  Ja, reken met partnervrijstelling
+                </span>
+              </label>
+
+              <label className="grid gap-2">
+                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                  Box 3 banktegoeden / spaargeld
+                </span>
+                <input
+                  inputMode="decimal"
+                  value={formValues.box3BankDeposits}
+                  onChange={(event) =>
+                    updateField("box3BankDeposits", event.target.value)
+                  }
+                  aria-invalid={Boolean(errors.box3BankDeposits)}
+                  className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
+                />
+                <FieldError message={errors.box3BankDeposits} />
+              </label>
+
+              <label className="grid gap-2">
+                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                  Box 3 beleggingen / overige bezittingen
+                </span>
+                <input
+                  inputMode="decimal"
+                  value={formValues.box3InvestmentsAndOtherAssets}
+                  onChange={(event) =>
+                    updateField("box3InvestmentsAndOtherAssets", event.target.value)
+                  }
+                  aria-invalid={Boolean(errors.box3InvestmentsAndOtherAssets)}
+                  className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
+                />
+                <FieldError message={errors.box3InvestmentsAndOtherAssets} />
+              </label>
+
+              <label className="grid gap-2">
+                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                  Box 3 schulden
+                </span>
+                <input
+                  inputMode="decimal"
+                  value={formValues.box3Debts}
+                  onChange={(event) => updateField("box3Debts", event.target.value)}
+                  aria-invalid={Boolean(errors.box3Debts)}
+                  className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
+                />
+                <FieldError message={errors.box3Debts} />
+              </label>
+            </>
+          ) : null}
         </div>
 
         {hasErrors ? (
@@ -282,6 +445,12 @@ function CalculatorContent({
                 betekent meer verwachte waarde bij beleggen. Negatief betekent dat
                 extra aflossen hier financieel steviger uitkomt.
               </p>
+              {result.box3Scenario ? (
+                <p className="mt-3 max-w-[56ch] text-[13px] leading-[1.65] text-white/70">
+                  Met indicatief box 3-effect wordt het beleggingsscenario ongeveer{" "}
+                  {formatCurrency(result.box3Scenario.additionalBox3TaxIndicative)} lager.
+                </p>
+              ) : null}
             </>
           ) : (
             <p className="mt-4 text-[14px] leading-[1.7] text-white/75">
@@ -323,6 +492,23 @@ function CalculatorContent({
                 sub="De kernuitkomst van deze vergelijking"
                 accent={result.difference >= 0}
               />
+              {result.box3Scenario ? (
+                <>
+                  <ResultRow
+                    label="Indicatieve extra box 3-heffing"
+                    value={formatCurrency(result.box3Scenario.additionalBox3TaxIndicative)}
+                    sub="Verschil tussen box 3 zonder en met beleggingsscenario"
+                  />
+                  <ResultRow
+                    label="Verschil na box 3-indicatie"
+                    value={formatCurrency(
+                      result.box3Scenario.differenceRepaymentVsInvestingAfterBox3,
+                    )}
+                    sub="Beleggingsuitkomst minus aflossingsuitkomst, na indicatieve box 3-correctie"
+                    accent={result.box3Scenario.differenceRepaymentVsInvestingAfterBox3 >= 0}
+                  />
+                </>
+              ) : null}
             </div>
           ) : null}
         </div>
@@ -360,15 +546,115 @@ function CalculatorContent({
           </div>
         ) : null}
 
+        <ToolDisclosure
+          title="Box 3-effect op beleggen"
+          subtitle="Optionele verdieping: indicatieve extra box 3-heffing op het beleggingsscenario."
+        >
+          {result?.box3Scenario ? (
+            <div className="space-y-4 text-[13px] leading-[1.65] text-[var(--muted)]">
+              <p>
+                Dit is een indicatie. Box 3-regels en forfaits kunnen wijzigen en je
+                volledige fiscale situatie kan anders uitpakken.
+              </p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <ResultRow
+                  label="Belastingjaar"
+                  value={String(result.box3Scenario.year)}
+                  sub="Gebruikt voor de forfaitaire box 3-aannames"
+                />
+                <ResultRow
+                  label="Fiscale partner"
+                  value={result.box3Scenario.hasFiscalPartner ? "Ja" : "Nee"}
+                  sub="Bepaalt hoogte van heffingsvrij vermogen"
+                />
+                <ResultRow
+                  label="Banktegoeden"
+                  value={formatCurrency(result.box3Scenario.usedBankDeposits)}
+                  sub="Invoer voor box 3 banktegoeden/spaargeld"
+                />
+                <ResultRow
+                  label="Beleggingen/overige bezittingen"
+                  value={formatCurrency(
+                    result.box3Scenario.usedInvestmentsAndOtherAssets,
+                  )}
+                  sub="Bestaande box 3-beleggingscomponent voor dit scenario"
+                />
+                <ResultRow
+                  label="Box 3-schulden"
+                  value={formatCurrency(result.box3Scenario.usedDebts)}
+                  sub="Verlagen indicatief de rendementsgrondslag"
+                />
+                <ResultRow
+                  label="Heffingsvrij vermogen"
+                  value={formatCurrency(result.box3Scenario.taxFreeAllowance)}
+                  sub="Afhankelijk van single/partnerstatus"
+                />
+                <ResultRow
+                  label="Forfait banktegoeden"
+                  value={`${formatPercent(result.box3Scenario.deemedReturnBankDepositsRate)}%`}
+                  sub="Indicatief percentage voor banktegoeden"
+                />
+                <ResultRow
+                  label="Forfait beleggingen"
+                  value={`${formatPercent(result.box3Scenario.deemedReturnInvestmentsRate)}%`}
+                  sub="Indicatief percentage voor beleggingen/overige bezittingen"
+                />
+                <ResultRow
+                  label="Forfait schulden"
+                  value={`${formatPercent(result.box3Scenario.deemedReturnDebtsRate)}%`}
+                  sub="Indicatieve schuldcorrectie in box 3"
+                />
+                <ResultRow
+                  label="Box 3-tarief"
+                  value={`${formatPercent(result.box3Scenario.box3TaxRate)}%`}
+                  sub="Tarief op belastbaar forfaitair rendement"
+                />
+                <ResultRow
+                  label="Box 3 zonder beleggingsscenario"
+                  value={formatCurrency(result.box3Scenario.box3TaxWithoutScenario)}
+                  sub="Indicatieve heffing op bestaande invoer"
+                />
+                <ResultRow
+                  label="Box 3 met beleggingsscenario"
+                  value={formatCurrency(result.box3Scenario.box3TaxWithInvestingScenario)}
+                  sub="Indicatieve heffing inclusief beleggingsscenario"
+                />
+                <ResultRow
+                  label="Extra box 3-heffing indicatief"
+                  value={formatCurrency(result.box3Scenario.additionalBox3TaxIndicative)}
+                  sub="Verschil tussen beide indicatieve box 3-uitkomsten"
+                />
+                <ResultRow
+                  label="Netto beleggingsuitkomst na box 3-indicatie"
+                  value={formatCurrency(result.box3Scenario.netInvestingOutcomeAfterBox3)}
+                  sub="Verwachte beleggingswaarde minus indicatieve extra box 3-heffing"
+                />
+              </div>
+              {result.box3Scenario.warnings.length > 0 ? (
+                <ul className="space-y-2 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3">
+                  {result.box3Scenario.warnings.map((warning) => (
+                    <li key={warning}>{warning}</li>
+                  ))}
+                </ul>
+              ) : null}
+            </div>
+          ) : (
+            <p className="text-[13px] leading-[1.65] text-[var(--muted)]">
+              Zet “Box 3-effect indicatief meenemen” aan bij de geavanceerde aannames
+              om deze verdieping te tonen.
+            </p>
+          )}
+        </ToolDisclosure>
+
         <div className="rounded-[1.5rem] border hair bg-white p-5 shadow-paper">
           <div className="text-[11px] uppercase tracking-[0.1em] text-[var(--muted)]">
             Belangrijk om te onthouden
           </div>
           <p className="mt-2 text-[12.5px] leading-[1.65] text-[var(--muted)]">
-            Deze tool gebruikt geen belastingeffecten, koersschommelingen of
-            persoonlijke risicovoorkeur. Het doel is niet om een definitief oordeel
-            te geven, maar om je sneller naar een betere vervolgvraag of keuze te
-            brengen.
+            Deze tool blijft een vereenvoudigde vergelijking. Met de optionele box
+            3-indicatie krijg je extra context, maar geen volledige belastingaangifte,
+            geen koerszekerheid en geen persoonlijk advies. Het doel is vooral: betere
+            vervolgvragen en scherpere keuzes.
           </p>
         </div>
       </section>

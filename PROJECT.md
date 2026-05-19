@@ -118,6 +118,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `apps/studieschuld-vs-beleggen`
   - eenvoudige frontend calculator
   - pure berekening in `logic.ts`
+  - gebruikt optioneel centrale tax-laag voor een indicatieve box 3-correctie in de verdiepingslaag
 - `apps/annuitair-lineair`
   - wrapper rond bestaande JS-logica
   - bevat oudere rekenscripts in `.js`
@@ -175,6 +176,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - daarna uitklapbare verdieping, standaard dicht, met uitleg, aannames en praktische aandachtspunten
 - Jaarlijkse financiële aannames komen centraal uit `src/lib/financial-constants`.
 - Toolverdieping mag die centrale aannames tonen, maar light-gebruikers worden niet gedwongen die details te openen.
+- In `studieschuld-vs-beleggen` blijft box 3 een optionele verdieping (toggle + disclosure); de hoofdflow blijft licht en bruikbaar zonder fiscale invoer.
 - Er zijn nu meerdere pechgeneratie/studieschuld-tools; hou tone of voice en disclaimerstijl tussen die modules consistent.
 - Partnerstudieschuld zit nog niet als aparte invoer in `apps/hypotheek-impact-studieschuld`; alleen copy/context. Dat is een logische v3-uitbreiding.
 - Toekomstige profielstap:
@@ -201,6 +203,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - Volgende DUO-stap: officiële draagkrachtberekening pas toevoegen zodra alle actuele draagkrachtparameters betrouwbaar in de constantslaag staan.
 - Volgende teststap: tax-engine en chart-utils pas opnemen in testlaag zodra die modules stabiel zijn.
 - Volgende inhoudelijke stap: tax-laag gecontroleerd koppelen aan relevante tools (o.a. aflossen-vs-beleggen en toekomstige box 3-scenario's).
+- Toekomstige tax-verdieping: meerjarige box 3-projectie of aparte box 3-tool, pas na validatie van gebruikservaring in de huidige optionele v1-koppeling.
 - CI controleert expliciet dat `src/lib/app-registry.ts` en `src/lib/app-components.tsx` na `generate:apps` geen diff hebben.
 
 ## Responsive design en layout-conventies
