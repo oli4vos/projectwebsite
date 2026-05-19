@@ -1,24 +1,35 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { BtnLink, Logo } from "@/components/ui";
+import { appRegistry } from "@/lib/app-registry";
 
 const navItems = [
-  { href: "/#apps", label: "Rekentools" },
+  { href: "/#apps", label: "Overzicht" },
   { href: "/#werkwijze", label: "Werkwijze" },
   { href: "/#scenario", label: "Scenario's" },
 ] as const;
+
+const headerCategories = Array.from(
+  new Set(appRegistry.map((app) => app.category)),
+);
 
 function navClassName() {
   return "inline-flex min-h-11 items-center rounded-full px-3 py-2 text-[var(--muted)] transition hover:bg-white/70 hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2";
 }
 
+function categoryHref(category: string) {
+  return `/?categorie=${encodeURIComponent(category)}#apps`;
+}
+
 export function SiteHeader() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const onHome = pathname === "/";
   const onToolPage = pathname.startsWith("/apps/");
+  const activeCategory = searchParams.get("categorie");
   const [isMobileCompact, setIsMobileCompact] = useState(false);
   const lastScrollY = useRef(0);
 
@@ -67,6 +78,16 @@ export function SiteHeader() {
             <Logo size={22} />
           </Link>
           <nav className="hidden items-center gap-2 text-[13.5px] md:flex">
+            {headerCategories.map((category) => (
+              <Link
+                key={category}
+                href={categoryHref(category)}
+                className={navClassName()}
+                aria-current={onHome && activeCategory === category ? "page" : undefined}
+              >
+                {category}
+              </Link>
+            ))}
             {navItems.map((item) => (
               <Link key={item.href} href={item.href} className={navClassName()}>
                 {item.label}
@@ -95,27 +116,49 @@ export function SiteHeader() {
         </div>
 
         {isMobileCompact ? (
-          <div className="mt-3 flex items-center justify-between gap-2 md:hidden">
-            <BtnLink
-              href="/#apps"
-              kind={onHome ? "outline" : "ghost"}
-              size="sm"
-              className="min-w-0 flex-1 justify-center"
-            >
-              Rekentools
-            </BtnLink>
-            <BtnLink
-              href="/profiel"
-              kind={pathname === "/profiel" ? "outline" : "ghost"}
-              size="sm"
-              className="min-w-0 flex-1 justify-center"
-            >
-              Mijn profiel
-            </BtnLink>
-          </div>
+          <>
+            <nav className="mt-3 flex min-h-11 items-center gap-2 overflow-x-auto pb-1 text-[13.5px] md:hidden">
+              {headerCategories.map((category) => (
+                <Link
+                  key={category}
+                  href={categoryHref(category)}
+                  className={`${navClassName()} shrink-0`}
+                >
+                  {category}
+                </Link>
+              ))}
+            </nav>
+            <div className="mt-2 flex items-center justify-between gap-2 md:hidden">
+              <BtnLink
+                href="/#apps"
+                kind={onHome ? "outline" : "ghost"}
+                size="sm"
+                className="min-w-0 flex-1 justify-center"
+              >
+                Rekentools
+              </BtnLink>
+              <BtnLink
+                href="/profiel"
+                kind={pathname === "/profiel" ? "outline" : "ghost"}
+                size="sm"
+                className="min-w-0 flex-1 justify-center"
+              >
+                Mijn profiel
+              </BtnLink>
+            </div>
+          </>
         ) : (
           <>
             <nav className="mt-3 flex min-h-11 items-center gap-2 overflow-x-auto pb-1 text-[13.5px] md:hidden">
+              {headerCategories.map((category) => (
+                <Link
+                  key={category}
+                  href={categoryHref(category)}
+                  className={`${navClassName()} shrink-0`}
+                >
+                  {category}
+                </Link>
+              ))}
               {navItems.map((item) => (
                 <Link
                   key={item.href}

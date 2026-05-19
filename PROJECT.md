@@ -207,6 +207,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - Donkere CTA's moeten expliciet wit contrast houden. Bronbestand: `src/components/ui.tsx`.
 - Alle gebruikersgerichte frontend-copy is standaard Nederlands. Engelse tekst mag alleen in code, technische namen of wanneer expliciet gekozen.
 - Mobile-first is verplicht: elke nieuwe component of tool moet standaard goed werken op mobiel.
+- Headernavigatie toont altijd de actuele toolcategorieën op basis van `appRegistry`; bij nieuwe categorieën in manifests verschijnen deze automatisch in het menu zonder handmatige header-edit.
 - Uitvoerige QA-rondes of brede responsive testmatrices alleen uitvoeren als de gebruiker daarom vraagt én dit bevestigt.
 - Bij runtime laadproblemen na deploy is er een Nederlandse error-fallback via `src/app/error.tsx` en `src/app/global-error.tsx`.
 - Bij “Deze pagina kon niet goed laden”: eerst hard refresh (`Cmd+Shift+R`) of sitegegevens wissen voor `oli4vos.github.io`.
