@@ -10,6 +10,7 @@ import {
   getAdaptiveEuroTicks,
   getAdaptiveYearTicks,
 } from "@/components/charts";
+import { ChartContainer, ChartLegend } from "@/components/ChartPrimitives";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
 import { Pill } from "@/components/ui";
 import { useMobileFieldFlow } from "@/hooks/useMobileFieldFlow";
@@ -701,16 +702,12 @@ function CalculatorContent({
                       Vermogenslijn met box 3 versus zonder box 3
                     </div>
                   </div>
-                  <div className="flex items-center gap-4 text-[12px] text-[var(--muted)]">
-                    <span className="flex items-center gap-1.5">
-                      <span className="inline-block h-[2px] w-3 bg-[oklch(45%_0.08_236)]" />
-                      Zonder box 3 (full compound)
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      <span className="inline-block h-[2px] w-3 bg-[oklch(62%_0.11_35)]" />
-                      Met box 3
-                    </span>
-                  </div>
+                  <ChartLegend
+                    items={[
+                      { label: "Zonder box 3 (full compound)", color: "oklch(45% 0.08 236)" },
+                      { label: "Met box 3", color: "oklch(62% 0.11 35)" },
+                    ]}
+                  />
                 </div>
                 <div className="mt-5 grid gap-3 sm:grid-cols-[68px_minmax(0,1fr)]">
                   <div className="hidden flex-col justify-between text-right text-[11px] text-[var(--soft)] sm:flex">
@@ -722,21 +719,19 @@ function CalculatorContent({
                       ))}
                   </div>
                   <div className="min-w-0">
-                    <AreaChart
-                      width={620}
-                      height={220}
-                      series={chartSeries}
-                      yTicks={yTicks}
-                      xValues={[0, ...result.horizon.points.map((point) => point.yearIndex)]}
-                      seriesLabels={["Zonder box 3", "Met box 3"]}
+                    <ChartContainer
+                      yearTicks={xTicks}
+                      chart={
+                        <AreaChart
+                          width={620}
+                          height={220}
+                          series={chartSeries}
+                          yTicks={yTicks}
+                          xValues={[0, ...result.horizon.points.map((point) => point.yearIndex)]}
+                          seriesLabels={["Zonder box 3", "Met box 3"]}
+                        />
+                      }
                     />
-                    <div className="axis mt-1 flex items-center justify-between gap-2 overflow-hidden">
-                      {xTicks.map((tick) => (
-                        <span key={tick} className="min-w-0 truncate first:text-left last:text-right">
-                          jaar {tick}
-                        </span>
-                      ))}
-                    </div>
                   </div>
                 </div>
               </div>
@@ -829,16 +824,12 @@ function CalculatorContent({
                     <div className="text-[12px] uppercase tracking-[0.08em] text-[var(--muted)]">
                       Timingvergelijking belasting
                     </div>
-                    <div className="flex items-center gap-4 text-[12px] text-[var(--muted)]">
-                      <span className="flex items-center gap-1.5">
-                        <span className="inline-block h-[2px] w-3 bg-[oklch(45%_0.08_236)]" />
-                        Zonder belasting
-                      </span>
-                      <span className="flex items-center gap-1.5">
-                        <span className="inline-block h-[2px] w-3 bg-[oklch(70%_0.12_20)]" />
-                        Alleen eindverkoop-heffing
-                      </span>
-                    </div>
+                    <ChartLegend
+                      items={[
+                        { label: "Zonder belasting", color: "oklch(45% 0.08 236)" },
+                        { label: "Alleen eindverkoop-heffing", color: "oklch(70% 0.12 20)" },
+                      ]}
+                    />
                   </div>
                   <div className="mt-4 grid gap-3 sm:grid-cols-[68px_minmax(0,1fr)]">
                     <div className="hidden flex-col justify-between text-right text-[11px] text-[var(--soft)] sm:flex">
@@ -850,24 +841,19 @@ function CalculatorContent({
                         ))}
                     </div>
                     <div className="min-w-0">
-                      <AreaChart
-                        width={620}
-                        height={220}
-                        series={saleExampleSeries}
-                        yTicks={saleExampleYTicks}
-                        xValues={[0, ...result.horizon.points.map((point) => point.yearIndex)]}
-                        seriesLabels={["Zonder belasting", "Alleen eindverkoop-heffing"]}
+                      <ChartContainer
+                        yearTicks={[0, ...xTicks]}
+                        chart={
+                          <AreaChart
+                            width={620}
+                            height={220}
+                            series={saleExampleSeries}
+                            yTicks={saleExampleYTicks}
+                            xValues={[0, ...result.horizon.points.map((point) => point.yearIndex)]}
+                            seriesLabels={["Zonder belasting", "Alleen eindverkoop-heffing"]}
+                          />
+                        }
                       />
-                      <div className="axis mt-1 flex items-center justify-between gap-2 overflow-hidden">
-                        {[0, ...xTicks].map((tick) => (
-                          <span
-                            key={tick}
-                            className="min-w-0 truncate first:text-left last:text-right"
-                          >
-                            jaar {tick}
-                          </span>
-                        ))}
-                      </div>
                     </div>
                   </div>
                 </div>

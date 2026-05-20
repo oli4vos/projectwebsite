@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { DisclosureSection } from "@/components/DisclosureSection";
 import { MobileFieldFlowControls } from "@/components/MobileFieldFlowControls";
+import { ChartContainer, ChartLegend } from "@/components/ChartPrimitives";
 import { ResultRow } from "@/components/ResultRow";
 import { ToolDisclosure } from "@/components/ToolDisclosure";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
@@ -141,31 +142,37 @@ function TimelineMiniChart({
 
   return (
     <div className="relative rounded-xl border hair bg-[var(--paper-soft)] p-3">
-      <svg
-        viewBox={`0 0 ${width} ${height}`}
-        className="h-32 w-full"
-        role="img"
-        aria-label="Jaarlijkse ontwikkeling netto beleggen na box 3 versus netto voordeel aflossen"
-        onMouseLeave={() => setActiveIndex(null)}
-      >
-        <path d={aflossenPath} fill="none" stroke="#2f7f5f" strokeWidth="2.5" />
-        <path d={investingPath} fill="none" stroke="#1f3f8f" strokeWidth="2.5" />
-        {points.map((point, index) => {
-          const x = index * xStep;
-          return (
-            <rect
-              key={point.year}
-              x={x - xStep / 2}
-              y={0}
-              width={Math.max(xStep, 10)}
-              height={height}
-              fill="transparent"
-              onMouseEnter={() => setActiveIndex(index)}
-              onTouchStart={() => setActiveIndex(index)}
-            />
-          );
-        })}
-      </svg>
+      <ChartContainer
+        className="overflow-x-auto"
+        yearTicks={points.map((point) => point.year)}
+        chart={
+          <svg
+            viewBox={`0 0 ${width} ${height}`}
+            className="h-32 w-full"
+            role="img"
+            aria-label="Jaarlijkse ontwikkeling netto beleggen na box 3 versus netto voordeel aflossen"
+            onMouseLeave={() => setActiveIndex(null)}
+          >
+            <path d={aflossenPath} fill="none" stroke="#2f7f5f" strokeWidth="2.5" />
+            <path d={investingPath} fill="none" stroke="#1f3f8f" strokeWidth="2.5" />
+            {points.map((point, index) => {
+              const x = index * xStep;
+              return (
+                <rect
+                  key={point.year}
+                  x={x - xStep / 2}
+                  y={0}
+                  width={Math.max(xStep, 10)}
+                  height={height}
+                  fill="transparent"
+                  onMouseEnter={() => setActiveIndex(index)}
+                  onTouchStart={() => setActiveIndex(index)}
+                />
+              );
+            })}
+          </svg>
+        }
+      />
       {activeIndex !== null ? (
         <div className="pointer-events-none absolute left-4 top-4 rounded-md border border-[var(--hair)] bg-white/95 px-3 py-2 text-[12px] shadow-paper">
           <div className="font-medium text-[var(--ink)]">
@@ -177,16 +184,13 @@ function TimelineMiniChart({
           </div>
         </div>
       ) : null}
-      <div className="mt-2 flex flex-wrap gap-3 text-[11px] text-[var(--muted)]">
-        <span className="inline-flex items-center gap-2">
-          <span className="block h-1.5 w-4 rounded-full bg-[#1f3f8f]" />
-          Beleggen (na box 3)
-        </span>
-        <span className="inline-flex items-center gap-2">
-          <span className="block h-1.5 w-4 rounded-full bg-[#2f7f5f]" />
-          Netto voordeel aflossen
-        </span>
-      </div>
+      <ChartLegend
+        className="mt-2 flex flex-wrap gap-3 text-[11px] text-[var(--muted)]"
+        items={[
+          { label: "Beleggen (na box 3)", color: "#1f3f8f" },
+          { label: "Netto voordeel aflossen", color: "#2f7f5f" },
+        ]}
+      />
     </div>
   );
 }

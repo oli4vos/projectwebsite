@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AreaChart, getAdaptiveEuroTicks, getAdaptiveYearTicks } from "@/components/charts";
+import { ChartContainer, ChartLegend } from "@/components/ChartPrimitives";
 import { DisclosureSection } from "@/components/DisclosureSection";
 import { MobileFieldFlowControls } from "@/components/MobileFieldFlowControls";
 import { ResultRow } from "@/components/ResultRow";
@@ -833,63 +834,61 @@ function CalculatorContent({
               </p>
 
               <div className="overflow-hidden rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] p-3">
-                <AreaChart
-                  height={220}
-                  yTicks={getAdaptiveEuroTicks(
-                    Math.max(
-                      ...result.wealthPlanning.points.map((point) =>
+                <ChartContainer
+                  className="overflow-x-auto"
+                  yearTicks={getAdaptiveYearTicks(result.horizonYears)}
+                  chart={
+                    <AreaChart
+                      height={220}
+                      yTicks={getAdaptiveEuroTicks(
                         Math.max(
-                          point.pensionNetIndicative,
-                          point.investingGrossWithoutBox3,
-                          point.investingNetAfterBox3,
+                          ...result.wealthPlanning.points.map((point) =>
+                            Math.max(
+                              point.pensionNetIndicative,
+                              point.investingGrossWithoutBox3,
+                              point.investingNetAfterBox3,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  )}
-                  series={[
-                    {
-                      color: "oklch(0.58 0.15 238)",
-                      points: result.wealthPlanning.points.map(
-                        (point) => point.pensionNetIndicative,
-                      ),
-                    },
-                    {
-                      color: "oklch(0.62 0.13 152)",
-                      points: result.wealthPlanning.points.map(
-                        (point) => point.investingGrossWithoutBox3,
-                      ),
-                    },
-                    {
-                      color: "oklch(0.56 0.18 28)",
-                      points: result.wealthPlanning.points.map(
-                        (point) => point.investingNetAfterBox3,
-                      ),
-                    },
-                  ]}
-                  xValues={result.wealthPlanning.points.map((point) => point.year)}
-                  seriesLabels={[
-                    "Pensioen netto indicatief",
-                    "Beleggen zonder box 3",
-                    "Beleggen na box 3",
-                  ]}
+                      )}
+                      series={[
+                        {
+                          color: "oklch(0.58 0.15 238)",
+                          points: result.wealthPlanning.points.map(
+                            (point) => point.pensionNetIndicative,
+                          ),
+                        },
+                        {
+                          color: "oklch(0.62 0.13 152)",
+                          points: result.wealthPlanning.points.map(
+                            (point) => point.investingGrossWithoutBox3,
+                          ),
+                        },
+                        {
+                          color: "oklch(0.56 0.18 28)",
+                          points: result.wealthPlanning.points.map(
+                            (point) => point.investingNetAfterBox3,
+                          ),
+                        },
+                      ]}
+                      xValues={result.wealthPlanning.points.map((point) => point.year)}
+                      seriesLabels={[
+                        "Pensioen netto indicatief",
+                        "Beleggen zonder box 3",
+                        "Beleggen na box 3",
+                      ]}
+                    />
+                  }
                 />
-                <div className="mt-2 flex flex-wrap items-center gap-3 text-[12px] text-[var(--soft)]">
-                  <span className="inline-flex items-center gap-1">
-                    <span className="size-2 rounded-full bg-[oklch(0.58_0.15_238)]" />
-                    Pensioen netto indicatief
-                  </span>
-                  <span className="inline-flex items-center gap-1">
-                    <span className="size-2 rounded-full bg-[oklch(0.62_0.13_152)]" />
-                    Beleggen zonder box 3
-                  </span>
-                  <span className="inline-flex items-center gap-1">
-                    <span className="size-2 rounded-full bg-[oklch(0.56_0.18_28)]" />
-                    Beleggen na box 3
-                  </span>
-                </div>
-                <div className="mt-2 text-[12px] text-[var(--soft)]">
-                  Jaarmarkeringen:{" "}
-                  {getAdaptiveYearTicks(result.horizonYears).join(" · ")}
+                <div className="mt-2">
+                  <ChartLegend
+                    className="flex flex-wrap items-center gap-3 text-[12px] text-[var(--soft)]"
+                    items={[
+                      { label: "Pensioen netto indicatief", color: "oklch(0.58 0.15 238)" },
+                      { label: "Beleggen zonder box 3", color: "oklch(0.62 0.13 152)" },
+                      { label: "Beleggen na box 3", color: "oklch(0.56 0.18 28)" },
+                    ]}
+                  />
                 </div>
               </div>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { ChartContainer, ChartLegend } from "@/components/ChartPrimitives";
 import { AreaChart } from "@/components/charts";
 import { DisclosureSection } from "@/components/DisclosureSection";
 import { ResultRow } from "@/components/ResultRow";
@@ -336,32 +337,26 @@ export default function Calculator() {
                   Netto per jaar: annuïtair vs lineair
                 </div>
               </div>
-              <div className="flex items-center gap-4 text-[12px] text-[var(--muted)]">
-                <span className="flex items-center gap-1.5">
-                  <span className="inline-block h-[2px] w-3 bg-[oklch(46%_0.07_232)]" />
-                  Annuïtair
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="inline-block h-[2px] w-3 bg-[oklch(54%_0.10_152)]" />
-                  Lineair
-                </span>
-              </div>
+              <ChartLegend
+                items={[
+                  { label: "Annuïtair", color: "oklch(46% 0.07 232)" },
+                  { label: "Lineair", color: "oklch(54% 0.10 152)" },
+                ]}
+              />
             </div>
 
-            <div className="mt-5 overflow-x-auto">
-              <AreaChart
-                width={620}
-                height={220}
-                series={chartSeries}
-                xValues={result.yearlySummary.map((entry) => entry.year)}
-                seriesLabels={["Annuïtair netto", "Lineair netto"]}
-              />
-              <div className="axis mt-1 flex items-center justify-between">
-                {result.yearlySummary.map((entry) => (
-                  <span key={entry.year}>jaar {entry.year}</span>
-                ))}
-              </div>
-            </div>
+            <ChartContainer
+              yearTicks={result.yearlySummary.map((entry) => entry.year)}
+              chart={
+                <AreaChart
+                  width={620}
+                  height={220}
+                  series={chartSeries}
+                  xValues={result.yearlySummary.map((entry) => entry.year)}
+                  seriesLabels={["Annuïtair netto", "Lineair netto"]}
+                />
+              }
+            />
           </div>
         ) : null}
 
