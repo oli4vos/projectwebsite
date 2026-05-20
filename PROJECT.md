@@ -310,12 +310,15 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - op mobiel staat de samenvatting/resultaatkaart eerst
   - daarna volgt het formulier met mobile field flow
   - op desktop blijft de twee-kolomsindeling actief
+  - shell ondersteunt ook een slot-opbouw voor consistente toolflow:
+    `intro`, `startActions`, `inputs`, `submitAction`, `result`, `details`, `disclaimer`
 - Regels voor toekomstige tools:
   - gebruik eerst centrale constants uit `src/lib/financial-constants`;
   - gebruik centrale DUO-logica uit `src/lib/duo` waar DUO-input meespeelt;
   - gebruik centrale tax-logica uit `src/lib/tax` voor box 1/box 3/aftrek-indicaties;
   - gebruik profieldefaults uitsluitend via `profile-tool-mapping` + `profile-prefill`;
-  - volg het mobiele shell-patroon (`CalculatorShell`) en houd aannames vindbaar via disclosure.
+  - volg het mobiele shell-patroon (`CalculatorShell`) en houd aannames vindbaar via disclosure;
+  - gebruik bij voorkeur de slot-opbouw van `CalculatorShell` voor invullen → berekenen → resultaat.
 - Jaarlijkse financiële aannames komen centraal uit `src/lib/financial-constants`.
 - Toolverdieping mag die centrale aannames tonen, maar light-gebruikers worden niet gedwongen die details te openen.
 - In `studieschuld-vs-beleggen` blijft box 3 een optionele verdieping (toggle + disclosure); de hoofdflow blijft licht en bruikbaar zonder fiscale invoer.

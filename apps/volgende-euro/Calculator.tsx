@@ -253,248 +253,273 @@ function CalculatorContent({ initialValues, hasRelevantProfileValues, profilePat
   const relevantTopThree = result?.topThree ?? [];
   const insufficient = (result?.priorities ?? []).filter((p) => p.applicability !== "relevant");
 
-  return (
-    <CalculatorShell>
-      <section className="order-2 min-w-0 rounded-[1.5rem] border hair bg-white p-6 shadow-paper lg:order-1">
-        <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">Beslis-tool</div>
-        <h2 className="mt-2 font-serif text-[28px] tracking-[-0.02em] text-[var(--ink)]">Wat doe ik met mijn volgende euro?</h2>
-        <p className="mt-3 text-[14px] leading-[1.7] text-[var(--ink-2)]">Vul in wat je weet en klik op Bereken. De tool gebruikt alleen de gegevens die je invult.</p>
+  const intro = (
+    <>
+      <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">Beslis-tool</div>
+      <h2 className="mt-2 font-serif text-[28px] tracking-[-0.02em] text-[var(--ink)]">Wat doe ik met mijn volgende euro?</h2>
+      <p className="mt-3 text-[14px] leading-[1.7] text-[var(--ink-2)]">Vul in wat je weet en klik op Bereken. De tool gebruikt alleen de gegevens die je invult.</p>
+    </>
+  );
 
-        <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
-          {hasRelevantProfileValues ? <span>Profielwaarden gevonden in deze browser.</span> : <span>Start leeg of laad voorbeeldwaarden.</span>}
-          <button type="button" onClick={applyExampleValues} className="rounded-full border hair bg-white px-3 py-2 text-[12px] text-[var(--ink)] transition hover:bg-[var(--paper-soft)]">Start met voorbeeldwaarden</button>
-          {hasRelevantProfileValues ? (
-            <button type="button" onClick={applyProfileValues} className="rounded-full border hair bg-white px-3 py-2 text-[12px] text-[var(--ink)] transition hover:bg-[var(--paper-soft)]">Start met profielwaarden</button>
-          ) : null}
-        </div>
-
-        {submitContextMessage ? <p className="mt-3 text-[12.5px] text-[var(--muted)]">{submitContextMessage}</p> : null}
-        {hasDirtyChanges ? <p className="mt-3 text-[12.5px] text-[var(--muted)]">Klik opnieuw op Bereken om de uitkomst te vernieuwen.</p> : null}
-        <div className="mt-3 rounded-lg border border-[var(--hair)] bg-[var(--paper-soft)] px-3 py-2 text-[12.5px] text-[var(--muted)]">
-          <p>
-            Invoerkwaliteit: {inputQuality.filled}/{inputQuality.total} kernvelden ingevuld.
+  const startActions = (
+    <>
+      <div className="flex flex-wrap items-center gap-3 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
+        {hasRelevantProfileValues ? <span>Profielwaarden gevonden in deze browser.</span> : <span>Start leeg of laad voorbeeldwaarden.</span>}
+        <button type="button" onClick={applyExampleValues} className="rounded-full border hair bg-white px-3 py-2 text-[12px] text-[var(--ink)] transition hover:bg-[var(--paper-soft)]">Start met voorbeeldwaarden</button>
+        {hasRelevantProfileValues ? (
+          <button type="button" onClick={applyProfileValues} className="rounded-full border hair bg-white px-3 py-2 text-[12px] text-[var(--ink)] transition hover:bg-[var(--paper-soft)]">Start met profielwaarden</button>
+        ) : null}
+      </div>
+      {submitContextMessage ? <p className="mt-3 text-[12.5px] text-[var(--muted)]">{submitContextMessage}</p> : null}
+      {hasDirtyChanges ? <p className="mt-3 text-[12.5px] text-[var(--muted)]">Klik opnieuw op Bereken om de uitkomst te vernieuwen.</p> : null}
+      <div className="mt-3 rounded-lg border border-[var(--hair)] bg-[var(--paper-soft)] px-3 py-2 text-[12.5px] text-[var(--muted)]">
+        <p>
+          Invoerkwaliteit: {inputQuality.filled}/{inputQuality.total} kernvelden ingevuld.
+        </p>
+        {inputQuality.missing.length > 0 ? (
+          <p className="mt-1">
+            Ontbrekend: {inputQuality.missing.join(", ")}.
           </p>
-          {inputQuality.missing.length > 0 ? (
-            <p className="mt-1">
-              Ontbrekend: {inputQuality.missing.join(", ")}.
-            </p>
-          ) : null}
-        </div>
+        ) : null}
+      </div>
+    </>
+  );
 
-        <form className="mt-6 grid gap-5" onSubmit={onSubmit}>
-          {(
-            [
-              ["year", "Belastingjaar"],
-              ["extraAmount", "Extra bedrag beschikbaar"],
-              ["monthlyFreeRoom", "Maandelijkse vrije ruimte"],
-              ["currentBuffer", "Huidige buffer"],
-              ["targetBuffer", "Gewenste buffer"],
-              ["studentDebtAmount", "Studieschuld"],
-              ["duoRate", "DUO-rente (%)"],
-              ["mortgageRate", "Hypotheekrente (%)"],
-              ["horizonYears", "Beleggingshorizon (jaren)"],
-              ["expectedAnnualReturn", "Verwacht rendement (%)"],
-            ] as const
-          ).map(([field, label]) => (
-            <label key={field} className={mobileFlow.getFieldClassName(field)}>
-              <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">{label}</span>
-              <input
-                inputMode="decimal"
-                value={formValues[field]}
-                onChange={(event) => updateField(field, event.target.value)}
-                onKeyDown={mobileFlow.handleEnterAdvance(field, Boolean(errors[field]))}
-                className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-              />
-              <FieldError message={errors[field]} />
-            </label>
-          ))}
+  const submitAction = (
+    <MobileFieldFlowControls
+      current={mobileFlow.activeIndex + 1}
+      total={mobileFlow.total}
+      canGoPrev={mobileFlow.canGoPrev}
+      canGoNext={mobileFlow.canGoNext}
+      canComplete={Boolean(submittedValues)}
+      onPrev={mobileFlow.goPrev}
+      onNext={mobileFlow.goNext}
+      onComplete={() => document.getElementById("tool-result-summary")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+    />
+  );
 
-          <label className={mobileFlow.getFieldClassName("hasExpensiveDebt")}>
-            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Dure schuld aanwezig</span>
-            <span className="flex items-center gap-3 text-[14px] text-[var(--ink)]">
-              <input type="checkbox" checked={formValues.hasExpensiveDebt} onChange={(event) => updateField("hasExpensiveDebt", event.target.checked)} className="size-4 accent-[var(--accent)]" />
-              Ja
-            </span>
-          </label>
-
-          {formValues.hasExpensiveDebt ? (
-            <>
-              <label className={mobileFlow.getFieldClassName("expensiveDebtRate")}>
-                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Rente dure schuld (%)</span>
-                <input inputMode="decimal" value={formValues.expensiveDebtRate} onChange={(event) => updateField("expensiveDebtRate", event.target.value)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
-              </label>
-              <label className={mobileFlow.getFieldClassName("expensiveDebtAmount")}>
-                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Bedrag dure schuld</span>
-                <input inputMode="decimal" value={formValues.expensiveDebtAmount} onChange={(event) => updateField("expensiveDebtAmount", event.target.value)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
-              </label>
-            </>
-          ) : null}
-
-          <label className={mobileFlow.getFieldClassName("hasJaarruimte")}>
-            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Jaarruimte beschikbaar</span>
-            <span className="flex items-center gap-3 text-[14px] text-[var(--ink)]">
-              <input type="checkbox" checked={formValues.hasJaarruimte} onChange={(event) => updateField("hasJaarruimte", event.target.checked)} className="size-4 accent-[var(--accent)]" />
-              Ja
-            </span>
-          </label>
-          {formValues.hasJaarruimte ? (
-            <label className={mobileFlow.getFieldClassName("availableJaarruimte")}>
-              <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Beschikbare jaarruimte</span>
-              <input inputMode="decimal" value={formValues.availableJaarruimte} onChange={(event) => updateField("availableJaarruimte", event.target.value)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
-            </label>
-          ) : null}
-
-          <label className={mobileFlow.getFieldClassName("hasHousingGoal")}>
-            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Woningdoel actief</span>
-            <span className="flex items-center gap-3 text-[14px] text-[var(--ink)]">
-              <input type="checkbox" checked={formValues.hasHousingGoal} onChange={(event) => updateField("hasHousingGoal", event.target.checked)} className="size-4 accent-[var(--accent)]" />
-              Ja
-            </span>
-          </label>
-          {formValues.hasHousingGoal ? (
-            <>
-              <label className={mobileFlow.getFieldClassName("targetHomePrice")}>
-                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Doel koopprijs</span>
-                <input inputMode="decimal" value={formValues.targetHomePrice} onChange={(event) => updateField("targetHomePrice", event.target.value)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
-              </label>
-              <label className={mobileFlow.getFieldClassName("ownFunds")}>
-                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Eigen geld nu</span>
-                <input inputMode="decimal" value={formValues.ownFunds} onChange={(event) => updateField("ownFunds", event.target.value)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
-              </label>
-            </>
-          ) : null}
-
-          <label className={mobileFlow.getFieldClassName("riskProfile")}>
-            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Risicoprofiel</span>
-            <select value={formValues.riskProfile} onChange={(event) => updateField("riskProfile", event.target.value as FormState["riskProfile"])} className="ring-focus hair h-12 rounded-md border bg-white px-4 text-[15px] text-[var(--ink)] outline-none">
-              <option value="conservative">Voorzichtig</option>
-              <option value="neutral">Neutraal</option>
-              <option value="offensive">Offensief</option>
-            </select>
-          </label>
-
-          <div className="space-y-3 border-t border-[var(--hair)] pt-4">
-            <button type="submit" className="ring-focus hair inline-flex h-12 w-full items-center justify-center rounded-full border bg-[var(--deep)] px-4 text-[14px] text-white">
-              {submittedValues && hasDirtyChanges ? "Bereken opnieuw" : "Bereken"}
-            </button>
-            <p className="text-[12px] text-[var(--muted)]">De tool rekent alleen met ingevulde gegevens.</p>
-          </div>
-
-          <MobileFieldFlowControls
-            current={mobileFlow.activeIndex + 1}
-            total={mobileFlow.total}
-            canGoPrev={mobileFlow.canGoPrev}
-            canGoNext={mobileFlow.canGoNext}
-            canComplete={Boolean(submittedValues)}
-            onPrev={mobileFlow.goPrev}
-            onNext={mobileFlow.goNext}
-            onComplete={() => document.getElementById("tool-result-summary")?.scrollIntoView({ behavior: "smooth", block: "start" })}
-          />
-        </form>
-      </section>
-
-      <section className="order-1 min-w-0 space-y-5 lg:order-2">
-        <div id="tool-result-summary" className="rounded-[1.5rem] bg-[var(--deep)] p-6 text-white shadow-paper-lg">
-          <div className="text-[11px] uppercase tracking-[0.12em] text-white/55">Samenvatting</div>
-          {!result ? (
+  const resultNode = (
+    <>
+      <div id="tool-result-summary" className="rounded-[1.5rem] bg-[var(--deep)] p-6 text-white shadow-paper-lg">
+        <div className="text-[11px] uppercase tracking-[0.12em] text-white/55">Samenvatting</div>
+        {!result ? (
+          <p className="mt-3 text-[14px] leading-[1.7] text-white/75">
+            Vul in wat je weet en klik op Bereken. De tool gebruikt alleen de gegevens die je invult.
+          </p>
+        ) : result.topRecommendation ? (
+          <>
+            <div className="mt-4 flex items-center justify-between gap-3">
+              <div className="font-serif text-[28px] leading-none tracking-[-0.03em]">{result.topRecommendation.label}</div>
+              <Pill tone="accent">{result.priorityPlan[0]?.status ?? "daarna"}</Pill>
+            </div>
             <p className="mt-3 text-[14px] leading-[1.7] text-white/75">
-              Vul in wat je weet en klik op Bereken. De tool gebruikt alleen de gegevens die je invult.
+              Op basis van je ingevulde gegevens lijkt dit nu je logische eerste stap.
             </p>
-          ) : result.topRecommendation ? (
-            <>
-              <div className="mt-4 flex items-center justify-between gap-3">
-                <div className="font-serif text-[28px] leading-none tracking-[-0.03em]">{result.topRecommendation.label}</div>
-                <Pill tone="accent">{result.priorityPlan[0]?.status ?? "daarna"}</Pill>
+          </>
+        ) : (
+          <p className="mt-3 text-[14px] leading-[1.7] text-white/75">
+            We hebben nog te weinig gegevens om een zinvolle volgorde te maken.
+          </p>
+        )}
+      </div>
+
+      {result?.topRecommendation ? (
+        <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
+          <h3 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">Top 3 relevante stappen</h3>
+          <div className="mt-4 space-y-3">
+            {relevantTopThree.map((option, index) => (
+              <div key={option.key} className="rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3">
+                <div className="font-medium text-[var(--ink)]">{index + 1}. {option.label}</div>
+                <p className="mt-1 text-[13px] leading-[1.6] text-[var(--muted)]">{option.reason}</p>
               </div>
-              <p className="mt-3 text-[14px] leading-[1.7] text-white/75">
-                Op basis van je ingevulde gegevens lijkt dit nu je logische eerste stap.
-              </p>
-            </>
-          ) : (
-            <p className="mt-3 text-[14px] leading-[1.7] text-white/75">
-              We hebben nog te weinig gegevens om een zinvolle volgorde te maken.
-            </p>
-          )}
-        </div>
-
-        {result?.topRecommendation ? (
-          <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
-            <h3 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">Top 3 relevante stappen</h3>
-            <div className="mt-4 space-y-3">
-              {relevantTopThree.map((option, index) => (
-                <div key={option.key} className="rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3">
-                  <div className="font-medium text-[var(--ink)]">{index + 1}. {option.label}</div>
-                  <p className="mt-1 text-[13px] leading-[1.6] text-[var(--muted)]">{option.reason}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        ) : null}
-
-        {result && insufficient.length > 0 ? (
-          <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
-            <h3 className="font-serif text-[22px] tracking-[-0.02em] text-[var(--ink)]">Niet meegenomen door ontbrekende gegevens</h3>
-            <ul className="mt-3 space-y-2 text-[13px] leading-[1.6] text-[var(--muted)]">
-              {insufficient.map((item) => (
-                <li key={item.key}>
-                  {item.label}: {item.missingFields?.length ? `vul ${item.missingFields.join(" en ")} in.` : "onvoldoende gegevens."}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : null}
-
-        {result && result.priorityPlan.length > 0 ? (
-          <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
-            <h3 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">Prioriteitenladder</h3>
-            <div className="mt-4 space-y-3">
-              {result.priorityPlan.map((step) => (
-                <div key={`${step.key}-${step.rank}`} className="rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="font-medium text-[var(--ink)]">Stap {step.rank}. {step.title}</div>
-                    <Pill tone={step.status === "nu doen" ? "pos" : step.status === "daarna" ? "accent" : "neg"}>{step.status}</Pill>
-                  </div>
-                  <p className="mt-2 text-[13px] leading-[1.6] text-[var(--muted)]">{step.actionLabel}</p>
-                  <div className="mt-3 grid gap-2 rounded-lg border border-[var(--hair)] bg-white px-3 py-2">
-                    <ResultRow label="Bedrag naar deze stap" value={formatCurrency(step.allocatedAmount ?? 0)} />
-                    <ResultRow label="Resterend na deze stap" value={formatCurrency(step.remainingAfterStep ?? 0)} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ) : null}
-
-        <DisclosureSection title="Hoe rekenen we dit?" subtitle="Educatief prioriteitenmodel, geen hard financieel advies.">
-          <div className="space-y-2 text-[13px] leading-[1.65] text-[var(--muted)]">
-            <p>1) We nemen alleen stappen mee waarvoor je genoeg gegevens invult.</p>
-            <p>2) We tonen geen harde aanbeveling als relevante input ontbreekt.</p>
-            <p>3) Je verplichte DUO-bedrag blijft altijd context; extra aflossen is de keuze erbovenop.</p>
-            {result ? <p>4) Indicatief wettelijk DUO-bedrag: {formatCurrency(result.duoContext.estimatedStatutoryMonthlyPayment)} per maand.</p> : null}
-          </div>
-        </DisclosureSection>
-
-        <DisclosureSection title="Welke aannames gebruiken we?" subtitle="Centrale constants als basis voor het model.">
-          {result ? (
-            <div className="space-y-2 text-[13px] leading-[1.65] text-[var(--muted)]">
-              <p>Bron: {result.assumptions.sourceLabel}</p>
-              <p>Gecontroleerd op: {result.assumptions.lastChecked}</p>
-              <p>Status: {result.assumptions.status}</p>
-            </div>
-          ) : null}
-        </DisclosureSection>
-
-        <ToolDisclosure title="Waar moet je op letten?" subtitle="Gebruik dit als routehulp en reken daarna door in verdiepende tools.">
-          <ul className="space-y-2 text-[13px] leading-[1.65] text-[var(--muted)]">
-            {(result?.warnings ?? []).map((warning) => (
-              <li key={warning}>{warning}</li>
             ))}
-            {(result?.missingDataHints ?? []).map((hint) => (
-              <li key={hint}>{hint}</li>
+          </div>
+        </div>
+      ) : null}
+
+      {result && insufficient.length > 0 ? (
+        <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
+          <h3 className="font-serif text-[22px] tracking-[-0.02em] text-[var(--ink)]">Niet meegenomen door ontbrekende gegevens</h3>
+          <ul className="mt-3 space-y-2 text-[13px] leading-[1.6] text-[var(--muted)]">
+            {insufficient.map((item) => (
+              <li key={item.key}>
+                {item.label}: {item.missingFields?.length ? `vul ${item.missingFields.join(" en ")} in.` : "onvoldoende gegevens."}
+              </li>
             ))}
           </ul>
-        </ToolDisclosure>
-      </section>
-    </CalculatorShell>
+        </div>
+      ) : null}
+
+      {result && result.priorityPlan.length > 0 ? (
+        <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
+          <h3 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">Prioriteitenladder</h3>
+          <div className="mt-4 space-y-3">
+            {result.priorityPlan.map((step) => (
+              <div key={`${step.key}-${step.rank}`} className="rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="font-medium text-[var(--ink)]">Stap {step.rank}. {step.title}</div>
+                  <Pill tone={step.status === "nu doen" ? "pos" : step.status === "daarna" ? "accent" : "neg"}>{step.status}</Pill>
+                </div>
+                <p className="mt-2 text-[13px] leading-[1.6] text-[var(--muted)]">{step.actionLabel}</p>
+                <div className="mt-3 grid gap-2 rounded-lg border border-[var(--hair)] bg-white px-3 py-2">
+                  <ResultRow label="Bedrag naar deze stap" value={formatCurrency(step.allocatedAmount ?? 0)} />
+                  <ResultRow label="Resterend na deze stap" value={formatCurrency(step.remainingAfterStep ?? 0)} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </>
+  );
+
+  const detailsNode = (
+    <>
+      <DisclosureSection title="Hoe rekenen we dit?" subtitle="Educatief prioriteitenmodel, geen hard financieel advies.">
+        <div className="space-y-2 text-[13px] leading-[1.65] text-[var(--muted)]">
+          <p>1) We nemen alleen stappen mee waarvoor je genoeg gegevens invult.</p>
+          <p>2) We tonen geen harde aanbeveling als relevante input ontbreekt.</p>
+          <p>3) Je verplichte DUO-bedrag blijft altijd context; extra aflossen is de keuze erbovenop.</p>
+          {result ? <p>4) Indicatief wettelijk DUO-bedrag: {formatCurrency(result.duoContext.estimatedStatutoryMonthlyPayment)} per maand.</p> : null}
+        </div>
+      </DisclosureSection>
+
+      <DisclosureSection title="Welke aannames gebruiken we?" subtitle="Centrale constants als basis voor het model.">
+        {result ? (
+          <div className="space-y-2 text-[13px] leading-[1.65] text-[var(--muted)]">
+            <p>Bron: {result.assumptions.sourceLabel}</p>
+            <p>Gecontroleerd op: {result.assumptions.lastChecked}</p>
+            <p>Status: {result.assumptions.status}</p>
+          </div>
+        ) : null}
+      </DisclosureSection>
+    </>
+  );
+
+  const disclaimerNode = (
+    <ToolDisclosure title="Waar moet je op letten?" subtitle="Gebruik dit als routehulp en reken daarna door in verdiepende tools.">
+      <ul className="space-y-2 text-[13px] leading-[1.65] text-[var(--muted)]">
+        {(result?.warnings ?? []).map((warning) => (
+          <li key={warning}>{warning}</li>
+        ))}
+        {(result?.missingDataHints ?? []).map((hint) => (
+          <li key={hint}>{hint}</li>
+        ))}
+      </ul>
+    </ToolDisclosure>
+  );
+
+  const inputForm = (
+    <form className="grid gap-5" onSubmit={onSubmit}>
+      {(
+        [
+          ["year", "Belastingjaar"],
+          ["extraAmount", "Extra bedrag beschikbaar"],
+          ["monthlyFreeRoom", "Maandelijkse vrije ruimte"],
+          ["currentBuffer", "Huidige buffer"],
+          ["targetBuffer", "Gewenste buffer"],
+          ["studentDebtAmount", "Studieschuld"],
+          ["duoRate", "DUO-rente (%)"],
+          ["mortgageRate", "Hypotheekrente (%)"],
+          ["horizonYears", "Beleggingshorizon (jaren)"],
+          ["expectedAnnualReturn", "Verwacht rendement (%)"],
+        ] as const
+      ).map(([field, label]) => (
+        <label key={field} className={mobileFlow.getFieldClassName(field)}>
+          <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">{label}</span>
+          <input
+            inputMode="decimal"
+            value={formValues[field]}
+            onChange={(event) => updateField(field, event.target.value)}
+            onKeyDown={mobileFlow.handleEnterAdvance(field, Boolean(errors[field]))}
+            className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
+          />
+          <FieldError message={errors[field]} />
+        </label>
+      ))}
+
+      <label className={mobileFlow.getFieldClassName("hasExpensiveDebt")}>
+        <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Dure schuld aanwezig</span>
+        <span className="flex items-center gap-3 text-[14px] text-[var(--ink)]">
+          <input type="checkbox" checked={formValues.hasExpensiveDebt} onChange={(event) => updateField("hasExpensiveDebt", event.target.checked)} className="size-4 accent-[var(--accent)]" />
+          Ja
+        </span>
+      </label>
+
+      {formValues.hasExpensiveDebt ? (
+        <>
+          <label className={mobileFlow.getFieldClassName("expensiveDebtRate")}>
+            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Rente dure schuld (%)</span>
+            <input inputMode="decimal" value={formValues.expensiveDebtRate} onChange={(event) => updateField("expensiveDebtRate", event.target.value)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
+          </label>
+          <label className={mobileFlow.getFieldClassName("expensiveDebtAmount")}>
+            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Bedrag dure schuld</span>
+            <input inputMode="decimal" value={formValues.expensiveDebtAmount} onChange={(event) => updateField("expensiveDebtAmount", event.target.value)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
+          </label>
+        </>
+      ) : null}
+
+      <label className={mobileFlow.getFieldClassName("hasJaarruimte")}>
+        <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Jaarruimte beschikbaar</span>
+        <span className="flex items-center gap-3 text-[14px] text-[var(--ink)]">
+          <input type="checkbox" checked={formValues.hasJaarruimte} onChange={(event) => updateField("hasJaarruimte", event.target.checked)} className="size-4 accent-[var(--accent)]" />
+          Ja
+        </span>
+      </label>
+      {formValues.hasJaarruimte ? (
+        <label className={mobileFlow.getFieldClassName("availableJaarruimte")}>
+          <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Beschikbare jaarruimte</span>
+          <input inputMode="decimal" value={formValues.availableJaarruimte} onChange={(event) => updateField("availableJaarruimte", event.target.value)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
+        </label>
+      ) : null}
+
+      <label className={mobileFlow.getFieldClassName("hasHousingGoal")}>
+        <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Woningdoel actief</span>
+        <span className="flex items-center gap-3 text-[14px] text-[var(--ink)]">
+          <input type="checkbox" checked={formValues.hasHousingGoal} onChange={(event) => updateField("hasHousingGoal", event.target.checked)} className="size-4 accent-[var(--accent)]" />
+          Ja
+        </span>
+      </label>
+      {formValues.hasHousingGoal ? (
+        <>
+          <label className={mobileFlow.getFieldClassName("targetHomePrice")}>
+            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Doel koopprijs</span>
+            <input inputMode="decimal" value={formValues.targetHomePrice} onChange={(event) => updateField("targetHomePrice", event.target.value)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
+          </label>
+          <label className={mobileFlow.getFieldClassName("ownFunds")}>
+            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Eigen geld nu</span>
+            <input inputMode="decimal" value={formValues.ownFunds} onChange={(event) => updateField("ownFunds", event.target.value)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
+          </label>
+        </>
+      ) : null}
+
+      <label className={mobileFlow.getFieldClassName("riskProfile")}>
+        <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Risicoprofiel</span>
+        <select value={formValues.riskProfile} onChange={(event) => updateField("riskProfile", event.target.value as FormState["riskProfile"])} className="ring-focus hair h-12 rounded-md border bg-white px-4 text-[15px] text-[var(--ink)] outline-none">
+          <option value="conservative">Voorzichtig</option>
+          <option value="neutral">Neutraal</option>
+          <option value="offensive">Offensief</option>
+        </select>
+      </label>
+
+      <div className="space-y-3 border-t border-[var(--hair)] pt-4">
+        <button type="submit" className="ring-focus hair inline-flex h-12 w-full items-center justify-center rounded-full border bg-[var(--deep)] px-4 text-[14px] text-white">
+          {submittedValues && hasDirtyChanges ? "Bereken opnieuw" : "Bereken"}
+        </button>
+        <p className="text-[12px] text-[var(--muted)]">De tool rekent alleen met ingevulde gegevens.</p>
+      </div>
+    </form>
+  );
+
+  return (
+    <CalculatorShell
+      intro={intro}
+      startActions={startActions}
+      inputs={inputForm}
+      submitAction={submitAction}
+      result={resultNode}
+      details={detailsNode}
+      disclaimer={disclaimerNode}
+    />
   );
 }
