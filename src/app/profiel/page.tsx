@@ -11,6 +11,7 @@ import {
   getGlossaryExplanation,
   getRepaymentRuleLabel,
 } from "@/lib/copy-glossary";
+import { parseOptionalDecimalInput } from "@/lib/number-input";
 import type {
   Box3MethodPreference,
   EmploymentType,
@@ -166,18 +167,8 @@ function profileToFormState(profile: UserProfile): ProfileFormState {
   };
 }
 
-function normalizeNumericInput(value: string) {
-  return value.replace(/\s+/g, "").replace(",", ".");
-}
-
 function parseOptionalNumber(value: string) {
-  const normalizedValue = normalizeNumericInput(value);
-
-  if (normalizedValue.length === 0) {
-    return undefined;
-  }
-
-  return Number(normalizedValue);
+  return parseOptionalDecimalInput(value);
 }
 
 function validateNonNegative(

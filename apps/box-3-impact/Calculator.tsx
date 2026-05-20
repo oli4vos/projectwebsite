@@ -17,6 +17,7 @@ import { useSubmittedCalculation } from "@/hooks/useSubmittedCalculation";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { getGlossaryExplanation } from "@/lib/copy-glossary";
 import { getDefaultFinancialYear } from "@/lib/financial-constants";
+import { parseOptionalDecimalInput } from "@/lib/number-input";
 import type { Box3Method } from "@/lib/tax";
 import {
   createProfilePrefillState,
@@ -83,14 +84,7 @@ type CalculatorContentProps = {
 };
 
 function parseOptionalNumber(value: string | undefined) {
-  if (typeof value !== "string") {
-    return undefined;
-  }
-  const normalized = value.replace(/\s+/g, "").replace(",", ".");
-  if (normalized.length === 0) {
-    return undefined;
-  }
-  return Number(normalized);
+  return parseOptionalDecimalInput(value);
 }
 
 function formatCurrency(value: number) {

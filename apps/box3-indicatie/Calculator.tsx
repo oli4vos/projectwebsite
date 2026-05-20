@@ -9,6 +9,7 @@ import { Pill } from "@/components/ui";
 import { useMobileFieldFlow } from "@/hooks/useMobileFieldFlow";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { getDefaultFinancialYear } from "@/lib/financial-constants";
+import { parseOptionalDecimalInput } from "@/lib/number-input";
 import type { Box3Method } from "@/lib/tax";
 import {
   createProfilePrefillState,
@@ -73,11 +74,7 @@ function formatPercent(value: number) {
 }
 
 function parseOptionalNumber(value: string) {
-  const normalized = value.replace(/\s+/g, "").replace(",", ".");
-  if (normalized.length === 0) {
-    return undefined;
-  }
-  return Number(normalized);
+  return parseOptionalDecimalInput(value);
 }
 
 function validateForm(values: FormState) {

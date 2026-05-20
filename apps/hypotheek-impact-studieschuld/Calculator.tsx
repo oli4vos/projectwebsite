@@ -10,6 +10,7 @@ import { useSubmittedCalculation } from "@/hooks/useSubmittedCalculation";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { getGlossaryExplanation } from "@/lib/copy-glossary";
 import { getFinancialConstants } from "@/lib/financial-constants";
+import { parseOptionalDecimalInput } from "@/lib/number-input";
 import {
   createProfilePrefillState,
   mergeProfilePatchIntoValues,
@@ -165,28 +166,16 @@ function formatMonthsAndYears(months: number) {
   return `${roundedMonths} maanden (${formatDecimal(years, 1)} jaar)`;
 }
 
-function normalizeNumericInput(value: string) {
-  return value.replace(/\s+/g, "").replace(",", ".");
-}
-
 function parseOptionalNumber(value: string) {
-  const normalizedValue = normalizeNumericInput(value);
-
-  if (normalizedValue.length === 0) {
-    return undefined;
-  }
-
-  return Number(normalizedValue);
+  return parseOptionalDecimalInput(value);
 }
 
 function parseRequiredNumber(value: string) {
-  const normalizedValue = normalizeNumericInput(value);
-
-  if (normalizedValue.length === 0) {
+  const parsed = parseOptionalDecimalInput(value);
+  if (parsed === undefined) {
     return Number.NaN;
   }
-
-  return Number(normalizedValue);
+  return parsed;
 }
 
 function validateForm(values: FormState) {

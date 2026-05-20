@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ResultRow } from "@/components/ResultRow";
 import { Pill } from "@/components/ui";
+import { parseOptionalDecimalInput } from "@/lib/number-input";
 import {
   COMPENSATION_CONFIG,
   calculateCompensation,
@@ -51,28 +52,16 @@ function formatCurrency(value: number) {
   }).format(value);
 }
 
-function normalizeNumericInput(value: string) {
-  return value.replace(/\s+/g, "").replace(",", ".");
-}
-
 function parseOptionalNumber(value: string) {
-  const normalizedValue = normalizeNumericInput(value);
-
-  if (normalizedValue.length === 0) {
-    return undefined;
-  }
-
-  return Number(normalizedValue);
+  return parseOptionalDecimalInput(value);
 }
 
 function parseRequiredNumber(value: string) {
-  const normalizedValue = normalizeNumericInput(value);
-
-  if (normalizedValue.length === 0) {
+  const parsed = parseOptionalDecimalInput(value);
+  if (parsed === undefined) {
     return Number.NaN;
   }
-
-  return Number(normalizedValue);
+  return parsed;
 }
 
 function validateForm(values: FormState) {

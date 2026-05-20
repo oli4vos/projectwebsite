@@ -10,6 +10,7 @@ import { useMobileFieldFlow } from "@/hooks/useMobileFieldFlow";
 import { useSubmittedCalculation } from "@/hooks/useSubmittedCalculation";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { getDefaultFinancialYear, getDuoRateForRule } from "@/lib/financial-constants";
+import { parseOptionalDecimalInput } from "@/lib/number-input";
 import type { RepaymentRule } from "@/lib/duo";
 import type { Box3Method } from "@/lib/tax";
 import {
@@ -112,24 +113,16 @@ function formatDecimal(value: number, digits = 2) {
   }).format(value);
 }
 
-function normalizeNumericInput(value: string) {
-  return value.replace(/\s+/g, "").replace(",", ".");
-}
-
 function parseOptionalNumber(value: string) {
-  const normalized = normalizeNumericInput(value);
-  if (normalized.length === 0) {
-    return undefined;
-  }
-  return Number(normalized);
+  return parseOptionalDecimalInput(value);
 }
 
 function parseRequiredNumber(value: string) {
-  const normalized = normalizeNumericInput(value);
-  if (normalized.length === 0) {
+  const parsed = parseOptionalDecimalInput(value);
+  if (parsed === undefined) {
     return Number.NaN;
   }
-  return Number(normalized);
+  return parsed;
 }
 
 function formatYearMonth(value: string | null) {
