@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
 import { DisclosureSection } from "@/components/DisclosureSection";
 import { MobileFieldFlowControls } from "@/components/MobileFieldFlowControls";
 import { ResultRow } from "@/components/ResultRow";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
 import { Pill } from "@/components/ui";
 import { useMobileFieldFlow } from "@/hooks/useMobileFieldFlow";
+import { useSubmittedCalculation } from "@/hooks/useSubmittedCalculation";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { getGlossaryExplanation } from "@/lib/copy-glossary";
 import { getFinancialConstants } from "@/lib/financial-constants";
@@ -450,7 +450,15 @@ function CalculatorContent({
   hasRelevantProfileValues,
   profilePatch,
 }: CalculatorContentProps) {
-  const [formValues, setFormValues] = useState<FormState>(initialValues);
+  const {
+    formValues,
+    setFormValues,
+    submittedValues,
+    submit,
+    hasDirtyChanges,
+    submitContextMessage,
+    setValues,
+  } = useSubmittedCalculation<FormState>(initialValues);
   const validation = validateForm(formValues);
   const errors = Object.fromEntries(
     Object.entries(validation.errors).filter(([field]) => {
@@ -459,7 +467,10 @@ function CalculatorContent({
     }),
   ) as ValidationErrors;
   const { parsedValues } = validation;
-  const result = parsedValues ? calculateHypotheekImpact(parsedValues) : null;
+  const submittedValidation = submittedValues ? validateForm(submittedValues) : null;
+  const result = submittedValidation?.parsedValues
+    ? calculateHypotheekImpact(submittedValidation.parsedValues)
+    : null;
   const hasErrors = Object.keys(errors).length > 0;
   const showActualField =
     formValues.situation === "repaying" ||
@@ -541,11 +552,14 @@ function CalculatorContent({
   }
 
   function applyProfileValues() {
-    setFormValues((current) => mergeProfilePatchIntoValues(current, profilePatch));
+    setValues(
+      mergeProfilePatchIntoValues(formValues, profilePatch),
+      "Profielwaarden geladen. Klik op Bereken om de uitkomst te zien.",
+    );
   }
 
   function applyExampleValues() {
-    setFormValues(exampleValues);
+    setValues(exampleValues, "Voorbeeldwaarden geladen. Klik op Bereken om de uitkomst te zien.");
   }
 
   function goToResult() {
@@ -553,6 +567,13 @@ function CalculatorContent({
       behavior: "smooth",
       block: "start",
     });
+  }
+
+  function handleCalculate() {
+    submit();
+    if (parsedValues) {
+      goToResult();
+    }
   }
 
   return (
@@ -622,6 +643,14 @@ function CalculatorContent({
               Start met profielwaarden
             </a>
           </div>
+        ) : null}
+        {submitContextMessage ? (
+          <p className="mt-3 text-[12.5px] text-[var(--muted)]">{submitContextMessage}</p>
+        ) : null}
+        {hasDirtyChanges ? (
+          <p className="mt-3 text-[12.5px] text-[var(--muted)]">
+            Klik opnieuw op Bereken om de uitkomst te vernieuwen.
+          </p>
         ) : null}
 
         <div className={`mt-7 ${isStepVisible(step1Fields) ? "block" : "hidden"} md:block`}>
@@ -1033,11 +1062,23 @@ function CalculatorContent({
             total={mobileFlow.total}
             canGoPrev={mobileFlow.canGoPrev}
             canGoNext={mobileFlow.canGoNext && !isCurrentFieldBlocked}
-            canComplete={Boolean(result)}
+            canComplete={Boolean(parsedValues)}
             onPrev={mobileFlow.goPrev}
             onNext={mobileFlow.goNext}
-            onComplete={goToResult}
+            onComplete={handleCalculate}
           />
+          <div className="mt-3 flex flex-wrap items-center gap-3 border-t border-[var(--hair)] pt-2">
+            <button
+              type="button"
+              onClick={handleCalculate}
+              className="rounded-full bg-[var(--accent)] px-4 py-2 text-[13px] font-medium text-white transition hover:opacity-90"
+            >
+              {submittedValues && hasDirtyChanges ? "Bereken opnieuw" : "Bereken"}
+            </button>
+            <p className="text-[12px] text-[var(--muted)]">
+              De tool rekent alleen met ingevulde gegevens.
+            </p>
+          </div>
         </div>
 
         {hasErrors ? (
