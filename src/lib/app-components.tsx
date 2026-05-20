@@ -21,6 +21,13 @@ export const appComponents: Record<string, AppCalculatorComponent> = {
       </div>
     ),
   }),
+  "fire-na-belasting": dynamic(() => import("../../apps/fire-na-belasting/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
   "hypotheek-impact-studieschuld": dynamic(() => import("../../apps/hypotheek-impact-studieschuld/Calculator"), {
     loading: () => (
       <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">

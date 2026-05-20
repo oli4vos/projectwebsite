@@ -61,6 +61,16 @@ export const PROFILE_FIELDS_VOLGENDE_EURO = [
   "housing.ownFunds",
 ] as const;
 
+export const PROFILE_FIELDS_FIRE_NA_BELASTING = [
+  "savingInvesting.currentSavings",
+  "savingInvesting.monthlyFreeCashflow",
+  "savingInvesting.expectedAnnualReturn",
+  "savingInvesting.investmentHorizonYears",
+  "savingInvesting.riskProfile",
+  "tax.preferredTaxYear",
+  "tax.hasFiscalPartner",
+] as const;
+
 type MortgageImpactDefaults = Partial<{
   grossIncomeUser: string;
   grossIncomePartner: string;
@@ -139,6 +149,20 @@ type VolgendeEuroDefaults = Partial<{
   targetHomePrice: string;
   ownFunds: string;
   hasHousingGoal: boolean;
+}>;
+
+type FireNaBelastingDefaults = Partial<{
+  currentNetWorth: string;
+  currentSavings: string;
+  currentInvestments: string;
+  monthlyContribution: string;
+  yearlyContribution: string;
+  expectedAnnualReturn: string;
+  annualInflation: string;
+  taxYear: string;
+  hasFiscalPartner: boolean;
+  horizonYears: string;
+  riskProfile: "conservative" | "neutral" | "offensive";
 }>;
 
 function toStringValue(value?: number) {
@@ -524,6 +548,62 @@ export function getVolgendeEuroDefaultsFromProfile(
   defaults.hasHousingGoal = Boolean(
     (profile.housing?.targetHomePrice ?? 0) > 0 || (profile.housing?.ownFunds ?? 0) > 0,
   );
+
+  return defaults;
+}
+
+export function getFireNaBelastingDefaultsFromProfile(
+  profile: UserProfile,
+): FireNaBelastingDefaults {
+  const defaults: FireNaBelastingDefaults = {};
+
+  const currentSavings = toStringValue(profile.savingInvesting?.currentSavings);
+  if (currentSavings !== undefined) {
+    defaults.currentSavings = currentSavings;
+    defaults.currentNetWorth = currentSavings;
+  }
+
+  const monthlyContribution = toStringValue(
+    profile.savingInvesting?.monthlyFreeCashflow,
+  );
+  if (monthlyContribution !== undefined) {
+    defaults.monthlyContribution = monthlyContribution;
+  }
+
+  const expectedAnnualReturn = toStringValue(
+    profile.savingInvesting?.expectedAnnualReturn,
+  );
+  if (expectedAnnualReturn !== undefined) {
+    defaults.expectedAnnualReturn = expectedAnnualReturn;
+  }
+
+  const horizonYears = toStringValue(profile.savingInvesting?.investmentHorizonYears);
+  if (horizonYears !== undefined) {
+    defaults.horizonYears = horizonYears;
+  }
+
+  if (profile.savingInvesting?.riskProfile !== undefined) {
+    defaults.riskProfile = profile.savingInvesting.riskProfile;
+  }
+
+  const taxYear = toStringValue(profile.tax?.preferredTaxYear);
+  if (taxYear !== undefined) {
+    defaults.taxYear = taxYear;
+  }
+
+  if (
+    profile.tax?.hasFiscalPartner !== undefined ||
+    profile.income?.householdType !== undefined ||
+    profile.income?.partnerGrossAnnualIncome !== undefined
+  ) {
+    defaults.hasFiscalPartner =
+      profile.tax?.hasFiscalPartner ??
+      Boolean(
+        profile.income?.householdType === "withPartner" ||
+          profile.income?.householdType === "family" ||
+          (profile.income?.partnerGrossAnnualIncome ?? 0) > 0,
+      );
+  }
 
   return defaults;
 }

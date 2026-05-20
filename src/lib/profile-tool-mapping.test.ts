@@ -5,6 +5,7 @@ import {
   getJaarruimteVsVrijBeleggenDefaultsFromProfile,
   getMortgageImpactDefaultsFromProfile,
   getStudentDebtVsInvestingDefaultsFromProfile,
+  getFireNaBelastingDefaultsFromProfile,
   getVolgendeEuroDefaultsFromProfile,
 } from "@/lib/profile-tool-mapping";
 import type { UserProfile } from "@/lib/user-profile";
@@ -80,6 +81,7 @@ describe("profile tool mapping", () => {
     expect(getBox3IndicatieDefaultsFromProfile({})).toEqual({});
     expect(getBox3ImpactDefaultsFromProfile({})).toEqual({});
     expect(getJaarruimteVsVrijBeleggenDefaultsFromProfile({})).toEqual({});
+    expect(getFireNaBelastingDefaultsFromProfile({})).toEqual({});
   });
 
   it("maps box3 indicatie defaults from profile values", () => {
@@ -191,5 +193,33 @@ describe("profile tool mapping", () => {
     expect(mapped.targetHomePrice).toBe("450000");
     expect(mapped.ownFunds).toBe("30000");
     expect(mapped.hasHousingGoal).toBe(true);
+  });
+
+  it("maps fire-na-belasting defaults from profile values", () => {
+    const profile: UserProfile = {
+      income: {
+        householdType: "withPartner",
+      },
+      savingInvesting: {
+        currentSavings: 42000,
+        monthlyFreeCashflow: 900,
+        expectedAnnualReturn: 5.8,
+        investmentHorizonYears: 22,
+        riskProfile: "neutral",
+      },
+      tax: {
+        preferredTaxYear: 2026,
+      },
+    };
+
+    const mapped = getFireNaBelastingDefaultsFromProfile(profile);
+    expect(mapped.currentSavings).toBe("42000");
+    expect(mapped.currentNetWorth).toBe("42000");
+    expect(mapped.monthlyContribution).toBe("900");
+    expect(mapped.expectedAnnualReturn).toBe("5.8");
+    expect(mapped.horizonYears).toBe("22");
+    expect(mapped.riskProfile).toBe("neutral");
+    expect(mapped.taxYear).toBe("2026");
+    expect(mapped.hasFiscalPartner).toBe(true);
   });
 });

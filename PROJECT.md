@@ -155,6 +155,10 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - centrale prioriteitenhulp voor de vraag waar extra geld nu het meest logisch naartoe kan
   - combineert buffer, dure schuld, studieschuld, hypotheek, jaarruimte, beleggen en woningdoel in één educatieve scorelijst
   - gebruikt centrale profieldefaults plus DUO/constants-context, maar blijft expliciet geen financieel advies
+- `apps/fire-na-belasting`
+  - indicatieve FIRE-tool met jaarlijkse tijdlijn voor vermogen, inleg, groei, box 3-heffing en FIRE-doel
+  - rekent met rendement, inflatie, withdrawal rate en optioneel box 3 via centrale tax-laag
+  - educatief hulpmiddel; geen financieel advies of zekerheid over haalbaarheid
 - `apps/annuitair-lineair`
   - wrapper rond bestaande JS-logica
   - bevat oudere rekenscripts in `.js`
@@ -184,6 +188,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - `apps/studieschuld-vs-beleggen`
   - `apps/jaarruimte-vs-vrij-beleggen`
   - `apps/volgende-euro`
+  - `apps/fire-na-belasting`
 - Die tools lezen profielwaarden als defaults, maar schrijven nog niet automatisch terug naar het profiel.
 - De mapping daarvan loopt centraal via `src/lib/profile-tool-mapping.ts`.
 - Tool-prefillgedrag (initial values, profile-key, apply profile patch) loopt gedeeld via `src/lib/profile-prefill.ts`.

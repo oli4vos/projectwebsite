@@ -76,6 +76,48 @@ export const appRegistry = [
     "entry": "Calculator.tsx"
   },
   {
+    "slug": "fire-na-belasting",
+    "title": "FIRE na belasting",
+    "description": "Bereken wanneer je indicatief financieel onafhankelijk bent, inclusief box 3-effect en aannames.",
+    "type": "frontend",
+    "category": "Beleggen",
+    "tags": [
+      "FIRE",
+      "beleggen",
+      "box 3",
+      "financiële vrijheid",
+      "vermogen"
+    ],
+    "status": "beta",
+    "visibility": "public",
+    "requiredProfileFields": [
+      "savingInvesting.currentSavings",
+      "savingInvesting.monthlyFreeCashflow",
+      "savingInvesting.expectedAnnualReturn",
+      "savingInvesting.investmentHorizonYears",
+      "savingInvesting.riskProfile",
+      "tax.preferredTaxYear",
+      "tax.hasFiscalPartner"
+    ],
+    "assumptionsUsed": [
+      "box3",
+      "tax",
+      "investment",
+      "inflation"
+    ],
+    "calculationDomains": [
+      "investing",
+      "saving",
+      "tax",
+      "cashflow"
+    ],
+    "riskLevel": "high",
+    "disclaimerType": "financialEducation",
+    "outputType": "timeline",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
     "slug": "hypotheek-impact-studieschuld",
     "title": "Hypotheek-impact studieschuld",
     "description": "Zie welk DUO-bedrag waarschijnlijk meetelt, hoe brutering werkt en wat je studieschuld indicatief doet met je hypotheekruimte.",
