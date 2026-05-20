@@ -111,7 +111,7 @@ export default async function AppDetailPage({ params }: AppDetailPageProps) {
           ← Terug naar dashboard
         </Link>
 
-        <section className="hair-b mt-5 grid gap-8 pb-8 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <section className="hair-b mt-5 pb-8">
           <div className="max-w-4xl">
             <div className="flex items-center gap-2 text-[12px] tabular text-[var(--muted)]">
               <span>Rekentools</span>
@@ -128,22 +128,25 @@ export default async function AppDetailPage({ params }: AppDetailPageProps) {
             <p className="text-fluid-lead mt-5 max-w-[62ch] leading-[1.7] text-[var(--ink-2)]">
               {app.description}
             </p>
-            <p className="mt-4 max-w-[58ch] text-[14px] leading-[1.7] text-[var(--muted)]">
-              Gebruik deze tool om scenario&apos;s naast elkaar te zetten, aannames
-              expliciet te maken en met meer inzicht vooruit te kijken zonder dat het
-              voelt alsof je eerst financieel jargon moet leren spreken.
-            </p>
             <div className="mt-6 flex flex-wrap gap-2">
               {app.tags.map((tag) => (
                 <Pill key={tag}>{tag}</Pill>
               ))}
             </div>
           </div>
+        </section>
 
-          <aside className="rounded-[1.5rem] border hair bg-white p-5 shadow-paper">
-            <div className="text-[11px] uppercase tracking-[0.12em] text-[var(--muted)]">
-              Context
-            </div>
+        <section className="pt-6">
+          <AppRenderer slug={app.slug} />
+        </section>
+
+        <section className="mt-6">
+          <details className="rounded-[1.5rem] border hair bg-white p-5 shadow-paper [&_summary::-webkit-details-marker]:hidden">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-[13px] font-medium text-[var(--ink)]">
+              Toolcontext en aannames
+              <span className="text-[var(--muted)]">Uitklappen</span>
+            </summary>
+
             <div className="mt-4 space-y-3 text-[13.5px]">
               <div className="flex items-center justify-between">
                 <span className="text-[var(--muted)]">Status</span>
@@ -216,12 +219,8 @@ export default async function AppDetailPage({ params }: AppDetailPageProps) {
                 </div>
               </div>
             )}
-            <div className="mt-5 border-t border-[var(--hair)] pt-4 text-[12.5px] leading-[1.6] text-[var(--muted)]">
-              Heldere aannames, lokale berekening en een resultaat dat je direct kunt
-              vertalen naar je eigen keuze of vervolgvraag.
-            </div>
             {app.requiredProfileFields && app.requiredProfileFields.length > 0 && (
-              <div className="mt-3 text-[12.5px] leading-[1.6] text-[var(--muted)]">
+              <div className="mt-4 border-t border-[var(--hair)] pt-4 text-[12.5px] leading-[1.6] text-[var(--muted)]">
                 Voor deze tool kun je basisvelden vooraf invullen in{" "}
                 <Link href="/profiel" className="text-[var(--ink)] underline">
                   Mijn profiel
@@ -229,11 +228,7 @@ export default async function AppDetailPage({ params }: AppDetailPageProps) {
                 .
               </div>
             )}
-          </aside>
-        </section>
-
-        <section className="pt-8">
-          <AppRenderer slug={app.slug} />
+          </details>
         </section>
       </main>
       <SiteFooter />

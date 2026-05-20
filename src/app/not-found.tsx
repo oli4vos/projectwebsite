@@ -28,7 +28,7 @@ export default function NotFound() {
                 Terug naar dashboard
               </BtnLink>
               <BtnLink href="/apps/studieschuld-vs-beleggen" kind="outline" size="md">
-                Open voorbeeldtool
+                Start met voorbeeldwaarden
               </BtnLink>
             </div>
           </div>

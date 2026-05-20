@@ -107,7 +107,7 @@ export function SiteHeader() {
               kind={onToolPage ? "outline" : "primary"}
               size="sm"
             >
-              Open voorbeeldtool
+              Start met voorbeeldwaarden
             </BtnLink>
           </div>
         </div>
@@ -198,7 +198,7 @@ export function SiteHeader() {
                 size="sm"
                 className="w-full justify-center"
               >
-                Open voorbeeldtool
+                Start met voorbeeldwaarden
               </BtnLink>
             </div>
           </>
