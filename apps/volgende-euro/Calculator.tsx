@@ -10,6 +10,7 @@ import { Pill } from "@/components/ui";
 import { useMobileFieldFlow } from "@/hooks/useMobileFieldFlow";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { getDefaultFinancialYear } from "@/lib/financial-constants";
+import { parseOptionalDecimalInput } from "@/lib/number-input";
 import { createProfilePrefillState, mergeProfilePatchIntoValues } from "@/lib/profile-prefill";
 import { getVolgendeEuroDefaultsFromProfile } from "@/lib/profile-tool-mapping";
 import { calculateVolgendeEuroPriorities, type VolgendeEuroInput } from "./logic";
@@ -87,10 +88,7 @@ type CalculatorContentProps = {
 };
 
 function parseOptionalNumber(value: string | undefined) {
-  if (typeof value !== "string") return undefined;
-  const normalized = value.replace(/\s+/g, "").replace(",", ".");
-  if (!normalized) return undefined;
-  return Number(normalized);
+  return parseOptionalDecimalInput(value);
 }
 
 function formatCurrency(value: number) {
@@ -201,6 +199,35 @@ function CalculatorContent({ initialValues, hasRelevantProfileValues, profilePat
     "riskProfile",
   ]);
 
+  const inputQuality = useMemo(() => {
+    const checks = [
+      { label: "belastingjaar", ok: parseOptionalNumber(formValues.year) !== undefined },
+      { label: "extra bedrag", ok: parseOptionalNumber(formValues.extraAmount) !== undefined },
+      {
+        label: "buffer (huidig + gewenst)",
+        ok:
+          parseOptionalNumber(formValues.currentBuffer) !== undefined &&
+          parseOptionalNumber(formValues.targetBuffer) !== undefined,
+      },
+      {
+        label: "dure schuld details",
+        ok:
+          !formValues.hasExpensiveDebt ||
+          parseOptionalNumber(formValues.expensiveDebtRate) !== undefined ||
+          parseOptionalNumber(formValues.expensiveDebtAmount) !== undefined,
+      },
+      {
+        label: "beleggen (horizon + rendement)",
+        ok:
+          parseOptionalNumber(formValues.horizonYears) !== undefined &&
+          parseOptionalNumber(formValues.expectedAnnualReturn) !== undefined,
+      },
+    ];
+    const filled = checks.filter((check) => check.ok).length;
+    const missing = checks.filter((check) => !check.ok).map((check) => check.label);
+    return { total: checks.length, filled, missing };
+  }, [formValues]);
+
   function updateField<K extends keyof FormState>(field: K, value: FormState[K]) {
     setFormValues((current) => ({ ...current, [field]: value }));
   }
@@ -243,6 +270,16 @@ function CalculatorContent({ initialValues, hasRelevantProfileValues, profilePat
 
         {submitContextMessage ? <p className="mt-3 text-[12.5px] text-[var(--muted)]">{submitContextMessage}</p> : null}
         {hasDirtyChanges ? <p className="mt-3 text-[12.5px] text-[var(--muted)]">Klik opnieuw op Bereken om de uitkomst te vernieuwen.</p> : null}
+        <div className="mt-3 rounded-lg border border-[var(--hair)] bg-[var(--paper-soft)] px-3 py-2 text-[12.5px] text-[var(--muted)]">
+          <p>
+            Invoerkwaliteit: {inputQuality.filled}/{inputQuality.total} kernvelden ingevuld.
+          </p>
+          {inputQuality.missing.length > 0 ? (
+            <p className="mt-1">
+              Ontbrekend: {inputQuality.missing.join(", ")}.
+            </p>
+          ) : null}
+        </div>
 
         <form className="mt-6 grid gap-5" onSubmit={onSubmit}>
           {(

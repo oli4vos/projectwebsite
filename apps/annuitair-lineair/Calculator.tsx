@@ -6,6 +6,7 @@ import { AreaChart } from "@/components/charts";
 import { DisclosureSection } from "@/components/DisclosureSection";
 import { ResultRow } from "@/components/ResultRow";
 import { Pill } from "@/components/ui";
+import { parseOptionalDecimalInput } from "@/lib/number-input";
 import { calculateMortgageComparison } from "./logic";
 
 type FormState = {
@@ -42,12 +43,13 @@ function formatCurrency(value: number, maximumFractionDigits = 0) {
 function validate(values: FormState) {
   const errors: ValidationErrors = {};
 
-  const loanAmount = Number(values.loanAmount);
+  const loanAmount = parseOptionalDecimalInput(values.loanAmount) ?? Number.NaN;
   if (!Number.isFinite(loanAmount) || loanAmount <= 0) {
     errors.loanAmount = "Voer een geldig hypotheekbedrag groter dan 0 in.";
   }
 
-  const interestRatePercent = Number(values.interestRatePercent);
+  const interestRatePercent =
+    parseOptionalDecimalInput(values.interestRatePercent) ?? Number.NaN;
   if (
     !Number.isFinite(interestRatePercent) ||
     interestRatePercent <= 0 ||
@@ -56,12 +58,13 @@ function validate(values: FormState) {
     errors.interestRatePercent = "Gebruik een rente tussen 0 en 25 procent.";
   }
 
-  const loanTermYears = Number(values.loanTermYears);
+  const loanTermYears = parseOptionalDecimalInput(values.loanTermYears) ?? Number.NaN;
   if (!Number.isFinite(loanTermYears) || loanTermYears < 1 || loanTermYears > 40) {
     errors.loanTermYears = "Kies een looptijd tussen 1 en 40 jaar.";
   }
 
-  const annualReturnPercent = Number(values.annualReturnPercent);
+  const annualReturnPercent =
+    parseOptionalDecimalInput(values.annualReturnPercent) ?? Number.NaN;
   if (
     !Number.isFinite(annualReturnPercent) ||
     annualReturnPercent < 0 ||

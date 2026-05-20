@@ -131,6 +131,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/hooks/useUserPreferences.ts`: sync-hook voor lokale kennisniveauvoorkeur
 - `src/lib/financial-constants/`: centrale jaarlijkse aannames/variabelen + helpers
 - `src/lib/chart-utils.ts`: centrale format/tick helpers voor grafieken (hele jaren + eurolabels)
+- `src/lib/number-input.ts`: centrale parser voor numerieke invoer; komma wordt als decimaalpunt behandeld
 - `src/lib/copy-glossary.ts`: centrale woordenlijst voor gebruikerstaal bij financiële termen en enumlabels
 - `src/lib/duo/`: centrale DUO-domeinlaag met wettelijk maandbedrag, relevant maandbedrag per situatie en scenariofuncties voor extra aflossen
 - `src/lib/duo/calculations.test.ts`: regressietests voor centrale DUO-berekenfuncties
