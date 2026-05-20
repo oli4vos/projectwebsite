@@ -6,27 +6,23 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { CategoryDot, Pill } from "@/components/ui";
 import type {
-  AppAssumptionDomain,
-  AppCalculationDomain,
-  AppDisclaimerType,
-  AppOutputType,
-  AppRiskLevel,
   AppStatus,
   AppType,
 } from "@/lib/app-types";
 import { resolveCategory } from "@/lib/categories";
+import {
+  getAssumptionDomainLabel,
+  getCalculationDomainLabel,
+  getDisclaimerTypeLabel,
+  getOutputTypeLabel,
+  getRiskLevelLabel,
+} from "@/lib/copy-glossary";
 import { appRegistry, appRegistryBySlug } from "@/lib/app-registry";
 
 type AppDetailPageProps = {
   params: Promise<{
     slug: string;
   }>;
-};
-
-const riskLabel: Record<AppRiskLevel, string> = {
-  low: "Laag",
-  medium: "Gemiddeld",
-  high: "Hoog",
 };
 
 const statusLabel: Record<AppStatus, string> = {
@@ -38,45 +34,6 @@ const statusLabel: Record<AppStatus, string> = {
 const typeLabel: Record<AppType, string> = {
   frontend: "Rekentool",
   api: "API",
-};
-
-const disclaimerLabel: Record<AppDisclaimerType, string> = {
-  indicative: "Indicatief",
-  financialEducation: "Educatieve keuzehulp",
-  taxIndicative: "Indicatieve belastingberekening",
-  mortgageIndicative: "Indicatieve hypotheekberekening",
-  duoIndicative: "Indicatieve DUO-berekening",
-};
-
-const outputTypeLabel: Record<AppOutputType, string> = {
-  singleResult: "Eén hoofdresultaat",
-  scenarioComparison: "Vergelijk scenario's",
-  timeline: "Tijdlijn",
-  checklist: "Checklist",
-  mixed: "Gemengd",
-};
-
-const calculationDomainLabel: Record<AppCalculationDomain, string> = {
-  studentDebt: "Studieschuld",
-  mortgage: "Hypotheek",
-  housing: "Wonen",
-  tax: "Belasting",
-  investing: "Beleggen",
-  saving: "Sparen",
-  cashflow: "Cashflow",
-  employment: "Werk",
-  pension: "Pensioen",
-};
-
-const assumptionDomainLabel: Record<AppAssumptionDomain, string> = {
-  duo: "DUO",
-  tax: "Belasting",
-  box1: "Box 1",
-  box3: "Box 3",
-  mortgage: "Hypotheek",
-  investment: "Beleggen",
-  inflation: "Inflatie",
-  charts: "Grafieken",
 };
 
 export async function generateStaticParams() {
@@ -183,7 +140,7 @@ export default async function AppDetailPage({ params }: AppDetailPageProps) {
                 <div className="flex items-center justify-between">
                   <span className="text-[var(--muted)]">Gevoeligheid voor aannames</span>
                   <span className="font-medium text-[var(--ink)]">
-                    {riskLabel[app.riskLevel]}
+                    {getRiskLevelLabel(app.riskLevel)}
                   </span>
                 </div>
               )}
@@ -191,7 +148,7 @@ export default async function AppDetailPage({ params }: AppDetailPageProps) {
                 <div className="flex items-center justify-between">
                   <span className="text-[var(--muted)]">Disclaimer</span>
                   <span className="font-medium text-[var(--ink)]">
-                    {disclaimerLabel[app.disclaimerType]}
+                    {getDisclaimerTypeLabel(app.disclaimerType)}
                   </span>
                 </div>
               )}
@@ -199,7 +156,7 @@ export default async function AppDetailPage({ params }: AppDetailPageProps) {
                 <div className="flex items-center justify-between">
                   <span className="text-[var(--muted)]">Resultaatvorm</span>
                   <span className="font-medium text-[var(--ink)]">
-                    {outputTypeLabel[app.outputType]}
+                    {getOutputTypeLabel(app.outputType)}
                   </span>
                 </div>
               )}
@@ -219,7 +176,7 @@ export default async function AppDetailPage({ params }: AppDetailPageProps) {
                 </div>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {app.calculationDomains.map((domain) => (
-                    <Pill key={domain}>{calculationDomainLabel[domain]}</Pill>
+                    <Pill key={domain}>{getCalculationDomainLabel(domain)}</Pill>
                   ))}
                 </div>
               </div>
@@ -231,7 +188,7 @@ export default async function AppDetailPage({ params }: AppDetailPageProps) {
                 </div>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {app.assumptionsUsed.map((assumption) => (
-                    <Pill key={assumption}>{assumptionDomainLabel[assumption]}</Pill>
+                    <Pill key={assumption}>{getAssumptionDomainLabel(assumption)}</Pill>
                   ))}
                 </div>
               </div>

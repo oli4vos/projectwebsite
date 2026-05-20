@@ -126,6 +126,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/lib/profile-tool-mapping.ts`: centrale mapping van profielwaarden naar tool-defaults
 - `src/lib/profile-prefill.ts`: gedeelde helper voor consistente tool-prefill-flow
 - `src/lib/financial-constants/`: centrale jaarlijkse aannames/variabelen + helpers
+- `src/lib/copy-glossary.ts`: centrale woordenlijst voor gebruikerstaal bij financiële termen en enumlabels
 - `src/lib/duo/`: centrale DUO-domeinlaag met wettelijk maandbedrag, relevant maandbedrag per situatie en scenariofuncties voor extra aflossen
 - `src/lib/duo/calculations.test.ts`: regressietests voor centrale DUO-berekenfuncties
 - `src/lib/tax/`: centrale indicatieve tax-laag voor box 1, hypotheekrenteaftrek en box 3
@@ -248,6 +249,10 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - Verborgen tools blijven buiten dashboard en app-routes via manifestveld `visibility: "hidden"`.
 - `requiredProfileFields` is documenterend voor prefill-koppelingen; velden worden niet automatisch verplicht voor de gebruiker gemaakt.
 - `reasonHint` is informatief (geen advies), kort, zonder HTML, en wordt gebruikt als fallback-uitleg in persoonlijke route.
+- Vaste financiële termen en technische enumwaarden worden centraal vertaald via `src/lib/copy-glossary.ts`.
+- Nieuwe tools en pagina's gebruiken waar mogelijk deze helper in plaats van losse lokale labelmaps.
+- Interne enumwaarden blijven technisch; de UI toont begrijpelijke gebruikerstaal.
+- Vaktermen worden bij eerste zichtbare gebruik kort uitgelegd.
 - Aannames die een tool gebruikt horen via centrale constants + disclosure vindbaar te zijn.
 - `/variabelen` gebruikt centrale financial constants als bron van waarheid; tools mogen daarbovenop eigen invoerwaarden toestaan.
 - Donkere CTA's moeten expliciet wit contrast houden. Bronbestand: `src/components/ui.tsx`.

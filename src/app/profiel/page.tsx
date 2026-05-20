@@ -5,6 +5,12 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Btn } from "@/components/ui";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import {
+  getDuoSituationLabel,
+  getEmploymentTypeLabel,
+  getGlossaryExplanation,
+  getRepaymentRuleLabel,
+} from "@/lib/copy-glossary";
 import type {
   Box3MethodPreference,
   EmploymentType,
@@ -77,6 +83,29 @@ const defaultFormState: ProfileFormState = {
   hasFiscalPartnerTax: false,
   preferredTaxYear: "",
 };
+
+const employmentTypeOptions: EmploymentType[] = [
+  "unknown",
+  "employee",
+  "selfEmployed",
+  "mixed",
+];
+
+const repaymentRuleOptions: ProfileRepaymentRule[] = [
+  "SF35",
+  "SF15",
+  "SF15_OLD",
+  "SF15_LLLK",
+  "UNKNOWN",
+];
+
+const duoSituationOptions: ProfileDuoSituation[] = [
+  "repaying",
+  "gracePeriod",
+  "incomeBasedReduction",
+  "paymentPause",
+  "unknown",
+];
 
 function formatUpdatedAt(value?: string) {
   if (!value) {
@@ -635,10 +664,11 @@ function ProfileEditor({
                   }
                   className="ring-focus hair h-12 rounded-md border bg-white px-4 text-[15px] text-[var(--ink)] outline-none"
                 >
-                  <option value="unknown">Onbekend / nog niet ingevuld</option>
-                  <option value="employee">In loondienst</option>
-                  <option value="selfEmployed">ZZP / ondernemer</option>
-                  <option value="mixed">Combinatie loondienst + zelfstandig</option>
+                  {employmentTypeOptions.map((value) => (
+                    <option key={value} value={value}>
+                      {getEmploymentTypeLabel(value)}
+                    </option>
+                  ))}
                 </select>
               </label>
             </div>
@@ -709,11 +739,11 @@ function ProfileEditor({
                   }
                   className="ring-focus hair h-12 rounded-md border bg-white px-4 text-[15px] text-[var(--ink)] outline-none"
                 >
-                  <option value="SF35">SF35</option>
-                  <option value="SF15">SF15</option>
-                  <option value="SF15_OLD">SF15 oude regeling</option>
-                  <option value="SF15_LLLK">SF15 levenlanglerenkrediet</option>
-                  <option value="UNKNOWN">Weet ik niet</option>
+                  {repaymentRuleOptions.map((value) => (
+                    <option key={value} value={value}>
+                      {getRepaymentRuleLabel(value)}
+                    </option>
+                  ))}
                 </select>
               </label>
 
@@ -761,12 +791,16 @@ function ProfileEditor({
                   }
                   className="ring-focus hair h-12 rounded-md border bg-white px-4 text-[15px] text-[var(--ink)] outline-none"
                 >
-                  <option value="repaying">Ik betaal al maandelijks</option>
-                  <option value="gracePeriod">Aanloopfase</option>
-                  <option value="incomeBasedReduction">Verlaagd door draagkracht</option>
-                  <option value="paymentPause">Aflossingsvrije periode</option>
-                  <option value="unknown">Weet ik niet</option>
+                  {duoSituationOptions.map((value) => (
+                    <option key={value} value={value}>
+                      {getDuoSituationLabel(value)}
+                    </option>
+                  ))}
                 </select>
+                <p className="text-[12px] leading-[1.5] text-[var(--muted)]">
+                  {getGlossaryExplanation("draagkracht")}{" "}
+                  {getGlossaryExplanation("aflossingsvrijePeriode")}
+                </p>
               </label>
             </div>
           </div>
