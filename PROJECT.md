@@ -313,6 +313,10 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - shell ondersteunt ook een slot-opbouw voor consistente toolflow:
     `intro`, `startActions`, `inputs`, `submitAction`, `result`, `details`, `disclaimer`
 - Regels voor toekomstige tools:
+  - start nieuwe tools via `npm run create:tool <slug>`;
+  - generator maakt `app.json`, `logic.ts`, `logic.test.ts`, `Calculator.tsx` met hidden-default;
+  - laat nieuwe tools eerst `visibility: "hidden"` tot copy, tests en metadata compleet zijn;
+  - zet daarna pas op `public` als `npm run generate:apps` en `npm run check` groen zijn;
   - gebruik eerst centrale constants uit `src/lib/financial-constants`;
   - gebruik centrale DUO-logica uit `src/lib/duo` waar DUO-input meespeelt;
   - gebruik centrale tax-logica uit `src/lib/tax` voor box 1/box 3/aftrek-indicaties;

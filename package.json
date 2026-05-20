@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "create:tool": "node scripts/create-tool.mjs",
     "generate:apps": "node scripts/generate-app-registry.mjs",
     "predev": "npm run generate:apps",
     "dev": "next dev",
