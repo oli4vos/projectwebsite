@@ -154,9 +154,16 @@ export default function Calculator() {
     setFormValues(exampleValues);
   }
 
+  function goToResult() {
+    document.getElementById("tool-result-summary")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }
+
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
-      <section className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
+      <section className="min-w-0 rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
         <div>
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
             Scenario
@@ -309,6 +316,15 @@ export default function Calculator() {
           </label>
         </div>
 
+        <button
+          type="button"
+          onClick={goToResult}
+          disabled={!result}
+          className="ring-focus hair mt-6 inline-flex h-11 w-full items-center justify-center rounded-full border bg-[var(--paper)] px-4 text-[14px] text-[var(--ink)] disabled:cursor-not-allowed disabled:opacity-45 md:hidden"
+        >
+          Bekijk uitkomst
+        </button>
+
         {hasErrors ? (
           <div className="mt-6 rounded-xl border border-[var(--neg-soft)] bg-[var(--neg-soft)]/55 px-4 py-3 text-sm text-[oklch(35%_0.13_28)]">
             Controleer de invoervelden hierboven. Zodra alles geldig is, zie je weer
@@ -327,8 +343,8 @@ export default function Calculator() {
         </div>
       </section>
 
-      <section className="space-y-5">
-        <div className="rounded-[1.5rem] bg-[var(--deep)] p-6 text-white shadow-paper-lg">
+      <section className="min-w-0 space-y-5">
+        <div id="tool-result-summary" className="rounded-[1.5rem] bg-[var(--deep)] p-6 text-white shadow-paper-lg">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="text-[11px] uppercase tracking-[0.12em] text-white/55">
               Korte conclusie
