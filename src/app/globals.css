@@ -43,8 +43,14 @@
 }
 
 html {
+  --sticky-header-offset: clamp(5.25rem, 9vw, 7.5rem);
   scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--sticky-header-offset) + 0.5rem);
   overflow-x: clip;
+}
+
+[id] {
+  scroll-margin-top: calc(var(--sticky-header-offset) + 0.5rem);
 }
 
 body {
