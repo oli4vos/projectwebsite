@@ -722,7 +722,14 @@ function CalculatorContent({
                       ))}
                   </div>
                   <div className="min-w-0">
-                    <AreaChart width={620} height={220} series={chartSeries} yTicks={yTicks} />
+                    <AreaChart
+                      width={620}
+                      height={220}
+                      series={chartSeries}
+                      yTicks={yTicks}
+                      xValues={[0, ...result.horizon.points.map((point) => point.yearIndex)]}
+                      seriesLabels={["Zonder box 3", "Met box 3"]}
+                    />
                     <div className="axis mt-1 flex items-center justify-between gap-2 overflow-hidden">
                       {xTicks.map((tick) => (
                         <span key={tick} className="min-w-0 truncate first:text-left last:text-right">
@@ -848,6 +855,8 @@ function CalculatorContent({
                         height={220}
                         series={saleExampleSeries}
                         yTicks={saleExampleYTicks}
+                        xValues={[0, ...result.horizon.points.map((point) => point.yearIndex)]}
+                        seriesLabels={["Zonder belasting", "Alleen eindverkoop-heffing"]}
                       />
                       <div className="axis mt-1 flex items-center justify-between gap-2 overflow-hidden">
                         {[0, ...xTicks].map((tick) => (

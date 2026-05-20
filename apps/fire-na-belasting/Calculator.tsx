@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { DisclosureSection } from "@/components/DisclosureSection";
 import { MobileFieldFlowControls } from "@/components/MobileFieldFlowControls";
 import { ResultRow } from "@/components/ResultRow";
 import { ToolDisclosure } from "@/components/ToolDisclosure";
@@ -528,7 +529,7 @@ function CalculatorContent({
           </div>
         ) : null}
 
-        <ToolDisclosure
+        <DisclosureSection
           title="Hoe rekenen we dit?"
           subtitle="Eenvoudige FIRE-projectie op jaarbasis."
         >
@@ -540,7 +541,7 @@ function CalculatorContent({
               <p>4) Bij box 3 aan wordt jaarlijkse heffing via centrale tax-laag afgetrokken.</p>
             </div>
           ) : null}
-        </ToolDisclosure>
+        </DisclosureSection>
 
         <ToolDisclosure
           title="Tijdlijn"
@@ -579,7 +580,7 @@ function CalculatorContent({
           ) : null}
         </ToolDisclosure>
 
-        <ToolDisclosure
+        <DisclosureSection
           title="Welke aannames gebruiken we?"
           subtitle="Dit zijn de gevoeligste knoppen in de uitkomst."
         >
@@ -592,9 +593,9 @@ function CalculatorContent({
               <p>Box 3 in model: {result.assumptions.includeBox3Effect ? "ja" : "nee"}</p>
             </div>
           ) : null}
-        </ToolDisclosure>
+        </DisclosureSection>
 
-        <ToolDisclosure
+        <DisclosureSection
           title="Waar moet je op letten?"
           subtitle="Rendement is onzeker; dit blijft een indicatief scenario."
         >
@@ -605,7 +606,7 @@ function CalculatorContent({
               ))}
             </ul>
           ) : null}
-        </ToolDisclosure>
+        </DisclosureSection>
       </section>
     </CalculatorShell>
   );

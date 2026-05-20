@@ -106,6 +106,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/components/ui.tsx`: `Btn`, `BtnLink`, `Pill`, `Logo`, `CategoryDot`
 - `src/components/ToolDisclosure.tsx`: standaard uitklapbare verdiepingssectie voor rekentools
 - `src/components/DisclosureSection.tsx`: lichte presentatie-wrapper rond `ToolDisclosure` voor consistente verdiepingskoppen en spacing
+- `src/components/charts.tsx`: gedeelde chartcomponenten met interactieve tooltip-ondersteuning
 - `src/app/apps/[slug]/page.tsx`: toont ook manifestmetadata (domeinen, aannames, output/disclaimer/risico) zonder de dashboardflow zwaarder te maken
 - Homepage en dashboard zijn nu keuzehulp-first:
   - primaire start via `volgende-euro`
@@ -127,6 +128,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/lib/profile-tool-mapping.ts`: centrale mapping van profielwaarden naar tool-defaults
 - `src/lib/profile-prefill.ts`: gedeelde helper voor consistente tool-prefill-flow
 - `src/lib/financial-constants/`: centrale jaarlijkse aannames/variabelen + helpers
+- `src/lib/chart-utils.ts`: centrale format/tick helpers voor grafieken (hele jaren + eurolabels)
 - `src/lib/copy-glossary.ts`: centrale woordenlijst voor gebruikerstaal bij financiële termen en enumlabels
 - `src/lib/duo/`: centrale DUO-domeinlaag met wettelijk maandbedrag, relevant maandbedrag per situatie en scenariofuncties voor extra aflossen
 - `src/lib/duo/calculations.test.ts`: regressietests voor centrale DUO-berekenfuncties
@@ -271,6 +273,11 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `DisclosureSection` is presentatie-only en bevat geen rekenlogica.
 - Tool-specifieke extra verdiepingen mogen blijven (bijv. DUO-checklist of jaarplanning), maar de kernkoppen blijven herkenbaar.
 - Vaste begrippen in verdiepingen (zoals box 3, brutering, wettelijk DUO-bedrag, draagkracht, jaarlijks opnamepercentage) lopen via `src/lib/copy-glossary.ts` waar logisch.
+- Grafieken gebruiken interactieve tooltips met duidelijke X/Y-weergave:
+  - tijd op de X-as als hele jaren;
+  - bedragen op de Y-as als euro's;
+  - formatting via centrale helpers in `src/lib/chart-utils.ts`;
+  - geen losse per-tool formatteringslogica dupliceren voor standaard chartlabels.
 - Mobile-first is verplicht: elke nieuwe component of tool moet standaard goed werken op mobiel.
 - Headernavigatie toont altijd de actuele toolcategorieën op basis van `appRegistry`; bij nieuwe categorieën in manifests verschijnen deze automatisch in het menu zonder handmatige header-edit.
 - Uitvoerige QA-rondes of brede responsive testmatrices alleen uitvoeren als de gebruiker daarom vraagt én dit bevestigt.

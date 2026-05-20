@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { DisclosureSection } from "@/components/DisclosureSection";
 import { MobileFieldFlowControls } from "@/components/MobileFieldFlowControls";
 import { ResultRow } from "@/components/ResultRow";
 import { ToolDisclosure } from "@/components/ToolDisclosure";
@@ -8,6 +9,7 @@ import { CalculatorShell } from "@/components/tool/CalculatorShell";
 import { Pill } from "@/components/ui";
 import { useMobileFieldFlow } from "@/hooks/useMobileFieldFlow";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { formatChartEuro, formatChartYear } from "@/lib/chart-utils";
 import { getDefaultFinancialYear } from "@/lib/financial-constants";
 import {
   createProfilePrefillState,
@@ -127,6 +129,7 @@ function TimelineMiniChart({
 }: {
   points: HypotheekAflossenVsBeleggenTimelinePoint[];
 }) {
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const width = 320;
   const height = 120;
   const investingValues = points.map((point) => point.investingPortfolioNetAfterBox3);
@@ -134,18 +137,46 @@ function TimelineMiniChart({
   const maxValue = Math.max(1, ...investingValues, ...aflossenValues);
   const investingPath = buildLinePath(investingValues, width, height, maxValue);
   const aflossenPath = buildLinePath(aflossenValues, width, height, maxValue);
+  const xStep = points.length > 1 ? width / (points.length - 1) : width;
 
   return (
-    <div className="rounded-xl border hair bg-[var(--paper-soft)] p-3">
+    <div className="relative rounded-xl border hair bg-[var(--paper-soft)] p-3">
       <svg
         viewBox={`0 0 ${width} ${height}`}
         className="h-32 w-full"
         role="img"
         aria-label="Jaarlijkse ontwikkeling netto beleggen na box 3 versus netto voordeel aflossen"
+        onMouseLeave={() => setActiveIndex(null)}
       >
         <path d={aflossenPath} fill="none" stroke="#2f7f5f" strokeWidth="2.5" />
         <path d={investingPath} fill="none" stroke="#1f3f8f" strokeWidth="2.5" />
+        {points.map((point, index) => {
+          const x = index * xStep;
+          return (
+            <rect
+              key={point.year}
+              x={x - xStep / 2}
+              y={0}
+              width={Math.max(xStep, 10)}
+              height={height}
+              fill="transparent"
+              onMouseEnter={() => setActiveIndex(index)}
+              onTouchStart={() => setActiveIndex(index)}
+            />
+          );
+        })}
       </svg>
+      {activeIndex !== null ? (
+        <div className="pointer-events-none absolute left-4 top-4 rounded-md border border-[var(--hair)] bg-white/95 px-3 py-2 text-[12px] shadow-paper">
+          <div className="font-medium text-[var(--ink)]">
+            {formatChartYear(points[activeIndex]?.year ?? activeIndex + 1)}
+          </div>
+          <div className="mt-1 space-y-1 text-[var(--muted)]">
+            <div>Beleggen (na box 3): {formatChartEuro(points[activeIndex]?.investingPortfolioNetAfterBox3 ?? 0)}</div>
+            <div>Netto voordeel aflossen: {formatChartEuro(points[activeIndex]?.cumulativeNetBenefitAflossen ?? 0)}</div>
+          </div>
+        </div>
+      ) : null}
       <div className="mt-2 flex flex-wrap gap-3 text-[11px] text-[var(--muted)]">
         <span className="inline-flex items-center gap-2">
           <span className="block h-1.5 w-4 rounded-full bg-[#1f3f8f]" />
@@ -710,7 +741,7 @@ function CalculatorContent({
           </div>
         ) : null}
 
-        <ToolDisclosure
+        <DisclosureSection
           title="Hoe rekenen we dit?"
           subtitle="Jaarlijkse vergelijking van aflossen en beleggen, inclusief box 3-correctie."
         >
@@ -751,9 +782,9 @@ function CalculatorContent({
               </div>
             </div>
           ) : null}
-        </ToolDisclosure>
+        </DisclosureSection>
 
-        <ToolDisclosure
+        <DisclosureSection
           title="Welke aannames gebruiken we?"
           subtitle="We rekenen netto met rentebesparing, gemiste aftrek en optioneel box 3."
         >
@@ -761,9 +792,9 @@ function CalculatorContent({
             In dit model vergelijken we bruto rentebesparing met mogelijk gemiste
             hypotheekrenteaftrek. Zo zie je het netto effect van extra aflossen.
           </p>
-        </ToolDisclosure>
+        </DisclosureSection>
 
-        <ToolDisclosure
+        <DisclosureSection
           title="Waar moet je op letten?"
           subtitle="Beleggen is flexibeler, maar ook onzekerder en box 3 kan het resultaat drukken."
         >
@@ -773,7 +804,7 @@ function CalculatorContent({
               <p>Totale extra box 3 in dit scenario: {formatCurrency(result.totalAdditionalBox3Tax)}.</p>
             </div>
           ) : null}
-        </ToolDisclosure>
+        </DisclosureSection>
 
         <ToolDisclosure
           title="Waarom aflossen rust kan geven"

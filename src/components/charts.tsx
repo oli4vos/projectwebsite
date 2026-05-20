@@ -1,3 +1,8 @@
+"use client";
+
+import { useState } from "react";
+import { formatChartEuro, formatChartYear, getWholeYearTicks } from "@/lib/chart-utils";
+
 interface SparklineProps {
   points: number[];
   width?: number;
@@ -22,7 +27,10 @@ export function Sparkline({
       [index * step, height - ((point - min) / range) * (height - 4) - 2] as const,
   );
   const linePath = coords
-    .map((coord, index) => `${index ? "L" : "M"}${coord[0].toFixed(1)} ${coord[1].toFixed(1)}`)
+    .map(
+      (coord, index) =>
+        `${index ? "L" : "M"}${coord[0].toFixed(1)} ${coord[1].toFixed(1)}`,
+    )
     .join(" ");
   const areaPath = `${linePath} L${width} ${height} L0 ${height} Z`;
 
@@ -50,6 +58,8 @@ interface AreaChartProps {
   height?: number;
   series: AreaSeries[];
   yTicks?: number[];
+  xValues?: number[];
+  seriesLabels?: string[];
 }
 
 function getEuroAxisStep(maxValue: number) {
@@ -73,24 +83,7 @@ function getEuroAxisStep(maxValue: number) {
 }
 
 export function getAdaptiveYearTicks(totalYears: number) {
-  const safeYears = Math.max(Math.round(totalYears), 0);
-
-  if (safeYears <= 6) {
-    return Array.from({ length: safeYears + 1 }, (_, index) => index);
-  }
-
-  const step = safeYears <= 15 ? 2 : safeYears <= 30 ? 5 : 10;
-  const ticks: number[] = [0];
-
-  for (let year = step; year < safeYears; year += step) {
-    ticks.push(year);
-  }
-
-  if (ticks[ticks.length - 1] !== safeYears) {
-    ticks.push(safeYears);
-  }
-
-  return ticks;
+  return getWholeYearTicks(totalYears);
 }
 
 export function getAdaptiveEuroTicks(maxValue: number) {
@@ -117,27 +110,38 @@ export function AreaChart({
   height = 220,
   series,
   yTicks,
+  xValues,
+  seriesLabels,
 }: AreaChartProps) {
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const allPoints = series.flatMap((entry) => entry.points);
   const min = Math.min(...allPoints);
   const max = Math.max(...allPoints);
   const range = max - min || 1;
-  const step = width / (series[0].points.length - 1);
+  const step = width / Math.max(series[0].points.length - 1, 1);
   const xPoints = series[0].points.map((_, index) => index * step);
+  const resolvedXValues =
+    xValues && xValues.length === series[0].points.length
+      ? xValues
+      : series[0].points.map((_, index) => index);
   const safeYTicks = yTicks && yTicks.length > 0 ? yTicks : getAdaptiveEuroTicks(max);
   const yGridValues = safeYTicks.filter((value) => value >= min && value <= max);
   const topPadding = 12;
   const bottomPadding = 24;
 
-  function pathFor(points: number[], close: boolean) {
-    const yPoints = points.map(
-      (point) =>
-        height -
-        ((point - min) / range) * (height - bottomPadding) -
-        topPadding,
+  function getY(point: number) {
+    return (
+      height - ((point - min) / range) * (height - bottomPadding) - topPadding
     );
+  }
+
+  function pathFor(points: number[], close: boolean) {
+    const yPoints = points.map((point) => getY(point));
     let pathData = yPoints
-      .map((yPoint, index) => `${index ? "L" : "M"}${xPoints[index].toFixed(1)} ${yPoint.toFixed(1)}`)
+      .map(
+        (yPoint, index) =>
+          `${index ? "L" : "M"}${xPoints[index].toFixed(1)} ${yPoint.toFixed(1)}`,
+      )
       .join(" ");
 
     if (close) {
@@ -147,39 +151,108 @@ export function AreaChart({
     return pathData;
   }
 
-  return (
-    <svg
-      width="100%"
-      height={height}
-      viewBox={`0 0 ${width} ${height}`}
-      className="block"
-      preserveAspectRatio="none"
-    >
-      {yGridValues.map((value, index) => {
-        const y =
-          height -
-          ((value - min) / range) * (height - bottomPadding) -
-          topPadding +
-          0.5;
+  const activeX = activeIndex === null ? null : xPoints[activeIndex];
 
-        return (
-          <line
-            key={`${value}-${index}`}
-            x1={0}
-            x2={width}
-            y1={y}
-            y2={y}
-            stroke="var(--hair)"
-            strokeDasharray={index === 0 ? "0" : "2 4"}
+  return (
+    <div className="relative" onMouseLeave={() => setActiveIndex(null)}>
+      <svg
+        width="100%"
+        height={height}
+        viewBox={`0 0 ${width} ${height}`}
+        className="block"
+        preserveAspectRatio="none"
+      >
+        {yGridValues.map((value, index) => {
+          const y = getY(value) + 0.5;
+
+          return (
+            <line
+              key={`${value}-${index}`}
+              x1={0}
+              x2={width}
+              y1={y}
+              y2={y}
+              stroke="var(--hair)"
+              strokeDasharray={index === 0 ? "0" : "2 4"}
+            />
+          );
+        })}
+
+        {series.map((entry, index) => (
+          <g key={index}>
+            <path d={pathFor(entry.points, true)} fill={entry.color} opacity={0.12} />
+            <path
+              d={pathFor(entry.points, false)}
+              fill="none"
+              stroke={entry.color}
+              strokeWidth={1.75}
+            />
+            {entry.points.map((point, pointIndex) => {
+              const x = xPoints[pointIndex];
+              const y = getY(point);
+              const isActive = activeIndex === pointIndex;
+              return (
+                <circle
+                  key={`${index}-${pointIndex}`}
+                  cx={x}
+                  cy={y}
+                  r={isActive ? 3.2 : 2.3}
+                  fill={entry.color}
+                  opacity={isActive ? 1 : 0.75}
+                  onMouseEnter={() => setActiveIndex(pointIndex)}
+                  onFocus={() => setActiveIndex(pointIndex)}
+                />
+              );
+            })}
+          </g>
+        ))}
+
+        {xPoints.map((x, index) => (
+          <rect
+            key={`hit-${index}`}
+            x={x - step / 2}
+            y={0}
+            width={Math.max(step, 8)}
+            height={height}
+            fill="transparent"
+            onMouseEnter={() => setActiveIndex(index)}
+            onTouchStart={() => setActiveIndex(index)}
           />
-        );
-      })}
-      {series.map((entry, index) => (
-        <g key={index}>
-          <path d={pathFor(entry.points, true)} fill={entry.color} opacity={0.12} />
-          <path d={pathFor(entry.points, false)} fill="none" stroke={entry.color} strokeWidth={1.75} />
-        </g>
-      ))}
-    </svg>
+        ))}
+
+        {activeX !== null ? (
+          <line
+            x1={activeX}
+            x2={activeX}
+            y1={0}
+            y2={height}
+            stroke="var(--hair)"
+            strokeDasharray="3 4"
+          />
+        ) : null}
+      </svg>
+
+      {activeIndex !== null ? (
+        <div className="pointer-events-none absolute left-2 top-2 max-w-[80%] rounded-md border border-[var(--hair)] bg-white/95 px-3 py-2 text-[12px] shadow-paper">
+          <div className="font-medium text-[var(--ink)]">
+            {formatChartYear(resolvedXValues[activeIndex] ?? activeIndex)}
+          </div>
+          <div className="mt-1 space-y-1 text-[var(--muted)]">
+            {series.map((entry, index) => (
+              <div key={`tip-${index}`} className="flex items-center gap-2">
+                <span
+                  className="inline-block h-2 w-2 rounded-full"
+                  style={{ background: entry.color }}
+                />
+                <span>
+                  {(seriesLabels?.[index] ?? `Reeks ${index + 1}`)}:{" "}
+                  {formatChartEuro(entry.points[activeIndex] ?? 0)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </div>
   );
 }

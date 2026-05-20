@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { AreaChart } from "@/components/charts";
+import { DisclosureSection } from "@/components/DisclosureSection";
 import { ResultRow } from "@/components/ResultRow";
 import { Pill } from "@/components/ui";
 import { calculateMortgageComparison } from "./logic";
@@ -348,7 +349,13 @@ export default function Calculator() {
             </div>
 
             <div className="mt-5 overflow-x-auto">
-              <AreaChart width={620} height={220} series={chartSeries} />
+              <AreaChart
+                width={620}
+                height={220}
+                series={chartSeries}
+                xValues={result.yearlySummary.map((entry) => entry.year)}
+                seriesLabels={["Annuïtair netto", "Lineair netto"]}
+              />
               <div className="axis mt-1 flex items-center justify-between">
                 {result.yearlySummary.map((entry) => (
                   <span key={entry.year}>jaar {entry.year}</span>
@@ -358,38 +365,38 @@ export default function Calculator() {
           </div>
         ) : null}
 
-        <div className="rounded-[1.5rem] border hair bg-white p-5 shadow-paper">
-          <div className="text-[11px] uppercase tracking-[0.1em] text-[var(--muted)]">
-            Hoe rekenen we dit?
-          </div>
+        <DisclosureSection
+          title="Hoe rekenen we dit?"
+          subtitle="We vergelijken beide hypotheekroutes over dezelfde looptijd en rente."
+        >
           <p className="mt-2 text-[12.5px] leading-[1.65] text-[var(--muted)]">
             We vergelijken annuïtair en lineair over dezelfde looptijd en rente. Daarna
             tonen we per jaar het netto verschil in maandlast en de groei van de eventuele
             beleggingspot uit dat verschil.
           </p>
-        </div>
+        </DisclosureSection>
 
-        <div className="rounded-[1.5rem] border hair bg-white p-5 shadow-paper">
-          <div className="text-[11px] uppercase tracking-[0.1em] text-[var(--muted)]">
-            Welke aannames gebruiken we?
-          </div>
+        <DisclosureSection
+          title="Welke aannames gebruiken we?"
+          subtitle="Vaste belastingfactor en vast verwacht rendement voor een zuivere vergelijking."
+        >
           <p className="mt-2 text-[12.5px] leading-[1.65] text-[var(--muted)]">
             Deze vergelijking gebruikt een vaste belastingfactor en een vast verwacht
             rendement op de beleggingspot. Het is bedoeld als scenariovergelijking, niet
             als offerte of persoonlijk advies.
           </p>
-        </div>
+        </DisclosureSection>
 
-        <div className="rounded-[1.5rem] border hair bg-white p-5 shadow-paper">
-          <div className="text-[11px] uppercase tracking-[0.1em] text-[var(--muted)]">
-            Waar moet je op letten?
-          </div>
+        <DisclosureSection
+          title="Waar moet je op letten?"
+          subtitle="Werkelijke voorwaarden kunnen de uitkomst verschuiven."
+        >
           <p className="mt-2 text-[12.5px] leading-[1.65] text-[var(--muted)]">
             Deze tool is een vereenvoudigde vergelijking. Werkelijke belastingeffecten,
             rentevaste periodes en productvoorwaarden kunnen de uitkomst verschuiven.
             Gebruik dit vooral om je scenario scherper te krijgen.
           </p>
-        </div>
+        </DisclosureSection>
       </section>
     </div>
   );

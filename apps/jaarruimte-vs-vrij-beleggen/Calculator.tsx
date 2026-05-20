@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AreaChart, getAdaptiveEuroTicks, getAdaptiveYearTicks } from "@/components/charts";
+import { DisclosureSection } from "@/components/DisclosureSection";
 import { MobileFieldFlowControls } from "@/components/MobileFieldFlowControls";
 import { ResultRow } from "@/components/ResultRow";
 import { ToolDisclosure } from "@/components/ToolDisclosure";
@@ -802,7 +803,7 @@ function CalculatorContent({
           </div>
         ) : null}
 
-        <ToolDisclosure
+        <DisclosureSection
           title="Hoe rekenen we dit?"
           subtitle="Indicatief model, geen officiële jaarruimte- of aangifteberekening."
         >
@@ -817,7 +818,7 @@ function CalculatorContent({
               <p>4) Vrij beleggen kan optioneel een indicatief box 3-effect meenemen.</p>
             </div>
           ) : null}
-        </ToolDisclosure>
+        </DisclosureSection>
 
         <ToolDisclosure
           title="Voorbeeldinterpretatie"
@@ -864,6 +865,12 @@ function CalculatorContent({
                         (point) => point.investingNetAfterBox3,
                       ),
                     },
+                  ]}
+                  xValues={result.wealthPlanning.points.map((point) => point.year)}
+                  seriesLabels={[
+                    "Pensioen netto indicatief",
+                    "Beleggen zonder box 3",
+                    "Beleggen na box 3",
                   ]}
                 />
                 <div className="mt-2 flex flex-wrap items-center gap-3 text-[12px] text-[var(--soft)]">
@@ -931,7 +938,7 @@ function CalculatorContent({
           ) : null}
         </ToolDisclosure>
 
-        <ToolDisclosure
+        <DisclosureSection
           title="Welke aannames gebruiken we?"
           subtitle="Kernafweging tussen fiscaal voordeel nu en flexibiliteit later."
         >
@@ -942,9 +949,9 @@ function CalculatorContent({
               ))}
             </ul>
           ) : null}
-        </ToolDisclosure>
+        </DisclosureSection>
 
-        <ToolDisclosure
+        <DisclosureSection
           title="Waar moet je op letten?"
           subtitle="Controleer jaarruimte en fiscale details altijd apart."
         >
@@ -955,7 +962,7 @@ function CalculatorContent({
               ))}
             </ul>
           ) : null}
-        </ToolDisclosure>
+        </DisclosureSection>
       </section>
     </CalculatorShell>
   );

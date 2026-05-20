@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { DisclosureSection } from "@/components/DisclosureSection";
 import { MobileFieldFlowControls } from "@/components/MobileFieldFlowControls";
 import { ResultRow } from "@/components/ResultRow";
 import { ToolDisclosure } from "@/components/ToolDisclosure";
@@ -456,7 +457,7 @@ function CalculatorContent({
           </div>
         ) : null}
 
-        <ToolDisclosure
+        <DisclosureSection
           title="Hoe rekenen we dit?"
           subtitle="Declarabele uren bepalen direct welk uurtarief je nodig hebt."
         >
@@ -468,7 +469,7 @@ function CalculatorContent({
               acquisitie) moet je via je tarief terugverdienen.
             </p>
           ) : null}
-        </ToolDisclosure>
+        </DisclosureSection>
 
         <ToolDisclosure
           title="Waarom ZZP-omzet niet hetzelfde is als salaris"
@@ -518,7 +519,7 @@ function CalculatorContent({
           )}
         </ToolDisclosure>
 
-        <ToolDisclosure
+        <DisclosureSection
           title="Welke aannames gebruiken we?"
           subtitle="Indicatieve fiscale referentie, geen volledige ZZP-aangifte."
         >
@@ -530,9 +531,9 @@ function CalculatorContent({
               <p>Indicatief marginaal tarief (box 1 referentie): {formatPercent(result.box1Reference.marginalRate)}%.</p>
             </div>
           ) : null}
-        </ToolDisclosure>
+        </DisclosureSection>
 
-        <ToolDisclosure title="Waar moet je op letten?" subtitle="Educatief hulpmiddel, geen financieel advies.">
+        <DisclosureSection title="Waar moet je op letten?" subtitle="Educatief hulpmiddel, geen financieel advies.">
           {result ? (
             <ul className="space-y-2 text-[13px] leading-[1.65] text-[var(--muted)]">
               {result.warnings.map((warning) => (
@@ -540,7 +541,7 @@ function CalculatorContent({
               ))}
             </ul>
           ) : null}
-        </ToolDisclosure>
+        </DisclosureSection>
       </section>
     </CalculatorShell>
   );

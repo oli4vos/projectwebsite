@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { DisclosureSection } from "@/components/DisclosureSection";
 import { MobileFieldFlowControls } from "@/components/MobileFieldFlowControls";
 import { ResultRow } from "@/components/ResultRow";
 import { ToolDisclosure } from "@/components/ToolDisclosure";
@@ -818,7 +819,7 @@ function CalculatorContent({
           ) : null}
         </div>
 
-        <ToolDisclosure
+        <DisclosureSection
           title="Hoe rekenen we dit?"
           subtitle="Verplicht DUO-bedrag eerst, keuze pas op de vrijwillige extra ruimte."
         >
@@ -840,9 +841,9 @@ function CalculatorContent({
               annuïtair bedrag. Dat is in deze tool geen vrij invulveld.
             </p>
           </div>
-        </ToolDisclosure>
+        </DisclosureSection>
 
-        <ToolDisclosure
+        <DisclosureSection
           title="Welke aannames gebruiken we?"
           subtitle="Optioneel box 3-scenario op je beleggingsroute; de hoofdflow blijft licht."
         >
@@ -913,10 +914,10 @@ function CalculatorContent({
               Zet de box 3-optie aan om dit scenario te tonen.
             </p>
           )}
-        </ToolDisclosure>
+        </DisclosureSection>
 
         {result?.warnings?.length ? (
-          <ToolDisclosure
+          <DisclosureSection
             title="Waar moet je op letten?"
             subtitle="Gebruik dit als scenariovergelijking, niet als zeker advies."
           >
@@ -927,7 +928,7 @@ function CalculatorContent({
                 ))}
               </ul>
             </div>
-          </ToolDisclosure>
+          </DisclosureSection>
         ) : null}
       </section>
     </CalculatorShell>
