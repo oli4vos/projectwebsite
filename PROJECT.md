@@ -108,6 +108,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - Homepage en dashboard zijn nu keuzehulp-first:
   - primaire start via `volgende-euro`
   - secundaire personalisatie via `/profiel`
+  - compacte persoonlijke route met max 3 starttools op basis van profielstatus
   - thematische toolgroepen in plaats van een losse toolbibliotheek
   - subtiele verwijzing naar `/variabelen` voor aannames en percentages
 
@@ -257,6 +258,8 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - Homepage-principe:
   - toon eerst “waar begin ik?” met duidelijke keuze-CTA
   - daarna profielblok en thematische toolgroepen
+  - daartussen “Jouw snelle route” op basis van local-first profielstatus
+  - aanbevelingen zijn startpunten, geen financieel advies
   - technische metadata blijft buiten de primaire homepageflow
 - Mobiele tool-layout is gecentraliseerd via `src/components/tool/CalculatorShell.tsx`:
   - op mobiel staat de samenvatting/resultaatkaart eerst

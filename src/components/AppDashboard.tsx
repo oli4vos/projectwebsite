@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import type { AppManifest } from "@/lib/app-types";
 import { BtnLink } from "@/components/ui";
 import { AppCard } from "./AppCard";
+import { PersonalRoute } from "./PersonalRoute";
 
 type AppDashboardProps = {
   apps: AppManifest[];
@@ -158,6 +159,8 @@ export function AppDashboard({ apps }: AppDashboardProps) {
           Open profiel
         </BtnLink>
       </section>
+
+      <PersonalRoute apps={apps} />
 
       <section id="scenario" className="space-y-6">
         <div className="rounded-[1.5rem] border hair bg-white/80 p-6 shadow-paper">
