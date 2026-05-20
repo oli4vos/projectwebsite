@@ -1,0 +1,3 @@
+export const ENABLE_KNOWLEDGE_LEVEL =
+  process.env.NEXT_PUBLIC_ENABLE_KNOWLEDGE_LEVEL === "1";
+

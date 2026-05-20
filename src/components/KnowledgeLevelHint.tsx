@@ -1,9 +1,14 @@
 "use client";
 
 import { useUserPreferences } from "@/hooks/useUserPreferences";
+import { ENABLE_KNOWLEDGE_LEVEL } from "@/lib/feature-flags";
 
 export function KnowledgeLevelHint() {
   const { knowledgeLevel } = useUserPreferences();
+
+  if (!ENABLE_KNOWLEDGE_LEVEL) {
+    return null;
+  }
 
   if (knowledgeLevel === "basic") {
     return (

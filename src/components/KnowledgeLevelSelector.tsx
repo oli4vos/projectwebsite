@@ -1,6 +1,7 @@
 "use client";
 
 import { useUserPreferences } from "@/hooks/useUserPreferences";
+import { ENABLE_KNOWLEDGE_LEVEL } from "@/lib/feature-flags";
 import { getKnowledgeLevelLabel, type KnowledgeLevel } from "@/lib/user-preferences";
 
 const options: Array<{ value: KnowledgeLevel; description: string }> = [
@@ -20,6 +21,10 @@ const options: Array<{ value: KnowledgeLevel; description: string }> = [
 
 export function KnowledgeLevelSelector() {
   const { knowledgeLevel, setKnowledgeLevel } = useUserPreferences();
+
+  if (!ENABLE_KNOWLEDGE_LEVEL) {
+    return null;
+  }
 
   return (
     <section className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
