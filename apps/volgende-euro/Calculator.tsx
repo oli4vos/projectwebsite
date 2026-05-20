@@ -640,17 +640,17 @@ function CalculatorContent({
               Samenvatting
             </div>
             {result ? (
-              <Pill tone="accent">{result.topRecommendation.bucket}</Pill>
+              <Pill tone="accent">{result.priorityPlan[0]?.status ?? "niet relevant"}</Pill>
             ) : null}
           </div>
           {result ? (
             <>
               <div className="mt-4 font-serif text-[30px] leading-none tracking-[-0.03em]">
-                {result.topRecommendation.label}
+                {result.priorityPlan[0]?.title}
               </div>
               <p className="mt-3 text-[14px] leading-[1.7] text-white/75">
                 Op basis van je invoer lijkt je volgende euro het meest logisch voor:{" "}
-                {result.topRecommendation.label.toLowerCase()}.
+                {result.priorityPlan[0]?.title.toLowerCase()}.
               </p>
             </>
           ) : null}
@@ -659,43 +659,71 @@ function CalculatorContent({
         {result ? (
           <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
             <h3 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
-              Top 3 keuzes
+              Prioriteitenladder
             </h3>
             <div className="mt-4 space-y-3">
-              {result.topThree.map((option, index) => (
+              {result.priorityPlan.map((step) => (
                 <div
-                  key={option.key}
+                  key={step.key}
                   className="rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div className="font-medium text-[var(--ink)]">
-                      {index + 1}. {option.label}
+                      Stap {step.rank}. {step.title}
                     </div>
-                    <Pill tone={option.score >= 70 ? "pos" : option.score >= 45 ? "accent" : "neg"}>
-                      score {option.score}
+                    <Pill
+                      tone={
+                        step.status === "nu doen"
+                          ? "pos"
+                          : step.status === "daarna"
+                            ? "accent"
+                            : "neg"
+                      }
+                    >
+                      {step.status}
                     </Pill>
                   </div>
-                  <p className="mt-2 text-[13px] leading-[1.6] text-[var(--muted)]">{option.reason}</p>
-                  <p className="mt-1 text-[12px] leading-[1.55] text-[var(--soft)]">{option.riskFlexNote}</p>
+                  <p className="mt-2 text-[13px] leading-[1.6] text-[var(--muted)]">
+                    {step.actionLabel}
+                  </p>
+                  <div className="mt-3 grid gap-2 rounded-lg border border-[var(--hair)] bg-white px-3 py-2">
+                    <ResultRow
+                      label="Bedrag naar deze stap"
+                      value={formatCurrency(step.allocatedAmount ?? 0)}
+                    />
+                    <ResultRow
+                      label="Resterend na deze stap"
+                      value={formatCurrency(step.remainingAfterStep ?? 0)}
+                    />
+                    {step.currentAmount !== undefined ? (
+                      <ResultRow
+                        label="Huidige stand"
+                        value={formatCurrency(step.currentAmount)}
+                      />
+                    ) : null}
+                    {step.targetAmount !== undefined ? (
+                      <ResultRow
+                        label="Doelbedrag"
+                        value={formatCurrency(step.targetAmount)}
+                      />
+                    ) : null}
+                    {step.amountNeeded !== undefined ? (
+                      <ResultRow
+                        label="Nog nodig tot grens"
+                        value={formatCurrency(step.amountNeeded)}
+                      />
+                    ) : null}
+                  </div>
+                  <p className="mt-2 text-[12px] leading-[1.55] text-[var(--soft)]">
+                    Waarom nu: {step.whyThisStep}
+                  </p>
+                  <p className="mt-1 text-[12px] leading-[1.55] text-[var(--soft)]">
+                    Waarom vóór/na volgende stap: {step.whyBeforeNext}
+                  </p>
+                  <p className="mt-1 text-[12px] leading-[1.55] text-[var(--soft)]">
+                    Volgende trigger: {step.nextTrigger}
+                  </p>
                 </div>
-              ))}
-            </div>
-          </div>
-        ) : null}
-
-        {result ? (
-          <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
-            <h3 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
-              Volledige prioriteitenlijst
-            </h3>
-            <div className="mt-4">
-              {result.priorities.map((option) => (
-                <ResultRow
-                  key={option.key}
-                  label={`${option.label} · ${option.bucket}`}
-                  value={`${option.score}/100`}
-                  sub={option.reason}
-                />
               ))}
             </div>
           </div>
