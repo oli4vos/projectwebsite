@@ -323,6 +323,11 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - gebruik profieldefaults uitsluitend via `profile-tool-mapping` + `profile-prefill`;
   - volg het mobiele shell-patroon (`CalculatorShell`) en houd aannames vindbaar via disclosure;
   - gebruik bij voorkeur de slot-opbouw van `CalculatorShell` voor invullen → berekenen → resultaat.
+  - publieke tools moeten minimaal compleet zijn in manifest en bestanden:
+    `title`, `description`, `category`, `tags`, `reasonHint`, `assumptionsUsed`,
+    `calculationDomains`, `riskLevel`, `disclaimerType`, `outputType` +
+    `Calculator.tsx`, `logic.ts`, `logic.test.ts`;
+  - hidden-first workflow: ontwikkel nieuwe tools standaard hidden en maak pas public na groene checks.
 - Jaarlijkse financiële aannames komen centraal uit `src/lib/financial-constants`.
 - Toolverdieping mag die centrale aannames tonen, maar light-gebruikers worden niet gedwongen die details te openen.
 - In `studieschuld-vs-beleggen` blijft box 3 een optionele verdieping (toggle + disclosure); de hoofdflow blijft licht en bruikbaar zonder fiscale invoer.

@@ -48,6 +48,18 @@ const validOutputTypes = new Set([
   "checklist",
   "mixed",
 ]);
+const publicRequiredManifestFields = [
+  "title",
+  "description",
+  "category",
+  "tags",
+  "reasonHint",
+  "assumptionsUsed",
+  "calculationDomains",
+  "riskLevel",
+  "disclaimerType",
+  "outputType",
+];
 
 function fail(message) {
   throw new Error(message);
@@ -238,6 +250,23 @@ function validateManifest(manifest, directoryName) {
     validOutputTypes,
   );
 
+  if (visibility === "public") {
+    for (const field of publicRequiredManifestFields) {
+      const value = manifest[field];
+      if (Array.isArray(value)) {
+        if (value.length === 0) {
+          fail(
+            `App "${slug}": publiek app.json mist verplicht veld "${field}" of bevat een lege waarde.`,
+          );
+        }
+      } else if (value === undefined || value === null || `${value}`.trim?.() === "") {
+        fail(
+          `App "${slug}": publiek app.json mist verplicht veld "${field}".`,
+        );
+      }
+    }
+  }
+
   return {
     slug,
     title,
@@ -338,6 +367,25 @@ async function main() {
       fail(
         `App "${validatedManifest.slug}": entry "${validatedManifest.entry}" bestaat niet.`,
       );
+    }
+
+    if (validatedManifest.visibility === "public") {
+      const requiredFiles = [
+        "logic.ts",
+        "Calculator.tsx",
+        "logic.test.ts",
+      ];
+
+      for (const requiredFile of requiredFiles) {
+        const requiredFilePath = path.join(appsDir, directoryName, requiredFile);
+        try {
+          await fs.access(requiredFilePath);
+        } catch {
+          fail(
+            `App "${validatedManifest.slug}": publiek app mist verplicht bestand "${requiredFile}".`,
+          );
+        }
+      }
     }
 
     manifests.push(validatedManifest);
