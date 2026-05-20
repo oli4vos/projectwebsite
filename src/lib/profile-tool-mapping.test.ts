@@ -8,6 +8,7 @@ import {
   getStudentDebtVsInvestingDefaultsFromProfile,
   getFireNaBelastingDefaultsFromProfile,
   getVolgendeEuroDefaultsFromProfile,
+  getZzpUurtariefDefaultsFromProfile,
 } from "@/lib/profile-tool-mapping";
 import type { UserProfile } from "@/lib/user-profile";
 
@@ -84,6 +85,7 @@ describe("profile tool mapping", () => {
     expect(getJaarruimteVsVrijBeleggenDefaultsFromProfile({})).toEqual({});
     expect(getFireNaBelastingDefaultsFromProfile({})).toEqual({});
     expect(getHypotheekAflossenVsBeleggenDefaultsFromProfile({})).toEqual({});
+    expect(getZzpUurtariefDefaultsFromProfile({})).toEqual({});
   });
 
   it("maps box3 indicatie defaults from profile values", () => {
@@ -258,5 +260,44 @@ describe("profile tool mapping", () => {
     expect(mapped.taxYear).toBe("2026");
     expect(mapped.minimumBuffer).toBe("20000");
     expect(mapped.annualExtraRepayment).toBe("5400");
+  });
+
+  it("maps zzp-uurtarief defaults from profile values", () => {
+    const profile = {
+      income: {
+        grossAnnualIncome: 72000,
+      },
+      savingInvesting: {
+        targetEmergencyFund: 18000,
+        pensionBuildUp: "none",
+        hasAov: false,
+        monthlyFreeCashflow: 1000,
+      },
+      tax: {
+        preferredTaxYear: 2026,
+      },
+      employment: {
+        grossAnnualSalary: 68000,
+        businessProfitBeforeTax: 90000,
+        aovPremiumAnnual: 3600,
+        pensionContributionAnnual: 7200,
+      },
+    } as UserProfile & {
+      employment: {
+        grossAnnualSalary: number;
+        businessProfitBeforeTax: number;
+        aovPremiumAnnual: number;
+        pensionContributionAnnual: number;
+      };
+    };
+
+    const mapped = getZzpUurtariefDefaultsFromProfile(profile);
+    expect(mapped.taxYear).toBe("2026");
+    expect(mapped.grossAnnualSalaryComparison).toBe("68000");
+    expect(mapped.targetNetMonthlyIncome).toBe("3750");
+    expect(mapped.monthlyBufferReserve).toBe("1500");
+    expect(mapped.monthlyAovPremium).toBe("300");
+    expect(mapped.monthlyPensionReserve).toBe("600");
+    expect(mapped.monthlyBusinessCosts).toBe("250");
   });
 });

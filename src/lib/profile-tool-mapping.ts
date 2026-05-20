@@ -84,6 +84,17 @@ export const PROFILE_FIELDS_HYPOTHEEK_AFLOSSEN_VS_BELEGGEN = [
   "savingInvesting.monthlyFreeCashflow",
 ] as const;
 
+export const PROFILE_FIELDS_ZZP_UURTARIEF = [
+  "income.employmentType",
+  "income.grossAnnualIncome",
+  "savingInvesting.targetEmergencyFund",
+  "tax.preferredTaxYear",
+  "employment.grossAnnualSalary",
+  "employment.businessProfitBeforeTax",
+  "employment.aovPremiumAnnual",
+  "employment.pensionContributionAnnual",
+] as const;
+
 type MortgageImpactDefaults = Partial<{
   grossIncomeUser: string;
   grossIncomePartner: string;
@@ -189,6 +200,17 @@ type HypotheekAflossenVsBeleggenDefaults = Partial<{
   taxYear: string;
   minimumBuffer: string;
   annualExtraRepayment: string;
+}>;
+
+type ZzpUurtariefDefaults = Partial<{
+  taxYear: string;
+  targetNetMonthlyIncome: string;
+  monthlyBufferReserve: string;
+  monthlyPensionReserve: string;
+  pensionReservePercent: string;
+  monthlyAovPremium: string;
+  grossAnnualSalaryComparison: string;
+  monthlyBusinessCosts: string;
 }>;
 
 function toStringValue(value?: number) {
@@ -702,6 +724,87 @@ export function getHypotheekAflossenVsBeleggenDefaultsFromProfile(
   const monthlyFreeCashflow = profile.savingInvesting?.monthlyFreeCashflow;
   if (monthlyFreeCashflow !== undefined && Number.isFinite(monthlyFreeCashflow)) {
     defaults.annualExtraRepayment = String(Math.max(monthlyFreeCashflow, 0) * 12);
+  }
+
+  return defaults;
+}
+
+export function getZzpUurtariefDefaultsFromProfile(
+  profile: UserProfile,
+): ZzpUurtariefDefaults {
+  const defaults: ZzpUurtariefDefaults = {};
+
+  const taxYear = toStringValue(profile.tax?.preferredTaxYear);
+  if (taxYear !== undefined) {
+    defaults.taxYear = taxYear;
+  }
+
+  const grossAnnualIncome = toStringValue(profile.income?.grossAnnualIncome);
+  if (grossAnnualIncome !== undefined) {
+    defaults.grossAnnualSalaryComparison = grossAnnualIncome;
+    defaults.targetNetMonthlyIncome = String(Math.round(Number(grossAnnualIncome) * 0.5 / 12));
+  }
+
+  const monthlyBufferReserve = toStringValue(profile.savingInvesting?.targetEmergencyFund);
+  if (monthlyBufferReserve !== undefined) {
+    defaults.monthlyBufferReserve = String(
+      Math.round(Math.max(Number(monthlyBufferReserve), 0) / 12),
+    );
+  }
+
+  const employmentProfile = profile as UserProfile & {
+    employment?: {
+      grossAnnualSalary?: number;
+      businessProfitBeforeTax?: number;
+      aovPremiumAnnual?: number;
+      pensionContributionAnnual?: number;
+    };
+  };
+
+  const grossAnnualSalary = toStringValue(
+    employmentProfile.employment?.grossAnnualSalary,
+  );
+  if (grossAnnualSalary !== undefined) {
+    defaults.grossAnnualSalaryComparison = grossAnnualSalary;
+  }
+
+  const businessProfitBeforeTax = toStringValue(
+    employmentProfile.employment?.businessProfitBeforeTax,
+  );
+  if (businessProfitBeforeTax !== undefined) {
+    defaults.targetNetMonthlyIncome = String(
+      Math.round(Math.max(Number(businessProfitBeforeTax), 0) * 0.5 / 12),
+    );
+  }
+
+  const aovPremiumAnnual = toStringValue(
+    employmentProfile.employment?.aovPremiumAnnual,
+  );
+  if (aovPremiumAnnual !== undefined) {
+    defaults.monthlyAovPremium = String(
+      Math.round(Math.max(Number(aovPremiumAnnual), 0) / 12),
+    );
+  }
+
+  const pensionContributionAnnual = toStringValue(
+    employmentProfile.employment?.pensionContributionAnnual,
+  );
+  if (pensionContributionAnnual !== undefined) {
+    defaults.monthlyPensionReserve = String(
+      Math.round(Math.max(Number(pensionContributionAnnual), 0) / 12),
+    );
+  } else if (profile.savingInvesting?.pensionBuildUp === "none") {
+    defaults.pensionReservePercent = "15";
+  }
+
+  if (profile.savingInvesting?.hasAov === false) {
+    defaults.monthlyAovPremium = defaults.monthlyAovPremium ?? "0";
+  }
+
+  if (profile.savingInvesting?.monthlyFreeCashflow !== undefined) {
+    defaults.monthlyBusinessCosts = String(
+      Math.round(Math.max(profile.savingInvesting.monthlyFreeCashflow * 0.25, 0)),
+    );
   }
 
   return defaults;

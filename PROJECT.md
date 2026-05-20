@@ -163,6 +163,10 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - vergelijkt extra aflossen op hypotheek met vrij beleggen en buffer aanhouden
   - gebruikt centrale `calculateMortgageInterestDeduction` en `calculateBox3Tax` voor indicatieve netto vergelijking
   - toont netto rentebesparing, gemiste aftrek, beleggingsuitkomst, box 3-correctie en break-even rendement
+- `apps/zzp-uurtarief`
+  - indicatieve werkvorm-tool voor benodigd ZZP-uurtarief inclusief belastingreservering, buffer, pensioen, AOV en kosten
+  - rekent met declarabele uren, actieve werkweken en niet-declarabele ruimte via invoer
+  - is expliciet geen volledige ZZP/IB-aangifte en gebruikt box 1 alleen als indicatieve referentie
 - `apps/annuitair-lineair`
   - wrapper rond bestaande JS-logica
   - bevat oudere rekenscripts in `.js`
@@ -288,6 +292,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - Volgende teststap: tax-engine en chart-utils pas opnemen in testlaag zodra die modules stabiel zijn.
 - Volgende inhoudelijke stap: DUO-draagkrachtlogica verder verdiepen zodra actuele officiële parameters stabiel en centraal beschikbaar zijn.
 - Toekomstige tax-verdieping: meerjarige box 3-projectie of aparte box 3-tool, pas na validatie van gebruikservaring in de huidige optionele v1-koppeling.
+- Toekomstige werkvorm-stap: uitgebreidere vergelijking vaste dienst vs ZZP met aanvullende werkgeverslasten, secundaire arbeidsvoorwaarden en ondernemersregelingen.
 - CI controleert expliciet dat `src/lib/app-registry.ts` en `src/lib/app-components.tsx` na `generate:apps` geen diff hebben.
 
 ## Responsive design en layout-conventies

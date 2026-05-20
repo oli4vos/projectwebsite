@@ -17,6 +17,7 @@ describe("generated app registry", () => {
     expect(appRegistryBySlug["box-3-impact"]).toBeDefined();
     expect(appRegistryBySlug["volgende-euro"]).toBeDefined();
     expect(appRegistryBySlug["hypotheek-aflossen-vs-beleggen"]).toBeDefined();
+    expect(appRegistryBySlug["zzp-uurtarief"]).toBeDefined();
   });
 
   it("keeps manifest metadata consistent for disclaimer and output type", () => {

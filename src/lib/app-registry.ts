@@ -343,6 +343,47 @@ export const appRegistry = [
     "outputType": "scenarioComparison",
     "version": "1.0.0",
     "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "zzp-uurtarief",
+    "title": "ZZP-uurtarief calculator",
+    "description": "Bereken welk uurtarief je ongeveer nodig hebt inclusief belasting, buffer, pensioen en AOV.",
+    "type": "frontend",
+    "category": "Werk",
+    "tags": [
+      "ZZP",
+      "uurtarief",
+      "AOV",
+      "pensioen",
+      "inkomen"
+    ],
+    "status": "beta",
+    "visibility": "public",
+    "requiredProfileFields": [
+      "income.employmentType",
+      "income.grossAnnualIncome",
+      "savingInvesting.targetEmergencyFund",
+      "tax.preferredTaxYear",
+      "employment.grossAnnualSalary",
+      "employment.businessProfitBeforeTax",
+      "employment.aovPremiumAnnual",
+      "employment.pensionContributionAnnual"
+    ],
+    "assumptionsUsed": [
+      "tax",
+      "box1"
+    ],
+    "calculationDomains": [
+      "employment",
+      "cashflow",
+      "pension",
+      "tax"
+    ],
+    "riskLevel": "high",
+    "disclaimerType": "taxIndicative",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
   }
 ] satisfies AppManifest[];
 
