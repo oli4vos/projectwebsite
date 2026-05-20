@@ -19,6 +19,7 @@
     "savingInvesting.targetEmergencyFund",
     "savingInvesting.monthlyFreeCashflow"
   ],
+  "reasonHint": "Handig als je extra geld wilt vergelijken tussen hypotheek aflossen en vrij beleggen.",
   "assumptionsUsed": ["tax", "box3", "mortgage", "investment"],
   "calculationDomains": ["mortgage", "investing", "tax", "saving"],
   "riskLevel": "high",

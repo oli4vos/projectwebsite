@@ -58,6 +58,17 @@ describe("generated app registry", () => {
     }
   });
 
+  it("keeps reasonHint compact and user-facing", () => {
+    for (const manifest of appRegistry as AppManifest[]) {
+      expect(typeof manifest.reasonHint).toBe("string");
+      const reasonHint = manifest.reasonHint?.trim() ?? "";
+      expect(reasonHint.length).toBeGreaterThan(0);
+      expect(reasonHint.length).toBeLessThanOrEqual(180);
+      expect(reasonHint.includes("<")).toBe(false);
+      expect(reasonHint.includes(">")).toBe(false);
+    }
+  });
+
   it("uses central box3 domain metadata consistently", () => {
     const box3Apps = (appRegistry as AppManifest[]).filter((app) =>
       (app.assumptionsUsed ?? []).includes("box3"),

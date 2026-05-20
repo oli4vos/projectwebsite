@@ -39,6 +39,69 @@ describe("profile recommendations", () => {
     ]);
   });
 
+  it("uses manifest reasonHint as fallback reason when no profile-specific reason exists", () => {
+    const recommendations = getRecommendedAppsForProfile(
+      {},
+      {
+        availableSlugs: ["volgende-euro"],
+        apps: [
+          {
+            slug: "volgende-euro",
+            reasonHint: "Handig als je eerst breed wilt verkennen waar je volgende euro naartoe kan.",
+          },
+        ],
+      },
+    );
+
+    expect(recommendations).toEqual([
+      {
+        slug: "volgende-euro",
+        reason:
+          "Handig als je eerst breed wilt verkennen waar je volgende euro naartoe kan.",
+      },
+    ]);
+  });
+
+  it("keeps profile-specific reason ahead of manifest reasonHint", () => {
+    const recommendations = getRecommendedAppsForProfile(
+      { studentDebt: { remainingDebt: 28000 } },
+      {
+        availableSlugs,
+        apps: [
+          {
+            slug: "studieschuld-vs-beleggen",
+            reasonHint: "Handig als je studieschuldscenario's wilt vergelijken.",
+          },
+        ],
+      },
+    );
+    const studieschuldRecommendation = recommendations.find(
+      (item) => item.slug === "studieschuld-vs-beleggen",
+    );
+
+    expect(studieschuldRecommendation?.reason).toBe(
+      "Omdat je studieschuld hebt ingevuld en extra aflossen niet altijd de enige logische keuze is.",
+    );
+  });
+
+  it("falls back to general reason when reasonHint is missing", () => {
+    const recommendations = getRecommendedAppsForProfile(
+      {},
+      {
+        availableSlugs: ["volgende-euro"],
+        apps: [{ slug: "volgende-euro" }],
+      },
+    );
+
+    expect(recommendations).toEqual([
+      {
+        slug: "volgende-euro",
+        reason:
+          "Omdat dit een brede starttool is als je nog niet weet waar je geld het beste naartoe kan.",
+      },
+    ]);
+  });
+
   it("recommends student debt tools when student debt is present", () => {
     const profile: UserProfile = {
       studentDebt: {

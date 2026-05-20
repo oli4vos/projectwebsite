@@ -21,6 +21,7 @@
     "tax.hasFiscalPartner",
     "tax.preferredBox3Method"
   ],
+  "reasonHint": "Handig als je wilt vergelijken wat extra aflossen op je studieschuld doet ten opzichte van beleggen.",
   "assumptionsUsed": ["duo", "box3", "investment"],
   "calculationDomains": ["studentDebt", "investing", "saving", "tax"],
   "riskLevel": "medium",

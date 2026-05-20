@@ -85,6 +85,35 @@ function validateOptionalStringArray(value, fieldName, slug) {
   });
 }
 
+function validateOptionalReasonHint(value, slug) {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  if (typeof value !== "string") {
+    fail(`App "${slug}": veld "reasonHint" moet een string zijn.`);
+  }
+
+  const trimmedValue = value.trim();
+  if (trimmedValue.length === 0) {
+    return undefined;
+  }
+
+  if (trimmedValue.length > 180) {
+    fail(
+      `App "${slug}": veld "reasonHint" mag maximaal 180 tekens bevatten.`,
+    );
+  }
+
+  if (trimmedValue.includes("<") || trimmedValue.includes(">")) {
+    fail(
+      `App "${slug}": veld "reasonHint" mag geen HTML of angle brackets bevatten.`,
+    );
+  }
+
+  return trimmedValue;
+}
+
 function validateOptionalEnum(value, fieldName, slug, validValues) {
   if (value === undefined) {
     return undefined;
@@ -177,6 +206,7 @@ function validateManifest(manifest, directoryName) {
     "requiredProfileFields",
     slug,
   );
+  const reasonHint = validateOptionalReasonHint(manifest.reasonHint, slug);
   const assumptionsUsed = validateOptionalEnumArray(
     manifest.assumptionsUsed,
     "assumptionsUsed",
@@ -218,6 +248,7 @@ function validateManifest(manifest, directoryName) {
     status,
     visibility,
     requiredProfileFields,
+    reasonHint,
     assumptionsUsed,
     calculationDomains,
     riskLevel,

@@ -16,6 +16,7 @@
     "tax.preferredTaxYear",
     "tax.hasFiscalPartner"
   ],
+  "reasonHint": "Handig als je wilt zien hoe rendement, inleg, uitgaven en box 3 je financiële vrijheid beïnvloeden.",
   "assumptionsUsed": ["box3", "tax", "investment", "inflation"],
   "calculationDomains": ["investing", "saving", "tax", "cashflow"],
   "riskLevel": "high",

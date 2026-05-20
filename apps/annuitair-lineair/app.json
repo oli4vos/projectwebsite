@@ -13,6 +13,7 @@
     "housing.mortgageRate",
     "housing.mortgageTermYears"
   ],
+  "reasonHint": "Handig als je annuïtaire en lineaire hypotheeklasten naast elkaar wilt zetten.",
   "assumptionsUsed": ["mortgage", "tax", "investment"],
   "calculationDomains": ["mortgage", "housing", "investing"],
   "riskLevel": "medium",

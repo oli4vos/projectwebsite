@@ -17,6 +17,7 @@
     "employment.aovPremiumAnnual",
     "employment.pensionContributionAnnual"
   ],
+  "reasonHint": "Handig als je wilt weten welk uurtarief past bij inkomen, belasting, pensioen, AOV en buffer.",
   "assumptionsUsed": ["tax", "box1"],
   "calculationDomains": ["employment", "cashflow", "pension", "tax"],
   "riskLevel": "high",

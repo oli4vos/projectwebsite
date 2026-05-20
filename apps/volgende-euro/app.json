@@ -20,6 +20,7 @@
     "housing.targetHomePrice",
     "housing.ownFunds"
   ],
+  "reasonHint": "Handig als je niet zeker weet of extra geld beter naar buffer, aflossen, pensioen of beleggen kan.",
   "assumptionsUsed": ["duo", "tax", "box3", "mortgage", "investment"],
   "calculationDomains": ["saving", "investing", "studentDebt", "mortgage", "tax", "cashflow", "pension"],
   "riskLevel": "high",

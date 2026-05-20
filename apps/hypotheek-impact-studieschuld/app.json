@@ -23,6 +23,7 @@
     "housing.mortgageTermYears",
     "housing.maxMortgageWithoutStudentDebt"
   ],
+  "reasonHint": "Handig als je wilt weten welk DUO-bedrag kan meetellen bij je hypotheekruimte.",
   "assumptionsUsed": ["duo", "mortgage"],
   "calculationDomains": ["studentDebt", "mortgage", "housing"],
   "riskLevel": "medium",

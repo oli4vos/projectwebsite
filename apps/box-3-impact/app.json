@@ -12,6 +12,7 @@
     "tax.hasFiscalPartner",
     "tax.preferredTaxYear"
   ],
+  "reasonHint": "Handig als je wilt zien wat spaargeld, beleggingen en schulden indicatief doen in box 3.",
   "assumptionsUsed": ["tax", "box3"],
   "calculationDomains": ["tax", "saving", "investing"],
   "riskLevel": "medium",

@@ -44,6 +44,7 @@ export type AppManifest = {
   status: AppStatus;
   visibility?: AppVisibility;
   requiredProfileFields?: string[];
+  reasonHint?: string;
   assumptionsUsed?: AppAssumptionDomain[];
   calculationDomains?: AppCalculationDomain[];
   riskLevel?: AppRiskLevel;

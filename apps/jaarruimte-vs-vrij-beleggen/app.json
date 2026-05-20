@@ -16,6 +16,7 @@
     "tax.hasFiscalPartner",
     "savingInvesting.pensionBuildUp"
   ],
+  "reasonHint": "Handig als je twijfelt tussen pensioeninleg met belastingvoordeel en flexibel vrij beleggen.",
   "assumptionsUsed": ["tax", "box1", "box3", "investment"],
   "calculationDomains": ["tax", "investing", "pension"],
   "riskLevel": "high",

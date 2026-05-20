@@ -22,9 +22,10 @@ export function PersonalRoute({ apps }: PersonalRouteProps) {
     () =>
       getRecommendedAppsForProfile(profile, {
         availableSlugs,
+        apps,
         max: 3,
       }),
-    [availableSlugs, profile],
+    [apps, availableSlugs, profile],
   );
   const recommendedApps = useMemo(
     () =>

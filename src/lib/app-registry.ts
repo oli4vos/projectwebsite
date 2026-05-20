@@ -24,6 +24,7 @@ export const appRegistry = [
       "housing.mortgageRate",
       "housing.mortgageTermYears"
     ],
+    "reasonHint": "Handig als je annuïtaire en lineaire hypotheeklasten naast elkaar wilt zetten.",
     "assumptionsUsed": [
       "mortgage",
       "tax",
@@ -60,6 +61,7 @@ export const appRegistry = [
       "tax.hasFiscalPartner",
       "tax.preferredTaxYear"
     ],
+    "reasonHint": "Handig als je wilt zien wat spaargeld, beleggingen en schulden indicatief doen in box 3.",
     "assumptionsUsed": [
       "tax",
       "box3"
@@ -99,6 +101,7 @@ export const appRegistry = [
       "tax.preferredTaxYear",
       "tax.hasFiscalPartner"
     ],
+    "reasonHint": "Handig als je wilt zien hoe rendement, inleg, uitgaven en box 3 je financiële vrijheid beïnvloeden.",
     "assumptionsUsed": [
       "box3",
       "tax",
@@ -144,6 +147,7 @@ export const appRegistry = [
       "savingInvesting.targetEmergencyFund",
       "savingInvesting.monthlyFreeCashflow"
     ],
+    "reasonHint": "Handig als je extra geld wilt vergelijken tussen hypotheek aflossen en vrij beleggen.",
     "assumptionsUsed": [
       "tax",
       "box3",
@@ -194,6 +198,7 @@ export const appRegistry = [
       "housing.mortgageTermYears",
       "housing.maxMortgageWithoutStudentDebt"
     ],
+    "reasonHint": "Handig als je wilt weten welk DUO-bedrag kan meetellen bij je hypotheekruimte.",
     "assumptionsUsed": [
       "duo",
       "mortgage"
@@ -233,6 +238,7 @@ export const appRegistry = [
       "tax.hasFiscalPartner",
       "savingInvesting.pensionBuildUp"
     ],
+    "reasonHint": "Handig als je twijfelt tussen pensioeninleg met belastingvoordeel en flexibel vrij beleggen.",
     "assumptionsUsed": [
       "tax",
       "box1",
@@ -277,6 +283,7 @@ export const appRegistry = [
       "tax.hasFiscalPartner",
       "tax.preferredBox3Method"
     ],
+    "reasonHint": "Handig als je wilt vergelijken wat extra aflossen op je studieschuld doet ten opzichte van beleggen.",
     "assumptionsUsed": [
       "duo",
       "box3",
@@ -322,6 +329,7 @@ export const appRegistry = [
       "housing.targetHomePrice",
       "housing.ownFunds"
     ],
+    "reasonHint": "Handig als je niet zeker weet of extra geld beter naar buffer, aflossen, pensioen of beleggen kan.",
     "assumptionsUsed": [
       "duo",
       "tax",
@@ -369,6 +377,7 @@ export const appRegistry = [
       "employment.aovPremiumAnnual",
       "employment.pensionContributionAnnual"
     ],
+    "reasonHint": "Handig als je wilt weten welk uurtarief past bij inkomen, belasting, pensioen, AOV en buffer.",
     "assumptionsUsed": [
       "tax",
       "box1"
