@@ -118,6 +118,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/lib/duo/`: centrale DUO-domeinlaag met wettelijk maandbedrag, relevant maandbedrag per situatie en scenariofuncties voor extra aflossen
 - `src/lib/duo/calculations.test.ts`: regressietests voor centrale DUO-berekenfuncties
 - `src/lib/tax/`: centrale indicatieve tax-laag voor box 1, hypotheekrenteaftrek en box 3
+- `src/lib/pension/`: centrale indicatieve pensioenlaag voor inleg-/uitkeringsscenario's (jaarruimte/lijfrente)
 - `src/lib/financial-constants/index.test.ts`: regressietests voor jaarkeuze/fallbacks en centrale aannames-helpers
 - `src/lib/profile-prefill.test.ts` en `src/lib/profile-tool-mapping.test.ts`: regressietests voor centrale profiel-prefill en toolmapping
 - `apps/hypotheek-impact-studieschuld/logic.test.ts`: regressietests voor tool-specifieke scenario-uitkomsten en defensieve inputafhandeling
@@ -192,6 +193,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 
 - Hou rekenlogica zo veel mogelijk puur en los van UI.
 - DUO-logica (wettelijk maandbedrag, situatie-afhankelijke relevantie, extra aflossen scenario's) loopt centraal via `src/lib/duo`.
+- Pensioeninleg-/uitkeringsaannames voor tools lopen centraal via `src/lib/pension`.
 - `npm run test` draait lichte unit-tests (Vitest) voor pure domeinlogica.
 - Teststrategie:
   - centrale constants altijd via `src/lib/financial-constants` en met regressietests op jaar-fallbacks;

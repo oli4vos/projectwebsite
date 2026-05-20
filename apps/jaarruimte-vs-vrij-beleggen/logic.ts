@@ -2,6 +2,13 @@ import {
   getDefaultFinancialYear,
   getFinancialConstants,
 } from "@/lib/financial-constants";
+import {
+  calculateFutureValueLumpSum,
+  calculatePensionContributionScenario,
+  sanitizePensionMoney,
+  sanitizePensionPercent,
+  sanitizePensionYears,
+} from "@/lib/pension";
 import { calculateBox1Tax, calculateBox3Tax } from "@/lib/tax";
 
 export type FlexibilityPreference = "low" | "medium" | "high";
@@ -62,20 +69,6 @@ export type JaarruimteVsVrijBeleggenResult = {
   guidance: string[];
 };
 
-function sanitizeMoney(value: number | undefined) {
-  if (!Number.isFinite(value)) {
-    return 0;
-  }
-  return Math.max(value as number, 0);
-}
-
-function sanitizePercent(value: number | undefined) {
-  if (!Number.isFinite(value)) {
-    return undefined;
-  }
-  return Math.min(Math.max(value as number, 0), 100);
-}
-
 function sanitizeYear(value?: number) {
   if (!Number.isFinite(value)) {
     return getDefaultFinancialYear();
@@ -87,26 +80,12 @@ function sanitizeYear(value?: number) {
   return rounded;
 }
 
-function sanitizeYears(value: number | undefined) {
-  if (!Number.isFinite(value)) {
-    return 10;
-  }
-  return Math.min(Math.max(Math.round(value as number), 1), 60);
-}
-
 function roundMoney(value: number) {
   return Math.round(Math.max(value, 0) * 100) / 100;
 }
 
 function roundPercent(value: number) {
   return Math.round(Math.max(value, 0) * 100) / 100;
-}
-
-function calculateFutureValueLumpSum(principal: number, annualReturn: number, years: number) {
-  const safePrincipal = sanitizeMoney(principal);
-  const safeReturn = sanitizePercent(annualReturn) ?? 0;
-  const safeYears = sanitizeYears(years);
-  return roundMoney(safePrincipal * Math.pow(1 + safeReturn / 100, safeYears));
 }
 
 function clampScore(score: number) {
@@ -144,11 +123,11 @@ export function calculateJaarruimteVsVrijBeleggen(
 ): JaarruimteVsVrijBeleggenResult {
   const year = sanitizeYear(input.year);
   const constants = getFinancialConstants(year);
-  const grossAnnualIncome = sanitizeMoney(input.grossAnnualIncome);
-  const taxableIncomeInput = sanitizeMoney(input.taxableIncome);
+  const grossAnnualIncome = sanitizePensionMoney(input.grossAnnualIncome);
+  const taxableIncomeInput = sanitizePensionMoney(input.taxableIncome);
   const usedTaxableIncome = taxableIncomeInput > 0 ? taxableIncomeInput : grossAnnualIncome;
-  const availableJaarruimte = sanitizeMoney(input.availableJaarruimte);
-  const contributionRequested = sanitizeMoney(input.plannedContribution);
+  const availableJaarruimte = sanitizePensionMoney(input.availableJaarruimte);
+  const contributionRequested = sanitizePensionMoney(input.plannedContribution);
   const contributionEligibleForJaarruimte = Math.min(
     contributionRequested,
     availableJaarruimte,
@@ -156,11 +135,11 @@ export function calculateJaarruimteVsVrijBeleggen(
   const contributionOutsideJaarruimte = roundMoney(
     Math.max(contributionRequested - contributionEligibleForJaarruimte, 0),
   );
-  const expectedAnnualReturn = sanitizePercent(input.expectedAnnualReturn) ?? 5;
-  const horizonYears = sanitizeYears(input.horizonYears);
+  const expectedAnnualReturn = sanitizePensionPercent(input.expectedAnnualReturn) ?? 5;
+  const horizonYears = sanitizePensionYears(input.horizonYears);
   const includeBox3Effect = Boolean(input.includeBox3Effect);
   const hasFiscalPartner = Boolean(input.hasFiscalPartner);
-  const currentInvestableAssets = sanitizeMoney(input.currentInvestableAssets);
+  const currentInvestableAssets = sanitizePensionMoney(input.currentInvestableAssets);
   const flexibilityPreference = input.flexibilityPreference ?? "medium";
 
   const box1Result = calculateBox1Tax({
@@ -168,33 +147,18 @@ export function calculateJaarruimteVsVrijBeleggen(
     year,
   });
   const derivedCurrentTaxRate = box1Result.marginalRate;
-  const overrideCurrentTaxRate = sanitizePercent(input.overrideCurrentTaxRate);
+  const overrideCurrentTaxRate = sanitizePensionPercent(input.overrideCurrentTaxRate);
   const currentTaxRateUsed = roundPercent(
     overrideCurrentTaxRate ?? derivedCurrentTaxRate,
   );
-  const expectedTaxRateAtPayout = sanitizePercent(input.expectedTaxRateAtPayout);
-
-  const taxBenefitNow = roundMoney(
-    contributionEligibleForJaarruimte * (currentTaxRateUsed / 100),
-  );
-  const netCostNow = roundMoney(
-    Math.max(contributionEligibleForJaarruimte - taxBenefitNow, 0),
-  );
-  const pensionFutureValueGross = calculateFutureValueLumpSum(
-    contributionEligibleForJaarruimte,
-    expectedAnnualReturn,
+  const expectedTaxRateAtPayout = sanitizePensionPercent(input.expectedTaxRateAtPayout);
+  const pensionScenario = calculatePensionContributionScenario({
+    contribution: contributionEligibleForJaarruimte,
+    annualReturnPercent: expectedAnnualReturn,
     horizonYears,
-  );
-  const estimatedTaxAtPayout =
-    expectedTaxRateAtPayout === undefined
-      ? undefined
-      : roundMoney(pensionFutureValueGross * (expectedTaxRateAtPayout / 100));
-  const pensionFutureValueNetIndicative = roundMoney(
-    Math.max(
-      pensionFutureValueGross - (estimatedTaxAtPayout ?? 0),
-      0,
-    ),
-  );
+    currentTaxRatePercent: currentTaxRateUsed,
+    payoutTaxRatePercent: expectedTaxRateAtPayout,
+  });
 
   const freeInvestingFutureValueGross = calculateFutureValueLumpSum(
     contributionRequested,
@@ -235,12 +199,12 @@ export function calculateJaarruimteVsVrijBeleggen(
   );
 
   const netDifferencePensionMinusInvesting = roundMoney(
-    pensionFutureValueNetIndicative - freeInvestingFutureValueNetIndicative,
+    pensionScenario.futureValueNetIndicative - freeInvestingFutureValueNetIndicative,
   );
 
   const flexibilityAdjustment = getFlexibilityAdjustment(flexibilityPreference);
   const taxEdgeScore = contributionRequested > 0
-    ? Math.min((taxBenefitNow / contributionRequested) * 100, 20)
+    ? Math.min((pensionScenario.taxBenefitNow / contributionRequested) * 100, 20)
     : 0;
   const pensionFitScore = clampScore(
     50 + flexibilityAdjustment.pension + taxEdgeScore,
@@ -262,10 +226,10 @@ export function calculateJaarruimteVsVrijBeleggen(
       "Het box 3-effect is indicatief en vereenvoudigd naar één vergelijkingsjaar.",
     );
   }
-  if (expectedTaxRateAtPayout === undefined) {
-    warnings.push(
-      "Belasting bij uitkering is niet ingevuld; netto pensioenuitkomst kan dus afwijken.",
-    );
+  for (const pensionWarning of pensionScenario.warnings) {
+    if (!warnings.includes(pensionWarning)) {
+      warnings.push(pensionWarning);
+    }
   }
 
   const guidance = [
@@ -286,11 +250,11 @@ export function calculateJaarruimteVsVrijBeleggen(
     expectedTaxRateAtPayoutUsed: expectedTaxRateAtPayout,
     scenarioPension: {
       contribution: contributionEligibleForJaarruimte,
-      taxBenefitNow,
-      netCostNow,
-      futureValueGross: pensionFutureValueGross,
-      estimatedTaxAtPayout,
-      futureValueNetIndicative: pensionFutureValueNetIndicative,
+      taxBenefitNow: pensionScenario.taxBenefitNow,
+      netCostNow: pensionScenario.netCostNow,
+      futureValueGross: pensionScenario.futureValueGross,
+      estimatedTaxAtPayout: pensionScenario.estimatedTaxAtPayout,
+      futureValueNetIndicative: pensionScenario.futureValueNetIndicative,
     },
     scenarioFreeInvesting: {
       contribution: contributionRequested,
