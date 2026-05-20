@@ -47,6 +47,20 @@ export const PROFILE_FIELDS_JAARRUIMTE_VS_VRIJ_BELEGGEN = [
   "savingInvesting.pensionBuildUp",
 ] as const;
 
+export const PROFILE_FIELDS_VOLGENDE_EURO = [
+  "savingInvesting.currentSavings",
+  "savingInvesting.targetEmergencyFund",
+  "savingInvesting.monthlyFreeCashflow",
+  "savingInvesting.expectedAnnualReturn",
+  "savingInvesting.investmentHorizonYears",
+  "savingInvesting.riskProfile",
+  "studentDebt.remainingDebt",
+  "studentDebt.duoInterestRate",
+  "housing.mortgageRate",
+  "housing.targetHomePrice",
+  "housing.ownFunds",
+] as const;
+
 type MortgageImpactDefaults = Partial<{
   grossIncomeUser: string;
   grossIncomePartner: string;
@@ -110,6 +124,21 @@ type JaarruimteVsVrijBeleggenDefaults = Partial<{
   horizonYears: string;
   hasFiscalPartner: boolean;
   plannedContribution: string;
+}>;
+
+type VolgendeEuroDefaults = Partial<{
+  currentBuffer: string;
+  targetBuffer: string;
+  monthlyFreeRoom: string;
+  expectedAnnualReturn: string;
+  horizonYears: string;
+  riskProfile: "conservative" | "neutral" | "offensive";
+  studentDebtAmount: string;
+  duoRate: string;
+  mortgageRate: string;
+  targetHomePrice: string;
+  ownFunds: string;
+  hasHousingGoal: boolean;
 }>;
 
 function toStringValue(value?: number) {
@@ -427,6 +456,74 @@ export function getJaarruimteVsVrijBeleggenDefaultsFromProfile(
   if (pensionContributionAnnual !== undefined) {
     defaults.plannedContribution = pensionContributionAnnual;
   }
+
+  return defaults;
+}
+
+export function getVolgendeEuroDefaultsFromProfile(
+  profile: UserProfile,
+): VolgendeEuroDefaults {
+  const defaults: VolgendeEuroDefaults = {};
+
+  const currentBuffer = toStringValue(profile.savingInvesting?.currentSavings);
+  if (currentBuffer !== undefined) {
+    defaults.currentBuffer = currentBuffer;
+  }
+
+  const targetBuffer = toStringValue(profile.savingInvesting?.targetEmergencyFund);
+  if (targetBuffer !== undefined) {
+    defaults.targetBuffer = targetBuffer;
+  }
+
+  const monthlyFreeRoom = toStringValue(profile.savingInvesting?.monthlyFreeCashflow);
+  if (monthlyFreeRoom !== undefined) {
+    defaults.monthlyFreeRoom = monthlyFreeRoom;
+  }
+
+  const expectedAnnualReturn = toStringValue(
+    profile.savingInvesting?.expectedAnnualReturn,
+  );
+  if (expectedAnnualReturn !== undefined) {
+    defaults.expectedAnnualReturn = expectedAnnualReturn;
+  }
+
+  const horizonYears = toStringValue(profile.savingInvesting?.investmentHorizonYears);
+  if (horizonYears !== undefined) {
+    defaults.horizonYears = horizonYears;
+  }
+
+  if (profile.savingInvesting?.riskProfile !== undefined) {
+    defaults.riskProfile = profile.savingInvesting.riskProfile;
+  }
+
+  const studentDebtAmount = toStringValue(profile.studentDebt?.remainingDebt);
+  if (studentDebtAmount !== undefined) {
+    defaults.studentDebtAmount = studentDebtAmount;
+  }
+
+  const duoRate = toStringValue(profile.studentDebt?.duoInterestRate);
+  if (duoRate !== undefined) {
+    defaults.duoRate = duoRate;
+  }
+
+  const mortgageRate = toStringValue(profile.housing?.mortgageRate);
+  if (mortgageRate !== undefined) {
+    defaults.mortgageRate = mortgageRate;
+  }
+
+  const targetHomePrice = toStringValue(profile.housing?.targetHomePrice);
+  if (targetHomePrice !== undefined) {
+    defaults.targetHomePrice = targetHomePrice;
+  }
+
+  const ownFunds = toStringValue(profile.housing?.ownFunds);
+  if (ownFunds !== undefined) {
+    defaults.ownFunds = ownFunds;
+  }
+
+  defaults.hasHousingGoal = Boolean(
+    (profile.housing?.targetHomePrice ?? 0) > 0 || (profile.housing?.ownFunds ?? 0) > 0,
+  );
 
   return defaults;
 }

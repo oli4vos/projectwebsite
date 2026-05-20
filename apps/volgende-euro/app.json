@@ -1,0 +1,30 @@
+{
+  "slug": "volgende-euro",
+  "title": "Wat doe ik met mijn volgende euro?",
+  "description": "Bepaal of extra geld logischer naar buffer, aflossen, pensioen, woning of beleggen kan.",
+  "type": "frontend",
+  "category": "Persoonlijke financiën",
+  "tags": ["buffer", "beleggen", "aflossen", "pensioen", "FIRE"],
+  "status": "beta",
+  "visibility": "public",
+  "requiredProfileFields": [
+    "savingInvesting.currentSavings",
+    "savingInvesting.targetEmergencyFund",
+    "savingInvesting.monthlyFreeCashflow",
+    "savingInvesting.expectedAnnualReturn",
+    "savingInvesting.investmentHorizonYears",
+    "savingInvesting.riskProfile",
+    "studentDebt.remainingDebt",
+    "studentDebt.duoInterestRate",
+    "housing.mortgageRate",
+    "housing.targetHomePrice",
+    "housing.ownFunds"
+  ],
+  "assumptionsUsed": ["duo", "tax", "box3", "mortgage", "investment"],
+  "calculationDomains": ["saving", "investing", "studentDebt", "mortgage", "tax", "cashflow", "pension"],
+  "riskLevel": "high",
+  "disclaimerType": "financialEducation",
+  "outputType": "scenarioComparison",
+  "version": "1.0.0",
+  "entry": "Calculator.tsx"
+}

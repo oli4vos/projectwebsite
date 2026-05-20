@@ -5,6 +5,7 @@ import {
   getJaarruimteVsVrijBeleggenDefaultsFromProfile,
   getMortgageImpactDefaultsFromProfile,
   getStudentDebtVsInvestingDefaultsFromProfile,
+  getVolgendeEuroDefaultsFromProfile,
 } from "@/lib/profile-tool-mapping";
 import type { UserProfile } from "@/lib/user-profile";
 
@@ -154,5 +155,41 @@ describe("profile tool mapping", () => {
     expect(mapped.horizonYears).toBe("18");
     expect(mapped.hasFiscalPartner).toBe(true);
     expect(mapped.plannedContribution).toBe("4200");
+  });
+
+  it("maps volgende-euro defaults from profile values", () => {
+    const profile: UserProfile = {
+      savingInvesting: {
+        currentSavings: 17000,
+        targetEmergencyFund: 25000,
+        monthlyFreeCashflow: 600,
+        expectedAnnualReturn: 5.5,
+        investmentHorizonYears: 14,
+        riskProfile: "offensive",
+      },
+      studentDebt: {
+        remainingDebt: 28000,
+        duoInterestRate: 2.33,
+      },
+      housing: {
+        mortgageRate: 4.2,
+        targetHomePrice: 450000,
+        ownFunds: 30000,
+      },
+    };
+
+    const mapped = getVolgendeEuroDefaultsFromProfile(profile);
+    expect(mapped.currentBuffer).toBe("17000");
+    expect(mapped.targetBuffer).toBe("25000");
+    expect(mapped.monthlyFreeRoom).toBe("600");
+    expect(mapped.expectedAnnualReturn).toBe("5.5");
+    expect(mapped.horizonYears).toBe("14");
+    expect(mapped.riskProfile).toBe("offensive");
+    expect(mapped.studentDebtAmount).toBe("28000");
+    expect(mapped.duoRate).toBe("2.33");
+    expect(mapped.mortgageRate).toBe("4.2");
+    expect(mapped.targetHomePrice).toBe("450000");
+    expect(mapped.ownFunds).toBe("30000");
+    expect(mapped.hasHousingGoal).toBe(true);
   });
 });

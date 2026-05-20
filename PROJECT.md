@@ -148,6 +148,10 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - gebruiker vult beschikbare jaarruimte zelf in; tool claimt geen officiële jaarruimteberekening
   - gebruikt centrale box 1- en box 3-logica voor indicatief voordeel nu en netto eindwaarde
   - benadrukt afweging tussen fiscaal voordeel en flexibiliteit (relevant voor FIRE-scenario's)
+- `apps/volgende-euro`
+  - centrale prioriteitenhulp voor de vraag waar extra geld nu het meest logisch naartoe kan
+  - combineert buffer, dure schuld, studieschuld, hypotheek, jaarruimte, beleggen en woningdoel in één educatieve scorelijst
+  - gebruikt centrale profieldefaults plus DUO/constants-context, maar blijft expliciet geen financieel advies
 - `apps/annuitair-lineair`
   - wrapper rond bestaande JS-logica
   - bevat oudere rekenscripts in `.js`
@@ -176,6 +180,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - `apps/hypotheek-impact-studieschuld`
   - `apps/studieschuld-vs-beleggen`
   - `apps/jaarruimte-vs-vrij-beleggen`
+  - `apps/volgende-euro`
 - Die tools lezen profielwaarden als defaults, maar schrijven nog niet automatisch terug naar het profiel.
 - De mapping daarvan loopt centraal via `src/lib/profile-tool-mapping.ts`.
 - Tool-prefillgedrag (initial values, profile-key, apply profile patch) loopt gedeeld via `src/lib/profile-prefill.ts`.
@@ -237,6 +242,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - Toolverdieping mag die centrale aannames tonen, maar light-gebruikers worden niet gedwongen die details te openen.
 - In `studieschuld-vs-beleggen` blijft box 3 een optionele verdieping (toggle + disclosure); de hoofdflow blijft licht en bruikbaar zonder fiscale invoer.
 - In `studieschuld-vs-beleggen` wordt box 3 nu jaarlijks toegepast in het scenario; belasting wordt per jaar betaald en groeit daarna niet mee in compound.
+- `volgende-euro` is een educatieve prioriteitenhulp (geen adviesengine) en moet altijd uitleggen waarom een keuze hoger/lager scoort.
 - Mobiele header schakelt bij omlaag scrollen naar compacte modus (logo + Rekentools/Mijn profiel) en klapt terug open bij omhoog scrollen.
 - In `hypotheek-impact-studieschuld` is de oude snelle vuistregel verwijderd; de kern blijft netto DUO-last -> brutering -> annuïtaire impact.
 - `hypotheek-impact-studieschuld` toont nu ook een indicatieve inkomens-naar-hypotheek-capaciteit als context (geen officiële leennormberekening).
