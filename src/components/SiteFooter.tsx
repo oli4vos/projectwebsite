@@ -11,28 +11,28 @@ export function SiteFooter() {
         </div>
         <div className="flex flex-wrap items-center gap-3 sm:gap-5">
           <Link
-            href="/#werkwijze"
-            className="rounded-full px-2 py-1 transition hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
-          >
-            Werkwijze
-          </Link>
-          <Link
             href="/#apps"
             className="rounded-full px-2 py-1 transition hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
           >
-            Rekentools
+            Overzicht
+          </Link>
+          <Link
+            href="/#persoonlijk"
+            className="rounded-full px-2 py-1 transition hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
+          >
+            Persoonlijk
+          </Link>
+          <Link
+            href="/#aannames"
+            className="rounded-full px-2 py-1 transition hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
+          >
+            Aannames
           </Link>
           <Link
             href="/apps/studieschuld-vs-beleggen"
             className="rounded-full px-2 py-1 transition hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
           >
             Voorbeeldtool
-          </Link>
-          <Link
-            href="/variabelen"
-            className="rounded-full px-2 py-1 transition hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
-          >
-            Variabelen
           </Link>
         </div>
       </div>

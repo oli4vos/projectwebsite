@@ -5,11 +5,12 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { BtnLink, Logo } from "@/components/ui";
 import { appRegistry } from "@/lib/app-registry";
+import { toAnchorId } from "@/lib/anchor-ids";
 
 const navItems = [
   { href: "/#apps", label: "Overzicht" },
-  { href: "/#werkwijze", label: "Werkwijze" },
-  { href: "/#scenario", label: "Scenario's" },
+  { href: "/#persoonlijk", label: "Persoonlijk" },
+  { href: "/#aannames", label: "Aannames" },
 ] as const;
 
 const headerCategories = Array.from(
@@ -21,7 +22,17 @@ function navClassName() {
 }
 
 function categoryHref(category: string) {
-  return `/?categorie=${encodeURIComponent(category)}#apps`;
+  const categoryToGroupTitle: Record<string, string> = {
+    Schulden: "Studieschuld",
+    Hypotheek: "Wonen",
+    Beleggen: "Sparen & beleggen",
+    Belasting: "Belasting",
+    Werk: "Werk & ZZP",
+    "Persoonlijke financiën": "Persoonlijke financiën",
+  };
+
+  const groupTitle = categoryToGroupTitle[category] ?? "Persoonlijke financiën";
+  return `/#${toAnchorId(groupTitle, "groep")}`;
 }
 
 export function SiteHeader() {

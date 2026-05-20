@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import type { AppManifest } from "@/lib/app-types";
+import { toAnchorId } from "@/lib/anchor-ids";
 import { BtnLink } from "@/components/ui";
 import { AppCard } from "./AppCard";
 import { KnowledgeLevelSelector } from "./KnowledgeLevelSelector";
@@ -112,7 +113,10 @@ export function AppDashboard({ apps }: AppDashboardProps) {
               <span className="text-[12px] text-[var(--soft)]">
                 {group.apps.length} {group.apps.length === 1 ? "tool" : "tools"}
               </span>
-              <Link href={`#groep-${encodeURIComponent(group.title)}`} className="text-[12px] text-[var(--ink)] underline">
+              <Link
+                href={`#${toAnchorId(group.title, "groep")}`}
+                className="text-[12px] text-[var(--ink)] underline"
+              >
                 Bekijk tools
               </Link>
             </div>
@@ -123,7 +127,7 @@ export function AppDashboard({ apps }: AppDashboardProps) {
       <section className="space-y-6">
         {groupedApps.map((group) => (
           <section
-            id={`groep-${encodeURIComponent(group.title)}`}
+            id={toAnchorId(group.title, "groep")}
             key={group.title}
             className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper"
           >
@@ -149,9 +153,14 @@ export function AppDashboard({ apps }: AppDashboardProps) {
         ))}
       </section>
 
-      <PersonalRoute apps={apps} />
+      <section id="persoonlijk">
+        <PersonalRoute apps={apps} />
+      </section>
 
-      <section className="grid gap-4 rounded-[1.5rem] border hair bg-white p-6 shadow-paper md:grid-cols-2">
+      <section
+        id="aannames"
+        className="grid gap-4 rounded-[1.5rem] border hair bg-white p-6 shadow-paper md:grid-cols-2"
+      >
         <div>
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
             Maak het persoonlijker
