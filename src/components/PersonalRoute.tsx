@@ -7,7 +7,7 @@ import { useUserProfile } from "@/hooks/useUserProfile";
 import type { AppManifest } from "@/lib/app-types";
 import {
   getProfileCompleteness,
-  getRecommendedAppSlugsForProfile,
+  getRecommendedAppsForProfile,
 } from "@/lib/profile-recommendations";
 
 type PersonalRouteProps = {
@@ -18,9 +18,9 @@ export function PersonalRoute({ apps }: PersonalRouteProps) {
   const { profile, hasProfile } = useUserProfile();
   const completeness = useMemo(() => getProfileCompleteness(profile), [profile]);
   const availableSlugs = useMemo(() => apps.map((app) => app.slug), [apps]);
-  const recommendedSlugs = useMemo(
+  const recommendations = useMemo(
     () =>
-      getRecommendedAppSlugsForProfile(profile, {
+      getRecommendedAppsForProfile(profile, {
         availableSlugs,
         max: 3,
       }),
@@ -28,10 +28,16 @@ export function PersonalRoute({ apps }: PersonalRouteProps) {
   );
   const recommendedApps = useMemo(
     () =>
-      recommendedSlugs
-        .map((slug) => apps.find((app) => app.slug === slug))
-        .filter((app): app is AppManifest => Boolean(app)),
-    [apps, recommendedSlugs],
+      recommendations
+        .map((recommendation) => {
+          const app = apps.find((candidate) => candidate.slug === recommendation.slug);
+          if (!app) {
+            return null;
+          }
+          return { app, reason: recommendation.reason };
+        })
+        .filter((item): item is { app: AppManifest; reason: string } => Boolean(item)),
+    [apps, recommendations],
   );
 
   const needsMoreProfileInput = hasProfile && completeness.score < 35;
@@ -82,7 +88,7 @@ export function PersonalRoute({ apps }: PersonalRouteProps) {
         <>
           {recommendedApps.length > 0 ? (
             <div className="grid gap-4 md:grid-cols-3">
-              {recommendedApps.map((app) => (
+              {recommendedApps.map(({ app, reason }) => (
                 <article
                   key={app.slug}
                   className="rounded-xl border border-[var(--hair)] bg-white p-4"
@@ -96,6 +102,14 @@ export function PersonalRoute({ apps }: PersonalRouteProps) {
                   <p className="mt-2 text-[13px] leading-[1.6] text-[var(--muted)]">
                     {app.description}
                   </p>
+                  <div className="mt-3 rounded-lg bg-[var(--paper-soft)] px-3 py-2">
+                    <p className="text-[11px] uppercase tracking-[0.08em] text-[var(--soft)]">
+                      Waarom deze?
+                    </p>
+                    <p className="mt-1 text-[12.5px] leading-[1.55] text-[var(--muted)]">
+                      {reason}
+                    </p>
+                  </div>
                   <div className="mt-3">
                     <BtnLink href={`/apps/${app.slug}`} kind="ghost" size="sm">
                       Open tool

@@ -15,6 +15,11 @@ export type ProfileCompleteness = {
   score: number;
 };
 
+export type ProfileRecommendation = {
+  slug: string;
+  reason: string;
+};
+
 const defaultRecommendation = "volgende-euro";
 
 function hasPositiveNumber(value: number | undefined) {
@@ -23,6 +28,21 @@ function hasPositiveNumber(value: number | undefined) {
 
 function dedupeSlugs(slugs: string[]) {
   return Array.from(new Set(slugs));
+}
+
+function dedupeRecommendations(recommendations: ProfileRecommendation[]) {
+  const seen = new Set<string>();
+  const deduped: ProfileRecommendation[] = [];
+
+  for (const recommendation of recommendations) {
+    if (seen.has(recommendation.slug)) {
+      continue;
+    }
+    seen.add(recommendation.slug);
+    deduped.push(recommendation);
+  }
+
+  return deduped;
 }
 
 export function getProfileCompleteness(profile: UserProfile): ProfileCompleteness {
@@ -91,6 +111,106 @@ export function getProfileCompleteness(profile: UserProfile): ProfileCompletenes
   };
 }
 
+export function getRecommendedAppsForProfile(
+  profile: UserProfile | null | undefined,
+  options?: {
+    availableSlugs?: string[];
+    max?: number;
+  },
+) {
+  const safeProfile = profile ?? {};
+  const max = options?.max ?? 3;
+  const availableSlugs = options?.availableSlugs ?? [];
+  const recommendations: ProfileRecommendation[] = [];
+
+  if (hasPositiveNumber(safeProfile.studentDebt?.remainingDebt)) {
+    recommendations.push({
+      slug: "studieschuld-vs-beleggen",
+      reason:
+        "Omdat je studieschuld hebt ingevuld en extra aflossen niet altijd de enige logische keuze is.",
+    });
+    recommendations.push({
+      slug: "hypotheek-impact-studieschuld",
+      reason:
+        "Omdat je studieschuld of woningdoel hebt ingevuld en DUO invloed kan hebben op je hypotheekruimte.",
+    });
+  }
+
+  if (
+    hasPositiveNumber(safeProfile.housing?.targetHomePrice) ||
+    hasPositiveNumber(safeProfile.housing?.mortgageRate)
+  ) {
+    recommendations.push({
+      slug: "hypotheek-impact-studieschuld",
+      reason:
+        "Omdat je studieschuld of woningdoel hebt ingevuld en DUO invloed kan hebben op je hypotheekruimte.",
+    });
+    recommendations.push({
+      slug: "hypotheek-aflossen-vs-beleggen",
+      reason:
+        "Omdat je hypotheekgegevens hebt ingevuld en extra aflossen niet altijd beter is dan beleggen.",
+    });
+  }
+
+  if (
+    hasPositiveNumber(safeProfile.savingInvesting?.currentSavings) ||
+    hasPositiveNumber(safeProfile.savingInvesting?.expectedAnnualReturn)
+  ) {
+    recommendations.push({
+      slug: "box-3-impact",
+      reason:
+        "Omdat je spaargeld of beleggingen hebt ingevuld en box 3 je netto rendement kan beïnvloeden.",
+    });
+    recommendations.push({
+      slug: "fire-na-belasting",
+      reason:
+        "Omdat je beleggingsgegevens hebt ingevuld en box 3 je FIRE-pad kan vertragen.",
+    });
+    recommendations.push({
+      slug: "jaarruimte-vs-vrij-beleggen",
+      reason:
+        "Omdat pensioeninleg fiscaal gunstig kan zijn, maar minder flexibel is dan vrij beleggen.",
+    });
+  }
+
+  if (safeProfile.income?.employmentType === "selfEmployed") {
+    recommendations.push({
+      slug: "zzp-uurtarief",
+      reason:
+        "Omdat je ZZP of zelfstandig werken hebt ingevuld en omzet geen salaris is.",
+    });
+  }
+
+  if (recommendations.length === 0) {
+    recommendations.push({
+      slug: defaultRecommendation,
+      reason:
+        "Omdat dit een brede starttool is als je nog niet weet waar je geld het beste naartoe kan.",
+    });
+  }
+
+  const uniqueRecommendations = dedupeRecommendations(recommendations);
+  const filteredRecommendations =
+    availableSlugs.length > 0
+      ? uniqueRecommendations.filter((item) => availableSlugs.includes(item.slug))
+      : uniqueRecommendations;
+
+  if (
+    filteredRecommendations.length === 0 &&
+    availableSlugs.includes(defaultRecommendation)
+  ) {
+    return [
+      {
+        slug: defaultRecommendation,
+        reason:
+          "Omdat dit een brede starttool is als je nog niet weet waar je geld het beste naartoe kan.",
+      },
+    ];
+  }
+
+  return filteredRecommendations.slice(0, Math.max(1, max));
+}
+
 export function getRecommendedAppSlugsForProfile(
   profile: UserProfile,
   options?: {
@@ -98,45 +218,5 @@ export function getRecommendedAppSlugsForProfile(
     max?: number;
   },
 ) {
-  const max = options?.max ?? 3;
-  const availableSlugs = options?.availableSlugs ?? [];
-  const slugs: string[] = [];
-
-  if (hasPositiveNumber(profile.studentDebt?.remainingDebt)) {
-    slugs.push("studieschuld-vs-beleggen", "hypotheek-impact-studieschuld");
-  }
-
-  if (
-    hasPositiveNumber(profile.housing?.targetHomePrice) ||
-    hasPositiveNumber(profile.housing?.mortgageRate)
-  ) {
-    slugs.push("hypotheek-impact-studieschuld", "hypotheek-aflossen-vs-beleggen");
-  }
-
-  if (
-    hasPositiveNumber(profile.savingInvesting?.currentSavings) ||
-    hasPositiveNumber(profile.savingInvesting?.expectedAnnualReturn)
-  ) {
-    slugs.push("box-3-impact", "fire-na-belasting", "jaarruimte-vs-vrij-beleggen");
-  }
-
-  if (profile.income?.employmentType === "selfEmployed") {
-    slugs.push("zzp-uurtarief");
-  }
-
-  if (slugs.length === 0) {
-    slugs.push(defaultRecommendation);
-  }
-
-  const uniqueSlugs = dedupeSlugs(slugs);
-  const filteredSlugs =
-    availableSlugs.length > 0
-      ? uniqueSlugs.filter((slug) => availableSlugs.includes(slug))
-      : uniqueSlugs;
-
-  if (filteredSlugs.length === 0 && availableSlugs.includes(defaultRecommendation)) {
-    return [defaultRecommendation];
-  }
-
-  return filteredSlugs.slice(0, Math.max(1, max));
+  return getRecommendedAppsForProfile(profile, options).map((item) => item.slug);
 }

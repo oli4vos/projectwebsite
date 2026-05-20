@@ -258,6 +258,8 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - Homepage-principe:
   - toon eerst “waar begin ik?” met duidelijke keuze-CTA
   - daarna profielblok en thematische toolgroepen
+  - persoonlijke route toont maximaal 3 tools met korte “waarom deze tool?” uitleg
+  - redenen zijn informatief en transparant, geen adviesmachine
   - daartussen “Jouw snelle route” op basis van local-first profielstatus
   - aanbevelingen zijn startpunten, geen financieel advies
   - technische metadata blijft buiten de primaire homepageflow
