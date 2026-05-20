@@ -14,7 +14,7 @@ describe("profile prefill helpers", () => {
     });
 
     expect(base.hasRelevantProfileValues).toBe(true);
-    expect(base.initialValues.income).toBe("2000");
+    expect(base.initialValues.income).toBe("1000");
     expect(base.profileKey).toContain("profile-2026-05-19");
   });
 

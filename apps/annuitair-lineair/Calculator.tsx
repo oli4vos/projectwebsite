@@ -15,11 +15,18 @@ type FormState = {
 
 type ValidationErrors = Partial<Record<keyof FormState, string>>;
 
-const defaults: FormState = {
+const exampleValues: FormState = {
   loanAmount: "385000",
   interestRatePercent: "3.89",
   loanTermYears: "30",
   annualReturnPercent: "5.5",
+};
+
+const defaults: FormState = {
+  loanAmount: "",
+  interestRatePercent: "",
+  loanTermYears: "",
+  annualReturnPercent: "",
 };
 
 function formatCurrency(value: number, maximumFractionDigits = 0) {
@@ -108,6 +115,10 @@ export default function Calculator() {
     }));
   }
 
+  function applyExampleValues() {
+    setFormValues(exampleValues);
+  }
+
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
       <section className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
@@ -122,6 +133,17 @@ export default function Calculator() {
           eerste maandlast, maar ook wat het verschil in de tijd doet en hoeveel
           ruimte een beleggingspot kan opvangen.
         </p>
+
+        <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
+          <span>Start leeg en vul snel een voorbeeldscenario in.</span>
+          <button
+            type="button"
+            onClick={applyExampleValues}
+            className="rounded-full border hair bg-white px-3 py-2 text-[12px] text-[var(--ink)] transition hover:bg-[var(--paper-soft)]"
+          >
+            Gebruik voorbeeldwaarden
+          </button>
+        </div>
 
         <div className="mt-6 grid gap-5">
           <label className="grid gap-2">

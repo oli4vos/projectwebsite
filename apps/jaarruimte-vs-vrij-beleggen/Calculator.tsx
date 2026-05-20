@@ -39,7 +39,7 @@ type FormState = {
 
 type ValidationErrors = Partial<Record<keyof FormState, string>>;
 
-const defaultValues: FormState = {
+const exampleValues: FormState = {
   year: String(getDefaultFinancialYear()),
   grossAnnualIncome: "55000",
   taxableIncome: "",
@@ -49,6 +49,22 @@ const defaultValues: FormState = {
   hasFiscalPartner: false,
   expectedAnnualReturn: "5",
   horizonYears: "20",
+  overrideCurrentTaxRate: "",
+  expectedTaxRateAtPayout: "",
+  includeBox3Effect: true,
+  flexibilityPreference: "medium",
+};
+
+const defaultValues: FormState = {
+  year: "",
+  grossAnnualIncome: "",
+  taxableIncome: "",
+  availableJaarruimte: "",
+  plannedContribution: "",
+  currentInvestableAssets: "",
+  hasFiscalPartner: false,
+  expectedAnnualReturn: "",
+  horizonYears: "",
   overrideCurrentTaxRate: "",
   expectedTaxRateAtPayout: "",
   includeBox3Effect: true,
@@ -381,6 +397,10 @@ function CalculatorContent({
     setFormValues((current) => mergeProfilePatchIntoValues(current, profilePatch));
   }
 
+  function applyExampleValues() {
+    setFormValues(exampleValues);
+  }
+
   return (
     <CalculatorShell>
       <section className="order-2 min-w-0 rounded-[1.5rem] border hair bg-white p-6 shadow-paper lg:order-1">
@@ -400,10 +420,29 @@ function CalculatorContent({
             <span>Profielwaarden gevonden in deze browser.</span>
             <button
               type="button"
+              onClick={applyExampleValues}
+              className="rounded-full border hair bg-white px-3 py-2 text-[12px] text-[var(--ink)] transition hover:bg-[var(--paper-soft)]"
+            >
+              Gebruik voorbeeldwaarden
+            </button>
+            <button
+              type="button"
               onClick={applyProfileValues}
               className="rounded-full border hair bg-white px-3 py-2 text-[12px] text-[var(--ink)] transition hover:bg-[var(--paper-soft)]"
             >
               Gebruik profielwaarden
+            </button>
+          </div>
+        ) : null}
+        {!hasRelevantProfileValues ? (
+          <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
+            <span>Start leeg en vul snel een voorbeeldscenario in.</span>
+            <button
+              type="button"
+              onClick={applyExampleValues}
+              className="rounded-full border hair bg-white px-3 py-2 text-[12px] text-[var(--ink)] transition hover:bg-[var(--paper-soft)]"
+            >
+              Gebruik voorbeeldwaarden
             </button>
           </div>
         ) : null}

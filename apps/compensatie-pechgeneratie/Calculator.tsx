@@ -24,11 +24,20 @@ type FormState = {
 
 type ValidationErrors = Partial<Record<keyof FormState, string>>;
 
-const defaultValues: FormState = {
+const exampleValues: FormState = {
   monthsUnderLoanSystem: "48",
   diplomaStatus: "yes",
   diplomaYearBucket: "2026",
   remainingStudentDebt: "22000",
+  studyVoucherMode: "exclude",
+  includeAdditionalCompensation: true,
+};
+
+const defaultValues: FormState = {
+  monthsUnderLoanSystem: "",
+  diplomaStatus: "yes",
+  diplomaYearBucket: "2026",
+  remainingStudentDebt: "",
   studyVoucherMode: "exclude",
   includeAdditionalCompensation: true,
 };
@@ -134,6 +143,10 @@ export default function Calculator() {
     }));
   }
 
+  function applyExampleValues() {
+    setFormValues(exampleValues);
+  }
+
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
       <section className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
@@ -149,6 +162,17 @@ export default function Calculator() {
             vast te stellen, wel om snel te zien over welke ordegrootte het ongeveer
             kan gaan.
           </p>
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
+          <span>Start leeg en vul snel een voorbeeldscenario in.</span>
+          <button
+            type="button"
+            onClick={applyExampleValues}
+            className="rounded-full border hair bg-white px-3 py-2 text-[12px] text-[var(--ink)] transition hover:bg-[var(--paper-soft)]"
+          >
+            Gebruik voorbeeldwaarden
+          </button>
         </div>
 
         <div className="mt-6 grid gap-5">
