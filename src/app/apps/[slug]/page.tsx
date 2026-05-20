@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AppRenderer } from "@/components/AppRenderer";
+import { KnowledgeLevelHint } from "@/components/KnowledgeLevelHint";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { CategoryDot, Pill } from "@/components/ui";
@@ -107,6 +108,9 @@ export default async function AppDetailPage({ params }: AppDetailPageProps) {
         </section>
 
         <section className="pt-6">
+          <div className="mb-4 rounded-xl border hair bg-white px-4 py-3 shadow-paper">
+            <KnowledgeLevelHint />
+          </div>
           <AppRenderer slug={app.slug} />
         </section>
 

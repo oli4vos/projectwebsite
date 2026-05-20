@@ -99,7 +99,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/app/globals.css`: design tokens, typografie, helpers, visuele basis
 - `src/components/SiteHeader.tsx`: topnavigatie en CTA's
 - `src/components/SiteFooter.tsx`: footerlinks
-- `src/components/AppDashboard.tsx`: keuzehulp-homeflow met primaire start, profielblok en thematische toolgroepen
+- `src/components/AppDashboard.tsx`: bibliotheek-first homepageflow met kennisniveaukeuze, categoriekaarten en tools per onderwerp
 - `src/components/AppCard.tsx`: vertaalt manifest naar card-props
 - `src/components/ToolCard.tsx`: daadwerkelijke kaart-UI
 - `src/components/AppRenderer.tsx`: pakt lazy toolcomponent op basis van slug
@@ -108,12 +108,12 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/components/DisclosureSection.tsx`: lichte presentatie-wrapper rond `ToolDisclosure` voor consistente verdiepingskoppen en spacing
 - `src/components/charts.tsx`: gedeelde chartcomponenten met interactieve tooltip-ondersteuning
 - `src/app/apps/[slug]/page.tsx`: toont ook manifestmetadata (domeinen, aannames, output/disclaimer/risico) zonder de dashboardflow zwaarder te maken
-- Homepage en dashboard zijn nu keuzehulp-first:
-  - primaire start via `volgende-euro`
-  - secundaire personalisatie via `/profiel`
-  - compacte persoonlijke route met max 3 starttools op basis van profielstatus
-  - thematische toolgroepen in plaats van een losse toolbibliotheek
-  - subtiele verwijzing naar `/variabelen` voor aannames en percentages
+- Homepage en dashboard zijn nu bibliotheek-first:
+  - primaire navigatie via categorieën en tools per onderwerp
+  - hero is kort en taakgericht, zonder lange uitlegblokken
+  - kennisniveau-keuze (Basis / Normaal / Verdiept) wordt lokaal opgeslagen
+  - persoonlijke route blijft beschikbaar maar staat lager en compacter
+  - profiel en aannames blijven secundaire, subtiele blokken
 - `/variabelen` is nu light-first:
   - bovenaan korte samenvatting met kernwaarden
   - daaronder uitklapbare verdiepingsblokken per domein (DUO, hypotheek, box 1, box 3, grafieken)
@@ -125,8 +125,10 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/lib/categories.ts`: mapping van categorie/slug naar visueel category-type
 - `src/lib/market.ts`: homepage-marktcontext met externe fetches en fallbacks
 - `src/lib/user-profile.ts`: local-first profieltype, sanitizing en localStorage helpers
+- `src/lib/user-preferences.ts`: local-first voorkeuren voor uitlegdiepte (`basic` / `standard` / `advanced`)
 - `src/lib/profile-tool-mapping.ts`: centrale mapping van profielwaarden naar tool-defaults
 - `src/lib/profile-prefill.ts`: gedeelde helper voor consistente tool-prefill-flow
+- `src/hooks/useUserPreferences.ts`: sync-hook voor lokale kennisniveauvoorkeur
 - `src/lib/financial-constants/`: centrale jaarlijkse aannames/variabelen + helpers
 - `src/lib/chart-utils.ts`: centrale format/tick helpers voor grafieken (hele jaren + eurolabels)
 - `src/lib/copy-glossary.ts`: centrale woordenlijst voor gebruikerstaal bij financiële termen en enumlabels
@@ -248,6 +250,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - De tax-laag is geen volledige IB-aangifte en rekent bewust niet met heffingskortingen, toeslagen, ondernemersaftrek of persoonlijke uitzonderingen.
 - Validatie gebeurt nu per calculatorcomponent in de client.
 - Formvalidatie toont rode veldfouten pas zodra een gebruiker dat veld inhoudelijk invult; lege startvelden tonen geen foutmeldingen vooraf.
+- Toolflow blijft light-first: eerst invullen, daarna resultaat; verdiepingsblokken staan standaard dicht.
 - Dashboard haalt alleen manifestdata op uit de gegenereerde registry.
 - Verborgen tools blijven buiten dashboard en app-routes via manifestveld `visibility: "hidden"`.
 - `requiredProfileFields` is documenterend voor prefill-koppelingen; velden worden niet automatisch verplicht voor de gebruiker gemaakt.
@@ -257,6 +260,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - Interne enumwaarden blijven technisch; de UI toont begrijpelijke gebruikerstaal.
 - Vaktermen worden bij eerste zichtbare gebruik kort uitgelegd.
 - Aannames die een tool gebruikt horen via centrale constants + disclosure vindbaar te zijn.
+- `Wat doe ik met mijn volgende euro?` is referentietool voor de gewenste invul-naar-uitkomst flow.
 - `/variabelen` gebruikt centrale financial constants als bron van waarheid; tools mogen daarbovenop eigen invoerwaarden toestaan.
 - Donkere CTA's moeten expliciet wit contrast houden. Bronbestand: `src/components/ui.tsx`.
 - Alle gebruikersgerichte frontend-copy is standaard Nederlands. Engelse tekst mag alleen in code, technische namen of wanneer expliciet gekozen.

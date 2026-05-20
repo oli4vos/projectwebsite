@@ -44,35 +44,34 @@ export function PersonalRoute({ apps }: PersonalRouteProps) {
   const needsMoreProfileInput = hasProfile && completeness.score < 35;
 
   return (
-    <section className="grid gap-4 rounded-[1.5rem] border hair bg-white/80 p-6 shadow-paper">
+    <section className="grid gap-4 rounded-[1.5rem] border hair bg-white/70 p-5 shadow-paper">
       <div>
         <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
           Jouw snelle route
         </div>
         {!hasProfile ? (
           <>
-            <h3 className="mt-2 font-serif text-[clamp(1.3rem,1.1rem+0.8vw,1.7rem)] tracking-[-0.02em] text-[var(--ink)]">
-              Vul je profiel in om tools automatisch te laten voorinvullen
+            <h3 className="mt-2 font-serif text-[clamp(1.15rem,1rem+0.6vw,1.45rem)] tracking-[-0.02em] text-[var(--ink)]">
+              Heb je een profiel ingevuld?
             </h3>
-            <p className="mt-3 max-w-[62ch] text-[14px] leading-[1.65] text-[var(--ink-2)]">
-              Nog geen profiel ingevuld? Geen probleem. Je kunt direct starten, of
-              eerst basisgegevens invullen voor persoonlijkere startpunten.
+            <p className="mt-2 max-w-[62ch] text-[13px] leading-[1.6] text-[var(--ink-2)]">
+              Zonder profiel kun je direct starten. Met profiel krijg je compactere snelle startpunten.
             </p>
             <div className="mt-4 flex flex-wrap gap-3">
-              <BtnLink href="/profiel" kind="outline" size="md">
+              <BtnLink href="/profiel" kind="outline" size="sm">
                 Open mijn profiel
               </BtnLink>
-              <BtnLink href="/apps/volgende-euro" kind="ghost" size="md">
+              <BtnLink href="/apps/volgende-euro" kind="ghost" size="sm">
                 Of start zonder profiel
               </BtnLink>
             </div>
           </>
         ) : (
           <>
-            <h3 className="mt-2 font-serif text-[clamp(1.3rem,1.1rem+0.8vw,1.7rem)] tracking-[-0.02em] text-[var(--ink)]">
+            <h3 className="mt-2 font-serif text-[clamp(1.15rem,1rem+0.6vw,1.45rem)] tracking-[-0.02em] text-[var(--ink)]">
               Op basis van je ingevulde gegevens zijn dit logische startpunten
             </h3>
-            <p className="mt-3 max-w-[62ch] text-[14px] leading-[1.65] text-[var(--ink-2)]">
+            <p className="mt-2 max-w-[62ch] text-[13px] leading-[1.6] text-[var(--ink-2)]">
               Dit zijn geen adviezen, maar handige startpunten op basis van je profiel.
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
@@ -88,11 +87,11 @@ export function PersonalRoute({ apps }: PersonalRouteProps) {
       {hasProfile ? (
         <>
           {recommendedApps.length > 0 ? (
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-3 md:grid-cols-3">
               {recommendedApps.map(({ app, reason }) => (
                 <article
                   key={app.slug}
-                  className="rounded-xl border border-[var(--hair)] bg-white p-4"
+                  className="rounded-xl border border-[var(--hair)] bg-white p-3"
                 >
                   <div className="text-[11px] uppercase tracking-[0.08em] text-[var(--muted)]">
                     {app.category}

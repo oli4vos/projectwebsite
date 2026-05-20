@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import type { AppManifest } from "@/lib/app-types";
 import { BtnLink } from "@/components/ui";
 import { AppCard } from "./AppCard";
+import { KnowledgeLevelSelector } from "./KnowledgeLevelSelector";
 import { PersonalRoute } from "./PersonalRoute";
 
 type AppDashboardProps = {
@@ -17,23 +18,20 @@ type AppGroup = {
   slugs: string[];
 };
 
-const requestedGroups: AppGroup[] = [
+const groups: AppGroup[] = [
   {
-    title: "Start hier",
-    description:
-      "Begin met een brede keuzehulp als je twijfelt tussen aflossen, sparen, beleggen of pensioen.",
+    title: "Persoonlijke financiën",
+    description: "Voor je eerste prioriteit als je extra geld overhoudt.",
     slugs: ["volgende-euro"],
   },
   {
     title: "Studieschuld",
-    description:
-      "Voor DUO-verplichting, vrijwillige extra aflossing en impact op je andere keuzes.",
+    description: "Vergelijk verplicht aflossen, extra aflossen en alternatieven.",
     slugs: ["studieschuld-vs-beleggen", "hypotheek-impact-studieschuld"],
   },
   {
     title: "Wonen",
-    description:
-      "Voor hypotheekruimte, extra aflossen of beleggen, en vergelijking van hypotheekvormen.",
+    description: "Inzicht in hypotheekkeuzes, maandlasten en extra aflossen.",
     slugs: [
       "hypotheek-impact-studieschuld",
       "hypotheek-aflossen-vs-beleggen",
@@ -42,20 +40,22 @@ const requestedGroups: AppGroup[] = [
   },
   {
     title: "Sparen & beleggen",
-    description:
-      "Voor vermogensgroei, pensioeninleg versus vrij beleggen, en lange termijn vrijheidsscenario's.",
+    description: "Voor vermogensopbouw met belastingimpact en flexibiliteit.",
     slugs: ["box-3-impact", "jaarruimte-vs-vrij-beleggen", "fire-na-belasting"],
   },
   {
     title: "Belasting",
-    description:
-      "Voor box 3-effecten en fiscale afwegingen rond pensioeninleg en beleggen.",
+    description: "Rekentools rond box 3 en fiscale afwegingen.",
     slugs: ["box-3-impact", "jaarruimte-vs-vrij-beleggen"],
   },
   {
+    title: "FIRE / financiële vrijheid",
+    description: "Langetermijnprojectie richting minder of niet meer hoeven werken.",
+    slugs: ["fire-na-belasting"],
+  },
+  {
     title: "Werk & ZZP",
-    description:
-      "Voor inschatting van benodigd uurtarief inclusief buffer, pensioen en AOV-reservering.",
+    description: "Inschatten welk uurtarief nodig is inclusief reserveringen.",
     slugs: ["zzp-uurtarief"],
   },
 ];
@@ -69,115 +69,61 @@ export function AppDashboard({ apps }: AppDashboardProps) {
       >,
     [apps],
   );
-  const nextEuroApp = appsBySlug["volgende-euro"];
 
-  const groups = useMemo(() => {
-    const seen = new Set<string>();
-    const resolved = requestedGroups
-      .map((group) => {
-        const groupApps = group.slugs
-          .map((slug) => appsBySlug[slug])
-          .filter((app): app is AppManifest => Boolean(app) && !seen.has(app.slug))
-          .map((app) => {
-            seen.add(app.slug);
-            return app;
-          });
-
-        return {
+  const groupedApps = useMemo(
+    () =>
+      groups
+        .map((group) => ({
           ...group,
-          apps: groupApps,
-        };
-      })
-      .filter((group) => group.apps.length > 0);
-
-    const remainingApps = apps.filter((app) => !seen.has(app.slug));
-
-    if (remainingApps.length > 0) {
-      resolved.push({
-        title: "Meer tools",
-        description: "Extra rekentools die ook publiek beschikbaar zijn.",
-        slugs: [],
-        apps: remainingApps,
-      });
-    }
-
-    return resolved;
-  }, [apps, appsBySlug]);
+          apps: group.slugs
+            .map((slug) => appsBySlug[slug])
+            .filter((app): app is AppManifest => Boolean(app)),
+        }))
+        .filter((group) => group.apps.length > 0),
+    [appsBySlug],
+  );
 
   return (
     <div className="space-y-8">
-      <section
-        id="apps"
-        className="grid gap-5 rounded-[1.5rem] border hair bg-white/80 p-6 shadow-paper"
-      >
-        <div>
-          <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
-            Startpunt
-          </div>
-          <h2 className="text-fluid-h2 mt-2 font-serif tracking-[-0.02em] text-[var(--ink)]">
-            Weet je niet waar je moet beginnen?
-          </h2>
-          <p className="mt-3 max-w-[58ch] text-[14px] leading-[1.65] text-[var(--ink-2)]">
-            Begin met één keuzehulp en ontdek waar je volgende euro het meest logisch
-            naartoe kan: buffer, aflossen, pensioen, woning of beleggen.
-          </p>
+      <KnowledgeLevelSelector />
+
+      <section id="apps" className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
+        <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
+          Kies een onderwerp
         </div>
-        {nextEuroApp ? (
-          <div className="rounded-xl border border-[var(--hair)] bg-white p-4">
-            <div className="text-[13px] leading-[1.7] text-[var(--muted)]">
-              Ontdek of je volgende euro logischer naar buffer, aflossen, pensioen,
-              woning of beleggen kan.
-            </div>
-            <div className="mt-4">
-              <BtnLink href={`/apps/${nextEuroApp.slug}`} kind="primary" size="md">
-                Start met de keuzehulp
-              </BtnLink>
-            </div>
-          </div>
-        ) : (
-          <div className="rounded-xl border border-[var(--hair)] bg-white p-4 text-[13px] leading-[1.7] text-[var(--muted)]">
-            De keuzehulp is tijdelijk niet beschikbaar. Start hieronder met een thema.
-          </div>
-        )}
+        <h2 className="mt-2 font-serif text-[clamp(1.35rem,1.1rem+1vw,1.9rem)] tracking-[-0.02em] text-[var(--ink)]">
+          Rekentools per onderwerp
+        </h2>
+        <p className="mt-3 max-w-[62ch] text-[14px] leading-[1.65] text-[var(--ink-2)]">
+          Eerst invullen, daarna resultaat. Verdieping staat standaard dicht en open je alleen als je meer uitleg wilt.
+        </p>
       </section>
 
-      <section className="grid gap-4 rounded-[1.5rem] border hair bg-white/80 p-6 shadow-paper md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
-        <div>
-          <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
-            Mijn profiel
-          </div>
-          <h3 className="mt-2 font-serif text-[clamp(1.35rem,1.1rem+1vw,1.9rem)] tracking-[-0.02em] text-[var(--ink)]">
-            Maak berekeningen persoonlijker
-          </h3>
-          <p className="mt-3 max-w-[58ch] text-[14px] leading-[1.65] text-[var(--ink-2)]">
-            Vul één keer je basisgegevens in. Tools kunnen die waarden daarna
-            gebruiken als voorinvulling. Je profiel is optioneel en blijft lokaal in
-            je browser.
-          </p>
-        </div>
-        <BtnLink href="/profiel" kind="outline" size="md">
-          Open profiel
-        </BtnLink>
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {groupedApps.map((group) => (
+          <article key={group.title} className="rounded-xl border hair bg-white p-4 shadow-paper">
+            <h3 className="font-serif text-[1.2rem] tracking-[-0.01em] text-[var(--ink)]">
+              {group.title}
+            </h3>
+            <p className="mt-2 text-[13px] leading-[1.6] text-[var(--muted)]">
+              {group.description}
+            </p>
+            <div className="mt-3 flex items-center justify-between">
+              <span className="text-[12px] text-[var(--soft)]">
+                {group.apps.length} {group.apps.length === 1 ? "tool" : "tools"}
+              </span>
+              <Link href={`#groep-${encodeURIComponent(group.title)}`} className="text-[12px] text-[var(--ink)] underline">
+                Bekijk tools
+              </Link>
+            </div>
+          </article>
+        ))}
       </section>
 
-      <PersonalRoute apps={apps} />
-
-      <section id="scenario" className="space-y-6">
-        <div className="rounded-[1.5rem] border hair bg-white/80 p-6 shadow-paper">
-          <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
-            Kies een onderwerp
-          </div>
-          <h3 className="mt-2 font-serif text-[clamp(1.35rem,1.1rem+1vw,1.9rem)] tracking-[-0.02em] text-[var(--ink)]">
-            Kies de keuzehulp die past bij je vraag
-          </h3>
-          <p className="mt-3 max-w-[62ch] text-[14px] leading-[1.65] text-[var(--ink-2)]">
-            Geen losse lijst met calculators, maar een overzicht in thema&apos;s. Zo
-            houd je het rustig en kom je sneller bij de juiste keuzevraag.
-          </p>
-        </div>
-
-        {groups.map((group) => (
+      <section className="space-y-6">
+        {groupedApps.map((group) => (
           <section
+            id={`groep-${encodeURIComponent(group.title)}`}
             key={group.title}
             className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper"
           >
@@ -203,39 +149,35 @@ export function AppDashboard({ apps }: AppDashboardProps) {
         ))}
       </section>
 
-      <section
-        id="werkwijze"
-        className="rounded-[1.5rem] bg-[var(--deep)] p-6 text-white shadow-paper-lg"
-      >
-        <div className="text-[11px] uppercase tracking-[0.14em] text-white/55">
-          Aannames
-        </div>
-        <h3 className="mt-3 font-serif text-[clamp(1.35rem,1.1rem+1vw,1.9rem)] leading-[1.12] tracking-[-0.02em]">
-          Wil je weten met welke percentages en aannames we rekenen?
-        </h3>
-        <p className="mt-4 max-w-[60ch] text-[14px] leading-[1.7] text-white/75">
-          Bekijk alle gebruikte variabelen op één plek. Zo kun je uitkomsten beter
-          controleren en scenario&apos;s aanpassen op je eigen aannames.
-        </p>
-        <div className="mt-5">
-          <BtnLink href="/variabelen" kind="outline" size="md">
-            Bekijk aannames en variabelen
-          </BtnLink>
-        </div>
-      </section>
+      <PersonalRoute apps={apps} />
 
-      <section className="rounded-[1.5rem] border hair bg-white/80 p-6 text-[13.5px] leading-[1.65] text-[var(--muted)] shadow-paper">
-        <p>
-          Twijfel je nog tussen meerdere richtingen? Begin met{" "}
-          {nextEuroApp ? (
-            <Link href={`/apps/${nextEuroApp.slug}`} className="text-[var(--ink)] underline">
-              de keuzehulp
-            </Link>
-          ) : (
-            "de toolgroep Start hier"
-          )}{" "}
-          en ga daarna pas de verdieping in per thema.
-        </p>
+      <section className="grid gap-4 rounded-[1.5rem] border hair bg-white p-6 shadow-paper md:grid-cols-2">
+        <div>
+          <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
+            Maak het persoonlijker
+          </div>
+          <p className="mt-2 text-[14px] leading-[1.65] text-[var(--ink-2)]">
+            Profiel is optioneel en blijft lokaal in je browser. Tools kunnen daarmee velden voorinvullen.
+          </p>
+          <div className="mt-3">
+            <BtnLink href="/profiel" kind="outline" size="md">
+              Naar profiel
+            </BtnLink>
+          </div>
+        </div>
+        <div>
+          <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
+            Controleer aannames
+          </div>
+          <p className="mt-2 text-[14px] leading-[1.65] text-[var(--ink-2)]">
+            Bekijk met welke percentages en standaardwaarden de site rekent.
+          </p>
+          <div className="mt-3">
+            <BtnLink href="/variabelen" kind="outline" size="md">
+              Naar aannames
+            </BtnLink>
+          </div>
+        </div>
       </section>
     </div>
   );
