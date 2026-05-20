@@ -6,6 +6,7 @@ import { MobileFieldFlowControls } from "@/components/MobileFieldFlowControls";
 import { ResultRow } from "@/components/ResultRow";
 import { ToolDisclosure } from "@/components/ToolDisclosure";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
+import { ToolActionButton } from "@/components/tool/ToolActionButton";
 import { Pill } from "@/components/ui";
 import { useMobileFieldFlow } from "@/hooks/useMobileFieldFlow";
 import { useUserProfile } from "@/hooks/useUserProfile";
@@ -265,9 +266,9 @@ function CalculatorContent({ initialValues, hasRelevantProfileValues, profilePat
     <>
       <div className="flex flex-wrap items-center gap-3 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
         {hasRelevantProfileValues ? <span>Profielwaarden gevonden in deze browser.</span> : <span>Start leeg of laad voorbeeldwaarden.</span>}
-        <button type="button" onClick={applyExampleValues} className="rounded-full border hair bg-white px-3 py-2 text-[12px] text-[var(--ink)] transition hover:bg-[var(--paper-soft)]">Start met voorbeeldwaarden</button>
+        <ToolActionButton type="button" onClick={applyExampleValues} variant="secondary" size="sm">Start met voorbeeldwaarden</ToolActionButton>
         {hasRelevantProfileValues ? (
-          <button type="button" onClick={applyProfileValues} className="rounded-full border hair bg-white px-3 py-2 text-[12px] text-[var(--ink)] transition hover:bg-[var(--paper-soft)]">Start met profielwaarden</button>
+          <ToolActionButton type="button" onClick={applyProfileValues} variant="secondary" size="sm">Start met profielwaarden</ToolActionButton>
         ) : null}
       </div>
       {submitContextMessage ? <p className="mt-3 text-[12.5px] text-[var(--muted)]">{submitContextMessage}</p> : null}
@@ -503,9 +504,9 @@ function CalculatorContent({ initialValues, hasRelevantProfileValues, profilePat
       </label>
 
       <div className="space-y-3 border-t border-[var(--hair)] pt-4">
-        <button type="submit" className="ring-focus hair inline-flex h-12 w-full items-center justify-center rounded-full border bg-[var(--deep)] px-4 text-[14px] text-white">
+        <ToolActionButton type="submit" variant="submit" size="md" full>
           {submittedValues && hasDirtyChanges ? "Bereken opnieuw" : "Bereken"}
-        </button>
+        </ToolActionButton>
         <p className="text-[12px] text-[var(--muted)]">De tool rekent alleen met ingevulde gegevens.</p>
       </div>
     </form>
