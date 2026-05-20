@@ -98,14 +98,18 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/app/globals.css`: design tokens, typografie, helpers, visuele basis
 - `src/components/SiteHeader.tsx`: topnavigatie en CTA's
 - `src/components/SiteFooter.tsx`: footerlinks
-- `src/components/AppDashboard.tsx`: zoek/filter/dashboardflow
+- `src/components/AppDashboard.tsx`: keuzehulp-homeflow met primaire start, profielblok en thematische toolgroepen
 - `src/components/AppCard.tsx`: vertaalt manifest naar card-props
 - `src/components/ToolCard.tsx`: daadwerkelijke kaart-UI
 - `src/components/AppRenderer.tsx`: pakt lazy toolcomponent op basis van slug
 - `src/components/ui.tsx`: `Btn`, `BtnLink`, `Pill`, `Logo`, `CategoryDot`
 - `src/components/ToolDisclosure.tsx`: standaard uitklapbare verdiepingssectie voor rekentools
 - `src/app/apps/[slug]/page.tsx`: toont ook manifestmetadata (domeinen, aannames, output/disclaimer/risico) zonder de dashboardflow zwaarder te maken
-- Dashboard bevat ook een doelgroep-overzicht met directe ingangen voor (oud-)studenten, pensioenrichting, zzp/loondienst en beleggen/vermogensgroei.
+- Homepage en dashboard zijn nu keuzehulp-first:
+  - primaire start via `volgende-euro`
+  - secundaire personalisatie via `/profiel`
+  - thematische toolgroepen in plaats van een losse toolbibliotheek
+  - subtiele verwijzing naar `/variabelen` voor aannames en percentages
 
 ## Huidige data/config
 
@@ -250,6 +254,10 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - dan een beknopte samenvatting met kernuitkomst in gewone taal
   - daarna uitklapbare verdieping, standaard dicht, met uitleg, aannames en praktische aandachtspunten
 - Tooldetailpagina (`/apps/[slug]`) toont contextmetadata als uitklapblok onder de calculator zodat light-gebruikers sneller bij de eerste invoer komen.
+- Homepage-principe:
+  - toon eerst “waar begin ik?” met duidelijke keuze-CTA
+  - daarna profielblok en thematische toolgroepen
+  - technische metadata blijft buiten de primaire homepageflow
 - Mobiele tool-layout is gecentraliseerd via `src/components/tool/CalculatorShell.tsx`:
   - op mobiel staat de samenvatting/resultaatkaart eerst
   - daarna volgt het formulier met mobile field flow

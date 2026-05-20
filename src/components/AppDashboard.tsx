@@ -1,167 +1,143 @@
 "use client";
 
 import Link from "next/link";
-import { useDeferredValue, useMemo, useState } from "react";
+import { useMemo } from "react";
 import type { AppManifest } from "@/lib/app-types";
-import { CategoryDot } from "@/components/ui";
 import { BtnLink } from "@/components/ui";
-import { resolveCategory } from "@/lib/categories";
 import { AppCard } from "./AppCard";
 
 type AppDashboardProps = {
   apps: AppManifest[];
 };
 
-export function AppDashboard({ apps }: AppDashboardProps) {
-  const [query, setQuery] = useState("");
-  const [manualCategory, setManualCategory] = useState("Alle");
-  const [ignoreUrlCategory, setIgnoreUrlCategory] = useState(false);
-  const deferredQuery = useDeferredValue(query);
+type AppGroup = {
+  title: string;
+  description: string;
+  slugs: string[];
+};
 
-  const categories = useMemo(
-    () => ["Alle", ...new Set(apps.map((app) => app.category))],
+const requestedGroups: AppGroup[] = [
+  {
+    title: "Start hier",
+    description:
+      "Begin met een brede keuzehulp als je twijfelt tussen aflossen, sparen, beleggen of pensioen.",
+    slugs: ["volgende-euro"],
+  },
+  {
+    title: "Studieschuld",
+    description:
+      "Voor DUO-verplichting, vrijwillige extra aflossing en impact op je andere keuzes.",
+    slugs: ["studieschuld-vs-beleggen", "hypotheek-impact-studieschuld"],
+  },
+  {
+    title: "Wonen",
+    description:
+      "Voor hypotheekruimte, extra aflossen of beleggen, en vergelijking van hypotheekvormen.",
+    slugs: [
+      "hypotheek-impact-studieschuld",
+      "hypotheek-aflossen-vs-beleggen",
+      "annuitair-lineair",
+    ],
+  },
+  {
+    title: "Sparen & beleggen",
+    description:
+      "Voor vermogensgroei, pensioeninleg versus vrij beleggen, en lange termijn FIRE-scenario's.",
+    slugs: ["box-3-impact", "jaarruimte-vs-vrij-beleggen", "fire-na-belasting"],
+  },
+  {
+    title: "Belasting",
+    description:
+      "Voor box 3-effecten en fiscale afwegingen rond pensioeninleg en beleggen.",
+    slugs: ["box-3-impact", "jaarruimte-vs-vrij-beleggen"],
+  },
+  {
+    title: "Werk & ZZP",
+    description:
+      "Voor inschatting van benodigd uurtarief inclusief buffer, pensioen en AOV-reservering.",
+    slugs: ["zzp-uurtarief"],
+  },
+];
+
+export function AppDashboard({ apps }: AppDashboardProps) {
+  const appsBySlug = useMemo(
+    () =>
+      Object.fromEntries(apps.map((app) => [app.slug, app])) as Record<
+        string,
+        AppManifest
+      >,
     [apps],
   );
-  const requestedCategory =
-    typeof window === "undefined"
-      ? null
-      : new URLSearchParams(window.location.search).get("categorie") ??
-        new URLSearchParams(window.location.search).get("category");
-  const selectedCategory =
-    !ignoreUrlCategory && requestedCategory && categories.includes(requestedCategory)
-      ? requestedCategory
-      : manualCategory;
+  const nextEuroApp = appsBySlug["volgende-euro"];
 
-  const normalizedQuery = deferredQuery.trim().toLowerCase();
-  const filteredApps = apps.filter((app) => {
-    const matchesCategory =
-      selectedCategory === "Alle" || app.category === selectedCategory;
-    const matchesQuery =
-      normalizedQuery.length === 0 ||
-      [app.title, app.description, app.category, ...app.tags]
-        .join(" ")
-        .toLowerCase()
-        .includes(normalizedQuery);
+  const groups = useMemo(() => {
+    const seen = new Set<string>();
+    const resolved = requestedGroups
+      .map((group) => {
+        const groupApps = group.slugs
+          .map((slug) => appsBySlug[slug])
+          .filter((app): app is AppManifest => Boolean(app) && !seen.has(app.slug))
+          .map((app) => {
+            seen.add(app.slug);
+            return app;
+          });
 
-    return matchesCategory && matchesQuery;
-  });
+        return {
+          ...group,
+          apps: groupApps,
+        };
+      })
+      .filter((group) => group.apps.length > 0);
 
-  const recentExamples = [
-    {
-      slug: "studieschuld-vs-beleggen",
-      title: "Aflossen of beleggen bij 2,56% DUO-rente",
-      meta: "€ 150 / mnd · 10 jaar · scenariovergelijking",
-      when: "vandaag",
-      result: "€ 4.283 verschil",
-      category: resolveCategory("Schulden", "studieschuld-vs-beleggen"),
-    },
-    {
-      slug: "studieschuld-vs-beleggen",
-      title: "Wat verandert er bij hogere maandinleg?",
-      meta: "€ 300 / mnd · 15 jaar · zelfde aannames",
-      when: "voorbeeld",
-      result: "meer grip op tempo",
-      category: resolveCategory("Schulden", "studieschuld-vs-beleggen"),
-    },
-  ];
+    const remainingApps = apps.filter((app) => !seen.has(app.slug));
 
-  const doelgroepBlokken = [
-    {
-      title: "(Oud-)studenten",
-      description:
-        "Voor keuzes rond verplicht DUO-bedrag, vrijwillige extra aflossing en hypotheekimpact.",
-      links: [
-        { href: "/apps/studieschuld-vs-beleggen", label: "Studieschuld aflossen of beleggen" },
-        { href: "/apps/hypotheek-impact-studieschuld", label: "Hypotheekimpact studieschuld" },
-      ],
-    },
-    {
-      title: "Richting pensioen",
-      description:
-        "Voor afweging tussen fiscale pensioeninleg (jaarruimte) en vrij beleggen met behoud van overzicht.",
-      links: [
-        { href: "/apps/jaarruimte-vs-vrij-beleggen", label: "Jaarruimte of vrij beleggen" },
-        { href: "/profiel", label: "Profiel (pensioen/AOV-context)" },
-      ],
-    },
-    {
-      title: "ZZP of loondienst",
-      description:
-        "Voor prioriteiten in cashflow: buffer, schulden, wonen, pensioen en beleggen in één beslisflow.",
-      links: [
-        { href: "/apps/volgende-euro", label: "Wat doe ik met mijn volgende euro?" },
-        { href: "/profiel", label: "Profielinvulling per situatie" },
-      ],
-    },
-    {
-      title: "Beleggen en vermogensgroei",
-      description:
-        "Voor box 3-impact op vermogen, rendement en langjarige groei met heldere fiscale verdieping.",
-      links: [
-        { href: "/apps/box-3-impact", label: "Box 3-impact calculator" },
-        { href: "/apps/box3-indicatie", label: "Box 3-indicatie" },
-      ],
-    },
-  ] as const;
+    if (remainingApps.length > 0) {
+      resolved.push({
+        title: "Meer tools",
+        description: "Extra rekentools die ook publiek beschikbaar zijn.",
+        slugs: [],
+        apps: remainingApps,
+      });
+    }
+
+    return resolved;
+  }, [apps, appsBySlug]);
 
   return (
     <div className="space-y-8">
       <section
         id="apps"
-        className="grid gap-4 rounded-[1.5rem] border hair bg-white/80 p-6 shadow-paper md:grid-cols-[minmax(0,1fr)_auto] md:items-end"
+        className="grid gap-5 rounded-[1.5rem] border hair bg-white/80 p-6 shadow-paper"
       >
         <div>
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
-            Overzicht
+            Startpunt
           </div>
           <h2 className="text-fluid-h2 mt-2 font-serif tracking-[-0.02em] text-[var(--ink)]">
-            Kies het scenario waar je nu regie op wilt
+            Weet je niet waar je moet beginnen?
           </h2>
           <p className="mt-3 max-w-[58ch] text-[14px] leading-[1.65] text-[var(--ink-2)]">
-            Zoek op onderwerp of filter op categorie. Elke tool gebruikt heldere
-            aannames en is bedoeld om keuzes vergelijkbaar te maken, niet om ze voor
-            je te maken.
+            Begin met één keuzehulp en ontdek waar je volgende euro het meest logisch
+            naartoe kan: buffer, aflossen, pensioen, woning of beleggen.
           </p>
         </div>
-
-        <div className="text-[12px] text-[var(--muted)]">
-          {filteredApps.length} van {apps.length} rekentools zichtbaar
-        </div>
-      </section>
-
-      <section className="grid gap-4 rounded-[1.5rem] border hair bg-white/80 p-6 shadow-paper md:grid-cols-[minmax(0,1fr)_280px] md:items-end">
-        <label className="grid gap-2">
-          <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-            Zoek op titel, thema of tag
-          </span>
-          <input
-            type="search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Bijvoorbeeld: studieschuld, beleggen of hypotheek"
-            className="ring-focus hair h-12 rounded-full border bg-white px-4 text-[14px] text-[var(--ink)] outline-none"
-          />
-        </label>
-
-        <label className="grid gap-2">
-          <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-            Categorie
-          </span>
-          <select
-            value={selectedCategory}
-            onChange={(event) => {
-              setIgnoreUrlCategory(true);
-              setManualCategory(event.target.value);
-            }}
-            className="ring-focus hair h-12 rounded-full border bg-white px-4 text-[14px] text-[var(--ink)] outline-none"
-          >
-            {categories.map((category) => (
-              <option key={category} value={category}>
-                {category}
-              </option>
-            ))}
-          </select>
-        </label>
+        {nextEuroApp ? (
+          <div className="rounded-xl border border-[var(--hair)] bg-white p-4">
+            <div className="text-[13px] leading-[1.7] text-[var(--muted)]">
+              Ontdek of je volgende euro logischer naar buffer, aflossen, pensioen,
+              woning of beleggen kan.
+            </div>
+            <div className="mt-4">
+              <BtnLink href={`/apps/${nextEuroApp.slug}`} kind="primary" size="md">
+                Start met de keuzehulp
+              </BtnLink>
+            </div>
+          </div>
+        ) : (
+          <div className="rounded-xl border border-[var(--hair)] bg-white p-4 text-[13px] leading-[1.7] text-[var(--muted)]">
+            De keuzehulp is tijdelijk niet beschikbaar. Start hieronder met een thema.
+          </div>
+        )}
       </section>
 
       <section className="grid gap-4 rounded-[1.5rem] border hair bg-white/80 p-6 shadow-paper md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
@@ -170,11 +146,12 @@ export function AppDashboard({ apps }: AppDashboardProps) {
             Mijn profiel
           </div>
           <h3 className="mt-2 font-serif text-[clamp(1.35rem,1.1rem+1vw,1.9rem)] tracking-[-0.02em] text-[var(--ink)]">
-            Vul je gegevens één keer in
+            Maak berekeningen persoonlijker
           </h3>
-          <p className="mt-3 max-w-[56ch] text-[14px] leading-[1.65] text-[var(--ink-2)]">
-            Sla inkomen, DUO-gegevens en woningdoel lokaal op in je browser. Relevante
-            tools kunnen die waarden daarna automatisch voor je invullen.
+          <p className="mt-3 max-w-[58ch] text-[14px] leading-[1.65] text-[var(--ink-2)]">
+            Vul één keer je basisgegevens in. Tools kunnen die waarden daarna
+            gebruiken als voorinvulling. Je profiel is optioneel en blijft lokaal in
+            je browser.
           </p>
         </div>
         <BtnLink href="/profiel" kind="outline" size="md">
@@ -182,144 +159,80 @@ export function AppDashboard({ apps }: AppDashboardProps) {
         </BtnLink>
       </section>
 
-      <section className="grid gap-4 rounded-[1.5rem] border hair bg-white/80 p-6 shadow-paper md:grid-cols-2">
-        <div className="md:col-span-2">
+      <section id="scenario" className="space-y-6">
+        <div className="rounded-[1.5rem] border hair bg-white/80 p-6 shadow-paper">
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
-            Per doelgroep
+            Kies een onderwerp
           </div>
           <h3 className="mt-2 font-serif text-[clamp(1.35rem,1.1rem+1vw,1.9rem)] tracking-[-0.02em] text-[var(--ink)]">
-            Start bij de situatie die op jou lijkt
+            Kies de keuzehulp die past bij je vraag
           </h3>
           <p className="mt-3 max-w-[62ch] text-[14px] leading-[1.65] text-[var(--ink-2)]">
-            Zo houd je de eerste stap simpel: kies je doelgroep, open de relevante
-            tool en duik daarna pas in de verdieping.
+            Geen losse lijst met calculators, maar een overzicht in thema&apos;s. Zo
+            houd je het rustig en kom je sneller bij de juiste keuzevraag.
           </p>
         </div>
-        {doelgroepBlokken.map((blok) => (
-          <article
-            key={blok.title}
-            className="rounded-xl border border-[var(--hair)] bg-white p-4"
+
+        {groups.map((group) => (
+          <section
+            key={group.title}
+            className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper"
           >
-            <h4 className="font-medium text-[var(--ink)]">{blok.title}</h4>
-            <p className="mt-2 text-[13px] leading-[1.6] text-[var(--muted)]">
-              {blok.description}
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {blok.links.map((link) => (
-                <BtnLink key={link.href} href={link.href} kind="ghost" size="sm">
-                  {link.label}
-                </BtnLink>
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h4 className="font-serif text-[clamp(1.2rem,1.05rem+0.7vw,1.5rem)] tracking-[-0.015em] text-[var(--ink)]">
+                  {group.title}
+                </h4>
+                <p className="mt-2 max-w-[60ch] text-[13.5px] leading-[1.65] text-[var(--muted)]">
+                  {group.description}
+                </p>
+              </div>
+              <span className="text-[12px] text-[var(--soft)]">
+                {group.apps.length} {group.apps.length === 1 ? "tool" : "tools"}
+              </span>
+            </div>
+            <div className="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+              {group.apps.map((app) => (
+                <AppCard key={app.slug} app={app} />
               ))}
             </div>
-          </article>
+          </section>
         ))}
       </section>
 
-      <div className="flex flex-wrap gap-2">
-        {categories.map((category) => (
-          <button
-            key={category}
-            type="button"
-            onClick={() => {
-              setIgnoreUrlCategory(true);
-              setManualCategory(category);
-            }}
-            className={`rounded-full px-3 py-2 text-[13px] transition ${
-              selectedCategory === category
-                ? "min-h-11 bg-[var(--deep)] text-white"
-                : "min-h-11 hair border bg-white text-[var(--muted)] hover:text-[var(--ink)]"
-            }`}
-          >
-            {category}
-          </button>
-        ))}
-      </div>
-
-      {filteredApps.length > 0 ? (
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-          {filteredApps.map((app) => (
-            <AppCard key={app.slug} app={app} />
-          ))}
+      <section
+        id="werkwijze"
+        className="rounded-[1.5rem] bg-[var(--deep)] p-6 text-white shadow-paper-lg"
+      >
+        <div className="text-[11px] uppercase tracking-[0.14em] text-white/55">
+          Aannames
         </div>
-      ) : (
-        <section className="rounded-[1.5rem] border border-dashed hair bg-white/60 p-10 text-center">
-          <h2 className="text-xl font-semibold tracking-tight text-[var(--ink)]">
-            Geen rekentools gevonden
-          </h2>
-          <p className="mt-3 text-sm leading-7 text-[var(--muted)]">
-            Pas je zoekterm of categorie aan om weer bruikbare scenario&apos;s en keuzes
-            in beeld te krijgen.
-          </p>
-        </section>
-      )}
-
-      <section id="scenario" className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
-          <div className="flex items-center justify-between gap-4">
-            <h3 className="font-serif text-[clamp(1.2rem,1.05rem+0.7vw,1.5rem)] tracking-[-0.015em] text-[var(--ink)]">
-              Voorbeeldscenario&apos;s
-            </h3>
-            <span className="text-[12px] text-[var(--muted)]">
-              Herkenbaar, maar altijd aanpasbaar naar je eigen situatie
-            </span>
-          </div>
-          <div className="mt-4">
-            {recentExamples.map((example) => (
-              <Link
-                key={example.title}
-                href={`/apps/${example.slug}`}
-                className="hair-b grid grid-cols-[minmax(0,1fr)_auto] gap-4 py-4 last:border-b-0"
-              >
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <CategoryDot cat={example.category} />
-                    <span className="text-[12px] text-[var(--soft)]">{example.when}</span>
-                  </div>
-                  <div className="mt-2 text-[14px] tracking-[-0.005em] text-[var(--ink)]">
-                    {example.title}
-                  </div>
-                  <div className="mt-1 text-[12px] text-[var(--muted)] tabular">
-                    {example.meta}
-                  </div>
-                </div>
-                <div className="self-center font-mono text-[13px] tabular text-[var(--ink-2)]">
-                  {example.result}
-                </div>
-              </Link>
-            ))}
-          </div>
+        <h3 className="mt-3 font-serif text-[clamp(1.35rem,1.1rem+1vw,1.9rem)] leading-[1.12] tracking-[-0.02em]">
+          Wil je weten met welke percentages en aannames we rekenen?
+        </h3>
+        <p className="mt-4 max-w-[60ch] text-[14px] leading-[1.7] text-white/75">
+          Bekijk alle gebruikte variabelen op één plek. Zo kun je uitkomsten beter
+          controleren en scenario&apos;s aanpassen op je eigen aannames.
+        </p>
+        <div className="mt-5">
+          <BtnLink href="/variabelen" kind="outline" size="md">
+            Bekijk aannames en variabelen
+          </BtnLink>
         </div>
+      </section>
 
-        <div
-          id="werkwijze"
-          className="rounded-[1.5rem] bg-[var(--deep)] p-6 text-white shadow-paper-lg"
-        >
-          <div className="text-[11px] uppercase tracking-[0.14em] text-white/55">
-            Werkwijze
-          </div>
-          <h3 className="mt-3 font-serif text-[clamp(1.35rem,1.1rem+1vw,1.9rem)] leading-[1.12] tracking-[-0.02em]">
-            Geen black box. Wel betere uitgangspunten.
-          </h3>
-          <p className="mt-4 text-[14px] leading-[1.7] text-white/75">
-            Niet iedereen begon met veel marge. Juist dan helpt het om aannames
-            zichtbaar te maken, scenario&apos;s naast elkaar te zetten en keuzes stap
-            voor stap terug te brengen tot iets waar je zelf weer grip op hebt.
-          </p>
-          <div className="mt-6 grid grid-cols-3 gap-4 border-t border-white/10 pt-5">
-            {[
-              ["1", "voorbeeldtool"],
-              ["4", "kernuitkomsten"],
-              ["100%", "lokaal in de browser"],
-            ].map(([number, label]) => (
-              <div key={label}>
-                <div className="font-serif text-[24px] leading-none">{number}</div>
-                <div className="mt-1.5 text-[11px] uppercase tracking-[0.08em] text-white/55">
-                  {label}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+      <section className="rounded-[1.5rem] border hair bg-white/80 p-6 text-[13.5px] leading-[1.65] text-[var(--muted)] shadow-paper">
+        <p>
+          Twijfel je nog tussen meerdere richtingen? Begin met{" "}
+          {nextEuroApp ? (
+            <Link href={`/apps/${nextEuroApp.slug}`} className="text-[var(--ink)] underline">
+              de keuzehulp
+            </Link>
+          ) : (
+            "de toolgroep Start hier"
+          )}{" "}
+          en ga daarna pas de verdieping in per thema.
+        </p>
       </section>
     </div>
   );
