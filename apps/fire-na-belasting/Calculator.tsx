@@ -529,8 +529,8 @@ function CalculatorContent({
         ) : null}
 
         <ToolDisclosure
-          title="Hoe rekenen we FIRE?"
-          subtitle="Indicatief model op basis van jaarlijkse projectie."
+          title="Hoe rekenen we dit?"
+          subtitle="Eenvoudige FIRE-projectie op jaarbasis."
         >
           {result ? (
             <div className="space-y-2 text-[13px] leading-[1.65] text-[var(--muted)]">
@@ -580,8 +580,8 @@ function CalculatorContent({
         </ToolDisclosure>
 
         <ToolDisclosure
-          title="Gevoelige aannames"
-          subtitle="Waarom de uitkomst kan afwijken van de praktijk."
+          title="Welke aannames gebruiken we?"
+          subtitle="Dit zijn de gevoeligste knoppen in de uitkomst."
         >
           {result ? (
             <div className="space-y-2 text-[13px] leading-[1.65] text-[var(--muted)]">
@@ -595,8 +595,8 @@ function CalculatorContent({
         </ToolDisclosure>
 
         <ToolDisclosure
-          title="Let op"
-          subtitle="Rendement is onzeker en dit is geen persoonlijk advies."
+          title="Waar moet je op letten?"
+          subtitle="Rendement is onzeker; dit blijft een indicatief scenario."
         >
           {result ? (
             <ul className="space-y-2 text-[13px] leading-[1.65] text-[var(--muted)]">

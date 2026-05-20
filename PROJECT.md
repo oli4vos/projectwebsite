@@ -261,6 +261,12 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - Technische termen worden bij eerste gebruik kort uitgelegd (bijv. jaarlijks opnamepercentage i.p.v. alleen "withdrawal rate").
 - `app.json` velden `title`, `description` en `reasonHint` moeten gewone taal gebruiken en geen dwingend advies geven.
 - Verdieping en nuance blijven in uitklapblokken; de eerste schermtekst blijft kort en begrijpelijk.
+- Verdiepingsblokken in tools volgen bij voorkeur dezelfde leesstructuur:
+  - `Hoe rekenen we dit?`
+  - `Welke aannames gebruiken we?`
+  - `Waar moet je op letten?`
+- Tool-specifieke extra verdiepingen mogen blijven (bijv. DUO-checklist of jaarplanning), maar de kernkoppen blijven herkenbaar.
+- Vaste begrippen in verdiepingen (zoals box 3, brutering, wettelijk DUO-bedrag, draagkracht, jaarlijks opnamepercentage) lopen via `src/lib/copy-glossary.ts` waar logisch.
 - Mobile-first is verplicht: elke nieuwe component of tool moet standaard goed werken op mobiel.
 - Headernavigatie toont altijd de actuele toolcategorieën op basis van `appRegistry`; bij nieuwe categorieën in manifests verschijnen deze automatisch in het menu zonder handmatige header-edit.
 - Uitvoerige QA-rondes of brede responsive testmatrices alleen uitvoeren als de gebruiker daarom vraagt én dit bevestigt.

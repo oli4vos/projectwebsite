@@ -13,6 +13,7 @@ import { CalculatorShell } from "@/components/tool/CalculatorShell";
 import { Pill } from "@/components/ui";
 import { useMobileFieldFlow } from "@/hooks/useMobileFieldFlow";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { getGlossaryExplanation } from "@/lib/copy-glossary";
 import { getDefaultFinancialYear } from "@/lib/financial-constants";
 import type { Box3Method } from "@/lib/tax";
 import {
@@ -740,9 +741,10 @@ function CalculatorContent({
           subtitle="Deze tool gebruikt centrale tax- en constantslagen."
         >
           <div className="space-y-2 text-[13px] leading-[1.65] text-[var(--muted)]">
+            <p>{getGlossaryExplanation("box3")}</p>
             <p>1) Start met je huidige spaargeld, beleggingen en schulden in box 3.</p>
             <p>2) Simuleer per jaar je inleg en bruto rendement.</p>
-            <p>3) Bereken per jaar de box 3-heffing via de centrale `calculateBox3Tax` functie.</p>
+            <p>3) Bereken per jaar de box 3-heffing met de centrale box 3-logica.</p>
             <p>4) Trek de jaarheffing af en gebruik de resterende waarde als start voor het volgende jaar.</p>
           </div>
         </ToolDisclosure>
@@ -882,7 +884,7 @@ function CalculatorContent({
         </ToolDisclosure>
 
         <ToolDisclosure
-          title="Let op: box 3 is indicatief"
+          title="Waar moet je op letten?"
           subtitle="Geen officiële aangifteberekening."
         >
           <ul className="space-y-2 text-[13px] leading-[1.65] text-[var(--muted)]">

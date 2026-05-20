@@ -701,7 +701,7 @@ function CalculatorContent({
         ) : null}
 
         <ToolDisclosure
-          title="Hoe bepalen we de volgorde?"
+          title="Hoe rekenen we dit?"
           subtitle="Educatief prioriteitenmodel, geen hard financieel advies."
         >
           {result ? (
@@ -742,7 +742,7 @@ function CalculatorContent({
           </p>
         </ToolDisclosure>
 
-        <ToolDisclosure title="Waarschuwingen" subtitle="Gebruik dit als prioriteitenhulp.">
+        <ToolDisclosure title="Waar moet je op letten?" subtitle="Gebruik dit als prioriteitenhulp en reken daarna door in een verdiepende tool.">
           <ul className="space-y-2 text-[13px] leading-[1.65] text-[var(--muted)]">
             {(result?.warnings ?? []).map((warning) => (
               <li key={warning}>{warning}</li>

@@ -711,8 +711,8 @@ function CalculatorContent({
         ) : null}
 
         <ToolDisclosure
-          title="Jaarlijkse ontwikkeling"
-          subtitle="Compacte tijdlijn met netto effect per jaar, inclusief box 3-correctie."
+          title="Hoe rekenen we dit?"
+          subtitle="Jaarlijkse vergelijking van aflossen en beleggen, inclusief box 3-correctie."
         >
           {result ? (
             <div className="space-y-3">
@@ -754,18 +754,18 @@ function CalculatorContent({
         </ToolDisclosure>
 
         <ToolDisclosure
-          title="Hoe werkt hypotheekrenteaftrek?"
-          subtitle="Aflossen verlaagt meestal rente en daarmee vaak ook de aftrek."
+          title="Welke aannames gebruiken we?"
+          subtitle="We rekenen netto met rentebesparing, gemiste aftrek en optioneel box 3."
         >
           <p className="text-[13px] leading-[1.65] text-[var(--muted)]">
             In dit model vergelijken we bruto rentebesparing met mogelijk gemiste
-            hypotheekrenteaftrek. Daardoor zie je het netto effect van extra aflossen.
+            hypotheekrenteaftrek. Zo zie je het netto effect van extra aflossen.
           </p>
         </ToolDisclosure>
 
         <ToolDisclosure
-          title="Wat doet box 3?"
-          subtitle="Bij beleggen kan box 3 het netto eindresultaat drukken."
+          title="Waar moet je op letten?"
+          subtitle="Beleggen is flexibeler, maar ook onzekerder en box 3 kan het resultaat drukken."
         >
           {result ? (
             <div className="space-y-2 text-[13px] leading-[1.65] text-[var(--muted)]">

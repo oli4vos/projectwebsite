@@ -457,8 +457,8 @@ function CalculatorContent({
         ) : null}
 
         <ToolDisclosure
-          title="Waarom declarabele uren zo belangrijk zijn"
-          subtitle="Minder declarabele uren betekent hoger benodigd tarief."
+          title="Hoe rekenen we dit?"
+          subtitle="Declarabele uren bepalen direct welk uurtarief je nodig hebt."
         >
           {result ? (
             <p className="text-[13px] leading-[1.65] text-[var(--muted)]">
@@ -519,7 +519,7 @@ function CalculatorContent({
         </ToolDisclosure>
 
         <ToolDisclosure
-          title="Aannames"
+          title="Welke aannames gebruiken we?"
           subtitle="Indicatieve fiscale referentie, geen volledige ZZP-aangifte."
         >
           {result ? (
@@ -532,7 +532,7 @@ function CalculatorContent({
           ) : null}
         </ToolDisclosure>
 
-        <ToolDisclosure title="Let op" subtitle="Educatief hulpmiddel, geen financieel advies.">
+        <ToolDisclosure title="Waar moet je op letten?" subtitle="Educatief hulpmiddel, geen financieel advies.">
           {result ? (
             <ul className="space-y-2 text-[13px] leading-[1.65] text-[var(--muted)]">
               {result.warnings.map((warning) => (

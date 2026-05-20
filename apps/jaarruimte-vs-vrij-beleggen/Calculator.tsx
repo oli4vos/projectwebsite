@@ -820,7 +820,7 @@ function CalculatorContent({
         </ToolDisclosure>
 
         <ToolDisclosure
-          title="Vermogensplanning (jaarlijks)"
+          title="Voorbeeldinterpretatie"
           subtitle="Per jaar inzicht in opbouw met en zonder box 3-heffing."
         >
           {result ? (
@@ -932,8 +932,8 @@ function CalculatorContent({
         </ToolDisclosure>
 
         <ToolDisclosure
-          title="Wanneer is dit logisch?"
-          subtitle="Kernafweging tussen fiscaal voordeel en flexibiliteit."
+          title="Welke aannames gebruiken we?"
+          subtitle="Kernafweging tussen fiscaal voordeel nu en flexibiliteit later."
         >
           {result ? (
             <ul className="space-y-2 text-[13px] leading-[1.65] text-[var(--muted)]">
@@ -945,7 +945,7 @@ function CalculatorContent({
         </ToolDisclosure>
 
         <ToolDisclosure
-          title="Let op"
+          title="Waar moet je op letten?"
           subtitle="Controleer jaarruimte en fiscale details altijd apart."
         >
           {result ? (

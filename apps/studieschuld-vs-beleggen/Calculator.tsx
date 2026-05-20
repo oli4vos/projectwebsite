@@ -820,7 +820,7 @@ function CalculatorContent({
 
         <ToolDisclosure
           title="Hoe rekenen we dit?"
-          subtitle="Verdieping op leenstelsel, verplicht minimum en vrijwillige ruimte."
+          subtitle="Verplicht DUO-bedrag eerst, keuze pas op de vrijwillige extra ruimte."
         >
           <div className="space-y-3 text-[13px] leading-[1.65] text-[var(--muted)]">
             <p>
@@ -843,8 +843,8 @@ function CalculatorContent({
         </ToolDisclosure>
 
         <ToolDisclosure
-          title="Box 3-effect op beleggen"
-          subtitle="Optioneel en indicatief; de hoofdflow blijft licht."
+          title="Welke aannames gebruiken we?"
+          subtitle="Optioneel box 3-scenario op je beleggingsroute; de hoofdflow blijft licht."
         >
           {result?.box3Scenario ? (
             <div className="space-y-4 text-[13px] leading-[1.65] text-[var(--muted)]">
@@ -916,13 +916,18 @@ function CalculatorContent({
         </ToolDisclosure>
 
         {result?.warnings?.length ? (
-          <div className="rounded-[1.5rem] border border-[var(--hair)] bg-[var(--paper-soft)] p-5 text-[12.5px] leading-[1.6] text-[var(--muted)]">
-            <ul className="space-y-2">
-              {result.warnings.map((warning) => (
-                <li key={warning}>{warning}</li>
-              ))}
-            </ul>
-          </div>
+          <ToolDisclosure
+            title="Waar moet je op letten?"
+            subtitle="Gebruik dit als scenariovergelijking, niet als zeker advies."
+          >
+            <div className="rounded-[1.5rem] border border-[var(--hair)] bg-[var(--paper-soft)] p-5 text-[12.5px] leading-[1.6] text-[var(--muted)]">
+              <ul className="space-y-2">
+                {result.warnings.map((warning) => (
+                  <li key={warning}>{warning}</li>
+                ))}
+              </ul>
+            </div>
+          </ToolDisclosure>
         ) : null}
       </section>
     </CalculatorShell>

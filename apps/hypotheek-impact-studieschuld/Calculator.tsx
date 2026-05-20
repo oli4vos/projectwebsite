@@ -8,6 +8,7 @@ import { CalculatorShell } from "@/components/tool/CalculatorShell";
 import { Pill } from "@/components/ui";
 import { useMobileFieldFlow } from "@/hooks/useMobileFieldFlow";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { getGlossaryExplanation } from "@/lib/copy-glossary";
 import { getFinancialConstants } from "@/lib/financial-constants";
 import {
   createProfilePrefillState,
@@ -1108,8 +1109,8 @@ function CalculatorContent({
         </div>
 
         <ToolDisclosure
-          title="Verdieping"
-          subtitle="Hoe rekenen we dit? Welke aannames gebruiken we? Wat betekent dit in de praktijk en waar moet je op letten?"
+          title="Hoe rekenen we dit?"
+          subtitle="Hieronder zie je ook de gebruikte aannames en waar je op moet letten in de praktijk."
         >
           <div className="space-y-5">
         <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
@@ -1161,6 +1162,10 @@ function CalculatorContent({
             betaalt in de praktijk het laagste van die twee. Alles wat je daarboven
             vrijwillig extra betaalt is een keuze en kun je ook als alternatief
             scenario (buffer, woning of beleggen) vergelijken.
+          </p>
+          <p className="mt-2 text-[12.5px] leading-[1.6] text-[var(--soft)]">
+            {getGlossaryExplanation("wettelijkDuoBedrag")}{" "}
+            {getGlossaryExplanation("draagkracht")}
           </p>
           {result ? (
             <div className="mt-5">
@@ -1225,6 +1230,9 @@ function CalculatorContent({
             De DUO-maandlast is meestal een netto maandlast. Voor hypotheekberekeningen
             wordt die vaak omgerekend naar een bruto vergelijkbare maandlast. Dat heet
             brutering. Hoe hoger de hypotheekrente, hoe zwaarder die brutering meestal telt.
+          </p>
+          <p className="mt-2 text-[12.5px] leading-[1.6] text-[var(--soft)]">
+            {getGlossaryExplanation("brutering")}
           </p>
           <p className="mt-3 text-[12.5px] leading-[1.6] text-[var(--soft)]">
             Belangrijk: een hogere brutering verhoogt altijd je maandlast-impact. Dat

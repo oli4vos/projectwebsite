@@ -360,7 +360,29 @@ export default function Calculator() {
 
         <div className="rounded-[1.5rem] border hair bg-white p-5 shadow-paper">
           <div className="text-[11px] uppercase tracking-[0.1em] text-[var(--muted)]">
-            Let op
+            Hoe rekenen we dit?
+          </div>
+          <p className="mt-2 text-[12.5px] leading-[1.65] text-[var(--muted)]">
+            We vergelijken annuïtair en lineair over dezelfde looptijd en rente. Daarna
+            tonen we per jaar het netto verschil in maandlast en de groei van de eventuele
+            beleggingspot uit dat verschil.
+          </p>
+        </div>
+
+        <div className="rounded-[1.5rem] border hair bg-white p-5 shadow-paper">
+          <div className="text-[11px] uppercase tracking-[0.1em] text-[var(--muted)]">
+            Welke aannames gebruiken we?
+          </div>
+          <p className="mt-2 text-[12.5px] leading-[1.65] text-[var(--muted)]">
+            Deze vergelijking gebruikt een vaste belastingfactor en een vast verwacht
+            rendement op de beleggingspot. Het is bedoeld als scenariovergelijking, niet
+            als offerte of persoonlijk advies.
+          </p>
+        </div>
+
+        <div className="rounded-[1.5rem] border hair bg-white p-5 shadow-paper">
+          <div className="text-[11px] uppercase tracking-[0.1em] text-[var(--muted)]">
+            Waar moet je op letten?
           </div>
           <p className="mt-2 text-[12.5px] leading-[1.65] text-[var(--muted)]">
             Deze tool is een vereenvoudigde vergelijking. Werkelijke belastingeffecten,
