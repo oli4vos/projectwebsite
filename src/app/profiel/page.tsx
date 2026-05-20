@@ -478,6 +478,14 @@ function ProfileEditor({
   onClear,
 }: ProfileEditorProps) {
   const [formValues, setFormValues] = useState<ProfileFormState>(initialValues);
+  const profileSteps = [
+    "Inkomen",
+    "Studieschuld",
+    "Wonen",
+    "Sparen & beleggen",
+    "Belasting",
+  ] as const;
+  const [activeStep, setActiveStep] = useState(0);
   const { errors, profile: parsedProfile } = useMemo(
     () => formStateToProfile(formValues),
     [formValues],
@@ -517,9 +525,51 @@ function ProfileEditor({
     onSaveMessageChange("Profiel uit deze browser verwijderd.");
   }
 
+  function goToPreviousStep() {
+    setActiveStep((current) => Math.max(0, current - 1));
+  }
+
+  function goToNextStep() {
+    setActiveStep((current) => Math.min(profileSteps.length - 1, current + 1));
+  }
+
   return (
     <>
       <section className="mt-6 space-y-6">
+          <div className="rounded-[1.5rem] border hair bg-white p-4 shadow-paper">
+            <div className="flex items-center justify-between gap-3 text-[12px] text-[var(--muted)]">
+              <span>
+                Stap {activeStep + 1} van {profileSteps.length}
+              </span>
+              <span>{profileSteps[activeStep]}</span>
+            </div>
+            <div className="mt-3 h-2 rounded-full bg-[var(--paper-soft)]">
+              <div
+                className="h-2 rounded-full bg-[var(--accent)] transition-all"
+                style={{
+                  width: `${((activeStep + 1) / profileSteps.length) * 100}%`,
+                }}
+              />
+            </div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {profileSteps.map((step, index) => (
+                <button
+                  key={step}
+                  type="button"
+                  onClick={() => setActiveStep(index)}
+                  className={`rounded-full border px-3 py-2 text-[12px] transition ${
+                    index === activeStep
+                      ? "border-[var(--ink)] bg-[var(--ink)] text-white"
+                      : "border-[var(--hair)] bg-white text-[var(--ink)] hover:bg-[var(--paper-soft)]"
+                  }`}
+                >
+                  {step}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {activeStep === 0 ? (
           <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
             <h2 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
               Persoonlijk en inkomen
@@ -593,7 +643,9 @@ function ProfileEditor({
               </label>
             </div>
           </div>
+          ) : null}
 
+          {activeStep === 1 ? (
           <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
             <h2 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
               Studieschuld en DUO
@@ -718,7 +770,9 @@ function ProfileEditor({
               </label>
             </div>
           </div>
+          ) : null}
 
+          {activeStep === 2 ? (
           <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
             <h2 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
               Wonen
@@ -800,7 +854,9 @@ function ProfileEditor({
               </label>
             </div>
           </div>
+          ) : null}
 
+          {activeStep === 3 ? (
           <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
             <h2 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
               Sparen en beleggen
@@ -932,7 +988,9 @@ function ProfileEditor({
               </label>
             </div>
           </div>
+          ) : null}
 
+          {activeStep === 4 ? (
           <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
             <h2 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
               Belastingvoorkeuren
@@ -989,9 +1047,18 @@ function ProfileEditor({
               </label>
             </div>
           </div>
+          ) : null}
         </section>
 
         <section className="mt-6 rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
+          <div className="mb-4 flex flex-wrap items-center gap-3">
+            <Btn type="button" kind="outline" onClick={goToPreviousStep}>
+              Vorige stap
+            </Btn>
+            <Btn type="button" kind="outline" onClick={goToNextStep}>
+              Volgende stap
+            </Btn>
+          </div>
           <div className="flex flex-wrap items-center gap-3">
             <Btn type="button" onClick={handleSave}>
               Profiel opslaan

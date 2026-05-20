@@ -89,7 +89,14 @@ function FieldError({ message }: { message?: string }) {
 
 export default function Calculator() {
   const [formValues, setFormValues] = useState<FormState>(defaults);
-  const { errors, parsed } = validate(formValues);
+  const validation = validate(formValues);
+  const errors = Object.fromEntries(
+    Object.entries(validation.errors).filter(([field]) => {
+      const value = formValues[field as keyof FormState];
+      return typeof value === "string" ? value.trim().length > 0 : Boolean(value);
+    }),
+  ) as ValidationErrors;
+  const { parsed } = validation;
   const result = useMemo(
     () => (parsed ? calculateMortgageComparison(parsed) : null),
     [parsed],
@@ -141,7 +148,7 @@ export default function Calculator() {
             onClick={applyExampleValues}
             className="rounded-full border hair bg-white px-3 py-2 text-[12px] text-[var(--ink)] transition hover:bg-[var(--paper-soft)]"
           >
-            Gebruik voorbeeldwaarden
+            Start met voorbeeldwaarden
           </button>
         </div>
 

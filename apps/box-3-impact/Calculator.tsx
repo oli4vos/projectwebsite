@@ -236,7 +236,14 @@ function CalculatorContent({
   profilePatch,
 }: CalculatorContentProps) {
   const [formValues, setFormValues] = useState(initialValues);
-  const { errors, parsedValues } = validateForm(formValues);
+  const validation = validateForm(formValues);
+  const errors = Object.fromEntries(
+    Object.entries(validation.errors).filter(([field]) => {
+      const value = formValues[field as keyof FormState];
+      return typeof value === "string" ? value.trim().length > 0 : Boolean(value);
+    }),
+  ) as ValidationErrors;
+  const { parsedValues } = validation;
   const result = parsedValues ? calculateBox3ImpactScenario(parsedValues) : null;
 
   const chartSeries = result
@@ -349,14 +356,14 @@ function CalculatorContent({
               onClick={applyExampleValues}
               className="rounded-full border hair bg-white px-3 py-2 text-[12px] text-[var(--ink)] transition hover:bg-[var(--paper-soft)]"
             >
-              Gebruik voorbeeldwaarden
+              Start met voorbeeldwaarden
             </button>
             <button
               type="button"
               onClick={applyProfileValues}
               className="rounded-full border hair bg-white px-3 py-2 text-[12px] text-[var(--ink)] transition hover:bg-[var(--paper-soft)]"
             >
-              Gebruik profielwaarden
+              Start met profielwaarden
             </button>
           </div>
         ) : null}
@@ -368,8 +375,14 @@ function CalculatorContent({
               onClick={applyExampleValues}
               className="rounded-full border hair bg-white px-3 py-2 text-[12px] text-[var(--ink)] transition hover:bg-[var(--paper-soft)]"
             >
-              Gebruik voorbeeldwaarden
+              Start met voorbeeldwaarden
             </button>
+            <a
+              href="/profiel"
+              className="rounded-full border hair bg-white px-3 py-2 text-[12px] text-[var(--ink)] transition hover:bg-[var(--paper-soft)]"
+            >
+              Start met profielwaarden
+            </a>
           </div>
         ) : null}
 
