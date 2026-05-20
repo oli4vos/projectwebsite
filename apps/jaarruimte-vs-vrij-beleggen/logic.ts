@@ -67,6 +67,20 @@ export type JaarruimteVsVrijBeleggenResult = {
   };
   warnings: string[];
   guidance: string[];
+  wealthPlanning: {
+    points: Array<{
+      year: number;
+      pensionGross: number;
+      pensionNetIndicative: number;
+      investingGrossWithoutBox3: number;
+      investingNetAfterBox3: number;
+      box3TaxThisYear: number;
+      cumulativeBox3Tax: number;
+    }>;
+    totalBox3TaxPaid: number;
+    endInvestingWithoutBox3: number;
+    endInvestingAfterBox3: number;
+  };
 };
 
 function sanitizeYear(value?: number) {
@@ -118,6 +132,88 @@ function chooseHeadline(input: {
   return "De uitkomst ligt dicht bij elkaar; flexibiliteit en timing bepalen de keuze.";
 }
 
+function buildWealthPlanning(input: {
+  year: number;
+  contributionEligibleForJaarruimte: number;
+  contributionRequested: number;
+  currentInvestableAssets: number;
+  hasFiscalPartner: boolean;
+  expectedAnnualReturn: number;
+  horizonYears: number;
+  expectedTaxRateAtPayout?: number;
+  includeBox3Effect: boolean;
+}) {
+  const points: JaarruimteVsVrijBeleggenResult["wealthPlanning"]["points"] = [];
+  const growthFactor = 1 + input.expectedAnnualReturn / 100;
+  const payoutTaxFactor =
+    input.expectedTaxRateAtPayout !== undefined
+      ? Math.max(1 - input.expectedTaxRateAtPayout / 100, 0)
+      : 1;
+
+  let investingWithoutBox3 = input.contributionRequested;
+  let investingAfterBox3 = input.contributionRequested;
+  let cumulativeBox3Tax = 0;
+
+  for (let yearIndex = 1; yearIndex <= input.horizonYears; yearIndex += 1) {
+    const pensionGross = roundMoney(
+      calculateFutureValueLumpSum(
+        input.contributionEligibleForJaarruimte,
+        input.expectedAnnualReturn,
+        yearIndex,
+      ),
+    );
+    const pensionNetIndicative = roundMoney(pensionGross * payoutTaxFactor);
+
+    investingWithoutBox3 = roundMoney(investingWithoutBox3 * growthFactor);
+    const investingBeforeTax = roundMoney(investingAfterBox3 * growthFactor);
+
+    let box3TaxThisYear = 0;
+    if (input.includeBox3Effect) {
+      const baseBox3 = calculateBox3Tax({
+        year: input.year,
+        hasFiscalPartner: input.hasFiscalPartner,
+        method: "actual",
+        bankDeposits: input.currentInvestableAssets,
+        investmentsAndOtherAssets: 0,
+        debts: 0,
+        actualAnnualReturnRate: input.expectedAnnualReturn,
+      });
+      const scenarioBox3 = calculateBox3Tax({
+        year: input.year,
+        hasFiscalPartner: input.hasFiscalPartner,
+        method: "actual",
+        bankDeposits: input.currentInvestableAssets,
+        investmentsAndOtherAssets: investingBeforeTax,
+        debts: 0,
+        actualAnnualReturnRate: input.expectedAnnualReturn,
+      });
+      box3TaxThisYear = roundMoney(
+        Math.max(scenarioBox3.box3Tax - baseBox3.box3Tax, 0),
+      );
+    }
+
+    cumulativeBox3Tax = roundMoney(cumulativeBox3Tax + box3TaxThisYear);
+    investingAfterBox3 = roundMoney(Math.max(investingBeforeTax - box3TaxThisYear, 0));
+
+    points.push({
+      year: yearIndex,
+      pensionGross,
+      pensionNetIndicative,
+      investingGrossWithoutBox3: investingWithoutBox3,
+      investingNetAfterBox3: investingAfterBox3,
+      box3TaxThisYear,
+      cumulativeBox3Tax,
+    });
+  }
+
+  return {
+    points,
+    totalBox3TaxPaid: roundMoney(cumulativeBox3Tax),
+    endInvestingWithoutBox3: roundMoney(investingWithoutBox3),
+    endInvestingAfterBox3: roundMoney(investingAfterBox3),
+  };
+}
+
 export function calculateJaarruimteVsVrijBeleggen(
   input: JaarruimteVsVrijBeleggenInput,
 ): JaarruimteVsVrijBeleggenResult {
@@ -166,36 +262,25 @@ export function calculateJaarruimteVsVrijBeleggen(
     horizonYears,
   );
 
-  let additionalBox3TaxIndicative: number | undefined;
-  if (includeBox3Effect) {
-    const baseBox3 = calculateBox3Tax({
-      year,
-      hasFiscalPartner,
-      method: "actual",
-      bankDeposits: currentInvestableAssets,
-      investmentsAndOtherAssets: 0,
-      debts: 0,
-      actualAnnualReturnRate: expectedAnnualReturn,
-    });
-    const scenarioBox3 = calculateBox3Tax({
-      year,
-      hasFiscalPartner,
-      method: "actual",
-      bankDeposits: currentInvestableAssets,
-      investmentsAndOtherAssets: freeInvestingFutureValueGross,
-      debts: 0,
-      actualAnnualReturnRate: expectedAnnualReturn,
-    });
-    additionalBox3TaxIndicative = roundMoney(
-      Math.max(scenarioBox3.box3Tax - baseBox3.box3Tax, 0),
-    );
-  }
+  const wealthPlanning = buildWealthPlanning({
+    year,
+    contributionEligibleForJaarruimte,
+    contributionRequested,
+    currentInvestableAssets,
+    hasFiscalPartner,
+    expectedAnnualReturn,
+    horizonYears,
+    expectedTaxRateAtPayout,
+    includeBox3Effect,
+  });
+  const additionalBox3TaxIndicative = includeBox3Effect
+    ? wealthPlanning.points.at(-1)?.box3TaxThisYear ?? 0
+    : undefined;
 
   const freeInvestingFutureValueNetIndicative = roundMoney(
-    Math.max(
-      freeInvestingFutureValueGross - (additionalBox3TaxIndicative ?? 0),
-      0,
-    ),
+    includeBox3Effect
+      ? wealthPlanning.endInvestingAfterBox3
+      : Math.max(freeInvestingFutureValueGross, 0),
   );
 
   const netDifferencePensionMinusInvesting = roundMoney(
@@ -223,7 +308,7 @@ export function calculateJaarruimteVsVrijBeleggen(
   ];
   if (includeBox3Effect) {
     warnings.push(
-      "Het box 3-effect is indicatief en vereenvoudigd naar één vergelijkingsjaar.",
+      "Het box 3-effect is indicatief en wordt hier als jaarlijkse benadering over de horizon verwerkt.",
     );
   }
   for (const pensionWarning of pensionScenario.warnings) {
@@ -280,5 +365,6 @@ export function calculateJaarruimteVsVrijBeleggen(
     },
     warnings,
     guidance,
+    wealthPlanning,
   };
 }

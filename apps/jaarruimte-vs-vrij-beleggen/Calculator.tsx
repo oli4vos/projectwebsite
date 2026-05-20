@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { AreaChart, getAdaptiveEuroTicks, getAdaptiveYearTicks } from "@/components/charts";
 import { MobileFieldFlowControls } from "@/components/MobileFieldFlowControls";
 import { ResultRow } from "@/components/ResultRow";
 import { ToolDisclosure } from "@/components/ToolDisclosure";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
-import { Pill } from "@/components/ui";
+import { Btn, Pill } from "@/components/ui";
 import { useMobileFieldFlow } from "@/hooks/useMobileFieldFlow";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { getDefaultFinancialYear } from "@/lib/financial-constants";
@@ -84,6 +85,120 @@ function formatPercent(value: number) {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(value);
+}
+
+function formatCsvNumber(value: number) {
+  return value.toFixed(2).replace(".", ",");
+}
+
+function buildPlanningCsv(result: NonNullable<ReturnType<typeof calculateJaarruimteVsVrijBeleggen>>) {
+  const lines: string[] = [
+    "Jaarruimte of vrij beleggen - vermogensplanning",
+    `Jaar;${result.year}`,
+    `Horizon (jaren);${result.horizonYears}`,
+    `Verwacht rendement (%);${formatCsvNumber(result.expectedAnnualReturn)}`,
+    "",
+    "Samenvatting;Waarde",
+    `Fiscaal voordeel nu;${formatCsvNumber(result.scenarioPension.taxBenefitNow)}`,
+    `Pensioen netto eindwaarde (indicatief);${formatCsvNumber(result.scenarioPension.futureValueNetIndicative)}`,
+    `Vrij beleggen netto eindwaarde (indicatief);${formatCsvNumber(result.scenarioFreeInvesting.futureValueNetIndicative)}`,
+    `Totaal box 3 over horizon;${formatCsvNumber(result.wealthPlanning.totalBox3TaxPaid)}`,
+    "",
+    "Jaar;Pensioen bruto;Pensioen netto indicatief;Beleggen zonder box 3;Beleggen na box 3;Box 3 dit jaar;Cumulatieve box 3",
+  ];
+
+  for (const point of result.wealthPlanning.points) {
+    lines.push(
+      [
+        point.year,
+        formatCsvNumber(point.pensionGross),
+        formatCsvNumber(point.pensionNetIndicative),
+        formatCsvNumber(point.investingGrossWithoutBox3),
+        formatCsvNumber(point.investingNetAfterBox3),
+        formatCsvNumber(point.box3TaxThisYear),
+        formatCsvNumber(point.cumulativeBox3Tax),
+      ].join(";"),
+    );
+  }
+
+  return lines.join("\n");
+}
+
+function downloadPlanningCsv(result: NonNullable<ReturnType<typeof calculateJaarruimteVsVrijBeleggen>>) {
+  const csvContent = buildPlanningCsv(result);
+  const blob = new Blob([`\uFEFF${csvContent}`], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `vermogensplanning-jaarruimte-vs-vrij-beleggen-${result.year}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function openPlanningPdfExport(result: NonNullable<ReturnType<typeof calculateJaarruimteVsVrijBeleggen>>) {
+  const tableRows = result.wealthPlanning.points
+    .map(
+      (point) =>
+        `<tr>
+          <td>${point.year}</td>
+          <td>${formatCurrency(point.pensionGross)}</td>
+          <td>${formatCurrency(point.pensionNetIndicative)}</td>
+          <td>${formatCurrency(point.investingGrossWithoutBox3)}</td>
+          <td>${formatCurrency(point.investingNetAfterBox3)}</td>
+          <td>${formatCurrency(point.box3TaxThisYear)}</td>
+          <td>${formatCurrency(point.cumulativeBox3Tax)}</td>
+        </tr>`,
+    )
+    .join("");
+
+  const html = `<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <title>Vermogensplanning export</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 24px; color: #1f2937; }
+    h1 { margin: 0 0 8px; font-size: 22px; }
+    p { margin: 0 0 4px; font-size: 13px; color: #4b5563; }
+    table { width: 100%; border-collapse: collapse; margin-top: 18px; font-size: 12px; }
+    th, td { border: 1px solid #d1d5db; padding: 8px; text-align: right; }
+    th:first-child, td:first-child { text-align: left; }
+    th { background: #f3f4f6; }
+  </style>
+</head>
+<body>
+  <h1>Vermogensplanning - Jaarruimte of vrij beleggen</h1>
+  <p>Belastingjaar: ${result.year}</p>
+  <p>Horizon: ${result.horizonYears} jaar</p>
+  <p>Verwacht rendement: ${formatPercent(result.expectedAnnualReturn)}%</p>
+  <p>Totaal box 3 over horizon (indicatief): ${formatCurrency(result.wealthPlanning.totalBox3TaxPaid)}</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Jaar</th>
+        <th>Pensioen bruto</th>
+        <th>Pensioen netto indicatief</th>
+        <th>Beleggen zonder box 3</th>
+        <th>Beleggen na box 3</th>
+        <th>Box 3 dit jaar</th>
+        <th>Cumulatieve box 3</th>
+      </tr>
+    </thead>
+    <tbody>${tableRows}</tbody>
+  </table>
+</body>
+</html>`;
+
+  const printWindow = window.open("", "_blank", "noopener,noreferrer,width=980,height=780");
+  if (!printWindow) {
+    return;
+  }
+  printWindow.document.write(html);
+  printWindow.document.close();
+  printWindow.focus();
+  printWindow.print();
 }
 
 function validateForm(values: FormState) {
@@ -348,6 +463,18 @@ function CalculatorContent({
               className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
             />
             <FieldError message={errors.availableJaarruimte} />
+            <p className="text-[12px] leading-[1.55] text-[var(--muted)]">
+              Weet je dit niet?{" "}
+              <a
+                href="https://www.belastingdienst.nl/wps/wcm/connect/nl/aftrek-en-kortingen/content/jaarruimte-en-reserveringsruimte"
+                target="_blank"
+                rel="noreferrer"
+                className="font-medium text-[var(--ink)] underline underline-offset-2"
+              >
+                Help mij berekenen
+              </a>
+              .
+            </p>
           </label>
 
           <label className={mobileFlow.getFieldClassName("plannedContribution")}>
@@ -529,9 +656,29 @@ function CalculatorContent({
 
         {result ? (
           <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
-            <h3 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
-              Vergelijking
-            </h3>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h3 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
+                Vergelijking
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                <Btn
+                  type="button"
+                  kind="outline"
+                  size="sm"
+                  onClick={() => downloadPlanningCsv(result)}
+                >
+                  Excel-export (.csv)
+                </Btn>
+                <Btn
+                  type="button"
+                  kind="ghost"
+                  size="sm"
+                  onClick={() => openPlanningPdfExport(result)}
+                >
+                  PDF-export
+                </Btn>
+              </div>
+            </div>
             <div className="mt-5">
               <ResultRow label="Gevraagde inleg" value={formatCurrency(result.contributionRequested)} />
               <ResultRow
@@ -606,6 +753,118 @@ function CalculatorContent({
               </p>
               <p>3) Beide scenario&apos;s groeien met hetzelfde verwachte rendement over dezelfde horizon.</p>
               <p>4) Vrij beleggen kan optioneel een indicatief box 3-effect meenemen.</p>
+            </div>
+          ) : null}
+        </ToolDisclosure>
+
+        <ToolDisclosure
+          title="Vermogensplanning (jaarlijks)"
+          subtitle="Per jaar inzicht in opbouw met en zonder box 3-heffing."
+        >
+          {result ? (
+            <div className="space-y-4 text-[13px] leading-[1.65] text-[var(--muted)]">
+              <p>
+                Deze planning laat per jaar zien hoe de pot zich ontwikkelt. Bij vrij
+                beleggen trekken we de indicatieve box 3-heffing jaarlijks van de
+                waarde af, zodat die heffing niet verder meecompoundt.
+              </p>
+
+              <div className="overflow-hidden rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] p-3">
+                <AreaChart
+                  height={220}
+                  yTicks={getAdaptiveEuroTicks(
+                    Math.max(
+                      ...result.wealthPlanning.points.map((point) =>
+                        Math.max(
+                          point.pensionNetIndicative,
+                          point.investingGrossWithoutBox3,
+                          point.investingNetAfterBox3,
+                        ),
+                      ),
+                    ),
+                  )}
+                  series={[
+                    {
+                      color: "oklch(0.58 0.15 238)",
+                      points: result.wealthPlanning.points.map(
+                        (point) => point.pensionNetIndicative,
+                      ),
+                    },
+                    {
+                      color: "oklch(0.62 0.13 152)",
+                      points: result.wealthPlanning.points.map(
+                        (point) => point.investingGrossWithoutBox3,
+                      ),
+                    },
+                    {
+                      color: "oklch(0.56 0.18 28)",
+                      points: result.wealthPlanning.points.map(
+                        (point) => point.investingNetAfterBox3,
+                      ),
+                    },
+                  ]}
+                />
+                <div className="mt-2 flex flex-wrap items-center gap-3 text-[12px] text-[var(--soft)]">
+                  <span className="inline-flex items-center gap-1">
+                    <span className="size-2 rounded-full bg-[oklch(0.58_0.15_238)]" />
+                    Pensioen netto indicatief
+                  </span>
+                  <span className="inline-flex items-center gap-1">
+                    <span className="size-2 rounded-full bg-[oklch(0.62_0.13_152)]" />
+                    Beleggen zonder box 3
+                  </span>
+                  <span className="inline-flex items-center gap-1">
+                    <span className="size-2 rounded-full bg-[oklch(0.56_0.18_28)]" />
+                    Beleggen na box 3
+                  </span>
+                </div>
+                <div className="mt-2 text-[12px] text-[var(--soft)]">
+                  Jaarmarkeringen:{" "}
+                  {getAdaptiveYearTicks(result.horizonYears).join(" · ")}
+                </div>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="min-w-full border-collapse text-[12px]">
+                  <thead>
+                    <tr className="border-b border-[var(--hair)] text-left">
+                      <th className="py-2 pr-4">Jaar</th>
+                      <th className="py-2 pr-4 text-right">Pensioen netto</th>
+                      <th className="py-2 pr-4 text-right">Beleggen zonder box 3</th>
+                      <th className="py-2 pr-4 text-right">Beleggen na box 3</th>
+                      <th className="py-2 pr-4 text-right">Box 3 dit jaar</th>
+                      <th className="py-2 text-right">Cumulatieve box 3</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {result.wealthPlanning.points.map((point) => (
+                      <tr key={point.year} className="border-b border-[var(--hair)]/65">
+                        <td className="py-2 pr-4">{point.year}</td>
+                        <td className="py-2 pr-4 text-right">{formatCurrency(point.pensionNetIndicative)}</td>
+                        <td className="py-2 pr-4 text-right">{formatCurrency(point.investingGrossWithoutBox3)}</td>
+                        <td className="py-2 pr-4 text-right">{formatCurrency(point.investingNetAfterBox3)}</td>
+                        <td className="py-2 pr-4 text-right">{formatCurrency(point.box3TaxThisYear)}</td>
+                        <td className="py-2 text-right">{formatCurrency(point.cumulativeBox3Tax)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="rounded-xl border border-[var(--hair)] bg-white p-3">
+                <ResultRow
+                  label="Totaal betaalde box 3-heffing over de horizon"
+                  value={formatCurrency(result.wealthPlanning.totalBox3TaxPaid)}
+                />
+                <ResultRow
+                  label="Eindvermogen vrij beleggen zonder box 3"
+                  value={formatCurrency(result.wealthPlanning.endInvestingWithoutBox3)}
+                />
+                <ResultRow
+                  label="Eindvermogen vrij beleggen na box 3"
+                  value={formatCurrency(result.wealthPlanning.endInvestingAfterBox3)}
+                />
+              </div>
             </div>
           ) : null}
         </ToolDisclosure>

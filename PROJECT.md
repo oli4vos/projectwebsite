@@ -148,6 +148,8 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - vergelijkt pensioeninleg via jaarruimte met vrij beleggen in box 3
   - gebruiker vult beschikbare jaarruimte zelf in; tool claimt geen officiële jaarruimteberekening
   - gebruikt centrale box 1- en box 3-logica voor indicatief voordeel nu en netto eindwaarde
+  - bevat nu jaarlijkse vermogensplanning met jaarlijkse box 3-afboeking, plus clean PDF/Excel-export (CSV)
+  - bevat onder het jaarruimteveld een directe “Help mij berekenen”-link naar externe jaarruimte-berekenhulp
   - benadrukt afweging tussen fiscaal voordeel en flexibiliteit (relevant voor FIRE-scenario's)
 - `apps/volgende-euro`
   - centrale prioriteitenhulp voor de vraag waar extra geld nu het meest logisch naartoe kan

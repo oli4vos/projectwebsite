@@ -92,6 +92,36 @@ describe("calculateJaarruimteVsVrijBeleggen", () => {
     expect(withoutBox3.scenarioFreeInvesting.futureValueNetIndicative).toBe(
       withoutBox3.scenarioFreeInvesting.futureValueGross,
     );
+    expect(
+      withoutBox3.wealthPlanning.points.every((point) => point.box3TaxThisYear === 0),
+    ).toBe(true);
+  });
+
+  it("builds yearly wealth planning with annual box3 impact when enabled", () => {
+    const withBox3 = calculateJaarruimteVsVrijBeleggen({
+      year: 2026,
+      grossAnnualIncome: 55000,
+      availableJaarruimte: 6000,
+      plannedContribution: 6000,
+      currentInvestableAssets: 50000,
+      expectedAnnualReturn: 5,
+      horizonYears: 12,
+      includeBox3Effect: true,
+    });
+
+    expect(withBox3.wealthPlanning.points).toHaveLength(12);
+    expect(withBox3.wealthPlanning.totalBox3TaxPaid).toBeGreaterThanOrEqual(0);
+    expect(
+      withBox3.wealthPlanning.endInvestingWithoutBox3,
+    ).toBeGreaterThanOrEqual(withBox3.wealthPlanning.endInvestingAfterBox3);
+    expect(
+      withBox3.wealthPlanning.points.every(
+        (point) =>
+          Number.isFinite(point.investingNetAfterBox3) &&
+          Number.isFinite(point.box3TaxThisYear) &&
+          point.box3TaxThisYear >= 0,
+      ),
+    ).toBe(true);
   });
 
   it("never returns NaN or Infinity", () => {
