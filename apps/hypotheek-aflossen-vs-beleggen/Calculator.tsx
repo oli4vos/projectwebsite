@@ -402,52 +402,58 @@ function CalculatorContent({
   }
 
   return (
-    <CalculatorShell>
-      <section className="order-2 min-w-0 rounded-[1.5rem] border hair bg-white p-6 shadow-paper lg:order-1">
-        <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
-          Hypotheekkeuze
-        </div>
-        <h2 className="mt-2 font-serif text-[28px] tracking-[-0.02em] text-[var(--ink)]">
-          Hypotheek aflossen of beleggen?
-        </h2>
-        <p className="mt-3 text-[14px] leading-[1.7] text-[var(--ink-2)]">
-          Extra aflossen geeft vaak meer rust, beleggen kan meer flexibiliteit en
-          groei geven. Deze tool vergelijkt beide routes met renteaftrek en
-          optioneel box 3-effect.
-        </p>
-
-        {hasRelevantProfileValues ? (
-          <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
-            <span>Profielwaarden gevonden in deze browser.</span>
-            <ToolActionButton type="button" onClick={applyExampleValues} variant="secondary" size="sm">
-              Start met voorbeeldwaarden
-            </ToolActionButton>
-            <ToolActionButton type="button" onClick={applyProfileValues} variant="secondary" size="sm">
-              Start met profielwaarden
-            </ToolActionButton>
+    <CalculatorShell
+      intro={
+        <>
+          <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
+            Hypotheekkeuze
           </div>
-        ) : null}
-        {!hasRelevantProfileValues ? (
-          <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
-            <span>Start leeg en vul snel een voorbeeldscenario in.</span>
-            <ToolActionButton type="button" onClick={applyExampleValues} variant="secondary" size="sm">
-              Start met voorbeeldwaarden
-            </ToolActionButton>
-            <ToolActionLinkButton href="/profiel" variant="secondary" size="sm">
-              Start met profielwaarden
-            </ToolActionLinkButton>
-          </div>
-        ) : null}
-        {submitContextMessage ? (
-          <p className="mt-3 text-[12.5px] text-[var(--muted)]">{submitContextMessage}</p>
-        ) : null}
-        {hasDirtyChanges ? (
-          <p className="mt-3 text-[12.5px] text-[var(--muted)]">
-            Klik opnieuw op Bereken om de uitkomst te vernieuwen.
+          <h2 className="mt-2 font-serif text-[28px] tracking-[-0.02em] text-[var(--ink)]">
+            Hypotheek aflossen of beleggen?
+          </h2>
+          <p className="mt-3 text-[14px] leading-[1.7] text-[var(--ink-2)]">
+            Extra aflossen geeft vaak meer rust, beleggen kan meer flexibiliteit en
+            groei geven. Deze tool vergelijkt beide routes met renteaftrek en
+            optioneel box 3-effect.
           </p>
-        ) : null}
-
-        <div className="mt-6 grid gap-5">
+        </>
+      }
+      startActions={
+        <>
+          {hasRelevantProfileValues ? (
+            <div className="flex flex-wrap items-center gap-3 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
+              <span>Profielwaarden gevonden in deze browser.</span>
+              <ToolActionButton type="button" onClick={applyExampleValues} variant="secondary" size="sm">
+                Start met voorbeeldwaarden
+              </ToolActionButton>
+              <ToolActionButton type="button" onClick={applyProfileValues} variant="secondary" size="sm">
+                Start met profielwaarden
+              </ToolActionButton>
+            </div>
+          ) : null}
+          {!hasRelevantProfileValues ? (
+            <div className="flex flex-wrap items-center gap-3 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
+              <span>Start leeg en vul snel een voorbeeldscenario in.</span>
+              <ToolActionButton type="button" onClick={applyExampleValues} variant="secondary" size="sm">
+                Start met voorbeeldwaarden
+              </ToolActionButton>
+              <ToolActionLinkButton href="/profiel" variant="secondary" size="sm">
+                Start met profielwaarden
+              </ToolActionLinkButton>
+            </div>
+          ) : null}
+          {submitContextMessage ? (
+            <p className="text-[12.5px] text-[var(--muted)]">{submitContextMessage}</p>
+          ) : null}
+          {hasDirtyChanges ? (
+            <p className="text-[12.5px] text-[var(--muted)]">
+              Klik opnieuw op Bereken om de uitkomst te vernieuwen.
+            </p>
+          ) : null}
+        </>
+      }
+      inputs={
+        <div className="grid gap-5">
           <label className={mobileFlow.getFieldClassName("remainingMortgageDebt")}>
             <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
               Resterende hypotheekschuld
@@ -675,18 +681,19 @@ function CalculatorContent({
             onComplete={handleCalculate}
           />
 
-          <div className="flex flex-wrap items-center gap-3 border-t border-[var(--hair)] pt-2">
-            <ToolActionButton type="button" onClick={handleCalculate} variant="accent" size="md">
-              {submittedValues && hasDirtyChanges ? "Bereken opnieuw" : "Bereken"}
-            </ToolActionButton>
-            <p className="text-[12px] text-[var(--muted)]">
-              De tool rekent alleen met ingevulde gegevens.
-            </p>
-          </div>
         </div>
-      </section>
-
-      <section className="order-1 min-w-0 space-y-5 lg:order-2">
+      }
+      submitAction={
+        <div className="flex flex-wrap items-center gap-3 border-t border-[var(--hair)] pt-2">
+          <ToolActionButton type="button" onClick={handleCalculate} variant="accent" size="md">
+            {submittedValues && hasDirtyChanges ? "Bereken opnieuw" : "Bereken"}
+          </ToolActionButton>
+          <p className="text-[12px] text-[var(--muted)]">
+            De tool rekent alleen met ingevulde gegevens.
+          </p>
+        </div>
+      }
+      result={
         <div id="tool-result-summary" className="rounded-[1.5rem] bg-[var(--deep)] p-6 text-white shadow-paper-lg">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="text-[11px] uppercase tracking-[0.12em] text-white/55">
@@ -719,7 +726,9 @@ function CalculatorContent({
             </>
           ) : null}
         </div>
-
+      }
+      details={
+        <>
         {result ? (
           <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
             <h3 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
@@ -868,7 +877,8 @@ function CalculatorContent({
             </ul>
           ) : null}
         </ToolDisclosure>
-      </section>
-    </CalculatorShell>
+        </>
+      }
+    />
   );
 }

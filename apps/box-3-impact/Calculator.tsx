@@ -360,18 +360,23 @@ function CalculatorContent({
   }
 
   return (
-    <CalculatorShell>
-      <section className="order-2 min-w-0 rounded-[1.5rem] border hair bg-white p-6 shadow-paper lg:order-1">
-        <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
-          Invoer
-        </div>
-        <h2 className="mt-2 font-serif text-[28px] tracking-[-0.02em] text-[var(--ink)]">
-          Wat kost mijn vermogen in box 3?
-        </h2>
-        <p className="mt-3 text-[14px] leading-[1.7] text-[var(--ink-2)]">
-          Box 3 is de belasting op sparen en beleggen. Deze tool laat zien wat je
-          vermogen indicatief aan belasting kost, nu en over je gekozen horizon.
-        </p>
+    <CalculatorShell
+      intro={
+        <>
+          <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
+            Invoer
+          </div>
+          <h2 className="mt-2 font-serif text-[28px] tracking-[-0.02em] text-[var(--ink)]">
+            Wat kost mijn vermogen in box 3?
+          </h2>
+          <p className="mt-3 text-[14px] leading-[1.7] text-[var(--ink-2)]">
+            Box 3 is de belasting op sparen en beleggen. Deze tool laat zien wat je
+            vermogen indicatief aan belasting kost, nu en over je gekozen horizon.
+          </p>
+        </>
+      }
+      startActions={
+        <>
 
         {hasRelevantProfileValues ? (
           <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
@@ -395,16 +400,18 @@ function CalculatorContent({
             </ToolActionLinkButton>
           </div>
         ) : null}
-        {submitContextMessage ? (
-          <p className="mt-3 text-[12.5px] text-[var(--muted)]">{submitContextMessage}</p>
-        ) : null}
-        {hasDirtyChanges ? (
-          <p className="mt-3 text-[12.5px] text-[var(--muted)]">
+          {submitContextMessage ? (
+            <p className="text-[12.5px] text-[var(--muted)]">{submitContextMessage}</p>
+          ) : null}
+          {hasDirtyChanges ? (
+            <p className="text-[12.5px] text-[var(--muted)]">
             Klik opnieuw op Bereken om de uitkomst te vernieuwen.
-          </p>
-        ) : null}
-
-        <div className="mt-6 grid gap-5">
+            </p>
+          ) : null}
+        </>
+      }
+      inputs={
+        <div className="grid gap-5">
           <label className={mobileFlow.getFieldClassName("year")}>
             <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
               Belastingjaar
@@ -610,18 +617,19 @@ function CalculatorContent({
             onComplete={handleCalculate}
           />
 
-          <div className="flex flex-wrap items-center gap-3 border-t border-[var(--hair)] pt-2">
-            <ToolActionButton type="button" onClick={handleCalculate} variant="accent" size="md">
-              {submittedValues && hasDirtyChanges ? "Bereken opnieuw" : "Bereken"}
-            </ToolActionButton>
-            <p className="text-[12px] text-[var(--muted)]">
-              De tool rekent alleen met ingevulde gegevens.
-            </p>
-          </div>
         </div>
-      </section>
-
-      <section className="order-1 min-w-0 space-y-5 lg:order-2">
+      }
+      submitAction={
+        <div className="flex flex-wrap items-center gap-3 border-t border-[var(--hair)] pt-2">
+          <ToolActionButton type="button" onClick={handleCalculate} variant="accent" size="md">
+            {submittedValues && hasDirtyChanges ? "Bereken opnieuw" : "Bereken"}
+          </ToolActionButton>
+          <p className="text-[12px] text-[var(--muted)]">
+            De tool rekent alleen met ingevulde gegevens.
+          </p>
+        </div>
+      }
+      result={
         <div id="tool-result-summary" className="rounded-[1.5rem] bg-[var(--deep)] p-6 text-white shadow-paper-lg">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="text-[11px] uppercase tracking-[0.12em] text-white/55">
@@ -664,6 +672,9 @@ function CalculatorContent({
             </p>
           )}
         </div>
+      }
+      details={
+        <>
 
         {result ? (
           <>
@@ -913,7 +924,8 @@ function CalculatorContent({
             )}
           </ul>
         </DisclosureSection>
-      </section>
-    </CalculatorShell>
+        </>
+      }
+    />
   );
 }
