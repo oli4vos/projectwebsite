@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   getBox3ImpactDefaultsFromProfile,
   getBox3IndicatieDefaultsFromProfile,
+  getHypotheekAflossenVsBeleggenDefaultsFromProfile,
   getJaarruimteVsVrijBeleggenDefaultsFromProfile,
   getMortgageImpactDefaultsFromProfile,
   getStudentDebtVsInvestingDefaultsFromProfile,
@@ -82,6 +83,7 @@ describe("profile tool mapping", () => {
     expect(getBox3ImpactDefaultsFromProfile({})).toEqual({});
     expect(getJaarruimteVsVrijBeleggenDefaultsFromProfile({})).toEqual({});
     expect(getFireNaBelastingDefaultsFromProfile({})).toEqual({});
+    expect(getHypotheekAflossenVsBeleggenDefaultsFromProfile({})).toEqual({});
   });
 
   it("maps box3 indicatie defaults from profile values", () => {
@@ -221,5 +223,40 @@ describe("profile tool mapping", () => {
     expect(mapped.riskProfile).toBe("neutral");
     expect(mapped.taxYear).toBe("2026");
     expect(mapped.hasFiscalPartner).toBe(true);
+  });
+
+  it("maps hypotheek-aflossen-vs-beleggen defaults from profile values", () => {
+    const profile: UserProfile = {
+      income: {
+        grossAnnualIncome: 68000,
+        householdType: "withPartner",
+      },
+      housing: {
+        mortgageRate: 3.9,
+        mortgageTermYears: 27,
+      },
+      savingInvesting: {
+        currentSavings: 28000,
+        expectedAnnualReturn: 5.7,
+        investmentHorizonYears: 18,
+        targetEmergencyFund: 20000,
+        monthlyFreeCashflow: 450,
+      },
+      tax: {
+        preferredTaxYear: 2026,
+      },
+    };
+
+    const mapped = getHypotheekAflossenVsBeleggenDefaultsFromProfile(profile);
+    expect(mapped.mortgageRate).toBe("3.9");
+    expect(mapped.remainingTermYears).toBe("27");
+    expect(mapped.taxableIncome).toBe("68000");
+    expect(mapped.expectedAnnualReturn).toBe("5.7");
+    expect(mapped.investmentHorizonYears).toBe("18");
+    expect(mapped.currentInvestableAssets).toBe("28000");
+    expect(mapped.hasFiscalPartner).toBe(true);
+    expect(mapped.taxYear).toBe("2026");
+    expect(mapped.minimumBuffer).toBe("20000");
+    expect(mapped.annualExtraRepayment).toBe("5400");
   });
 });

@@ -16,6 +16,7 @@ describe("generated app registry", () => {
     expect(appRegistryBySlug["jaarruimte-vs-vrij-beleggen"]).toBeDefined();
     expect(appRegistryBySlug["box-3-impact"]).toBeDefined();
     expect(appRegistryBySlug["volgende-euro"]).toBeDefined();
+    expect(appRegistryBySlug["hypotheek-aflossen-vs-beleggen"]).toBeDefined();
   });
 
   it("keeps manifest metadata consistent for disclaimer and output type", () => {
@@ -71,7 +72,8 @@ describe("generated app registry", () => {
       ).toBe(true);
       expect(
         app.disclaimerType === "taxIndicative" ||
-          app.disclaimerType === "financialEducation",
+          app.disclaimerType === "financialEducation" ||
+          app.disclaimerType === "mortgageIndicative",
       ).toBe(true);
     }
   });

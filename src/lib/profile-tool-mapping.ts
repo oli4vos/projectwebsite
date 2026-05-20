@@ -71,6 +71,19 @@ export const PROFILE_FIELDS_FIRE_NA_BELASTING = [
   "tax.hasFiscalPartner",
 ] as const;
 
+export const PROFILE_FIELDS_HYPOTHEEK_AFLOSSEN_VS_BELEGGEN = [
+  "income.grossAnnualIncome",
+  "housing.mortgageRate",
+  "housing.mortgageTermYears",
+  "savingInvesting.currentSavings",
+  "savingInvesting.expectedAnnualReturn",
+  "savingInvesting.investmentHorizonYears",
+  "tax.hasFiscalPartner",
+  "tax.preferredTaxYear",
+  "savingInvesting.targetEmergencyFund",
+  "savingInvesting.monthlyFreeCashflow",
+] as const;
+
 type MortgageImpactDefaults = Partial<{
   grossIncomeUser: string;
   grossIncomePartner: string;
@@ -163,6 +176,19 @@ type FireNaBelastingDefaults = Partial<{
   hasFiscalPartner: boolean;
   horizonYears: string;
   riskProfile: "conservative" | "neutral" | "offensive";
+}>;
+
+type HypotheekAflossenVsBeleggenDefaults = Partial<{
+  mortgageRate: string;
+  remainingTermYears: string;
+  taxableIncome: string;
+  expectedAnnualReturn: string;
+  investmentHorizonYears: string;
+  currentInvestableAssets: string;
+  hasFiscalPartner: boolean;
+  taxYear: string;
+  minimumBuffer: string;
+  annualExtraRepayment: string;
 }>;
 
 function toStringValue(value?: number) {
@@ -603,6 +629,79 @@ export function getFireNaBelastingDefaultsFromProfile(
           profile.income?.householdType === "family" ||
           (profile.income?.partnerGrossAnnualIncome ?? 0) > 0,
       );
+  }
+
+  return defaults;
+}
+
+export function getHypotheekAflossenVsBeleggenDefaultsFromProfile(
+  profile: UserProfile,
+): HypotheekAflossenVsBeleggenDefaults {
+  const defaults: HypotheekAflossenVsBeleggenDefaults = {};
+
+  const mortgageRate = toStringValue(profile.housing?.mortgageRate);
+  if (mortgageRate !== undefined) {
+    defaults.mortgageRate = mortgageRate;
+  }
+
+  const remainingTermYears = toStringValue(profile.housing?.mortgageTermYears);
+  if (remainingTermYears !== undefined) {
+    defaults.remainingTermYears = remainingTermYears;
+  }
+
+  const taxableIncome = toStringValue(profile.income?.grossAnnualIncome);
+  if (taxableIncome !== undefined) {
+    defaults.taxableIncome = taxableIncome;
+  }
+
+  const expectedAnnualReturn = toStringValue(
+    profile.savingInvesting?.expectedAnnualReturn,
+  );
+  if (expectedAnnualReturn !== undefined) {
+    defaults.expectedAnnualReturn = expectedAnnualReturn;
+  }
+
+  const investmentHorizonYears = toStringValue(
+    profile.savingInvesting?.investmentHorizonYears,
+  );
+  if (investmentHorizonYears !== undefined) {
+    defaults.investmentHorizonYears = investmentHorizonYears;
+  }
+
+  const currentInvestableAssets = toStringValue(
+    profile.savingInvesting?.currentSavings,
+  );
+  if (currentInvestableAssets !== undefined) {
+    defaults.currentInvestableAssets = currentInvestableAssets;
+  }
+
+  if (
+    profile.tax?.hasFiscalPartner !== undefined ||
+    profile.income?.householdType !== undefined ||
+    profile.income?.partnerGrossAnnualIncome !== undefined
+  ) {
+    defaults.hasFiscalPartner =
+      profile.tax?.hasFiscalPartner ??
+      Boolean(
+        profile.income?.householdType === "withPartner" ||
+          profile.income?.householdType === "family" ||
+          (profile.income?.partnerGrossAnnualIncome ?? 0) > 0,
+      );
+  }
+
+  const taxYear = toStringValue(profile.tax?.preferredTaxYear);
+  if (taxYear !== undefined) {
+    defaults.taxYear = taxYear;
+  }
+
+  const minimumBuffer = toStringValue(profile.savingInvesting?.targetEmergencyFund);
+  if (minimumBuffer !== undefined) {
+    defaults.minimumBuffer = minimumBuffer;
+  }
+
+  const monthlyFreeCashflow = profile.savingInvesting?.monthlyFreeCashflow;
+  if (monthlyFreeCashflow !== undefined && Number.isFinite(monthlyFreeCashflow)) {
+    defaults.annualExtraRepayment = String(Math.max(monthlyFreeCashflow, 0) * 12);
   }
 
   return defaults;
