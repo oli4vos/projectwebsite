@@ -65,6 +65,45 @@ export function AppDashboard({ apps }: AppDashboardProps) {
     },
   ];
 
+  const doelgroepBlokken = [
+    {
+      title: "(Oud-)studenten",
+      description:
+        "Voor keuzes rond verplicht DUO-bedrag, vrijwillige extra aflossing en hypotheekimpact.",
+      links: [
+        { href: "/apps/studieschuld-vs-beleggen", label: "Studieschuld aflossen of beleggen" },
+        { href: "/apps/hypotheek-impact-studieschuld", label: "Hypotheekimpact studieschuld" },
+      ],
+    },
+    {
+      title: "Richting pensioen",
+      description:
+        "Voor afweging tussen fiscale pensioeninleg (jaarruimte) en vrij beleggen met behoud van overzicht.",
+      links: [
+        { href: "/apps/jaarruimte-vs-vrij-beleggen", label: "Jaarruimte of vrij beleggen" },
+        { href: "/profiel", label: "Profiel (pensioen/AOV-context)" },
+      ],
+    },
+    {
+      title: "ZZP of loondienst",
+      description:
+        "Voor prioriteiten in cashflow: buffer, schulden, wonen, pensioen en beleggen in één beslisflow.",
+      links: [
+        { href: "/apps/volgende-euro", label: "Wat doe ik met mijn volgende euro?" },
+        { href: "/profiel", label: "Profielinvulling per situatie" },
+      ],
+    },
+    {
+      title: "Beleggen en vermogensgroei",
+      description:
+        "Voor box 3-impact op vermogen, rendement en langjarige groei met heldere fiscale verdieping.",
+      links: [
+        { href: "/apps/box-3-impact", label: "Box 3-impact calculator" },
+        { href: "/apps/box3-indicatie", label: "Box 3-indicatie" },
+      ],
+    },
+  ] as const;
+
   return (
     <div className="space-y-8">
       <section
@@ -141,6 +180,39 @@ export function AppDashboard({ apps }: AppDashboardProps) {
         <BtnLink href="/profiel" kind="outline" size="md">
           Open profiel
         </BtnLink>
+      </section>
+
+      <section className="grid gap-4 rounded-[1.5rem] border hair bg-white/80 p-6 shadow-paper md:grid-cols-2">
+        <div className="md:col-span-2">
+          <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
+            Per doelgroep
+          </div>
+          <h3 className="mt-2 font-serif text-[clamp(1.35rem,1.1rem+1vw,1.9rem)] tracking-[-0.02em] text-[var(--ink)]">
+            Start bij de situatie die op jou lijkt
+          </h3>
+          <p className="mt-3 max-w-[62ch] text-[14px] leading-[1.65] text-[var(--ink-2)]">
+            Zo houd je de eerste stap simpel: kies je doelgroep, open de relevante
+            tool en duik daarna pas in de verdieping.
+          </p>
+        </div>
+        {doelgroepBlokken.map((blok) => (
+          <article
+            key={blok.title}
+            className="rounded-xl border border-[var(--hair)] bg-white p-4"
+          >
+            <h4 className="font-medium text-[var(--ink)]">{blok.title}</h4>
+            <p className="mt-2 text-[13px] leading-[1.6] text-[var(--muted)]">
+              {blok.description}
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {blok.links.map((link) => (
+                <BtnLink key={link.href} href={link.href} kind="ghost" size="sm">
+                  {link.label}
+                </BtnLink>
+              ))}
+            </div>
+          </article>
+        ))}
       </section>
 
       <div className="flex flex-wrap gap-2">

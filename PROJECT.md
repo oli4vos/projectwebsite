@@ -105,6 +105,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/components/ui.tsx`: `Btn`, `BtnLink`, `Pill`, `Logo`, `CategoryDot`
 - `src/components/ToolDisclosure.tsx`: standaard uitklapbare verdiepingssectie voor rekentools
 - `src/app/apps/[slug]/page.tsx`: toont ook manifestmetadata (domeinen, aannames, output/disclaimer/risico) zonder de dashboardflow zwaarder te maken
+- Dashboard bevat ook een doelgroep-overzicht met directe ingangen voor (oud-)studenten, pensioenrichting, zzp/loondienst en beleggen/vermogensgroei.
 
 ## Huidige data/config
 
@@ -211,6 +212,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - `calculateBox1Tax`
   - `calculateMortgageInterestDeduction`
   - `calculateBox3Tax`
+- Waar box 3 relevant is in tools, loopt de heffingsberekening via centrale `calculateBox3Tax` (geen losse box 3-formules per tool).
 - De tax-laag is geen volledige IB-aangifte en rekent bewust niet met heffingskortingen, toeslagen, ondernemersaftrek of persoonlijke uitzonderingen.
 - Validatie gebeurt nu per calculatorcomponent in de client.
 - Dashboard haalt alleen manifestdata op uit de gegenereerde registry.

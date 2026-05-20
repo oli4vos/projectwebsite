@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { AppManifest } from "@/lib/app-types";
 import { appRegistry, appRegistryBySlug } from "@/lib/app-registry";
 
 describe("generated app registry", () => {
@@ -18,40 +19,45 @@ describe("generated app registry", () => {
   });
 
   it("keeps manifest metadata consistent for disclaimer and output type", () => {
-    for (const app of appRegistry) {
-      if (app.disclaimerType === "taxIndicative") {
-        expect(app.assumptionsUsed ?? []).toContain("tax");
+    for (const manifest of appRegistry as AppManifest[]) {
+      const assumptionsUsed = manifest.assumptionsUsed ?? [];
+      const calculationDomains = manifest.calculationDomains ?? [];
+      const disclaimerType = manifest.disclaimerType;
+      const outputType = manifest.outputType;
+
+      if (disclaimerType === "taxIndicative") {
+        expect(assumptionsUsed).toContain("tax");
         expect(
-          (app.assumptionsUsed ?? []).some(
+          assumptionsUsed.some(
             (value) => value === "box1" || value === "box3",
           ),
         ).toBe(true);
       }
 
-      if (app.disclaimerType === "mortgageIndicative") {
+      if (disclaimerType === "mortgageIndicative") {
         expect(
-          (app.calculationDomains ?? []).some(
+          calculationDomains.some(
             (value) => value === "mortgage" || value === "housing",
           ),
         ).toBe(true);
       }
 
-      if (app.disclaimerType === "duoIndicative") {
-        expect(app.assumptionsUsed ?? []).toContain("duo");
+      if (disclaimerType === "duoIndicative") {
+        expect(assumptionsUsed).toContain("duo");
       }
 
-      if (app.outputType === "singleResult") {
-        expect((app.tags ?? []).length).toBeGreaterThan(0);
+      if (outputType === "singleResult") {
+        expect((manifest.tags ?? []).length).toBeGreaterThan(0);
       }
 
-      if (app.outputType === "scenarioComparison") {
-        expect((app.calculationDomains ?? []).length).toBeGreaterThan(0);
+      if (outputType === "scenarioComparison") {
+        expect(calculationDomains.length).toBeGreaterThan(0);
       }
     }
   });
 
   it("uses central box3 domain metadata consistently", () => {
-    const box3Apps = appRegistry.filter((app) =>
+    const box3Apps = (appRegistry as AppManifest[]).filter((app) =>
       (app.assumptionsUsed ?? []).includes("box3"),
     );
     expect(box3Apps.length).toBeGreaterThan(0);
