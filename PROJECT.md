@@ -183,6 +183,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 ## Profiel-MVP
 
 - Er is nu een local-first profielpagina op `/profiel`.
+- Profielinvoer is opgesplitst in stappen (inkomen, studieschuld, wonen, sparen/beleggen, belasting) met voortgangsindicator.
 - Profieldata wordt alleen lokaal opgeslagen in de browser via `localStorage`.
 - Storage key: `project-site:user-profile:v1`.
 - Privacy-uitgangspunt: geen server-opslag, geen auth, geen cookies, geen cloud sync.
@@ -231,6 +232,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - Waar box 3 relevant is in tools, loopt de heffingsberekening via centrale `calculateBox3Tax` (geen losse box 3-formules per tool).
 - De tax-laag is geen volledige IB-aangifte en rekent bewust niet met heffingskortingen, toeslagen, ondernemersaftrek of persoonlijke uitzonderingen.
 - Validatie gebeurt nu per calculatorcomponent in de client.
+- Formvalidatie toont rode veldfouten pas zodra een gebruiker dat veld inhoudelijk invult; lege startvelden tonen geen foutmeldingen vooraf.
 - Dashboard haalt alleen manifestdata op uit de gegenereerde registry.
 - Verborgen tools blijven buiten dashboard en app-routes via manifestveld `visibility: "hidden"`.
 - `requiredProfileFields` is documenterend voor prefill-koppelingen; velden worden niet automatisch verplicht voor de gebruiker gemaakt.
@@ -243,9 +245,11 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - Bij runtime laadproblemen na deploy is er een Nederlandse error-fallback via `src/app/error.tsx` en `src/app/global-error.tsx`.
 - Bij “Deze pagina kon niet goed laden”: eerst hard refresh (`Cmd+Shift+R`) of sitegegevens wissen voor `oli4vos.github.io`.
 - UX-standaard voor rekentools:
+  - bovenaan start-CTA's met voorbeeldwaarden en profielroute
   - eerst invulvelden
   - dan een beknopte samenvatting met kernuitkomst in gewone taal
   - daarna uitklapbare verdieping, standaard dicht, met uitleg, aannames en praktische aandachtspunten
+- Tooldetailpagina (`/apps/[slug]`) toont contextmetadata als uitklapblok onder de calculator zodat light-gebruikers sneller bij de eerste invoer komen.
 - Mobiele tool-layout is gecentraliseerd via `src/components/tool/CalculatorShell.tsx`:
   - op mobiel staat de samenvatting/resultaatkaart eerst
   - daarna volgt het formulier met mobile field flow
