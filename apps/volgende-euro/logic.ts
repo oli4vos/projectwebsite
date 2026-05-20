@@ -213,28 +213,36 @@ export function calculateVolgendeEuroPriorities(input: VolgendeEuroInput): Volge
   const bufferTargetGiven = hasValue(input.targetBuffer);
   if (bufferCurrentGiven && bufferTargetGiven) {
     const gap = Math.max(targetBuffer - currentBuffer, 0);
-    candidates.push({
-      key: "buffer",
-      title: TITLES.buffer,
-      score: gap > 0 ? 96 : 30,
-      amountNeeded: gap,
-      currentAmount: currentBuffer,
-      targetAmount: targetBuffer,
-      applicability: "relevant",
-      actionLabel:
-        gap > 0
-          ? `Vul je buffer aan tot €${targetBuffer.toLocaleString("nl-NL")}`
-          : "Houd je buffer op peil",
-      whyThisStep:
-        gap > 0
-          ? "Je buffer zit onder je doel. Zonder buffer kunnen onverwachte kosten je hele plan verstoren."
-          : "Je buffer is op orde. Deze stap blijft als behoudsstap onder beleggings- of afloskeuzes.",
-      whyBeforeNext:
-        gap > 0
-          ? "Eerst buffer maakt de rest stabieler, omdat je niet direct hoeft te lenen of beleggingen te verkopen."
-          : "Omdat je buffer al op orde is, hoeft deze stap nu niet vooraan te staan.",
-      nextTrigger: gap > 0 ? "Ga door zodra je bufferdoel is gehaald." : "Controleer periodiek of je buffer op peil blijft.",
-    });
+    if (gap > 0) {
+      candidates.push({
+        key: "buffer",
+        title: TITLES.buffer,
+        score: 96,
+        amountNeeded: gap,
+        currentAmount: currentBuffer,
+        targetAmount: targetBuffer,
+        applicability: "relevant",
+        actionLabel: `Vul je buffer aan tot €${targetBuffer.toLocaleString("nl-NL")}`,
+        whyThisStep:
+          "Je buffer zit onder je doel. Zonder buffer kunnen onverwachte kosten je hele plan verstoren.",
+        whyBeforeNext:
+          "Eerst buffer maakt de rest stabieler, omdat je niet direct hoeft te lenen of beleggingen te verkopen.",
+        nextTrigger: "Ga door zodra je bufferdoel is gehaald.",
+      });
+    } else {
+      candidates.push({
+        key: "buffer",
+        title: TITLES.buffer,
+        score: 0,
+        applicability: "notApplicable",
+        currentAmount: currentBuffer,
+        targetAmount: targetBuffer,
+        actionLabel: "Buffer is al op peil",
+        whyThisStep: "Je bufferdoel is al gehaald, dus deze stap is nu niet leidend.",
+        whyBeforeNext: "Daardoor kunnen andere doelen nu voorrang krijgen.",
+        nextTrigger: "Blijf periodiek controleren of je buffer op peil blijft.",
+      });
+    }
   } else if (bufferCurrentGiven || bufferTargetGiven) {
     candidates.push({
       key: "buffer",
@@ -479,6 +487,17 @@ export function calculateVolgendeEuroPriorities(input: VolgendeEuroInput): Volge
   ];
 
   const topRecommendation = priorities.find((item) => item.applicability === "relevant") ?? null;
+  const fallbackHints = [
+    "Vul je extra bedrag in dat je nu wilt verdelen.",
+    "Vul huidige en gewenste buffer in.",
+    "Vul beleggingshorizon en verwacht rendement in.",
+  ];
+  const missingDataHints =
+    Array.from(missingHints).length > 0
+      ? Array.from(missingHints).slice(0, 3)
+      : topRecommendation
+        ? []
+        : fallbackHints;
 
   return {
     year,
@@ -495,7 +514,7 @@ export function calculateVolgendeEuroPriorities(input: VolgendeEuroInput): Volge
       lastChecked: constants.mortgage.meta.lastChecked,
       status: constants.mortgage.meta.status,
     },
-    missingDataHints: Array.from(missingHints).slice(0, 3),
+    missingDataHints,
     warnings: [
       "Deze beslis-tool is educatief en geeft geen persoonlijk financieel advies.",
       "Gebruik dit stappenplan als startpunt en reken belangrijke keuzes daarna door in de verdiepende tools.",

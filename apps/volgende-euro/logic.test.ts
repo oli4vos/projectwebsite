@@ -26,6 +26,13 @@ function expectFiniteNonNegative(value: number | undefined) {
 
 describe("calculateVolgendeEuroPriorities", () => {
   describe("priorityPlan", () => {
+    it("returns no top recommendation for empty input", () => {
+      const result = calculateVolgendeEuroPriorities({});
+      expect(result.topRecommendation).toBeNull();
+      expect(result.priorityPlan).toHaveLength(0);
+      expect(result.missingDataHints.length).toBeGreaterThan(0);
+    });
+
     it("starts with buffer until the target amount when there is a clear buffer gap", () => {
       const result = calculateVolgendeEuroPriorities({
         extraAmount: 1000,
@@ -90,7 +97,7 @@ describe("calculateVolgendeEuroPriorities", () => {
         extraAmount: 1000,
       });
       expect(getStep(result, "freeInvesting")).toBeDefined();
-      expectStepBefore(result, "freeInvesting", "buffer");
+      expect(getStep(result, "buffer")).toBeUndefined();
       expect(getStep(result, "freeInvesting")?.allocatedAmount).toBe(1000);
     });
 
@@ -140,6 +147,17 @@ describe("calculateVolgendeEuroPriorities", () => {
       expect(keys).not.toContain("mortgagePrepay");
       expect(keys).not.toContain("pensionJaarruimte");
       expect(keys).not.toContain("housingOwnFunds");
+    });
+
+    it("does not mark buffer as relevant when the target is already met", () => {
+      const result = calculateVolgendeEuroPriorities({
+        extraAmount: 1000,
+        currentBuffer: 15000,
+        targetBuffer: 12000,
+      });
+      const bufferPriority = result.priorities.find((item) => item.key === "buffer");
+      expect(bufferPriority?.applicability).toBe("notApplicable");
+      expect(result.priorityPlan.some((step) => step.key === "buffer")).toBe(false);
     });
 
     it("creates a concrete housing own-funds step when a housing goal is provided", () => {
@@ -251,6 +269,15 @@ describe("calculateVolgendeEuroPriorities", () => {
       expect(result.priorityPlan.length).toBeGreaterThan(0);
       expect(result.priorities.length).toBeGreaterThan(0);
       expect(result.topRecommendation?.key).toBe(result.priorityPlan[0]?.key);
+    });
+
+    it("ensures topRecommendation only comes from relevant options", () => {
+      const result = calculateVolgendeEuroPriorities({
+        currentBuffer: 15000,
+        targetBuffer: 12000,
+      });
+      expect(result.topRecommendation).toBeNull();
+      expect(result.priorities.some((item) => item.applicability === "relevant")).toBe(false);
     });
   });
 });

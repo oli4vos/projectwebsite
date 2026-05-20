@@ -173,6 +173,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - werkt submit-gedreven met expliciete `Bereken`-knop (geen misleidende live-output op halflege invoer)
   - combineert buffer, dure schuld, studieschuld, hypotheek, jaarruimte, beleggen en woningdoel in één educatief stappenplan
   - toont alleen relevante aanbevelingen; ontbrekende gegevens worden als hulp getoond, niet als fout
+  - als er geen relevante opties zijn, toont de tool bewust geen nep-aanbeveling maar eerst invoerhints
   - gebruikt centrale profieldefaults plus DUO/constants-context, maar blijft expliciet geen financieel advies
 - `apps/fire-na-belasting`
   - indicatieve FIRE-tool met jaarlijkse tijdlijn voor vermogen, inleg, groei, box 3-heffing en FIRE-doel
