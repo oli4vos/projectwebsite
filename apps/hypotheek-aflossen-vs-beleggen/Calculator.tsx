@@ -17,6 +17,7 @@ import { getHypotheekAflossenVsBeleggenDefaultsFromProfile } from "@/lib/profile
 import {
   calculateHypotheekAflossenVsBeleggen,
   type HypotheekAflossenVsBeleggenInput,
+  type HypotheekAflossenVsBeleggenTimelinePoint,
 } from "./logic";
 
 type FormState = {
@@ -87,6 +88,58 @@ function formatPercent(value: number) {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(value);
+}
+
+function buildLinePath(values: number[], width: number, height: number, maxValue: number) {
+  if (values.length === 0 || maxValue <= 0) {
+    return "";
+  }
+  const xStep = values.length > 1 ? width / (values.length - 1) : width;
+  return values
+    .map((value, index) => {
+      const x = index * xStep;
+      const y = height - (Math.max(value, 0) / maxValue) * height;
+      return `${index === 0 ? "M" : "L"} ${x.toFixed(2)} ${y.toFixed(2)}`;
+    })
+    .join(" ");
+}
+
+function TimelineMiniChart({
+  points,
+}: {
+  points: HypotheekAflossenVsBeleggenTimelinePoint[];
+}) {
+  const width = 320;
+  const height = 120;
+  const investingValues = points.map((point) => point.investingPortfolioNetAfterBox3);
+  const aflossenValues = points.map((point) => point.cumulativeNetBenefitAflossen);
+  const maxValue = Math.max(1, ...investingValues, ...aflossenValues);
+  const investingPath = buildLinePath(investingValues, width, height, maxValue);
+  const aflossenPath = buildLinePath(aflossenValues, width, height, maxValue);
+
+  return (
+    <div className="rounded-xl border hair bg-[var(--paper-soft)] p-3">
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        className="h-32 w-full"
+        role="img"
+        aria-label="Jaarlijkse ontwikkeling netto beleggen na box 3 versus netto voordeel aflossen"
+      >
+        <path d={aflossenPath} fill="none" stroke="#2f7f5f" strokeWidth="2.5" />
+        <path d={investingPath} fill="none" stroke="#1f3f8f" strokeWidth="2.5" />
+      </svg>
+      <div className="mt-2 flex flex-wrap gap-3 text-[11px] text-[var(--muted)]">
+        <span className="inline-flex items-center gap-2">
+          <span className="block h-1.5 w-4 rounded-full bg-[#1f3f8f]" />
+          Beleggen (na box 3)
+        </span>
+        <span className="inline-flex items-center gap-2">
+          <span className="block h-1.5 w-4 rounded-full bg-[#2f7f5f]" />
+          Netto voordeel aflossen
+        </span>
+      </div>
+    </div>
+  );
 }
 
 function validateForm(values: FormState) {
@@ -592,6 +645,49 @@ function CalculatorContent({
             </div>
           </div>
         ) : null}
+
+        <ToolDisclosure
+          title="Jaarlijkse ontwikkeling"
+          subtitle="Compacte tijdlijn met netto effect per jaar, inclusief box 3-correctie."
+        >
+          {result ? (
+            <div className="space-y-3">
+              <TimelineMiniChart points={result.timeline.points} />
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[680px] border-separate border-spacing-y-1 text-left text-[12px]">
+                  <thead>
+                    <tr className="text-[var(--muted)]">
+                      <th className="px-2 py-1 font-medium">Jaar</th>
+                      <th className="px-2 py-1 font-medium">Aflossen netto cumulatief</th>
+                      <th className="px-2 py-1 font-medium">Beleggen netto cumulatief</th>
+                      <th className="px-2 py-1 font-medium">Box 3 dit jaar</th>
+                      <th className="px-2 py-1 font-medium">Verschil (beleggen - aflossen)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {result.timeline.points.map((point) => (
+                      <tr key={point.year} className="bg-[var(--paper-soft)] text-[var(--ink)]">
+                        <td className="rounded-l-md px-2 py-1.5">{point.year}</td>
+                        <td className="px-2 py-1.5">
+                          {formatCurrency(point.cumulativeNetBenefitAflossen)}
+                        </td>
+                        <td className="px-2 py-1.5">
+                          {formatCurrency(point.investingPortfolioNetAfterBox3)}
+                        </td>
+                        <td className="px-2 py-1.5">
+                          {formatCurrency(point.additionalBox3TaxThisYear)}
+                        </td>
+                        <td className="rounded-r-md px-2 py-1.5">
+                          {formatCurrency(point.differenceInvestingMinusAflossen)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ) : null}
+        </ToolDisclosure>
 
         <ToolDisclosure
           title="Hoe werkt hypotheekrenteaftrek?"

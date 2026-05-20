@@ -26,6 +26,26 @@ type MortgageSimulationResult = {
   totalExtraUsed: number;
 };
 
+type InvestingTimelinePoint = {
+  year: number;
+  grossPortfolio: number;
+  netPortfolioAfterBox3: number;
+  additionalBox3TaxThisYear: number;
+  cumulativeAdditionalBox3Tax: number;
+};
+
+export type HypotheekAflossenVsBeleggenTimelinePoint = {
+  year: number;
+  cumulativeGrossInterestSaved: number;
+  cumulativeLostMortgageInterestDeduction: number;
+  cumulativeNetBenefitAflossen: number;
+  investingPortfolioGross: number;
+  investingPortfolioNetAfterBox3: number;
+  additionalBox3TaxThisYear: number;
+  cumulativeAdditionalBox3Tax: number;
+  differenceInvestingMinusAflossen: number;
+};
+
 export type HypotheekAflossenVsBeleggenResult = {
   taxYear: number;
   horizonYears: number;
@@ -46,6 +66,9 @@ export type HypotheekAflossenVsBeleggenResult = {
     includeBox3Effect: boolean;
     expectedAnnualReturn: number;
     mortgageRate: number;
+  };
+  timeline: {
+    points: HypotheekAflossenVsBeleggenTimelinePoint[];
   };
   warnings: string[];
 };
@@ -87,6 +110,13 @@ function roundMoney(value: number) {
     return 0;
   }
   return Math.round(Math.max(value, 0) * 100) / 100;
+}
+
+function roundSignedMoney(value: number) {
+  if (!Number.isFinite(value)) {
+    return 0;
+  }
+  return Math.round(value * 100) / 100;
 }
 
 function calculateMonthlyPayment(principal: number, annualRate: number, termYears: number) {
@@ -186,10 +216,12 @@ function simulateInvestingScenario(input: {
   let grossPortfolio = oneTimeAmount;
   let netPortfolio = oneTimeAmount;
   let totalAdditionalBox3Tax = 0;
+  const timelinePoints: InvestingTimelinePoint[] = [];
 
   for (let year = 1; year <= years; year += 1) {
     grossPortfolio = roundMoney(grossPortfolio * returnFactor + annualAmount);
     netPortfolio = roundMoney(netPortfolio * returnFactor + annualAmount);
+    let additionalTax = 0;
 
     if (input.includeBox3Effect) {
       const base = calculateBox3Tax({
@@ -210,16 +242,25 @@ function simulateInvestingScenario(input: {
         debts: 0,
         actualAnnualReturnRate: annualReturnPercent,
       });
-      const additionalTax = roundMoney(Math.max(scenario.box3Tax - base.box3Tax, 0));
+      additionalTax = roundMoney(Math.max(scenario.box3Tax - base.box3Tax, 0));
       totalAdditionalBox3Tax = roundMoney(totalAdditionalBox3Tax + additionalTax);
       netPortfolio = roundMoney(Math.max(netPortfolio - additionalTax, 0));
     }
+
+    timelinePoints.push({
+      year,
+      grossPortfolio: roundMoney(grossPortfolio),
+      netPortfolioAfterBox3: roundMoney(netPortfolio),
+      additionalBox3TaxThisYear: roundMoney(additionalTax),
+      cumulativeAdditionalBox3Tax: roundMoney(totalAdditionalBox3Tax),
+    });
   }
 
   return {
     futureValueGross: roundMoney(grossPortfolio),
     futureValueNetAfterBox3: roundMoney(netPortfolio),
     totalAdditionalBox3Tax: roundMoney(totalAdditionalBox3Tax),
+    timelinePoints,
   };
 }
 
@@ -372,9 +413,6 @@ export function calculateHypotheekAflossenVsBeleggen(
     currentInvestableAssets,
   });
 
-  const differenceInvestingMinusAflossen = roundMoney(
-    investing.futureValueNetAfterBox3 - netBenefitAflossen,
-  );
   const breakEvenAnnualReturn = calculateBreakEvenAnnualReturn({
     oneTimeAmount: oneTimeExtraRepayment,
     annualAmount: annualExtraRepayment,
@@ -391,8 +429,11 @@ export function calculateHypotheekAflossenVsBeleggen(
     Math.max(totalExtraUsed - Math.min(oneTimeExtraRepayment, remainingMortgageDebt), 0),
   );
 
+  const comparisonSignal = roundSignedMoney(
+    investing.futureValueNetAfterBox3 - netBenefitAflossen,
+  );
   let recommendation: HypotheekAflossenVsBeleggenResult["recommendation"] =
-    differenceInvestingMinusAflossen >= 0 ? "beleggen" : "aflossen";
+    comparisonSignal >= 0 ? "beleggen" : "aflossen";
   if (keepBuffer && currentInvestableAssets < minimumBuffer) {
     recommendation = "buffer";
   }
@@ -420,6 +461,77 @@ export function calculateHypotheekAflossenVsBeleggen(
     );
   }
 
+  const timelinePoints: HypotheekAflossenVsBeleggenTimelinePoint[] = [];
+  let cumulativeGrossInterestSaved = 0;
+  let cumulativeLostMortgageInterestDeduction = 0;
+
+  for (let yearIndex = 0; yearIndex < investmentHorizonYears; yearIndex += 1) {
+    const baselineInterest = baseline.annualInterest[yearIndex] ?? 0;
+    const withExtraInterest = withExtra.annualInterest[yearIndex] ?? 0;
+    const annualGrossSaved = roundMoney(
+      Math.max(baselineInterest - withExtraInterest, 0),
+    );
+    cumulativeGrossInterestSaved = roundMoney(
+      cumulativeGrossInterestSaved + annualGrossSaved,
+    );
+
+    let annualLostDeduction = 0;
+    if (includeMortgageInterestDeduction && taxableIncome > 0) {
+      const baseDeduction = calculateMortgageInterestDeduction({
+        annualMortgageInterest: baselineInterest,
+        taxableIncome,
+        year: taxYear,
+      });
+      const extraDeduction = calculateMortgageInterestDeduction({
+        annualMortgageInterest: withExtraInterest,
+        taxableIncome,
+        year: taxYear,
+      });
+      annualLostDeduction = roundMoney(
+        Math.max(
+          baseDeduction.estimatedTaxBenefit - extraDeduction.estimatedTaxBenefit,
+          0,
+        ),
+      );
+    }
+    cumulativeLostMortgageInterestDeduction = roundMoney(
+      cumulativeLostMortgageInterestDeduction + annualLostDeduction,
+    );
+    const cumulativeNetBenefitAflossen = roundMoney(
+      Math.max(
+        cumulativeGrossInterestSaved - cumulativeLostMortgageInterestDeduction,
+        0,
+      ),
+    );
+
+    const investingPoint = investing.timelinePoints[yearIndex] ?? {
+      year: yearIndex + 1,
+      grossPortfolio: investing.futureValueGross,
+      netPortfolioAfterBox3: investing.futureValueNetAfterBox3,
+      additionalBox3TaxThisYear: 0,
+      cumulativeAdditionalBox3Tax: investing.totalAdditionalBox3Tax,
+    };
+
+    timelinePoints.push({
+      year: yearIndex + 1,
+      cumulativeGrossInterestSaved,
+      cumulativeLostMortgageInterestDeduction,
+      cumulativeNetBenefitAflossen,
+      investingPortfolioGross: investingPoint.grossPortfolio,
+      investingPortfolioNetAfterBox3: investingPoint.netPortfolioAfterBox3,
+      additionalBox3TaxThisYear: investingPoint.additionalBox3TaxThisYear,
+      cumulativeAdditionalBox3Tax: investingPoint.cumulativeAdditionalBox3Tax,
+      differenceInvestingMinusAflossen: roundSignedMoney(
+        investingPoint.netPortfolioAfterBox3 - cumulativeNetBenefitAflossen,
+      ),
+    });
+  }
+
+  const finalTimelinePoint = timelinePoints[timelinePoints.length - 1];
+  const differenceInvestingMinusAflossenFinal = finalTimelinePoint
+    ? finalTimelinePoint.differenceInvestingMinusAflossen
+    : roundSignedMoney(investing.futureValueNetAfterBox3 - netBenefitAflossen);
+
   return {
     taxYear,
     horizonYears: investmentHorizonYears,
@@ -433,7 +545,7 @@ export function calculateHypotheekAflossenVsBeleggen(
     investingFutureValueGross: investing.futureValueGross,
     investingFutureValueNetAfterBox3: investing.futureValueNetAfterBox3,
     totalAdditionalBox3Tax: investing.totalAdditionalBox3Tax,
-    differenceInvestingMinusAflossen,
+    differenceInvestingMinusAflossen: differenceInvestingMinusAflossenFinal,
     breakEvenAnnualReturn,
     recommendation,
     summary,
@@ -442,6 +554,9 @@ export function calculateHypotheekAflossenVsBeleggen(
       includeBox3Effect,
       expectedAnnualReturn,
       mortgageRate,
+    },
+    timeline: {
+      points: timelinePoints,
     },
     warnings,
   };

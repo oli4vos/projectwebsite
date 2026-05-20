@@ -156,4 +156,75 @@ describe("calculateHypotheekAflossenVsBeleggen", () => {
       expect(result.breakEvenAnnualReturn).toBeNull();
     }
   });
+
+  it("builds a consistent yearly timeline", () => {
+    const result = calculateHypotheekAflossenVsBeleggen({
+      remainingMortgageDebt: 260000,
+      mortgageRate: 4,
+      remainingTermYears: 25,
+      oneTimeExtraRepayment: 10000,
+      annualExtraRepayment: 2400,
+      taxableIncome: 62000,
+      expectedAnnualReturn: 5,
+      investmentHorizonYears: 12,
+      includeMortgageInterestDeduction: true,
+      includeBox3Effect: true,
+      currentInvestableAssets: 50000,
+      taxYear: 2026,
+    });
+
+    expect(result.timeline.points).toHaveLength(12);
+    expect(result.timeline.points[0]?.year).toBe(1);
+    expect(result.timeline.points[11]?.year).toBe(12);
+
+    for (let i = 1; i < result.timeline.points.length; i += 1) {
+      const prev = result.timeline.points[i - 1];
+      const next = result.timeline.points[i];
+      expect(next.cumulativeNetBenefitAflossen).toBeGreaterThanOrEqual(
+        prev.cumulativeNetBenefitAflossen,
+      );
+      expect(next.cumulativeAdditionalBox3Tax).toBeGreaterThanOrEqual(
+        prev.cumulativeAdditionalBox3Tax,
+      );
+    }
+
+    const finalPoint = result.timeline.points[result.timeline.points.length - 1];
+    expect(finalPoint.cumulativeNetBenefitAflossen).toBeCloseTo(
+      result.netBenefitAflossen,
+      1,
+    );
+    expect(finalPoint.investingPortfolioNetAfterBox3).toBeCloseTo(
+      result.investingFutureValueNetAfterBox3,
+      1,
+    );
+    expect(finalPoint.cumulativeAdditionalBox3Tax).toBeCloseTo(
+      result.totalAdditionalBox3Tax,
+      1,
+    );
+    expect(finalPoint.differenceInvestingMinusAflossen).toBeCloseTo(
+      result.differenceInvestingMinusAflossen,
+      1,
+    );
+  });
+
+  it("keeps yearly box3 tax at zero when box3 effect is disabled", () => {
+    const result = calculateHypotheekAflossenVsBeleggen({
+      remainingMortgageDebt: 260000,
+      mortgageRate: 4,
+      remainingTermYears: 25,
+      oneTimeExtraRepayment: 10000,
+      annualExtraRepayment: 2400,
+      taxableIncome: 62000,
+      expectedAnnualReturn: 5,
+      investmentHorizonYears: 10,
+      includeBox3Effect: false,
+      currentInvestableAssets: 50000,
+      taxYear: 2026,
+    });
+
+    expect(
+      result.timeline.points.every((point) => point.additionalBox3TaxThisYear === 0),
+    ).toBe(true);
+    expect(result.totalAdditionalBox3Tax).toBe(0);
+  });
 });
