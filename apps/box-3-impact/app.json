@@ -1,7 +1,7 @@
 {
   "slug": "box-3-impact",
-  "title": "Box 3-impact calculator",
-  "description": "Bereken indicatief wat spaargeld, beleggingen en schulden doen in box 3.",
+  "title": "Wat kost mijn vermogen in box 3?",
+  "description": "Zie hoeveel belasting je indicatief betaalt over spaargeld, beleggingen en schulden.",
   "type": "frontend",
   "category": "Belasting",
   "tags": ["box 3", "belasting", "sparen", "beleggen", "vermogen"],

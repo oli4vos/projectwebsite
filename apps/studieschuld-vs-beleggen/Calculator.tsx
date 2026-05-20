@@ -91,9 +91,9 @@ type CalculatorContentProps = {
 const repaymentRuleLabels: Record<RepaymentRule, string> = {
   SF35: "SF35",
   SF15: "SF15",
-  SF15_OLD: "SF15-oud",
+  SF15_OLD: "SF15 oude regeling",
   SF15_LLLK: "SF15 levenlanglerenkrediet",
-  UNKNOWN: "Onbekend (fallback SF35)",
+  UNKNOWN: "Weet ik niet (veilige schatting SF35)",
 };
 
 function formatCurrency(value: number) {
@@ -380,12 +380,12 @@ function CalculatorContent({
           Scenario
         </div>
         <h2 className="mt-2 font-serif text-[28px] tracking-[-0.02em] text-[var(--ink)]">
-          Studieschuld aflossen of beleggen
+          Studieschuld extra aflossen of beleggen?
         </h2>
         <p className="mt-3 text-[14px] leading-[1.7] text-[var(--ink-2)]">
-          Deze tool rekent eerst met je wettelijke DUO-maandbedrag en je verplichte
-          maandbedrag op draagkracht. Alles daarboven behandelen we als vrijwillige
-          keuzeruimte: extra aflossen of beleggen.
+          Je verplichte DUO-bedrag moet je sowieso betalen. De keuze gaat vooral
+          over extra aflossen: doe je dat, of gebruik je dat geld liever om te
+          sparen of te beleggen?
         </p>
 
         {hasRelevantProfileValues ? (

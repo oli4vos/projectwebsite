@@ -1,7 +1,7 @@
 {
   "slug": "zzp-uurtarief",
-  "title": "ZZP-uurtarief calculator",
-  "description": "Bereken welk uurtarief je ongeveer nodig hebt inclusief belasting, buffer, pensioen en AOV.",
+  "title": "Welk ZZP-uurtarief heb ik nodig?",
+  "description": "Bereken een indicatief uurtarief inclusief belasting, buffer, pensioen, AOV en kosten.",
   "type": "frontend",
   "category": "Werk",
   "tags": ["ZZP", "uurtarief", "AOV", "pensioen", "inkomen"],

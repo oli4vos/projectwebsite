@@ -347,12 +347,11 @@ function CalculatorContent({
           Invoer
         </div>
         <h2 className="mt-2 font-serif text-[28px] tracking-[-0.02em] text-[var(--ink)]">
-          Box 3-impact calculator
+          Wat kost mijn vermogen in box 3?
         </h2>
         <p className="mt-3 text-[14px] leading-[1.7] text-[var(--ink-2)]">
-          Start met je huidige vermogen en simuleer daarna je beleggingshorizon met
-          periodieke inleg. Zo zie je wanneer en hoeveel box 3-heffing indicatief
-          langskomt.
+          Box 3 is de belasting op sparen en beleggen. Deze tool laat zien wat je
+          vermogen indicatief aan belasting kost, nu en over je gekozen horizon.
         </p>
 
         {hasRelevantProfileValues ? (

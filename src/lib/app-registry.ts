@@ -7,7 +7,7 @@ export const appRegistry = [
   {
     "slug": "annuitair-lineair",
     "title": "Annuïtair of lineair",
-    "description": "Vergelijk bruto en netto maandlasten van een annuïtaire en lineaire hypotheek, inclusief het effect van een beleggingspot.",
+    "description": "Vergelijk hoe je maandlasten en schuld dalen bij een annuïtaire of lineaire hypotheek.",
     "type": "frontend",
     "category": "Hypotheek",
     "tags": [
@@ -43,8 +43,8 @@ export const appRegistry = [
   },
   {
     "slug": "box-3-impact",
-    "title": "Box 3-impact calculator",
-    "description": "Bereken indicatief wat spaargeld, beleggingen en schulden doen in box 3.",
+    "title": "Wat kost mijn vermogen in box 3?",
+    "description": "Zie hoeveel belasting je indicatief betaalt over spaargeld, beleggingen en schulden.",
     "type": "frontend",
     "category": "Belasting",
     "tags": [
@@ -79,8 +79,8 @@ export const appRegistry = [
   },
   {
     "slug": "fire-na-belasting",
-    "title": "FIRE na belasting",
-    "description": "Bereken wanneer je indicatief financieel onafhankelijk bent, inclusief box 3-effect en aannames.",
+    "title": "Wanneer kan ik stoppen of minder werken?",
+    "description": "Bereken je pad naar financiële vrijheid met inleg, rendement, uitgaven en box 3-effect.",
     "type": "frontend",
     "category": "Beleggen",
     "tags": [
@@ -101,7 +101,7 @@ export const appRegistry = [
       "tax.preferredTaxYear",
       "tax.hasFiscalPartner"
     ],
-    "reasonHint": "Handig als je wilt zien hoe rendement, inleg, uitgaven en box 3 je financiële vrijheid beïnvloeden.",
+    "reasonHint": "Handig als je wilt zien wanneer je vermogen je uitgaven kan dragen, met rendement en box 3 erbij.",
     "assumptionsUsed": [
       "box3",
       "tax",
@@ -169,7 +169,7 @@ export const appRegistry = [
   {
     "slug": "hypotheek-impact-studieschuld",
     "title": "Hypotheek-impact studieschuld",
-    "description": "Zie welk DUO-bedrag waarschijnlijk meetelt, hoe brutering werkt en wat je studieschuld indicatief doet met je hypotheekruimte.",
+    "description": "Zie welk DUO-bedrag kan meetellen en wat dat indicatief doet met je hypotheekruimte.",
     "type": "frontend",
     "category": "Hypotheek",
     "tags": [
@@ -217,7 +217,7 @@ export const appRegistry = [
   {
     "slug": "jaarruimte-vs-vrij-beleggen",
     "title": "Jaarruimte of vrij beleggen?",
-    "description": "Vergelijk pensioeninleg met vrij beleggen, inclusief indicatief belastingvoordeel en box 3-effect.",
+    "description": "Vergelijk pensioeninleg met vrij beleggen: belastingvoordeel nu, box 3 later en flexibiliteit.",
     "type": "frontend",
     "category": "Belasting",
     "tags": [
@@ -258,8 +258,8 @@ export const appRegistry = [
   },
   {
     "slug": "studieschuld-vs-beleggen",
-    "title": "Studieschuld aflossen of beleggen",
-    "description": "Vergelijk vrijwillig extra aflossen versus beleggen, met wettelijk DUO-bedrag, draagkrachtminimum en optioneel box 3-effect.",
+    "title": "Studieschuld extra aflossen of beleggen?",
+    "description": "Vergelijk wat extra aflossen op je studieschuld doet ten opzichte van sparen of beleggen.",
     "type": "frontend",
     "category": "Schulden",
     "tags": [
@@ -304,7 +304,7 @@ export const appRegistry = [
   {
     "slug": "volgende-euro",
     "title": "Wat doe ik met mijn volgende euro?",
-    "description": "Bepaal of extra geld logischer naar buffer, aflossen, pensioen, woning of beleggen kan.",
+    "description": "Ontdek of extra geld logischer naar buffer, aflossen, pensioen, woning of beleggen kan.",
     "type": "frontend",
     "category": "Persoonlijke financiën",
     "tags": [
@@ -354,8 +354,8 @@ export const appRegistry = [
   },
   {
     "slug": "zzp-uurtarief",
-    "title": "ZZP-uurtarief calculator",
-    "description": "Bereken welk uurtarief je ongeveer nodig hebt inclusief belasting, buffer, pensioen en AOV.",
+    "title": "Welk ZZP-uurtarief heb ik nodig?",
+    "description": "Bereken een indicatief uurtarief inclusief belasting, buffer, pensioen, AOV en kosten.",
     "type": "frontend",
     "category": "Werk",
     "tags": [

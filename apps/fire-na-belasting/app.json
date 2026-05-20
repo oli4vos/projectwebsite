@@ -1,7 +1,7 @@
 {
   "slug": "fire-na-belasting",
-  "title": "FIRE na belasting",
-  "description": "Bereken wanneer je indicatief financieel onafhankelijk bent, inclusief box 3-effect en aannames.",
+  "title": "Wanneer kan ik stoppen of minder werken?",
+  "description": "Bereken je pad naar financiële vrijheid met inleg, rendement, uitgaven en box 3-effect.",
   "type": "frontend",
   "category": "Beleggen",
   "tags": ["FIRE", "beleggen", "box 3", "financiële vrijheid", "vermogen"],
@@ -16,7 +16,7 @@
     "tax.preferredTaxYear",
     "tax.hasFiscalPartner"
   ],
-  "reasonHint": "Handig als je wilt zien hoe rendement, inleg, uitgaven en box 3 je financiële vrijheid beïnvloeden.",
+  "reasonHint": "Handig als je wilt zien wanneer je vermogen je uitgaven kan dragen, met rendement en box 3 erbij.",
   "assumptionsUsed": ["box3", "tax", "investment", "inflation"],
   "calculationDomains": ["investing", "saving", "tax", "cashflow"],
   "riskLevel": "high",

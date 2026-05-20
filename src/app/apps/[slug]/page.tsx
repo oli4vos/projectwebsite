@@ -11,6 +11,8 @@ import type {
   AppDisclaimerType,
   AppOutputType,
   AppRiskLevel,
+  AppStatus,
+  AppType,
 } from "@/lib/app-types";
 import { resolveCategory } from "@/lib/categories";
 import { appRegistry, appRegistryBySlug } from "@/lib/app-registry";
@@ -23,21 +25,32 @@ type AppDetailPageProps = {
 
 const riskLabel: Record<AppRiskLevel, string> = {
   low: "Laag",
-  medium: "Middel",
+  medium: "Gemiddeld",
   high: "Hoog",
+};
+
+const statusLabel: Record<AppStatus, string> = {
+  active: "Actief",
+  beta: "Beta",
+  draft: "Concept",
+};
+
+const typeLabel: Record<AppType, string> = {
+  frontend: "Rekentool",
+  api: "API",
 };
 
 const disclaimerLabel: Record<AppDisclaimerType, string> = {
   indicative: "Indicatief",
-  financialEducation: "Financiële educatie",
-  taxIndicative: "Belasting indicatief",
-  mortgageIndicative: "Hypotheek indicatief",
-  duoIndicative: "DUO indicatief",
+  financialEducation: "Educatieve keuzehulp",
+  taxIndicative: "Indicatieve belastingberekening",
+  mortgageIndicative: "Indicatieve hypotheekberekening",
+  duoIndicative: "Indicatieve DUO-berekening",
 };
 
 const outputTypeLabel: Record<AppOutputType, string> = {
-  singleResult: "Enkel resultaat",
-  scenarioComparison: "Scenariovergelijking",
+  singleResult: "Eén hoofdresultaat",
+  scenarioComparison: "Vergelijk scenario's",
   timeline: "Tijdlijn",
   checklist: "Checklist",
   mixed: "Gemengd",
@@ -150,11 +163,15 @@ export default async function AppDetailPage({ params }: AppDetailPageProps) {
             <div className="mt-4 space-y-3 text-[13.5px]">
               <div className="flex items-center justify-between">
                 <span className="text-[var(--muted)]">Status</span>
-                <span className="font-medium text-[var(--ink)]">{app.status}</span>
+                <span className="font-medium text-[var(--ink)]">
+                  {statusLabel[app.status]}
+                </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-[var(--muted)]">Type</span>
-                <span className="font-medium text-[var(--ink)]">{app.type}</span>
+                <span className="font-medium text-[var(--ink)]">
+                  {typeLabel[app.type]}
+                </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-[var(--muted)]">Versie</span>
@@ -164,7 +181,7 @@ export default async function AppDetailPage({ params }: AppDetailPageProps) {
               </div>
               {app.riskLevel && (
                 <div className="flex items-center justify-between">
-                  <span className="text-[var(--muted)]">Risiconiveau</span>
+                  <span className="text-[var(--muted)]">Gevoeligheid voor aannames</span>
                   <span className="font-medium text-[var(--ink)]">
                     {riskLabel[app.riskLevel]}
                   </span>
@@ -180,7 +197,7 @@ export default async function AppDetailPage({ params }: AppDetailPageProps) {
               )}
               {app.outputType && (
                 <div className="flex items-center justify-between">
-                  <span className="text-[var(--muted)]">Output</span>
+                  <span className="text-[var(--muted)]">Resultaatvorm</span>
                   <span className="font-medium text-[var(--ink)]">
                     {outputTypeLabel[app.outputType]}
                   </span>

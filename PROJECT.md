@@ -252,6 +252,10 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `/variabelen` gebruikt centrale financial constants als bron van waarheid; tools mogen daarbovenop eigen invoerwaarden toestaan.
 - Donkere CTA's moeten expliciet wit contrast houden. Bronbestand: `src/components/ui.tsx`.
 - Alle gebruikersgerichte frontend-copy is standaard Nederlands. Engelse tekst mag alleen in code, technische namen of wanneer expliciet gekozen.
+- Toolcopy begint met gebruikerstaal: eerst de vraag of keuze van de gebruiker, daarna pas vaktermen.
+- Technische termen worden bij eerste gebruik kort uitgelegd (bijv. jaarlijks opnamepercentage i.p.v. alleen "withdrawal rate").
+- `app.json` velden `title`, `description` en `reasonHint` moeten gewone taal gebruiken en geen dwingend advies geven.
+- Verdieping en nuance blijven in uitklapblokken; de eerste schermtekst blijft kort en begrijpelijk.
 - Mobile-first is verplicht: elke nieuwe component of tool moet standaard goed werken op mobiel.
 - Headernavigatie toont altijd de actuele toolcategorieën op basis van `appRegistry`; bij nieuwe categorieën in manifests verschijnen deze automatisch in het menu zonder handmatige header-edit.
 - Uitvoerige QA-rondes of brede responsive testmatrices alleen uitvoeren als de gebruiker daarom vraagt én dit bevestigt.

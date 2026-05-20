@@ -359,8 +359,9 @@ function CalculatorContent({
           Hypotheek aflossen of beleggen?
         </h2>
         <p className="mt-3 text-[14px] leading-[1.7] text-[var(--ink-2)]">
-          Vergelijk extra aflossen met vrij beleggen, inclusief renteaftrek en optioneel
-          box 3-effect.
+          Extra aflossen geeft vaak meer rust, beleggen kan meer flexibiliteit en
+          groei geven. Deze tool vergelijkt beide routes met renteaftrek en
+          optioneel box 3-effect.
         </p>
 
         {hasRelevantProfileValues ? (

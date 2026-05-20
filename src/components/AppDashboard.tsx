@@ -43,7 +43,7 @@ const requestedGroups: AppGroup[] = [
   {
     title: "Sparen & beleggen",
     description:
-      "Voor vermogensgroei, pensioeninleg versus vrij beleggen, en lange termijn FIRE-scenario's.",
+      "Voor vermogensgroei, pensioeninleg versus vrij beleggen, en lange termijn vrijheidsscenario's.",
     slugs: ["box-3-impact", "jaarruimte-vs-vrij-beleggen", "fire-na-belasting"],
   },
   {

@@ -425,8 +425,9 @@ function CalculatorContent({
           Jaarruimte of vrij beleggen?
         </h2>
         <p className="mt-3 text-[14px] leading-[1.7] text-[var(--ink-2)]">
-          Vergelijk de keuze tussen pensioeninleg (lijfrente/jaarruimte) en vrij
-          beleggen. Je ziet zowel fiscaal voordeel nu als de indicatieve eindwaarde.
+          Pensioeninleg kan belastingvoordeel geven, maar je geld staat meestal
+          vast. Vrij beleggen is flexibeler, maar kan in box 3 vallen. Deze tool
+          zet beide routes naast elkaar.
         </p>
 
         {hasRelevantProfileValues ? (

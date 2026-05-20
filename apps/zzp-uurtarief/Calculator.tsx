@@ -307,8 +307,8 @@ function CalculatorContent({
           ZZP-uurtarief inclusief buffer, pensioen en AOV
         </h2>
         <p className="mt-3 text-[14px] leading-[1.7] text-[var(--ink-2)]">
-          Bereken indicatief welk uurtarief nodig is voor je netto doel, inclusief
-          reserveringen en niet-declarabele tijd.
+          ZZP-omzet is geen salaris. Deze tool rekent terug welk uurtarief past
+          bij je gewenste inkomen, reserveringen en niet-declarabele tijd.
         </p>
 
         {hasRelevantProfileValues ? (

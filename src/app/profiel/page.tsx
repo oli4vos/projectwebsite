@@ -711,9 +711,9 @@ function ProfileEditor({
                 >
                   <option value="SF35">SF35</option>
                   <option value="SF15">SF15</option>
-                  <option value="SF15_OLD">SF15_OLD</option>
-                  <option value="SF15_LLLK">SF15_LLLK</option>
-                  <option value="UNKNOWN">UNKNOWN</option>
+                  <option value="SF15_OLD">SF15 oude regeling</option>
+                  <option value="SF15_LLLK">SF15 levenlanglerenkrediet</option>
+                  <option value="UNKNOWN">Weet ik niet</option>
                 </select>
               </label>
 
@@ -761,11 +761,11 @@ function ProfileEditor({
                   }
                   className="ring-focus hair h-12 rounded-md border bg-white px-4 text-[15px] text-[var(--ink)] outline-none"
                 >
-                  <option value="repaying">repaying</option>
-                  <option value="gracePeriod">gracePeriod</option>
-                  <option value="incomeBasedReduction">incomeBasedReduction</option>
-                  <option value="paymentPause">paymentPause</option>
-                  <option value="unknown">unknown</option>
+                  <option value="repaying">Ik betaal al maandelijks</option>
+                  <option value="gracePeriod">Aanloopfase</option>
+                  <option value="incomeBasedReduction">Verlaagd door draagkracht</option>
+                  <option value="paymentPause">Aflossingsvrije periode</option>
+                  <option value="unknown">Weet ik niet</option>
                 </select>
               </label>
             </div>

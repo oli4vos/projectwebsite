@@ -566,7 +566,7 @@ function CalculatorContent({
           </h2>
           <p className="mt-3 text-[14px] leading-[1.7] text-[var(--ink-2)]">
             Je studieschuld hoeft een koophuis niet onmogelijk te maken, maar je
-            DUO-maandlast telt wel mee. Deze tool laat zien welk bedrag waarschijnlijk
+            DUO-maandlast kan wel meetellen. Deze tool laat zien welk bedrag waarschijnlijk
             relevant is, hoe brutering werkt en wat dat indicatief met je
             hypotheekruimte kan doen.
           </p>

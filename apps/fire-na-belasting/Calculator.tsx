@@ -156,7 +156,7 @@ function validateForm(values: FormState) {
     withdrawalRate <= 0 ||
     withdrawalRate > 20
   ) {
-    errors.withdrawalRate = "Gebruik een withdrawal rate tussen 0,1 en 20.";
+    errors.withdrawalRate = "Gebruik een jaarlijks opnamepercentage tussen 0,1 en 20.";
   }
 
   if (taxYear === undefined || !Number.isFinite(taxYear) || taxYear < 2000 || taxYear > 2200) {
@@ -305,14 +305,15 @@ function CalculatorContent({
     <CalculatorShell>
       <section className="order-2 min-w-0 rounded-[1.5rem] border hair bg-white p-6 shadow-paper lg:order-1">
         <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
-          FIRE-planning
+          Financiële vrijheid
         </div>
         <h2 className="mt-2 font-serif text-[28px] tracking-[-0.02em] text-[var(--ink)]">
-          FIRE na belasting
+          Wanneer kan ik stoppen of minder werken?
         </h2>
         <p className="mt-3 text-[14px] leading-[1.7] text-[var(--ink-2)]">
-          Bereken indicatief wanneer je financieel onafhankelijk kunt zijn met
-          rendement, inflatie en optioneel box 3-effect.
+          Wil je weten wanneer werken optioneel wordt? Deze tool rekent uit
+          wanneer je vermogen groot genoeg kan zijn om je uitgaven te dragen,
+          met rendement, inflatie en optioneel box 3-effect.
         </p>
 
         {hasRelevantProfileValues ? (
@@ -383,7 +384,7 @@ function CalculatorContent({
             ["annualInflation", "Inflatie (%)"],
             ["taxYear", "Belastingjaar"],
             ["annualExpensesNow", "Jaarlijkse uitgaven nu"],
-            ["withdrawalRate", "Withdrawal rate (%)"],
+            ["withdrawalRate", "Jaarlijks opnamepercentage (%)"],
             ["horizonYears", "Horizon (jaren)"],
             ["currentAge", "Huidige leeftijd (optioneel)"],
           ].map(([field, label]) => (
@@ -533,7 +534,7 @@ function CalculatorContent({
         >
           {result ? (
             <div className="space-y-2 text-[13px] leading-[1.65] text-[var(--muted)]">
-              <p>1) FIRE-doel = jaarlijkse uitgaven / withdrawal rate.</p>
+              <p>1) FIRE-doel = jaarlijkse uitgaven / jaarlijks opnamepercentage.</p>
               <p>2) Vermogen groeit jaarlijks met rendement en inleg.</p>
               <p>3) Uitgaven en FIRE-doel groeien mee met inflatie.</p>
               <p>4) Bij box 3 aan wordt jaarlijkse heffing via centrale tax-laag afgetrokken.</p>
@@ -586,7 +587,7 @@ function CalculatorContent({
             <div className="space-y-2 text-[13px] leading-[1.65] text-[var(--muted)]">
               <p>Verwacht rendement: {formatPercent(result.assumptions.expectedAnnualReturn)}%</p>
               <p>Inflatie: {formatPercent(result.assumptions.annualInflation)}%</p>
-              <p>Withdrawal rate: {formatPercent(result.assumptions.withdrawalRate)}%</p>
+              <p>Jaarlijks opnamepercentage: {formatPercent(result.assumptions.withdrawalRate)}%</p>
               <p>Horizon: {result.assumptions.horizonYears} jaar</p>
               <p>Box 3 in model: {result.assumptions.includeBox3Effect ? "ja" : "nee"}</p>
             </div>
