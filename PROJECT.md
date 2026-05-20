@@ -112,6 +112,10 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - compacte persoonlijke route met max 3 starttools op basis van profielstatus
   - thematische toolgroepen in plaats van een losse toolbibliotheek
   - subtiele verwijzing naar `/variabelen` voor aannames en percentages
+- `/variabelen` is nu light-first:
+  - bovenaan korte samenvatting met kernwaarden
+  - daaronder uitklapbare verdiepingsblokken per domein (DUO, hypotheek, box 1, box 3, grafieken)
+  - technische velden worden vertaald naar gewone labels zoals “Gecontroleerd op” en “Bron/aannameset”
 
 ## Huidige data/config
 
@@ -245,6 +249,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `requiredProfileFields` is documenterend voor prefill-koppelingen; velden worden niet automatisch verplicht voor de gebruiker gemaakt.
 - `reasonHint` is informatief (geen advies), kort, zonder HTML, en wordt gebruikt als fallback-uitleg in persoonlijke route.
 - Aannames die een tool gebruikt horen via centrale constants + disclosure vindbaar te zijn.
+- `/variabelen` gebruikt centrale financial constants als bron van waarheid; tools mogen daarbovenop eigen invoerwaarden toestaan.
 - Donkere CTA's moeten expliciet wit contrast houden. Bronbestand: `src/components/ui.tsx`.
 - Alle gebruikersgerichte frontend-copy is standaard Nederlands. Engelse tekst mag alleen in code, technische namen of wanneer expliciet gekozen.
 - Mobile-first is verplicht: elke nieuwe component of tool moet standaard goed werken op mobiel.
