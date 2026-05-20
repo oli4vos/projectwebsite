@@ -169,7 +169,9 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - benadrukt afweging tussen fiscaal voordeel en flexibiliteit (relevant voor FIRE-scenario's)
 - `apps/volgende-euro`
   - centrale prioriteitenhulp voor de vraag waar extra geld nu het meest logisch naartoe kan
-  - combineert buffer, dure schuld, studieschuld, hypotheek, jaarruimte, beleggen en woningdoel in één educatieve scorelijst
+  - werkt submit-gedreven met expliciete `Bereken`-knop (geen misleidende live-output op halflege invoer)
+  - combineert buffer, dure schuld, studieschuld, hypotheek, jaarruimte, beleggen en woningdoel in één educatief stappenplan
+  - toont alleen relevante aanbevelingen; ontbrekende gegevens worden als hulp getoond, niet als fout
   - gebruikt centrale profieldefaults plus DUO/constants-context, maar blijft expliciet geen financieel advies
 - `apps/fire-na-belasting`
   - indicatieve FIRE-tool met jaarlijkse tijdlijn voor vermogen, inleg, groei, box 3-heffing en FIRE-doel
@@ -251,6 +253,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - Validatie gebeurt nu per calculatorcomponent in de client.
 - Formvalidatie toont rode veldfouten pas zodra een gebruiker dat veld inhoudelijk invult; lege startvelden tonen geen foutmeldingen vooraf.
 - Toolflow blijft light-first: eerst invullen, daarna resultaat; verdiepingsblokken staan standaard dicht.
+- In `volgende-euro` worden lege optionele velden niet stil als `0` geïnterpreteerd voor prioriteiten; alleen ingevulde context telt mee.
 - Dashboard haalt alleen manifestdata op uit de gegenereerde registry.
 - Verborgen tools blijven buiten dashboard en app-routes via manifestveld `visibility: "hidden"`.
 - `requiredProfileFields` is documenterend voor prefill-koppelingen; velden worden niet automatisch verplicht voor de gebruiker gemaakt.

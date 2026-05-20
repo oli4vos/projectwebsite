@@ -21,6 +21,8 @@ export type PriorityOptionKey =
   | "freeInvesting"
   | "housingOwnFunds";
 
+export type PriorityApplicability = "relevant" | "insufficientData" | "notApplicable";
+
 export type PriorityPlanStatus =
   | "nu doen"
   | "daarna"
@@ -41,6 +43,8 @@ export type PriorityPlanStep = {
   whyThisStep: string;
   whyBeforeNext: string;
   nextTrigger: string;
+  applicability: PriorityApplicability;
+  missingFields?: string[];
 };
 
 export type VolgendeEuroInput = {
@@ -71,11 +75,13 @@ export type PriorityOption = {
   bucket: PriorityBucket;
   reason: string;
   riskFlexNote: string;
+  applicability: PriorityApplicability;
+  missingFields?: string[];
 };
 
 export type VolgendeEuroResult = {
   year: number;
-  topRecommendation: PriorityOption;
+  topRecommendation: PriorityOption | null;
   topThree: PriorityOption[];
   priorities: PriorityOption[];
   priorityPlan: PriorityPlanStep[];
@@ -88,22 +94,26 @@ export type VolgendeEuroResult = {
     lastChecked: string;
     status: string;
   };
+  missingDataHints: string[];
   warnings: string[];
 };
 
-type InternalCandidate = {
+type Candidate = {
   key: PriorityOptionKey;
   title: string;
   score: number;
-  amountNeeded?: number;
-  currentAmount?: number;
-  targetAmount?: number;
   whyThisStep: string;
   whyBeforeNext: string;
   nextTrigger: string;
+  actionLabel: string;
+  amountNeeded?: number;
+  currentAmount?: number;
+  targetAmount?: number;
+  applicability: PriorityApplicability;
+  missingFields?: string[];
 };
 
-const STEP_TITLES: Record<PriorityOptionKey, string> = {
+const TITLES: Record<PriorityOptionKey, string> = {
   buffer: "Buffer aanvullen",
   expensiveDebt: "Dure schuld aflossen",
   studentDebtExtra: "Studieschuld extra aflossen",
@@ -113,160 +123,59 @@ const STEP_TITLES: Record<PriorityOptionKey, string> = {
   housingOwnFunds: "Eigen geld voor woning",
 };
 
+function hasValue(value: unknown) {
+  return value !== undefined && value !== null;
+}
+
 function sanitizeMoney(value: number | undefined) {
-  if (!Number.isFinite(value)) {
-    return 0;
-  }
+  if (!Number.isFinite(value)) return 0;
   return Math.max(value as number, 0);
 }
-
 function sanitizePercent(value: number | undefined) {
-  if (!Number.isFinite(value)) {
-    return undefined;
-  }
+  if (!Number.isFinite(value)) return undefined;
   return Math.min(Math.max(value as number, 0), 100);
 }
-
 function sanitizeYears(value: number | undefined) {
-  if (!Number.isFinite(value)) {
-    return 10;
-  }
-  return Math.min(Math.max(Math.round(value as number), 1), 60);
+  if (!Number.isFinite(value)) return 0;
+  return Math.min(Math.max(Math.round(value as number), 0), 60);
 }
-
 function sanitizeYear(value: number | undefined) {
-  if (!Number.isFinite(value)) {
-    return getDefaultFinancialYear();
-  }
+  if (!Number.isFinite(value)) return getDefaultFinancialYear();
   const rounded = Math.round(value as number);
-  if (rounded < 2000 || rounded > 2200) {
-    return getDefaultFinancialYear();
-  }
-  return rounded;
+  return rounded < 2000 || rounded > 2200 ? getDefaultFinancialYear() : rounded;
 }
-
-function clampScore(value: number) {
-  if (!Number.isFinite(value)) {
-    return 0;
-  }
-  return Math.min(Math.max(Math.round(value), 0), 100);
-}
-
 function roundMoney(value: number | undefined) {
-  if (!Number.isFinite(value)) {
-    return 0;
-  }
+  if (!Number.isFinite(value)) return 0;
   return Math.max(Math.round(value as number), 0);
 }
-
+function clampScore(value: number) {
+  if (!Number.isFinite(value)) return 0;
+  return Math.min(Math.max(Math.round(value), 0), 100);
+}
 function toBucket(score: number): PriorityBucket {
-  if (score >= 80) {
-    return "eerst doen";
-  }
-  if (score >= 60) {
-    return "daarna overwegen";
-  }
-  if (score >= 40) {
-    return "alleen als...";
-  }
+  if (score >= 80) return "eerst doen";
+  if (score >= 60) return "daarna overwegen";
+  if (score >= 40) return "alleen als...";
   return "minder logisch nu";
 }
-
 function getRiskAdjustment(riskProfile: RiskProfile | undefined) {
-  if (riskProfile === "conservative") {
-    return { investing: -10, pension: 4 };
-  }
-  if (riskProfile === "offensive") {
-    return { investing: 10, pension: -2 };
-  }
+  if (riskProfile === "conservative") return { investing: -10, pension: 4 };
+  if (riskProfile === "offensive") return { investing: 10, pension: -2 };
   return { investing: 0, pension: 0 };
 }
-
-function getStatus(allocatedAmount: number, rank: number): PriorityPlanStatus {
-  if (allocatedAmount > 0 && rank === 1) {
-    return "nu doen";
-  }
-  if (allocatedAmount > 0) {
-    return "daarna";
-  }
-  return "alleen bij extra ruimte";
-}
-
-function buildActionLabel(step: InternalCandidate) {
-  const target = step.targetAmount;
-  switch (step.key) {
-    case "buffer":
-      if (target !== undefined) {
-        return `Vul je buffer aan tot €${target.toLocaleString("nl-NL")}`;
-      }
-      return "Vul je buffer aan";
-    case "expensiveDebt":
-      return "Los je dure schuld af tot €0";
-    case "studentDebtExtra":
-      return "Overweeg extra aflossen op je studieschuld";
-    case "mortgagePrepay":
-      return "Overweeg extra aflossen op je hypotheek";
-    case "pensionJaarruimte":
-      if (target !== undefined) {
-        return `Vul je jaarruimte tot €${target.toLocaleString("nl-NL")}`;
-      }
-      return "Overweeg pensioeninleg via jaarruimte";
-    case "freeInvesting":
-      return "Beleg het resterende bedrag voor de lange termijn";
-    case "housingOwnFunds":
-      if (target !== undefined) {
-        return `Bouw eigen geld op richting €${target.toLocaleString("nl-NL")}`;
-      }
-      return "Bouw eigen geld op voor je woningdoel";
-    default:
-      return "Kies de volgende logische stap";
-  }
-}
-
-function getLegacyRiskNote(step: PriorityPlanStep) {
-  if (step.key === "buffer") {
-    return "Hoge flexibiliteit: direct beschikbaar geld.";
-  }
-  if (step.key === "expensiveDebt") {
-    return "Zekere kostenbesparing door dure rente te stoppen.";
-  }
-  if (step.key === "freeInvesting") {
-    return "Meer groeipotentieel, maar ook meer marktrisico.";
-  }
-  if (step.key === "pensionJaarruimte") {
-    return "Fiscaal voordeel kan sterk zijn, flexibiliteit is lager.";
-  }
-  return "Gebruik dit als startpunt en reken daarna verder door.";
-}
-
-function planToPriorityOption(step: PriorityPlanStep): PriorityOption {
-  const impliedScore =
-    step.status === "nu doen"
-      ? 90 - (step.rank - 1) * 8
-      : step.status === "daarna"
-        ? 70 - (step.rank - 1) * 6
-        : 45 - (step.rank - 1) * 4;
-  const score = clampScore(impliedScore);
-  return {
-    key: step.key,
-    label: step.title,
-    score,
-    bucket: toBucket(score),
-    reason: step.whyThisStep,
-    riskFlexNote: getLegacyRiskNote(step),
-  };
-}
-
-function byCandidatePriority(a: InternalCandidate, b: InternalCandidate) {
-  if (b.score !== a.score) {
-    return b.score - a.score;
-  }
+function byScoreDesc(a: Candidate, b: Candidate) {
+  if (b.score !== a.score) return b.score - a.score;
   return a.title.localeCompare(b.title, "nl-NL");
 }
+function getLegacyRiskNote(key: PriorityOptionKey) {
+  if (key === "buffer") return "Hoge flexibiliteit: direct beschikbaar geld.";
+  if (key === "expensiveDebt") return "Zekere kostenbesparing door dure rente te stoppen.";
+  if (key === "freeInvesting") return "Meer groeipotentieel, maar ook marktrisico.";
+  if (key === "pensionJaarruimte") return "Fiscaal voordeel kan sterk zijn, flexibiliteit is lager.";
+  return "Gebruik dit als routehulp en reken daarna verder door.";
+}
 
-export function calculateVolgendeEuroPriorities(
-  input: VolgendeEuroInput,
-): VolgendeEuroResult {
+export function calculateVolgendeEuroPriorities(input: VolgendeEuroInput): VolgendeEuroResult {
   const year = sanitizeYear(input.year);
   const constants = getFinancialConstants(year);
   const extraAmount = roundMoney(sanitizeMoney(input.extraAmount));
@@ -280,7 +189,7 @@ export function calculateVolgendeEuroPriorities(
   const mortgageRate = sanitizePercent(input.mortgageRate) ?? 0;
   const availableJaarruimte = roundMoney(sanitizeMoney(input.availableJaarruimte));
   const horizonYears = sanitizeYears(input.horizonYears);
-  const expectedAnnualReturn = sanitizePercent(input.expectedAnnualReturn) ?? 5;
+  const expectedAnnualReturn = sanitizePercent(input.expectedAnnualReturn) ?? 0;
   const hasHousingGoal = Boolean(input.hasHousingGoal);
   const riskProfile = input.riskProfile ?? "neutral";
   const targetHomePrice = roundMoney(sanitizeMoney(input.targetHomePrice));
@@ -297,224 +206,286 @@ export function calculateVolgendeEuroPriorities(
         })
       : 0;
 
-  const candidates: InternalCandidate[] = [];
+  const candidates: Candidate[] = [];
+  const missingHints = new Set<string>();
 
-  const hasBufferContext = input.currentBuffer !== undefined || input.targetBuffer !== undefined;
-  const bufferGap = Math.max(targetBuffer - currentBuffer, 0);
-  if (hasBufferContext) {
-    const bufferScore = clampScore(
-      bufferGap > 0 ? 96 + Math.min(Math.round((bufferGap / Math.max(extraAmount, 1)) * 8), 4) : 38,
-    );
+  const bufferCurrentGiven = hasValue(input.currentBuffer);
+  const bufferTargetGiven = hasValue(input.targetBuffer);
+  if (bufferCurrentGiven && bufferTargetGiven) {
+    const gap = Math.max(targetBuffer - currentBuffer, 0);
     candidates.push({
       key: "buffer",
-      title: STEP_TITLES.buffer,
-      score: bufferScore,
+      title: TITLES.buffer,
+      score: gap > 0 ? 96 : 30,
+      amountNeeded: gap,
       currentAmount: currentBuffer,
       targetAmount: targetBuffer,
-      amountNeeded: bufferGap,
+      applicability: "relevant",
+      actionLabel:
+        gap > 0
+          ? `Vul je buffer aan tot €${targetBuffer.toLocaleString("nl-NL")}`
+          : "Houd je buffer op peil",
       whyThisStep:
-        bufferGap > 0
-          ? "Je buffer zit onder je doelbedrag. Zonder buffer kunnen onverwachte kosten je plan direct verstoren."
-          : "Je buffer is al op orde. Je hoeft hier nu niet als eerste extra geld te plaatsen.",
+        gap > 0
+          ? "Je buffer zit onder je doel. Zonder buffer kunnen onverwachte kosten je hele plan verstoren."
+          : "Je buffer is op orde. Deze stap blijft als behoudsstap onder beleggings- of afloskeuzes.",
       whyBeforeNext:
-        bufferGap > 0
-          ? "Een stabiele buffer voorkomt dat je later moet lenen of beleggingen op een slecht moment verkoopt."
-          : "Omdat je buffer op orde is, kan je extra geld daarna sneller naar schuldafbouw of groei gaan.",
-      nextTrigger:
-        bufferGap > 0
-          ? `Ga door naar de volgende stap zodra je buffer ongeveer €${targetBuffer.toLocaleString("nl-NL")} is.`
-          : "Volgende stap: kijk naar dure schuld, studieschuld of langetermijndoelen.",
+        gap > 0
+          ? "Eerst buffer maakt de rest stabieler, omdat je niet direct hoeft te lenen of beleggingen te verkopen."
+          : "Omdat je buffer al op orde is, hoeft deze stap nu niet vooraan te staan.",
+      nextTrigger: gap > 0 ? "Ga door zodra je bufferdoel is gehaald." : "Controleer periodiek of je buffer op peil blijft.",
     });
-  }
-
-  const expensiveDebtRelevant = hasExpensiveDebt && expensiveDebtAmount > 0;
-  if (expensiveDebtRelevant) {
-    const debtScore = clampScore(88 + (expensiveDebtRate >= 8 ? 8 : expensiveDebtRate >= 7 ? 4 : 0));
+  } else if (bufferCurrentGiven || bufferTargetGiven) {
     candidates.push({
-      key: "expensiveDebt",
-      title: STEP_TITLES.expensiveDebt,
-      score: debtScore,
-      currentAmount: expensiveDebtAmount,
-      targetAmount: 0,
-      amountNeeded: expensiveDebtAmount,
-      whyThisStep:
-        expensiveDebtRate >= 8
-          ? `Je dure schuld kost ongeveer ${expensiveDebtRate.toFixed(1)}% rente. Dat is een zekere en hoge kostenpost.`
-          : `Je dure schuld kost ongeveer ${expensiveDebtRate.toFixed(1)}% rente en drukt je maandruimte.`,
-      whyBeforeNext:
-        "Rente op dure schuld is direct verlies. Eerst aflossen geeft meestal een zekerder effect dan beleggen.",
-      nextTrigger: "Als deze schuld is afgebouwd, kun je het volgende bedrag inzetten voor groei of andere doelen.",
+      key: "buffer",
+      title: TITLES.buffer,
+      score: 0,
+      applicability: "insufficientData",
+      missingFields: [
+        !bufferCurrentGiven ? "huidige buffer" : "",
+        !bufferTargetGiven ? "gewenste buffer" : "",
+      ].filter(Boolean),
+      actionLabel: "Vul huidige en gewenste buffer in",
+      whyThisStep: "Buffer is nog niet goed te beoordelen.",
+      whyBeforeNext: "Zonder buffercontext is de prioriteitenvolgorde minder betrouwbaar.",
+      nextTrigger: "Vul beide buffervelden in.",
     });
+    missingHints.add("Vul huidige en gewenste buffer in.");
   }
 
-  if (studentDebtAmount > 0) {
-    const studentDebtScore = clampScore(
-      48 + (duoRate >= 4 ? 10 : duoRate <= 2.5 ? -8 : 0) + (hasHousingGoal ? 6 : 0),
-    );
-    candidates.push({
-      key: "studentDebtExtra",
-      title: STEP_TITLES.studentDebtExtra,
-      score: studentDebtScore,
-      currentAmount: studentDebtAmount,
-      whyThisStep:
-        duoRate <= 2.5
-          ? `Je DUO-rente is laag (${duoRate.toFixed(2)}%). Extra aflossen is daarom niet automatisch je eerste stap.`
-          : `Je DUO-rente is ${duoRate.toFixed(2)}%. Extra aflossen kan dan sneller interessant worden.`,
-      whyBeforeNext:
-        hasHousingGoal
-          ? "Bij een woningdoel kan minder studieschuld helpen, maar houd eerst je basisbuffer en dure schuld in de gaten."
-          : "Deze stap komt vaak na buffer en dure schuld, omdat die meestal directer effect hebben.",
-      nextTrigger: `Indicatief wettelijk DUO-bedrag is ongeveer €${roundMoney(
-        estimatedStatutoryMonthlyPayment,
-      ).toLocaleString("nl-NL")} per maand; extra aflossen is daarboven vrijwillig.`,
-    });
+  const debtRateGiven = hasValue(input.expensiveDebtRate);
+  const debtAmountGiven = hasValue(input.expensiveDebtAmount);
+  if (hasExpensiveDebt) {
+    if (debtRateGiven || debtAmountGiven) {
+      const score = clampScore(84 + (expensiveDebtRate >= 8 ? 10 : 0));
+      candidates.push({
+        key: "expensiveDebt",
+        title: TITLES.expensiveDebt,
+        score,
+        applicability: expensiveDebtAmount > 0 ? "relevant" : "insufficientData",
+        missingFields: expensiveDebtAmount > 0 ? undefined : ["bedrag dure schuld"],
+        amountNeeded: expensiveDebtAmount > 0 ? expensiveDebtAmount : undefined,
+        targetAmount: expensiveDebtAmount > 0 ? 0 : undefined,
+        currentAmount: expensiveDebtAmount > 0 ? expensiveDebtAmount : undefined,
+        actionLabel: "Los je dure schuld af tot €0",
+        whyThisStep: `Dure schuld met ${expensiveDebtRate.toFixed(1)}% rente is een zekere kostenpost.`,
+        whyBeforeNext: "Deze rente stopt direct als je aflost; dat effect is vaak zekerder dan verwacht beleggingsrendement.",
+        nextTrigger: "Ga door naar volgende stap zodra deze schuld is afgebouwd.",
+      });
+      if (!(expensiveDebtAmount > 0)) {
+        missingHints.add("Vul het bedrag van je dure schuld in.");
+      }
+    } else {
+      candidates.push({
+        key: "expensiveDebt",
+        title: TITLES.expensiveDebt,
+        score: 0,
+        applicability: "insufficientData",
+        missingFields: ["rente dure schuld", "bedrag dure schuld"],
+        actionLabel: "Vul rente en bedrag van je dure schuld in",
+        whyThisStep: "Je gaf aan dat je dure schuld hebt, maar gegevens ontbreken.",
+        whyBeforeNext: "Zonder rente/bedrag kunnen we deze stap niet goed plaatsen.",
+        nextTrigger: "Vul rente of schuldbedrag in.",
+      });
+      missingHints.add("Vul rente en bedrag van je dure schuld in.");
+    }
   }
 
-  if (mortgageRate > 0) {
-    const mortgageScore = clampScore(44 + (mortgageRate >= 5 ? 8 : mortgageRate >= 4 ? 4 : 0));
+  if (hasValue(input.studentDebtAmount)) {
+    if (studentDebtAmount > 0) {
+      const score = clampScore(44 + (duoRate >= 4 ? 10 : duoRate <= 2.5 ? -8 : 0) + (hasHousingGoal ? 6 : 0));
+      candidates.push({
+        key: "studentDebtExtra",
+        title: TITLES.studentDebtExtra,
+        score,
+        applicability: "relevant",
+        currentAmount: studentDebtAmount,
+        actionLabel: "Overweeg extra aflossen boven je verplichte DUO-bedrag",
+        whyThisStep:
+          duoRate <= 2.5
+            ? `Bij lage DUO-rente (${duoRate.toFixed(2)}%) is extra aflossen niet automatisch de eerste stap.`
+            : `Met DUO-rente van ${duoRate.toFixed(2)}% kan extra aflossen relevanter worden.`,
+        whyBeforeNext: "Je verplichte DUO-betaling loopt sowieso door; de keuze gaat alleen over vrijwillig extra aflossen.",
+        nextTrigger: `Je indicatieve wettelijke DUO-bedrag is ongeveer €${roundMoney(estimatedStatutoryMonthlyPayment).toLocaleString("nl-NL")} per maand.`,
+      });
+    }
+  }
+
+  if (hasValue(input.mortgageRate) && mortgageRate > 0) {
     candidates.push({
       key: "mortgagePrepay",
-      title: STEP_TITLES.mortgagePrepay,
-      score: mortgageScore,
-      whyThisStep: `Je hypotheekrente is ongeveer ${mortgageRate.toFixed(
-        2,
-      )}%. Extra aflossen kan rust en lagere rentelasten geven.`,
-      whyBeforeNext:
-        "Deze stap hangt af van je flexibiliteit: aflossen geeft zekerheid, beleggen houdt je geld vrij opneembaar.",
-      nextTrigger: "Reken deze keuze door met je hypotheekschuld, renteaftrek en gewenste buffer.",
+      title: TITLES.mortgagePrepay,
+      score: clampScore(48 + (mortgageRate >= 5 ? 8 : 0)),
+      applicability: "relevant",
+      actionLabel: "Overweeg extra aflossen op je hypotheek",
+      whyThisStep: `Met hypotheekrente van ${mortgageRate.toFixed(2)}% kan extra aflossen interessant zijn.`,
+      whyBeforeNext: "Deze stap vraagt vergelijking met flexibiliteit, renteaftrek en alternatieven zoals beleggen.",
+      nextTrigger: "Vul ook hypotheekschuld in een verdiepende tool voor een scherpere vergelijking.",
     });
   }
 
-  if (availableJaarruimte > 0) {
-    const pensionScore = clampScore(58 + riskAdjustment.pension - (bufferGap > 0 ? 14 : 0));
-    candidates.push({
-      key: "pensionJaarruimte",
-      title: STEP_TITLES.pensionJaarruimte,
-      score: pensionScore,
-      currentAmount: 0,
-      targetAmount: availableJaarruimte,
-      amountNeeded: availableJaarruimte,
-      whyThisStep:
-        "Jaarruimte kan fiscaal voordeel geven doordat je nu mogelijk minder belasting betaalt op inleg.",
-      whyBeforeNext:
-        bufferGap > 0
-          ? "Eerst je buffer op orde houden is meestal veiliger; daarna wordt pensioeninleg logischer."
-          : "Als je basis op orde is, kan jaarruimte een sterke vervolgstap zijn naast vrij beleggen.",
-      nextTrigger: `Deze stap loopt tot ongeveer €${availableJaarruimte.toLocaleString(
-        "nl-NL",
-      )} inleg binnen je beschikbare jaarruimte.`,
-    });
+  if (hasValue(input.availableJaarruimte)) {
+    if (availableJaarruimte > 0) {
+      candidates.push({
+        key: "pensionJaarruimte",
+        title: TITLES.pensionJaarruimte,
+        score: clampScore(56 + riskAdjustment.pension),
+        applicability: "relevant",
+        amountNeeded: availableJaarruimte,
+        targetAmount: availableJaarruimte,
+        currentAmount: 0,
+        actionLabel: `Benut je jaarruimte tot €${availableJaarruimte.toLocaleString("nl-NL")}`,
+        whyThisStep: "Jaarruimte kan nu fiscaal voordeel geven, maar het geld is minder flexibel beschikbaar.",
+        whyBeforeNext: "Gebruik dit vooral nadat basisveiligheid (zoals buffer) op orde is.",
+        nextTrigger: "Ga daarna verder met beleggen of andere doelen.",
+      });
+    }
   }
 
-  const investingSignal =
-    (input.horizonYears !== undefined && horizonYears > 0) ||
-    input.expectedAnnualReturn !== undefined ||
-    input.riskProfile !== undefined;
-  if (investingSignal) {
-    const investingScore = clampScore(
-      42 +
-        (horizonYears >= 15 ? 16 : horizonYears >= 10 ? 8 : 2) +
-        (expectedAnnualReturn >= 6 ? 8 : 2) +
-        riskAdjustment.investing +
-        (bufferGap > 0 ? -16 : 0) +
-        (expensiveDebtRelevant && expensiveDebtRate >= 7 ? -14 : 0),
-    );
+  const investingRelevant =
+    (extraAmount > 0 || sanitizeMoney(input.monthlyFreeRoom) > 0) &&
+    hasValue(input.horizonYears) &&
+    hasValue(input.expectedAnnualReturn) &&
+    horizonYears > 0;
+  if (investingRelevant) {
     candidates.push({
       key: "freeInvesting",
-      title: STEP_TITLES.freeInvesting,
-      score: investingScore,
-      whyThisStep:
-        "Vrij beleggen is vooral logisch voor de lange termijn, nadat je buffer en dure schuld op orde zijn.",
-      whyBeforeNext:
-        "Beleggen kan meer opleveren, maar heeft risico. Daarom staat het meestal niet vóór basisveiligheid.",
-      nextTrigger: `Met een horizon van ${horizonYears} jaar kun je resterende ruimte daarna gericht spreiden naar beleggingen.`,
+      title: TITLES.freeInvesting,
+      score: clampScore(52 + (horizonYears >= 15 ? 10 : 4) + (expectedAnnualReturn >= 6 ? 6 : 0) + riskAdjustment.investing),
+      applicability: "relevant",
+      actionLabel: "Beleg resterende ruimte voor de lange termijn",
+      whyThisStep: "Beleggen wordt vooral logisch bij langere horizon en als basisveiligheid op orde is.",
+      whyBeforeNext: "Potentieel hoger rendement gaat samen met marktrisico, dus deze stap komt vaak na buffer en dure schuld.",
+      nextTrigger: "Gebruik deze stap zodra eerdere prioriteiten voldoende zijn gevuld.",
     });
+  } else if (
+    hasValue(input.horizonYears) ||
+    hasValue(input.expectedAnnualReturn) ||
+    extraAmount > 0 ||
+    sanitizeMoney(input.monthlyFreeRoom) > 0
+  ) {
+    candidates.push({
+      key: "freeInvesting",
+      title: TITLES.freeInvesting,
+      score: 0,
+      applicability: "insufficientData",
+      missingFields: [
+        !hasValue(input.horizonYears) ? "beleggingshorizon" : "",
+        !hasValue(input.expectedAnnualReturn) ? "verwacht rendement" : "",
+      ].filter(Boolean),
+      actionLabel: "Vul horizon en verwacht rendement in",
+      whyThisStep: "Voor beleggen missen nog kerngegevens.",
+      whyBeforeNext: "Zonder horizon en rendement blijft deze stap te algemeen.",
+      nextTrigger: "Vul beide velden in voor een bruikbare belegstap.",
+    });
+    if (!hasValue(input.horizonYears) || !hasValue(input.expectedAnnualReturn)) {
+      missingHints.add("Vul beleggingshorizon en verwacht rendement in.");
+    }
   }
 
-  const housingInputPresent =
-    hasHousingGoal && (input.targetHomePrice !== undefined || input.ownFunds !== undefined);
-  if (housingInputPresent) {
-    const targetOwnFunds = roundMoney(targetHomePrice * 0.1);
-    const housingGap = Math.max(targetOwnFunds - ownFunds, 0);
-    const housingScore = clampScore(56 + (housingGap > 0 ? 12 : 0) - (bufferGap > 0 ? 8 : 0));
+  const homePriceGiven = hasValue(input.targetHomePrice);
+  const ownFundsGiven = hasValue(input.ownFunds);
+  if (hasHousingGoal && homePriceGiven && ownFundsGiven) {
+    if (targetHomePrice > ownFunds) {
+      const targetOwnFunds = roundMoney(targetHomePrice * 0.1);
+      const needed = Math.max(targetOwnFunds - ownFunds, 0);
+      candidates.push({
+        key: "housingOwnFunds",
+        title: TITLES.housingOwnFunds,
+        score: clampScore(58 + (needed > 0 ? 10 : 0)),
+        applicability: "relevant",
+        targetAmount: targetOwnFunds,
+        currentAmount: ownFunds,
+        amountNeeded: needed,
+        actionLabel: `Bouw eigen geld op richting €${targetOwnFunds.toLocaleString("nl-NL")}`,
+        whyThisStep: "Voor koop heb je vaak eigen geld nodig voor kosten en financiële ruimte.",
+        whyBeforeNext: "Als je koopmoment dichterbij komt, weegt beschikbaar eigen geld vaak zwaarder dan extra risico nemen.",
+        nextTrigger: "Dit doel is indicatief op 10% van je doelkoopprijs.",
+      });
+    }
+  } else if (hasHousingGoal && (homePriceGiven || ownFundsGiven)) {
     candidates.push({
       key: "housingOwnFunds",
-      title: STEP_TITLES.housingOwnFunds,
-      score: housingScore,
-      currentAmount: ownFunds,
-      targetAmount: targetOwnFunds,
-      amountNeeded: housingGap,
-      whyThisStep:
-        housingGap > 0
-          ? "Voor een woning heb je meestal eigen geld nodig. Deze stap helpt dat doel gericht op te bouwen."
-          : "Je eigen geld lijkt al dicht bij je indicatieve doel voor aankoopkosten te liggen.",
-      whyBeforeNext:
-        "Als je binnen enkele jaren wilt kopen, geeft extra eigen geld vaak meer onderhandelruimte en lagere maandlasten.",
-      nextTrigger:
-        housingGap > 0
-          ? `Indicatief doel eigen geld: ongeveer €${targetOwnFunds.toLocaleString("nl-NL")} (10% van koopprijs).`
-          : "Volgende stap: houd je buffer op peil en weeg daarna beleggen of aflossen.",
+      title: TITLES.housingOwnFunds,
+      score: 0,
+      applicability: "insufficientData",
+      missingFields: [
+        !homePriceGiven ? "doel koopprijs" : "",
+        !ownFundsGiven ? "eigen geld nu" : "",
+      ].filter(Boolean),
+      actionLabel: "Vul doel koopprijs en eigen geld in",
+      whyThisStep: "Voor woningdoel missen nog kerngegevens.",
+      whyBeforeNext: "Zonder beide velden is geen zinvolle inschatting mogelijk.",
+      nextTrigger: "Vul beide velden in om deze stap mee te nemen.",
     });
+    missingHints.add("Vul doel koopprijs en eigen geld in.");
   }
 
-  const sortedCandidates = candidates.sort(byCandidatePriority);
+  const relevant = candidates.filter((item) => item.applicability === "relevant").sort(byScoreDesc);
+  const nonRelevant = candidates.filter((item) => item.applicability !== "relevant");
   const priorityPlan: PriorityPlanStep[] = [];
   let remaining = extraAmount;
 
-  for (const candidate of sortedCandidates) {
-    const needed = candidate.amountNeeded !== undefined ? roundMoney(candidate.amountNeeded) : undefined;
+  for (const item of relevant) {
+    const needed = item.amountNeeded !== undefined ? roundMoney(item.amountNeeded) : undefined;
     let allocated = 0;
     if (remaining > 0) {
-      if (needed !== undefined) {
-        allocated = Math.min(remaining, needed);
-      } else if (candidate.key === "freeInvesting") {
-        allocated = remaining;
-      }
+      if (needed !== undefined) allocated = Math.min(remaining, needed);
+      else if (item.key === "freeInvesting") allocated = remaining;
     }
     remaining = roundMoney(remaining - allocated);
     const rank = priorityPlan.length + 1;
-    const status = getStatus(allocated, rank);
-
     priorityPlan.push({
       rank,
-      key: candidate.key,
-      title: candidate.title,
-      actionLabel: buildActionLabel(candidate),
-      currentAmount: candidate.currentAmount !== undefined ? roundMoney(candidate.currentAmount) : undefined,
-      targetAmount: candidate.targetAmount !== undefined ? roundMoney(candidate.targetAmount) : undefined,
+      key: item.key,
+      title: item.title,
+      actionLabel: item.actionLabel,
+      currentAmount: item.currentAmount !== undefined ? roundMoney(item.currentAmount) : undefined,
+      targetAmount: item.targetAmount !== undefined ? roundMoney(item.targetAmount) : undefined,
       amountNeeded: needed,
       allocatedAmount: allocated,
       remainingAfterStep: remaining,
-      status,
-      whyThisStep: candidate.whyThisStep,
-      whyBeforeNext: candidate.whyBeforeNext,
-      nextTrigger: candidate.nextTrigger,
+      status: allocated > 0 ? (rank === 1 ? "nu doen" : "daarna") : "alleen bij extra ruimte",
+      whyThisStep: item.whyThisStep,
+      whyBeforeNext: item.whyBeforeNext,
+      nextTrigger: item.nextTrigger,
+      applicability: "relevant",
     });
   }
 
-  const fallbackStep: PriorityPlanStep = {
-    rank: 1,
-    key: "buffer",
-    title: STEP_TITLES.buffer,
-    actionLabel: "Vul eerst basisgegevens in om je prioriteiten te zien",
-    allocatedAmount: 0,
-    remainingAfterStep: extraAmount,
-    status: "niet relevant",
-    whyThisStep: "Er is nog te weinig relevante invoer om een prioriteitenladder te maken.",
-    whyBeforeNext: "Vul minimaal je buffer, schuld of horizon in voor een bruikbare volgorde.",
-    nextTrigger: "Start met het veld 'huidige buffer' en 'gewenste buffer'.",
-  };
+  const priorities: PriorityOption[] = [
+    ...priorityPlan.map((step) => {
+      const score = clampScore(92 - (step.rank - 1) * 10);
+      return {
+        key: step.key,
+        label: step.title,
+        score,
+        bucket: toBucket(score),
+        reason: step.whyThisStep,
+        riskFlexNote: getLegacyRiskNote(step.key),
+        applicability: "relevant" as const,
+      };
+    }),
+    ...nonRelevant.map((item) => ({
+      key: item.key,
+      label: item.title,
+      score: 0,
+      bucket: "minder logisch nu" as const,
+      reason: item.whyThisStep,
+      riskFlexNote: getLegacyRiskNote(item.key),
+      applicability: item.applicability,
+      missingFields: item.missingFields,
+    })),
+  ];
 
-  const effectivePlan = priorityPlan.length > 0 ? priorityPlan : [fallbackStep];
-  const priorities = effectivePlan.map(planToPriorityOption);
-  const topRecommendation = priorities[0];
+  const topRecommendation = priorities.find((item) => item.applicability === "relevant") ?? null;
 
   return {
     year,
     topRecommendation,
-    topThree: priorities.slice(0, 3),
+    topThree: priorities.filter((item) => item.applicability === "relevant").slice(0, 3),
     priorities,
-    priorityPlan: effectivePlan,
+    priorityPlan,
     duoContext: {
       assumedRate: duoRate,
       estimatedStatutoryMonthlyPayment: roundMoney(estimatedStatutoryMonthlyPayment),
@@ -524,6 +495,7 @@ export function calculateVolgendeEuroPriorities(
       lastChecked: constants.mortgage.meta.lastChecked,
       status: constants.mortgage.meta.status,
     },
+    missingDataHints: Array.from(missingHints).slice(0, 3),
     warnings: [
       "Deze beslis-tool is educatief en geeft geen persoonlijk financieel advies.",
       "Gebruik dit stappenplan als startpunt en reken belangrijke keuzes daarna door in de verdiepende tools.",
