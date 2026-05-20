@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { BtnLink, Pill } from "@/components/ui";
@@ -5,7 +6,9 @@ import { BtnLink, Pill } from "@/components/ui";
 export default function NotFound() {
   return (
     <>
-      <SiteHeader />
+      <Suspense fallback={<HeaderFallback />}>
+        <SiteHeader />
+      </Suspense>
       <main
         id="main-content"
         className="mx-auto flex min-h-[72dvh] max-w-7xl items-center px-5 py-10 sm:px-8 lg:px-10"
@@ -59,5 +62,20 @@ export default function NotFound() {
       </main>
       <SiteFooter />
     </>
+  );
+}
+
+function HeaderFallback() {
+  return (
+    <header className="hair-b sticky top-0 z-20 bg-[rgba(245,241,234,0.78)] backdrop-blur-md">
+      <div className="page-shell py-3">
+        <div className="flex min-w-0 items-center justify-between gap-3">
+          <div className="font-serif text-[18px] tracking-[-0.01em] text-[var(--ink)]">
+            Rekentools
+          </div>
+          <div className="text-[13px] text-[var(--muted)]">Laden...</div>
+        </div>
+      </div>
+    </header>
   );
 }
