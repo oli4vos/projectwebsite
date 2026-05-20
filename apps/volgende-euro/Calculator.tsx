@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { DisclosureSection } from "@/components/DisclosureSection";
 import { MobileFieldFlowControls } from "@/components/MobileFieldFlowControls";
 import { ResultRow } from "@/components/ResultRow";
 import { ToolDisclosure } from "@/components/ToolDisclosure";
@@ -700,7 +701,7 @@ function CalculatorContent({
           </div>
         ) : null}
 
-        <ToolDisclosure
+        <DisclosureSection
           title="Hoe rekenen we dit?"
           subtitle="Educatief prioriteitenmodel, geen hard financieel advies."
         >
@@ -712,9 +713,9 @@ function CalculatorContent({
               <p>4) DUO-context: geschat wettelijk maandbedrag circa {formatCurrency(result.duoContext.estimatedStatutoryMonthlyPayment)} bij {result.duoContext.assumedRate.toFixed(2)}%.</p>
             </div>
           ) : null}
-        </ToolDisclosure>
+        </DisclosureSection>
 
-        <ToolDisclosure
+        <DisclosureSection
           title="Welke aannames gebruiken we?"
           subtitle="Centrale constants als basis voor het model."
         >
@@ -725,7 +726,7 @@ function CalculatorContent({
               <p>Status: {result.assumptions.status}</p>
             </div>
           ) : null}
-        </ToolDisclosure>
+        </DisclosureSection>
 
         <ToolDisclosure title="Waarom niet blind aflossen?" subtitle="Aflossen is niet altijd automatisch de beste eerste stap.">
           <p className="text-[13px] leading-[1.65] text-[var(--muted)]">
@@ -742,13 +743,13 @@ function CalculatorContent({
           </p>
         </ToolDisclosure>
 
-        <ToolDisclosure title="Waar moet je op letten?" subtitle="Gebruik dit als prioriteitenhulp en reken daarna door in een verdiepende tool.">
+        <DisclosureSection title="Waar moet je op letten?" subtitle="Gebruik dit als prioriteitenhulp en reken daarna door in een verdiepende tool.">
           <ul className="space-y-2 text-[13px] leading-[1.65] text-[var(--muted)]">
             {(result?.warnings ?? []).map((warning) => (
               <li key={warning}>{warning}</li>
             ))}
           </ul>
-        </ToolDisclosure>
+        </DisclosureSection>
       </section>
     </CalculatorShell>
   );

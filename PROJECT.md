@@ -105,6 +105,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/components/AppRenderer.tsx`: pakt lazy toolcomponent op basis van slug
 - `src/components/ui.tsx`: `Btn`, `BtnLink`, `Pill`, `Logo`, `CategoryDot`
 - `src/components/ToolDisclosure.tsx`: standaard uitklapbare verdiepingssectie voor rekentools
+- `src/components/DisclosureSection.tsx`: lichte presentatie-wrapper rond `ToolDisclosure` voor consistente verdiepingskoppen en spacing
 - `src/app/apps/[slug]/page.tsx`: toont ook manifestmetadata (domeinen, aannames, output/disclaimer/risico) zonder de dashboardflow zwaarder te maken
 - Homepage en dashboard zijn nu keuzehulp-first:
   - primaire start via `volgende-euro`
@@ -265,6 +266,9 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - `Hoe rekenen we dit?`
   - `Welke aannames gebruiken we?`
   - `Waar moet je op letten?`
+- Nieuwe tools gebruiken bij voorkeur `DisclosureSection` voor deze standaardblokken.
+- Tool-specifieke extra disclosures (zoals DUO-checklists of voorbeeldinterpretaties) mogen daarnaast gewoon `ToolDisclosure` blijven gebruiken.
+- `DisclosureSection` is presentatie-only en bevat geen rekenlogica.
 - Tool-specifieke extra verdiepingen mogen blijven (bijv. DUO-checklist of jaarplanning), maar de kernkoppen blijven herkenbaar.
 - Vaste begrippen in verdiepingen (zoals box 3, brutering, wettelijk DUO-bedrag, draagkracht, jaarlijks opnamepercentage) lopen via `src/lib/copy-glossary.ts` waar logisch.
 - Mobile-first is verplicht: elke nieuwe component of tool moet standaard goed werken op mobiel.

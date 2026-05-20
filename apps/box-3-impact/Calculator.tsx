@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { MobileFieldFlowControls } from "@/components/MobileFieldFlowControls";
+import { DisclosureSection } from "@/components/DisclosureSection";
 import { ResultRow } from "@/components/ResultRow";
 import { ToolDisclosure } from "@/components/ToolDisclosure";
 import {
@@ -736,7 +737,7 @@ function CalculatorContent({
           </>
         ) : null}
 
-        <ToolDisclosure
+        <DisclosureSection
           title="Hoe rekenen we dit?"
           subtitle="Deze tool gebruikt centrale tax- en constantslagen."
         >
@@ -747,7 +748,7 @@ function CalculatorContent({
             <p>3) Bereken per jaar de box 3-heffing met de centrale box 3-logica.</p>
             <p>4) Trek de jaarheffing af en gebruik de resterende waarde als start voor het volgende jaar.</p>
           </div>
-        </ToolDisclosure>
+        </DisclosureSection>
 
         <ToolDisclosure
           title="Wanneer welke box 3-heffing komt"
@@ -866,7 +867,7 @@ function CalculatorContent({
           ) : null}
         </ToolDisclosure>
 
-        <ToolDisclosure
+        <DisclosureSection
           title="Welke aannames gebruiken we?"
           subtitle="Aannames komen centraal uit het gekozen belastingjaar."
         >
@@ -881,9 +882,9 @@ function CalculatorContent({
               <p>Forfait schulden: {formatPercent(result.assumptions.deemedReturnDebtsRate)}%</p>
             </div>
           ) : null}
-        </ToolDisclosure>
+        </DisclosureSection>
 
-        <ToolDisclosure
+        <DisclosureSection
           title="Waar moet je op letten?"
           subtitle="Geen officiële aangifteberekening."
         >
@@ -894,7 +895,7 @@ function CalculatorContent({
               ),
             )}
           </ul>
-        </ToolDisclosure>
+        </DisclosureSection>
       </section>
     </CalculatorShell>
   );

@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { DisclosureSection } from "@/components/DisclosureSection";
 import { MobileFieldFlowControls } from "@/components/MobileFieldFlowControls";
 import { ResultRow } from "@/components/ResultRow";
-import { ToolDisclosure } from "@/components/ToolDisclosure";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
 import { Pill } from "@/components/ui";
 import { useMobileFieldFlow } from "@/hooks/useMobileFieldFlow";
@@ -1108,7 +1108,7 @@ function CalculatorContent({
           )}
         </div>
 
-        <ToolDisclosure
+        <DisclosureSection
           title="Hoe rekenen we dit?"
           subtitle="Hieronder zie je ook de gebruikte aannames en waar je op moet letten in de praktijk."
         >
@@ -1602,7 +1602,7 @@ function CalculatorContent({
 
         <InfoList items={result?.warnings ?? []} tone="warning" />
           </div>
-        </ToolDisclosure>
+        </DisclosureSection>
       </section>
     </CalculatorShell>
   );
