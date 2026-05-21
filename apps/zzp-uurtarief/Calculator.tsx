@@ -315,8 +315,9 @@ function CalculatorContent({
   }
 
   return (
-    <CalculatorShell>
-      <section className="order-2 min-w-0 rounded-[1.5rem] border hair bg-white p-6 shadow-paper lg:order-1">
+    <CalculatorShell
+      intro={
+        <>
         <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
           ZZP-planning
         </div>
@@ -327,6 +328,10 @@ function CalculatorContent({
           ZZP-omzet is geen salaris. Deze tool rekent terug welk uurtarief past
           bij je gewenste inkomen, reserveringen en niet-declarabele tijd.
         </p>
+        </>
+      }
+      startActions={
+        <>
 
         {hasRelevantProfileValues ? (
           <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
@@ -351,15 +356,17 @@ function CalculatorContent({
           </div>
         ) : null}
         {submitContextMessage ? (
-          <p className="mt-3 text-[12.5px] text-[var(--muted)]">{submitContextMessage}</p>
+          <p className="text-[12.5px] text-[var(--muted)]">{submitContextMessage}</p>
         ) : null}
         {hasDirtyChanges ? (
-          <p className="mt-3 text-[12.5px] text-[var(--muted)]">
+          <p className="text-[12.5px] text-[var(--muted)]">
             Klik opnieuw op Bereken om de uitkomst te vernieuwen.
           </p>
         ) : null}
-
-        <div className="mt-6 grid gap-5">
+        </>
+      }
+      inputs={
+        <div className="grid gap-5">
           {(
             [
               ["taxYear", "Belastingjaar"],
@@ -402,18 +409,19 @@ function CalculatorContent({
             onComplete={handleCalculate}
           />
 
-          <div className="flex flex-wrap items-center gap-3 border-t border-[var(--hair)] pt-2">
-            <ToolActionButton type="button" onClick={handleCalculate} variant="accent" size="md">
-              {submittedValues && hasDirtyChanges ? "Bereken opnieuw" : "Bereken"}
-            </ToolActionButton>
-            <p className="text-[12px] text-[var(--muted)]">
-              De tool rekent alleen met ingevulde gegevens.
-            </p>
-          </div>
         </div>
-      </section>
-
-      <section className="order-1 min-w-0 space-y-5 lg:order-2">
+      }
+      submitAction={
+        <div className="flex flex-wrap items-center gap-3 border-t border-[var(--hair)] pt-2">
+          <ToolActionButton type="button" onClick={handleCalculate} variant="accent" size="md">
+            {submittedValues && hasDirtyChanges ? "Bereken opnieuw" : "Bereken"}
+          </ToolActionButton>
+          <p className="text-[12px] text-[var(--muted)]">
+            De tool rekent alleen met ingevulde gegevens.
+          </p>
+        </div>
+      }
+      result={
         <div id="tool-result-summary" className="rounded-[1.5rem] bg-[var(--deep)] p-6 text-white shadow-paper-lg">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="text-[11px] uppercase tracking-[0.12em] text-white/55">
@@ -434,7 +442,9 @@ function CalculatorContent({
             </>
           ) : null}
         </div>
-
+      }
+      details={
+        <>
         {result ? (
           <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
             <h3 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
@@ -560,7 +570,8 @@ function CalculatorContent({
             </ul>
           ) : null}
         </DisclosureSection>
-      </section>
-    </CalculatorShell>
+        </>
+      }
+    />
   );
 }
