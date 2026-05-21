@@ -844,7 +844,7 @@ function CalculatorContent({
               <ResultRow
                 label="Eerder schuldenvrij door extra aflossen"
                 value={`${result.duoContext.monthsEarlierDebtFree} maanden (${formatDecimal(result.duoContext.yearsEarlierDebtFree, 1)} jaar)`}
-                sub={`Van ${formatYearMonth(result.duoContext.payoffWithoutExtraDate)} naar ${formatYearMonth(result.duoContext.payoffWithExtraDate)}`}
+                sub={`Van ${formatYearMonth(result.duoContext.payoffWithoutExtraDate)} naar ${formatYearMonth(result.duoContext.payoffWithExtraDate)}. Conclusie: op ${formatYearMonth(result.duoContext.payoffWithExtraDate)} ben je in dit scenario schuldenvrij.`}
               />
             </div>
           ) : null}
