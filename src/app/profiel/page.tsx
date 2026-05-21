@@ -431,6 +431,9 @@ function FieldError({ message }: { message?: string }) {
 }
 
 export default function ProfilePage() {
+  const { profile, hasProfile, saveProfile, clearProfile } = useUserProfile();
+  const [saveMessage, setSaveMessage] = useState("");
+
   if (!ENABLE_PROFILE) {
     return (
       <>
@@ -456,9 +459,6 @@ export default function ProfilePage() {
       </>
     );
   }
-
-  const { profile, hasProfile, saveProfile, clearProfile } = useUserProfile();
-  const [saveMessage, setSaveMessage] = useState("");
   const formKey = profile.updatedAt ?? (hasProfile ? "profile-present" : "profile-empty");
 
   return (

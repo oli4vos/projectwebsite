@@ -7,7 +7,7 @@ import { ToolDisclosure } from "@/components/ToolDisclosure";
 import { ChartContainer, ChartLegend } from "@/components/ChartPrimitives";
 import { AreaChart, getAdaptiveEuroTicks, getAdaptiveYearTicks } from "@/components/charts";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
-import { ToolActionButton, ToolActionLinkButton } from "@/components/tool/ToolActionButton";
+import { ToolActionButton } from "@/components/tool/ToolActionButton";
 import { Pill } from "@/components/ui";
 import { useMobileFieldFlow } from "@/hooks/useMobileFieldFlow";
 import { useSubmittedCalculation } from "@/hooks/useSubmittedCalculation";
@@ -435,9 +435,6 @@ function CalculatorContent({
             <ToolActionButton type="button" onClick={applyExampleValues} variant="secondary" size="sm">
               Start met voorbeeldwaarden
             </ToolActionButton>
-            <ToolActionLinkButton href="/profiel" variant="secondary" size="sm">
-              Start met profielwaarden
-            </ToolActionLinkButton>
           </div>
         ) : null}
         {submitContextMessage ? (

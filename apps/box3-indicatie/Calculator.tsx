@@ -6,7 +6,7 @@ import { FieldError } from "@/components/forms/FieldError";
 import { ResultRow } from "@/components/ResultRow";
 import { ToolDisclosure } from "@/components/ToolDisclosure";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
-import { ToolActionButton, ToolActionLinkButton } from "@/components/tool/ToolActionButton";
+import { ToolActionButton } from "@/components/tool/ToolActionButton";
 import { Pill } from "@/components/ui";
 import { useMobileFieldFlow } from "@/hooks/useMobileFieldFlow";
 import { useUserProfile } from "@/hooks/useUserProfile";
@@ -246,9 +246,6 @@ function CalculatorContent({
             <ToolActionButton type="button" onClick={applyExampleValues} variant="secondary" size="sm">
               Start met voorbeeldwaarden
             </ToolActionButton>
-            <ToolActionLinkButton href="/profiel" variant="secondary" size="sm">
-              Start met profielwaarden
-            </ToolActionLinkButton>
           </div>
         ) : null}
 

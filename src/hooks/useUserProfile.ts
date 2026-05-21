@@ -39,40 +39,38 @@ function subscribeToUserProfile(callback: () => void) {
 }
 
 export function useUserProfile() {
-  if (!ENABLE_PROFILE) {
-    return {
-      profile: defaultUserProfile,
-      isLoaded: true,
-      hasProfile: false,
-      saveProfile: (nextProfile: UserProfile) => nextProfile,
-      mergeProfile: () => defaultUserProfile,
-      clearProfile: () => undefined,
-    };
-  }
-
   const profile = useSyncExternalStore<UserProfile>(
-    subscribeToUserProfile,
-    loadUserProfile,
-    loadUserProfile,
+    ENABLE_PROFILE ? subscribeToUserProfile : () => () => undefined,
+    ENABLE_PROFILE ? loadUserProfile : () => defaultUserProfile,
+    ENABLE_PROFILE ? loadUserProfile : () => defaultUserProfile,
   );
 
   function saveProfile(nextProfile: UserProfile) {
+    if (!ENABLE_PROFILE) {
+      return nextProfile;
+    }
     return saveUserProfile(nextProfile);
   }
 
   function mergeProfile(nextPatch: Partial<UserProfile>) {
+    if (!ENABLE_PROFILE) {
+      return defaultUserProfile;
+    }
     const mergedProfile = mergeProfilePatch(profile, nextPatch);
     return saveProfile(mergedProfile);
   }
 
   function clearProfile() {
+    if (!ENABLE_PROFILE) {
+      return;
+    }
     clearUserProfile();
   }
 
   return {
     profile,
     isLoaded: true,
-    hasProfile: profileHasValues(profile),
+    hasProfile: ENABLE_PROFILE ? profileHasValues(profile) : false,
     saveProfile,
     mergeProfile,
     clearProfile,
