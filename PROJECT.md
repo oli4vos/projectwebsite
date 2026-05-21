@@ -163,6 +163,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `RELEASE_NOTES.md`: release-overzicht met datum + commit + scope
 - `ASSUMPTION_CHANGELOG.md`: expliciet logboek voor wijzigingen in aannames/percentages
 - `INCIDENT_RESPONSE.md`: incidentproces met ernstniveaus, reactietijden en communicatieformat
+- `docs/database/README.md` + `docs/database/supabase-schema.sql`: voorbereid databaseplan en schema voor side-by-side remote variant
 - `src/lib/runtime-monitoring.ts` + `src/components/RuntimeMonitoringBootstrap.tsx`: privacy-first frontend runtime monitoring (error/unhandledrejection), met release-tag en optionele webhook via `NEXT_PUBLIC_MONITORING_WEBHOOK_URL`
 - `src/lib/feature-flags.ts`: centrale flags voor tijdelijk uit/aan zetten van productfunctionaliteit (o.a. profiel en kennisniveau)
 - `FUNCTIONALITY_STATUS.md`: centrale statuslijst met actief/uitgeschakeld/toekomstig + heractivatiestappen
@@ -183,6 +184,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - async `ProfileStoreAsync` als voorbereiding op remote/database.
 - Async store is voorbereid maar nog niet geactiveerd in de UI-flow.
 - Echte database/auth-fase komt later en vereist implementatie van de remote async store zonder local fallback.
+- Databasefase is nu expliciet gedocumenteerd, maar runtime blijft local-first en static-safe.
 
 ## Huidige tools
 
