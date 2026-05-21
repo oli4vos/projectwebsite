@@ -368,6 +368,7 @@ export default function Calculator() {
 
             <ChartContainer
               yearTicks={chartYearTicks}
+              xValues={result.yearlySummary.map((entry) => entry.year)}
               chart={
                 <div className="grid gap-3 sm:grid-cols-[72px_minmax(0,1fr)]">
                   <div className="hidden flex-col justify-between text-right text-[11px] text-[var(--soft)] sm:flex">

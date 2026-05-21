@@ -754,6 +754,7 @@ function CalculatorContent({
                   <div className="min-w-0">
                     <ChartContainer
                       yearTicks={xTicks}
+                      xValues={[0, ...result.horizon.points.map((point) => point.yearIndex)]}
                       chart={
                         <AreaChart
                           width={620}
@@ -876,6 +877,7 @@ function CalculatorContent({
                     <div className="min-w-0">
                       <ChartContainer
                         yearTicks={[0, ...xTicks]}
+                        xValues={[0, ...result.horizon.points.map((point) => point.yearIndex)]}
                         chart={
                           <AreaChart
                             width={620}

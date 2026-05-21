@@ -141,6 +141,7 @@ function TimelineMiniChart({
       <ChartContainer
         className="overflow-x-auto"
         yearTicks={points.map((point) => point.year)}
+        xValues={points.map((point) => point.year)}
         chart={
           <svg
             viewBox={`0 0 ${width} ${height}`}

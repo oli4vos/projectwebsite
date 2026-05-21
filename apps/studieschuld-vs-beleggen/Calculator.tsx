@@ -874,6 +874,7 @@ function CalculatorContent({
                 <div className="min-w-0">
                   <ChartContainer
                     yearTicks={horizonXTicks}
+                    xValues={result.projections.map((point) => point.year)}
                     chart={
                       <AreaChart
                         width={620}

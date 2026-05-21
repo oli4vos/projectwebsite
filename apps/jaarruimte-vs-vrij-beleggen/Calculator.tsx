@@ -857,6 +857,7 @@ function CalculatorContent({
                 <ChartContainer
                   className="overflow-x-auto"
                   yearTicks={getAdaptiveYearTicks(result.horizonYears)}
+                  xValues={result.wealthPlanning.points.map((point) => point.year)}
                   chart={
                     <AreaChart
                       height={220}
