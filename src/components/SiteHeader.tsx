@@ -35,6 +35,21 @@ function categoryHref(category: string) {
   return `/#${toAnchorId(groupTitle, "groep")}`;
 }
 
+function categoryFallbackToolHref(category: string) {
+  const preferredByCategory: Record<string, string[]> = {
+    Schulden: ["studieschuld-vs-beleggen", "hypotheek-impact-studieschuld"],
+    Hypotheek: ["hypotheek-aflossen-vs-beleggen", "annuitair-lineair"],
+    Beleggen: ["box-3-impact", "fire-na-belasting"],
+    Belasting: ["box-3-impact", "jaarruimte-vs-vrij-beleggen"],
+    Werk: ["zzp-uurtarief"],
+    "Persoonlijke financiën": ["volgende-euro"],
+  };
+
+  const preferred = preferredByCategory[category] ?? ["volgende-euro"];
+  const match = preferred.find((slug) => appRegistry.some((app) => app.slug === slug));
+  return `/apps/${match ?? "volgende-euro"}`;
+}
+
 export function SiteHeader() {
   const pathname = usePathname();
   const onHome = pathname === "/";
@@ -75,6 +90,9 @@ export function SiteHeader() {
     };
   }, []);
 
+  const getCategoryLink = (category: string) =>
+    onHome ? categoryHref(category) : categoryFallbackToolHref(category);
+
   return (
     <header className="hair-b sticky top-0 z-20 bg-[rgba(245,241,234,0.78)] backdrop-blur-md">
       <div className="page-shell py-3">
@@ -90,7 +108,7 @@ export function SiteHeader() {
             {headerCategories.map((category) => (
               <Link
                 key={category}
-                href={categoryHref(category)}
+                href={getCategoryLink(category)}
                 className={navClassName()}
               >
                 {category}
@@ -129,7 +147,7 @@ export function SiteHeader() {
               {headerCategories.map((category) => (
                 <Link
                   key={category}
-                  href={categoryHref(category)}
+                  href={getCategoryLink(category)}
                   className={`${navClassName()} shrink-0`}
                 >
                   {category}
@@ -161,7 +179,7 @@ export function SiteHeader() {
               {headerCategories.map((category) => (
                 <Link
                   key={category}
-                  href={categoryHref(category)}
+                  href={getCategoryLink(category)}
                   className={`${navClassName()} shrink-0`}
                 >
                   {category}
