@@ -71,6 +71,16 @@ export const PROFILE_FIELDS_FIRE_NA_BELASTING = [
   "tax.hasFiscalPartner",
 ] as const;
 
+export const PROFILE_FIELDS_PRIVE_BELEGGEN_EINDVERMOGEN = [
+  "savingInvesting.currentSavings",
+  "savingInvesting.monthlyFreeCashflow",
+  "savingInvesting.expectedAnnualReturn",
+  "savingInvesting.investmentHorizonYears",
+  "tax.preferredTaxYear",
+  "tax.hasFiscalPartner",
+  "tax.preferredBox3Method",
+] as const;
+
 export const PROFILE_FIELDS_HYPOTHEEK_AFLOSSEN_VS_BELEGGEN = [
   "income.grossAnnualIncome",
   "housing.mortgageRate",
@@ -187,6 +197,16 @@ type FireNaBelastingDefaults = Partial<{
   hasFiscalPartner: boolean;
   horizonYears: string;
   riskProfile: "conservative" | "neutral" | "offensive";
+}>;
+
+type PriveBeleggenEindvermogenDefaults = Partial<{
+  taxYear: string;
+  hasFiscalPartner: boolean;
+  box3Method: "actual" | "forfaitary";
+  startVermogen: string;
+  maandelijkseInleg: string;
+  verwachtRendementPct: string;
+  horizonJaren: string;
 }>;
 
 type HypotheekAflossenVsBeleggenDefaults = Partial<{
@@ -651,6 +671,61 @@ export function getFireNaBelastingDefaultsFromProfile(
           profile.income?.householdType === "family" ||
           (profile.income?.partnerGrossAnnualIncome ?? 0) > 0,
       );
+  }
+
+  return defaults;
+}
+
+export function getPriveBeleggenEindvermogenDefaultsFromProfile(
+  profile: UserProfile,
+): PriveBeleggenEindvermogenDefaults {
+  const defaults: PriveBeleggenEindvermogenDefaults = {};
+
+  const taxYear = toStringValue(profile.tax?.preferredTaxYear);
+  if (taxYear !== undefined) {
+    defaults.taxYear = taxYear;
+  }
+
+  if (
+    profile.tax?.hasFiscalPartner !== undefined ||
+    profile.income?.householdType !== undefined ||
+    profile.income?.partnerGrossAnnualIncome !== undefined
+  ) {
+    defaults.hasFiscalPartner =
+      profile.tax?.hasFiscalPartner ??
+      Boolean(
+        profile.income?.householdType === "withPartner" ||
+          profile.income?.householdType === "family" ||
+          (profile.income?.partnerGrossAnnualIncome ?? 0) > 0,
+      );
+  }
+
+  if (profile.tax?.preferredBox3Method !== undefined) {
+    defaults.box3Method = profile.tax.preferredBox3Method;
+  }
+
+  const startVermogen = toStringValue(profile.savingInvesting?.currentSavings);
+  if (startVermogen !== undefined) {
+    defaults.startVermogen = startVermogen;
+  }
+
+  const maandelijkseInleg = toStringValue(profile.savingInvesting?.monthlyFreeCashflow);
+  if (maandelijkseInleg !== undefined) {
+    defaults.maandelijkseInleg = maandelijkseInleg;
+  }
+
+  const verwachtRendementPct = toStringValue(
+    profile.savingInvesting?.expectedAnnualReturn,
+  );
+  if (verwachtRendementPct !== undefined) {
+    defaults.verwachtRendementPct = verwachtRendementPct;
+  }
+
+  const horizonJaren = toStringValue(
+    profile.savingInvesting?.investmentHorizonYears,
+  );
+  if (horizonJaren !== undefined) {
+    defaults.horizonJaren = horizonJaren;
   }
 
   return defaults;

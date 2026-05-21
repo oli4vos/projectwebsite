@@ -1,0 +1,27 @@
+{
+  "slug": "prive-beleggen-eindvermogen",
+  "title": "Wat wordt mijn eindvermogen met beleggen?",
+  "description": "Bereken je verwachte eindvermogen bij maandelijks beleggen, inclusief box 3-heffing zodra je boven de vrijstelling uitkomt.",
+  "type": "frontend",
+  "category": "Beleggen",
+  "tags": ["beleggen", "eindvermogen", "box 3", "vermogen", "privé"],
+  "status": "beta",
+  "visibility": "public",
+  "requiredProfileFields": [
+    "savingInvesting.currentSavings",
+    "savingInvesting.monthlyFreeCashflow",
+    "savingInvesting.expectedAnnualReturn",
+    "savingInvesting.investmentHorizonYears",
+    "tax.preferredTaxYear",
+    "tax.hasFiscalPartner",
+    "tax.preferredBox3Method"
+  ],
+  "reasonHint": "Handig als je wilt zien wat periodiek privé beleggen oplevert na box 3 over de jaren.",
+  "assumptionsUsed": ["tax", "box3", "investment"],
+  "calculationDomains": ["investing", "saving", "tax"],
+  "riskLevel": "high",
+  "disclaimerType": "taxIndicative",
+  "outputType": "timeline",
+  "version": "1.0.0",
+  "entry": "Calculator.tsx"
+}
