@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Btn } from "@/components/ui";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { ENABLE_PROFILE } from "@/lib/feature-flags";
 import {
   getDuoSituationLabel,
   getEmploymentTypeLabel,
@@ -430,6 +431,32 @@ function FieldError({ message }: { message?: string }) {
 }
 
 export default function ProfilePage() {
+  if (!ENABLE_PROFILE) {
+    return (
+      <>
+        <SiteHeader />
+        <main
+          id="main-content"
+          className="page-shell min-h-[100dvh] max-w-3xl pb-10 pt-8 lg:pb-14"
+        >
+          <section className="grid gap-4 rounded-[1.5rem] border hair bg-white/80 p-6 shadow-paper">
+            <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
+              Mijn profiel
+            </div>
+            <h1 className="mt-2 font-serif text-[34px] tracking-[-0.02em] text-[var(--ink)]">
+              Profielfunctie staat tijdelijk uit
+            </h1>
+            <p className="text-[14.5px] leading-[1.7] text-[var(--ink-2)]">
+              Deze functie is bewust tijdelijk uitgeschakeld. Je kunt alle tools
+              blijven gebruiken met handmatige invoer of voorbeeldwaarden.
+            </p>
+          </section>
+        </main>
+        <SiteFooter />
+      </>
+    );
+  }
+
   const { profile, hasProfile, saveProfile, clearProfile } = useUserProfile();
   const [saveMessage, setSaveMessage] = useState("");
   const formKey = profile.updatedAt ?? (hasProfile ? "profile-present" : "profile-empty");

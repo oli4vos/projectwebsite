@@ -18,6 +18,7 @@ import {
   getOutputTypeLabel,
   getRiskLevelLabel,
 } from "@/lib/copy-glossary";
+import { ENABLE_PROFILE } from "@/lib/feature-flags";
 import { appRegistry, appRegistryBySlug } from "@/lib/app-registry";
 
 type AppDetailPageProps = {
@@ -197,7 +198,7 @@ export default async function AppDetailPage({ params }: AppDetailPageProps) {
                 </div>
               </div>
             )}
-            {app.requiredProfileFields && app.requiredProfileFields.length > 0 && (
+            {ENABLE_PROFILE && app.requiredProfileFields && app.requiredProfileFields.length > 0 && (
               <div className="mt-4 border-t border-[var(--hair)] pt-4 text-[12.5px] leading-[1.6] text-[var(--muted)]">
                 Voor deze tool kun je basisvelden vooraf invullen in{" "}
                 <Link href="/profiel" className="text-[var(--ink)] underline">

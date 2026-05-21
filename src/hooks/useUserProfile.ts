@@ -1,10 +1,12 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { ENABLE_PROFILE } from "@/lib/feature-flags";
 import {
   USER_PROFILE_STORAGE_KEY,
   USER_PROFILE_STORAGE_EVENT,
   clearUserProfile,
+  defaultUserProfile,
   loadUserProfile,
   mergeProfilePatch,
   profileHasValues,
@@ -37,6 +39,17 @@ function subscribeToUserProfile(callback: () => void) {
 }
 
 export function useUserProfile() {
+  if (!ENABLE_PROFILE) {
+    return {
+      profile: defaultUserProfile,
+      isLoaded: true,
+      hasProfile: false,
+      saveProfile: (nextProfile: UserProfile) => nextProfile,
+      mergeProfile: () => defaultUserProfile,
+      clearProfile: () => undefined,
+    };
+  }
+
   const profile = useSyncExternalStore<UserProfile>(
     subscribeToUserProfile,
     loadUserProfile,

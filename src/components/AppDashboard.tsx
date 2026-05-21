@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo } from "react";
 import type { AppManifest } from "@/lib/app-types";
 import { toAnchorId } from "@/lib/anchor-ids";
+import { ENABLE_PROFILE } from "@/lib/feature-flags";
 import { toolGroups } from "@/lib/tool-groups";
 import { BtnLink } from "@/components/ui";
 import { AppCard } from "./AppCard";
@@ -106,27 +107,33 @@ export function AppDashboard({ apps }: AppDashboardProps) {
         ))}
       </section>
 
-      <section id="persoonlijk">
-        <PersonalRoute apps={apps} />
-      </section>
+      {ENABLE_PROFILE ? (
+        <section id="persoonlijk">
+          <PersonalRoute apps={apps} />
+        </section>
+      ) : null}
 
       <section
         id="aannames"
-        className="grid gap-4 rounded-[1.5rem] border hair bg-white p-6 shadow-paper md:grid-cols-2"
+        className={`grid gap-4 rounded-[1.5rem] border hair bg-white p-6 shadow-paper ${
+          ENABLE_PROFILE ? "md:grid-cols-2" : ""
+        }`}
       >
-        <div>
-          <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
-            Maak het persoonlijker
+        {ENABLE_PROFILE ? (
+          <div>
+            <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
+              Maak het persoonlijker
+            </div>
+            <p className="mt-2 text-[14px] leading-[1.65] text-[var(--ink-2)]">
+              Profiel is optioneel en blijft lokaal in je browser. Tools kunnen daarmee velden voorinvullen.
+            </p>
+            <div className="mt-3">
+              <BtnLink href="/profiel" kind="outline" size="md">
+                Naar profiel
+              </BtnLink>
+            </div>
           </div>
-          <p className="mt-2 text-[14px] leading-[1.65] text-[var(--ink-2)]">
-            Profiel is optioneel en blijft lokaal in je browser. Tools kunnen daarmee velden voorinvullen.
-          </p>
-          <div className="mt-3">
-            <BtnLink href="/profiel" kind="outline" size="md">
-              Naar profiel
-            </BtnLink>
-          </div>
-        </div>
+        ) : null}
         <div>
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
             Controleer aannames

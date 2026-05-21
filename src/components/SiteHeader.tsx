@@ -5,11 +5,12 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { BtnLink, Logo } from "@/components/ui";
 import { toAnchorId } from "@/lib/anchor-ids";
+import { ENABLE_PROFILE } from "@/lib/feature-flags";
 import { toolGroups } from "@/lib/tool-groups";
 
 const navItems = [
   { href: "/#apps", label: "Overzicht" },
-  { href: "/#persoonlijk", label: "Persoonlijk" },
+  ...(ENABLE_PROFILE ? [{ href: "/#persoonlijk", label: "Persoonlijk" as const }] : []),
   { href: "/#aannames", label: "Aannames" },
 ] as const;
 
@@ -91,9 +92,11 @@ export function SiteHeader() {
           </nav>
 
           <div className="hidden items-center gap-2 md:flex">
-            <BtnLink href="/profiel" kind={pathname === "/profiel" ? "outline" : "ghost"} size="sm">
-              Mijn profiel
-            </BtnLink>
+            {ENABLE_PROFILE ? (
+              <BtnLink href="/profiel" kind={pathname === "/profiel" ? "outline" : "ghost"} size="sm">
+                Mijn profiel
+              </BtnLink>
+            ) : null}
             <BtnLink href="/variabelen" kind={pathname === "/variabelen" ? "outline" : "ghost"} size="sm">
               Variabelen
             </BtnLink>
@@ -132,14 +135,16 @@ export function SiteHeader() {
               >
                 Rekentools
               </BtnLink>
-              <BtnLink
-                href="/profiel"
-                kind={pathname === "/profiel" ? "outline" : "ghost"}
-                size="sm"
-                className="min-w-0 flex-1 justify-center"
-              >
-                Mijn profiel
-              </BtnLink>
+              {ENABLE_PROFILE ? (
+                <BtnLink
+                  href="/profiel"
+                  kind={pathname === "/profiel" ? "outline" : "ghost"}
+                  size="sm"
+                  className="min-w-0 flex-1 justify-center"
+                >
+                  Mijn profiel
+                </BtnLink>
+              ) : null}
             </div>
           </>
         ) : (
@@ -166,14 +171,16 @@ export function SiteHeader() {
             </nav>
 
             <div className="mt-3 grid grid-cols-1 gap-2 md:hidden">
-              <BtnLink
-                href="/profiel"
-                kind={pathname === "/profiel" ? "outline" : "ghost"}
-                size="sm"
-                className="w-full justify-center"
-              >
-                Mijn profiel
-              </BtnLink>
+              {ENABLE_PROFILE ? (
+                <BtnLink
+                  href="/profiel"
+                  kind={pathname === "/profiel" ? "outline" : "ghost"}
+                  size="sm"
+                  className="w-full justify-center"
+                >
+                  Mijn profiel
+                </BtnLink>
+              ) : null}
               <BtnLink
                 href="/variabelen"
                 kind={pathname === "/variabelen" ? "outline" : "ghost"}

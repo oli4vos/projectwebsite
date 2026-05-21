@@ -3,6 +3,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { BtnLink } from "@/components/ui";
 import { appRegistry } from "@/lib/app-registry";
+import { ENABLE_PROFILE } from "@/lib/feature-flags";
 
 export default async function HomePage() {
   return (
@@ -27,9 +28,11 @@ export default async function HomePage() {
               <BtnLink href="#apps" kind="primary" size="md">
                 Bekijk rekentools
               </BtnLink>
-              <BtnLink href="/profiel" kind="outline" size="md">
-                Vul profiel in
-              </BtnLink>
+              {ENABLE_PROFILE ? (
+                <BtnLink href="/profiel" kind="outline" size="md">
+                  Vul profiel in
+                </BtnLink>
+              ) : null}
               <BtnLink href="/variabelen" kind="ghost" size="md">
                 Bekijk aannames
               </BtnLink>
