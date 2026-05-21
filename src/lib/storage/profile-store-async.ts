@@ -4,7 +4,7 @@ import type {
   ProfileStoreAsync,
   ProfileStoreResult,
 } from "@/lib/storage/profile-store.types";
-import { createRemoteProfileStoreAsyncStub } from "@/lib/storage/remote-profile-store-async";
+import { createRemoteProfileStoreAsync } from "@/lib/storage/remote-profile-store-async";
 import {
   getConfiguredProfileStorageMode,
   type ProfileStorageMode,
@@ -15,7 +15,7 @@ function resolveProfileStoreAsync(mode: ProfileStorageMode): ProfileStoreAsync {
     return localProfileStoreAsync;
   }
 
-  return createRemoteProfileStoreAsyncStub({
+  return createRemoteProfileStoreAsync({
     mode,
     localStoreAsync: localProfileStoreAsync,
   });
