@@ -144,6 +144,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - GitHub Pages draait als project-site onder `/projectwebsite` (basePath/assetPrefix worden in Actions automatisch gezet)
 - `.github/workflows/ci.yml`: sequentiële CI-checks voor generate/test/lint/typecheck/build
 - `.github/workflows/deploy-pages.yml`: deploy draait pas na succesvolle `CI` (`workflow_run`) op `main`; handmatige deploy via `workflow_dispatch` blijft mogelijk
+- `GO_LIVE_CHECKLIST.md`: vaste release-gate voor juridische copy, CI, aannames, monitoring en export bij browser-only livegang
 
 ## Huidige tools
 
