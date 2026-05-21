@@ -21,6 +21,14 @@ type FormState = {
   interestRatePercent: string;
   loanTermYears: string;
   annualReturnPercent: string;
+  showInvestmentDeepDive: boolean;
+  includeBox3Effect: boolean;
+  taxYear: string;
+  hasFiscalPartner: boolean;
+  box3Method: "actual" | "forfaitary";
+  box3BankDeposits: string;
+  box3InvestmentsAndOtherAssets: string;
+  box3Debts: string;
 };
 
 type ValidationErrors = Partial<Record<keyof FormState, string>>;
@@ -30,6 +38,14 @@ const exampleValues: FormState = {
   interestRatePercent: "3.89",
   loanTermYears: "30",
   annualReturnPercent: "5.5",
+  showInvestmentDeepDive: true,
+  includeBox3Effect: false,
+  taxYear: String(new Date().getFullYear()),
+  hasFiscalPartner: false,
+  box3Method: "actual",
+  box3BankDeposits: "0",
+  box3InvestmentsAndOtherAssets: "0",
+  box3Debts: "0",
 };
 
 const defaults: FormState = {
@@ -37,6 +53,14 @@ const defaults: FormState = {
   interestRatePercent: "",
   loanTermYears: "",
   annualReturnPercent: "",
+  showInvestmentDeepDive: false,
+  includeBox3Effect: false,
+  taxYear: "",
+  hasFiscalPartner: false,
+  box3Method: "actual",
+  box3BankDeposits: "",
+  box3InvestmentsAndOtherAssets: "",
+  box3Debts: "",
 };
 
 function formatCurrency(value: number, maximumFractionDigits = 0) {
@@ -81,12 +105,49 @@ function validate(values: FormState) {
 
   const annualReturnPercent =
     parseOptionalDecimalInput(values.annualReturnPercent) ?? Number.NaN;
-  if (
-    !Number.isFinite(annualReturnPercent) ||
-    annualReturnPercent < 0 ||
-    annualReturnPercent > 20
-  ) {
-    errors.annualReturnPercent = "Gebruik een verwacht rendement tussen 0 en 20 procent.";
+  const taxYear = parseOptionalDecimalInput(values.taxYear);
+  const box3BankDeposits = parseOptionalDecimalInput(values.box3BankDeposits);
+  const box3InvestmentsAndOtherAssets = parseOptionalDecimalInput(
+    values.box3InvestmentsAndOtherAssets,
+  );
+  const box3Debts = parseOptionalDecimalInput(values.box3Debts);
+
+  if (values.showInvestmentDeepDive) {
+    if (
+      !Number.isFinite(annualReturnPercent) ||
+      annualReturnPercent < 0 ||
+      annualReturnPercent > 20
+    ) {
+      errors.annualReturnPercent = "Gebruik een verwacht rendement tussen 0 en 20 procent.";
+    }
+  }
+
+  if (values.showInvestmentDeepDive && values.includeBox3Effect) {
+    if (
+      taxYear === undefined ||
+      !Number.isFinite(taxYear) ||
+      Math.round(taxYear) < 2000 ||
+      Math.round(taxYear) > 2200
+    ) {
+      errors.taxYear = "Gebruik een geldig belastingjaar.";
+    }
+    if (
+      box3BankDeposits === undefined ||
+      !Number.isFinite(box3BankDeposits) ||
+      box3BankDeposits < 0
+    ) {
+      errors.box3BankDeposits = "Gebruik 0 of een hoger bedrag.";
+    }
+    if (
+      box3InvestmentsAndOtherAssets === undefined ||
+      !Number.isFinite(box3InvestmentsAndOtherAssets) ||
+      box3InvestmentsAndOtherAssets < 0
+    ) {
+      errors.box3InvestmentsAndOtherAssets = "Gebruik 0 of een hoger bedrag.";
+    }
+    if (box3Debts === undefined || !Number.isFinite(box3Debts) || box3Debts < 0) {
+      errors.box3Debts = "Gebruik 0 of een hoger bedrag.";
+    }
   }
 
   return {
@@ -97,7 +158,33 @@ function validate(values: FormState) {
             loanAmount,
             interestRatePercent,
             loanTermYears,
-            annualReturnPercent,
+            annualReturnPercent: values.showInvestmentDeepDive ? annualReturnPercent : undefined,
+            includeInvestmentScenario: values.showInvestmentDeepDive,
+            box3EffectEnabled: values.showInvestmentDeepDive && values.includeBox3Effect,
+            taxYear:
+              values.showInvestmentDeepDive && values.includeBox3Effect
+                ? Math.round(taxYear ?? 0)
+                : undefined,
+            hasFiscalPartner:
+              values.showInvestmentDeepDive && values.includeBox3Effect
+                ? values.hasFiscalPartner
+                : undefined,
+            box3Method:
+              values.showInvestmentDeepDive && values.includeBox3Effect
+                ? values.box3Method
+                : undefined,
+            box3BankDeposits:
+              values.showInvestmentDeepDive && values.includeBox3Effect
+                ? (box3BankDeposits ?? 0)
+                : undefined,
+            box3InvestmentsAndOtherAssets:
+              values.showInvestmentDeepDive && values.includeBox3Effect
+                ? (box3InvestmentsAndOtherAssets ?? 0)
+                : undefined,
+            box3Debts:
+              values.showInvestmentDeepDive && values.includeBox3Effect
+                ? (box3Debts ?? 0)
+                : undefined,
           }
         : null,
   };
@@ -118,33 +205,33 @@ export default function Calculator() {
     [parsed],
   );
 
-  const chartSeries = result
+  const chartSeries = result?.investmentScenario
     ? [
         {
           color: "oklch(46% 0.07 232)",
-          points: result.yearlySummary.map((entry) => entry.annuityNettoSum),
+          points: result.investmentScenario.yearly.map((entry) => entry.annuityNettoSum),
         },
         {
           color: "oklch(54% 0.10 152)",
-          points: result.yearlySummary.map((entry) => entry.linearNettoSum),
+          points: result.investmentScenario.yearly.map((entry) => entry.linearNettoSum),
         },
       ]
     : null;
-  const chartYTicks = result
+  const chartYTicks = result?.investmentScenario
     ? getAdaptiveEuroTicks(
         Math.max(
-          ...result.yearlySummary.map((entry) => entry.annuityNettoSum),
-          ...result.yearlySummary.map((entry) => entry.linearNettoSum),
+          ...result.investmentScenario.yearly.map((entry) => entry.annuityNettoSum),
+          ...result.investmentScenario.yearly.map((entry) => entry.linearNettoSum),
         ),
       )
     : [];
-  const lastYear = result?.yearlySummary.at(-1)?.year ?? 0;
+  const lastYear = result?.investmentScenario?.yearly.at(-1)?.year ?? 0;
   const adaptiveYears = getAdaptiveYearTicks(lastYear);
   const chartYearTicks = adaptiveYears
     .filter((year) => year > 0)
-    .filter((year) => result?.yearlySummary.some((entry) => entry.year === year));
+    .filter((year) => result?.investmentScenario?.yearly.some((entry) => entry.year === year));
 
-  function updateField(field: keyof FormState, value: string) {
+  function updateField<K extends keyof FormState>(field: K, value: FormState[K]) {
     setFormValues((current) => ({
       ...current,
       [field]: value,
@@ -235,19 +322,121 @@ export default function Calculator() {
 
           <label className="grid gap-2">
             <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-              Verwacht rendement beleggingspot (%)
+              Verdieping
             </span>
-            <input
-              inputMode="decimal"
-              value={formValues.annualReturnPercent}
-              onChange={(event) =>
-                updateField("annualReturnPercent", event.target.value)
-              }
-              aria-invalid={Boolean(errors.annualReturnPercent)}
-              className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-            />
-            <FieldError message={errors.annualReturnPercent} />
+            <span className="flex items-center gap-3 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[14px] text-[var(--ink)]">
+              <input
+                type="checkbox"
+                checked={formValues.showInvestmentDeepDive}
+                onChange={(event) => updateField("showInvestmentDeepDive", event.target.checked)}
+                className="size-4 accent-[var(--accent)]"
+              />
+              Toon verdieping: netto lastverschil maandelijks beleggen/onttrekken
+            </span>
           </label>
+
+          {formValues.showInvestmentDeepDive ? (
+            <>
+              <label className="grid gap-2">
+                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                  Verwacht rendement beleggingspot (%)
+                </span>
+                <input
+                  inputMode="decimal"
+                  value={formValues.annualReturnPercent}
+                  onChange={(event) =>
+                    updateField("annualReturnPercent", event.target.value)
+                  }
+                  aria-invalid={Boolean(errors.annualReturnPercent)}
+                  className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
+                />
+                <FieldError message={errors.annualReturnPercent} />
+              </label>
+
+              <label className="grid gap-2">
+                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                  Box 3 meenemen (optioneel)
+                </span>
+                <span className="flex items-center gap-3 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[14px] text-[var(--ink)]">
+                  <input
+                    type="checkbox"
+                    checked={formValues.includeBox3Effect}
+                    onChange={(event) => updateField("includeBox3Effect", event.target.checked)}
+                    className="size-4 accent-[var(--accent)]"
+                  />
+                  Neem jaarlijks indicatief box 3-effect mee op de beleggingspot
+                </span>
+              </label>
+
+              {formValues.includeBox3Effect ? (
+                <>
+                  <label className="grid gap-2">
+                    <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                      Belastingjaar
+                    </span>
+                    <input
+                      inputMode="numeric"
+                      value={formValues.taxYear}
+                      onChange={(event) => updateField("taxYear", event.target.value)}
+                      aria-invalid={Boolean(errors.taxYear)}
+                      className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
+                    />
+                    <FieldError message={errors.taxYear} />
+                  </label>
+
+                  <label className="grid gap-2">
+                    <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                      Fiscale partner
+                    </span>
+                    <span className="flex items-center gap-3 text-[14px] text-[var(--ink)]">
+                      <input
+                        type="checkbox"
+                        checked={formValues.hasFiscalPartner}
+                        onChange={(event) => updateField("hasFiscalPartner", event.target.checked)}
+                        className="size-4 accent-[var(--accent)]"
+                      />
+                      Ja
+                    </span>
+                  </label>
+
+                  <label className="grid gap-2">
+                    <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                      Box 3-methode
+                    </span>
+                    <span className="flex items-center gap-3 text-[14px] text-[var(--ink)]">
+                      <input
+                        type="checkbox"
+                        checked={formValues.box3Method === "forfaitary"}
+                        onChange={(event) =>
+                          updateField("box3Method", event.target.checked ? "forfaitary" : "actual")
+                        }
+                        className="size-4 accent-[var(--accent)]"
+                      />
+                      Gebruik vaste percentages (forfaitair)
+                    </span>
+                  </label>
+
+                  <label className="grid gap-2">
+                    <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Box 3 banktegoeden</span>
+                    <input inputMode="decimal" value={formValues.box3BankDeposits} onChange={(event) => updateField("box3BankDeposits", event.target.value)} aria-invalid={Boolean(errors.box3BankDeposits)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
+                    <FieldError message={errors.box3BankDeposits} />
+                  </label>
+
+                  <label className="grid gap-2">
+                    <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Box 3 beleggingen/overige bezittingen</span>
+                    <input inputMode="decimal" value={formValues.box3InvestmentsAndOtherAssets} onChange={(event) => updateField("box3InvestmentsAndOtherAssets", event.target.value)} aria-invalid={Boolean(errors.box3InvestmentsAndOtherAssets)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
+                    <FieldError message={errors.box3InvestmentsAndOtherAssets} />
+                  </label>
+
+                  <label className="grid gap-2">
+                    <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Box 3 schulden</span>
+                    <input inputMode="decimal" value={formValues.box3Debts} onChange={(event) => updateField("box3Debts", event.target.value)} aria-invalid={Boolean(errors.box3Debts)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
+                    <FieldError message={errors.box3Debts} />
+                  </label>
+                </>
+              ) : null}
+            </>
+          ) : null}
         </div>
       }
       submitAction={
@@ -328,26 +517,30 @@ export default function Calculator() {
                 sub="Lagere totale rente over de hele looptijd"
                 accent
               />
-              <ResultRow
-                label="Eindwaarde beleggingspot"
-                value={formatCurrency(result.totals.endPot)}
-                sub={`Maximale stand ${formatCurrency(result.totals.maxPot)}`}
-                accent={result.totals.endPot > 0}
-              />
-              <ResultRow
-                label="Omslagmaand"
-                value={
-                  result.totals.omslagMaand
-                    ? `maand ${result.totals.omslagMaand}`
-                    : "geen omslag"
-                }
-                sub="Eerste maand waarop lineair netto goedkoper wordt"
-              />
+              {result.investmentScenario ? (
+                <>
+                  <ResultRow
+                    label="Eindwaarde beleggingspot"
+                    value={formatCurrency(result.totals.endPot)}
+                    sub={`Maximale stand ${formatCurrency(result.totals.maxPot)}`}
+                    accent={result.totals.endPot > 0}
+                  />
+                  <ResultRow
+                    label="Omslagmaand"
+                    value={
+                      result.totals.omslagMaand
+                        ? `maand ${result.totals.omslagMaand}`
+                        : "geen omslag"
+                    }
+                    sub="Eerste maand waarop lineair netto goedkoper wordt"
+                  />
+                </>
+              ) : null}
             </div>
           ) : null}
         </div>
 
-        {result && chartSeries ? (
+        {result?.investmentScenario && chartSeries ? (
           <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
             <div className="flex items-center justify-between gap-4">
               <div>
@@ -368,7 +561,7 @@ export default function Calculator() {
 
             <ChartContainer
               yearTicks={chartYearTicks}
-              xValues={result.yearlySummary.map((entry) => entry.year)}
+              xValues={result.investmentScenario.yearly.map((entry) => entry.year)}
               chart={
                 <div className="grid gap-3 sm:grid-cols-[72px_minmax(0,1fr)]">
                   <div className="hidden flex-col justify-between text-right text-[11px] text-[var(--soft)] sm:flex">
@@ -385,7 +578,7 @@ export default function Calculator() {
                       height={220}
                       series={chartSeries}
                       yTicks={chartYTicks}
-                      xValues={result.yearlySummary.map((entry) => entry.year)}
+                      xValues={result.investmentScenario.yearly.map((entry) => entry.year)}
                       seriesLabels={["Annuïtair netto", "Lineair netto"]}
                     />
                   </div>
@@ -398,6 +591,23 @@ export default function Calculator() {
                 Y-as: {formatCompactEuro(chartYTicks[0] ?? 0)} tot{" "}
                 {formatCompactEuro(chartYTicks.at(-1) ?? 0)}
               </span>
+            </div>
+          </div>
+        ) : null}
+
+        {result?.investmentScenario ? (
+          <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
+            <h3 className="font-serif text-[22px] tracking-[-0.02em] text-[var(--ink)]">
+              Verdieping: verschil beleggen en later opnemen
+            </h3>
+            <div className="mt-4">
+              <ResultRow label="Eindwaarde beleggingspot" value={formatCurrency(result.investmentScenario.endPotAfterBox3)} accent />
+              <ResultRow label="Totale inleg vanuit netto lastverschil" value={formatCurrency(result.investmentScenario.totalInleg)} />
+              <ResultRow label="Totale onttrekking in duurdere fase" value={formatCurrency(result.investmentScenario.totalOnttrekking)} />
+              <ResultRow label="Totaal rendement" value={formatCurrency(result.investmentScenario.totalRendement)} />
+              {result.investmentScenario.box3EffectEnabled ? (
+                <ResultRow label="Cumulatief extra box 3-effect" value={formatCurrency(result.investmentScenario.totalBox3TaxExtra)} />
+              ) : null}
             </div>
           </div>
         ) : null}
