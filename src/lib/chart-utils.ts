@@ -36,7 +36,8 @@ export function formatChartEuro(value: number | string | undefined | null) {
   return new Intl.NumberFormat("nl-NL", {
     style: "currency",
     currency: "EUR",
-    maximumFractionDigits: 0,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   }).format(numeric);
 }
 

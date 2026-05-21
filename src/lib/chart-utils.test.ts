@@ -19,7 +19,7 @@ describe("chart utils", () => {
   });
 
   it("formats euro values", () => {
-    expect(formatChartEuro(12500)).toBe("€ 12.500");
+    expect(formatChartEuro(12500)).toBe("€ 12.500,00");
   });
 
   it("returns safe euro fallback for invalid values", () => {

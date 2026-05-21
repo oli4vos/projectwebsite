@@ -51,7 +51,7 @@ const exampleValues: FormState = {
   horizonYears: "10",
 };
 
-function formatCurrency(value: number, maximumFractionDigits = 0) {
+function formatCurrency(value: number, maximumFractionDigits = 2) {
   return new Intl.NumberFormat("nl-NL", {
     style: "currency",
     currency: "EUR",
