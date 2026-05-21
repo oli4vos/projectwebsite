@@ -8,6 +8,7 @@ import {
   getAdaptiveYearTicks,
 } from "@/components/charts";
 import { DisclosureSection } from "@/components/DisclosureSection";
+import { FieldError } from "@/components/forms/FieldError";
 import { ResultRow } from "@/components/ResultRow";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
@@ -100,11 +101,6 @@ function validate(values: FormState) {
           }
         : null,
   };
-}
-
-function FieldError({ message }: { message?: string }) {
-  if (!message) return null;
-  return <p className="text-sm text-red-700">{message}</p>;
 }
 
 export default function Calculator() {

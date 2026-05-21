@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { MobileFieldFlowControls } from "@/components/MobileFieldFlowControls";
+import { FieldError } from "@/components/forms/FieldError";
 import { ResultRow } from "@/components/ResultRow";
 import { ToolDisclosure } from "@/components/ToolDisclosure";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
@@ -135,14 +136,6 @@ function validateForm(values: FormState) {
       : null;
 
   return { errors, parsedValues };
-}
-
-function FieldError({ message }: { message?: string }) {
-  if (!message) {
-    return null;
-  }
-
-  return <p className="text-sm text-red-700">{message}</p>;
 }
 
 export default function Calculator() {

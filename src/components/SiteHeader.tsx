@@ -5,7 +5,10 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { BtnLink, Logo } from "@/components/ui";
 import { appRegistry } from "@/lib/app-registry";
-import { toAnchorId } from "@/lib/anchor-ids";
+import {
+  getCategoryFallbackToolHref,
+  getGroupAnchorForCategory,
+} from "@/lib/tool-groups";
 
 const navItems = [
   { href: "/#apps", label: "Overzicht" },
@@ -19,35 +22,6 @@ const headerCategories = Array.from(
 
 function navClassName() {
   return "inline-flex min-h-11 items-center rounded-full px-3 py-2 text-[var(--muted)] transition hover:bg-white/70 hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2";
-}
-
-function categoryHref(category: string) {
-  const categoryToGroupTitle: Record<string, string> = {
-    Schulden: "Studieschuld",
-    Hypotheek: "Wonen",
-    Beleggen: "Sparen & beleggen",
-    Belasting: "Belasting",
-    Werk: "Werk & ZZP",
-    "Persoonlijke financiën": "Persoonlijke financiën",
-  };
-
-  const groupTitle = categoryToGroupTitle[category] ?? "Persoonlijke financiën";
-  return `/#${toAnchorId(groupTitle, "groep")}`;
-}
-
-function categoryFallbackToolHref(category: string) {
-  const preferredByCategory: Record<string, string[]> = {
-    Schulden: ["studieschuld-vs-beleggen", "hypotheek-impact-studieschuld"],
-    Hypotheek: ["hypotheek-aflossen-vs-beleggen", "annuitair-lineair"],
-    Beleggen: ["box-3-impact", "fire-na-belasting"],
-    Belasting: ["box-3-impact", "jaarruimte-vs-vrij-beleggen"],
-    Werk: ["zzp-uurtarief"],
-    "Persoonlijke financiën": ["volgende-euro"],
-  };
-
-  const preferred = preferredByCategory[category] ?? ["volgende-euro"];
-  const match = preferred.find((slug) => appRegistry.some((app) => app.slug === slug));
-  return `/apps/${match ?? "volgende-euro"}`;
 }
 
 export function SiteHeader() {
@@ -91,7 +65,9 @@ export function SiteHeader() {
   }, []);
 
   const getCategoryLink = (category: string) =>
-    onHome ? categoryHref(category) : categoryFallbackToolHref(category);
+    onHome
+      ? `/#${getGroupAnchorForCategory(category)}`
+      : getCategoryFallbackToolHref(category, appRegistry);
 
   return (
     <header className="hair-b sticky top-0 z-20 bg-[rgba(245,241,234,0.78)] backdrop-blur-md">
