@@ -440,7 +440,7 @@ export function calculateBox3ImpactScenario(input: Box3ImpactInput): Box3ImpactR
     warnings: [
       ...base.warnings,
       "Horizon-simulatie is indicatief; regels, forfaits en persoonlijke fiscale situatie kunnen wijzigen.",
-      "Jaarlijkse box 3-heffing wordt in deze simulatie ieder jaar betaald en gaat niet mee in volgende compoundjaren.",
+      "Jaarlijkse box 3-heffing wordt in deze simulatie ieder jaar betaald en telt daarna niet meer mee in verdere groei.",
       "De eindverkoop-vergelijking is een hypothetisch voorbeeld op gerealiseerde winst en is geen weergave van de huidige Nederlandse box 3-systematiek.",
       "Deze tool is indicatief en geen officiële aangifteberekening.",
     ],

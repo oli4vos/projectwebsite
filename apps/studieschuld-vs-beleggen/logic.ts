@@ -343,7 +343,7 @@ function calculateOptionalBox3Scenario(input: {
     yearlyBreakdown,
     warnings: [
       "Box 3-heffing is per jaar indicatief toegepast en direct uit de beleggingspot gehaald.",
-      "Hierdoor groeit betaalde box 3 niet mee in verdere compoundgroei.",
+      "Hierdoor groeit betaalde box 3 daarna niet verder mee.",
       ...(input.box3Method === "actual"
         ? [
             "Methode staat op werkelijk rendement. Dit blijft een vereenvoudigde indicatie en geen officiële aanslagberekening.",

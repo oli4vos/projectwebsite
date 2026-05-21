@@ -652,7 +652,7 @@ function CalculatorContent({
                     }
                     className="size-4 accent-[var(--accent)]"
                   />
-                  Gebruik forfaitair rendement (default = werkelijk rendement)
+                  Gebruik vaste percentages (forfaitair) in plaats van werkelijk rendement
                 </span>
               </label>
 
@@ -942,7 +942,7 @@ function CalculatorContent({
                 value={formatCurrency(
                   result.box3Scenario.cumulativeAdditionalBox3TaxIndicative,
                 )}
-                sub="Jaarlijks betaald uit de beleggingspot, dus niet meegecompounded"
+                sub="Jaarlijks betaald uit de beleggingspot; betaalde belasting groeit daarna niet verder mee"
               />
               <ResultRow
                 label="Netto uitkomst na box 3"

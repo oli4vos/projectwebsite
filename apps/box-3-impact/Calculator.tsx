@@ -658,7 +658,7 @@ function CalculatorContent({
                 {formatCurrency(result.horizon.endNetWorthAfterTax)}.
               </p>
               <p className="mt-2 text-[13px] leading-[1.65] text-white/70">
-                Eindvermogen zonder box 3 (volledige compound):{" "}
+                Eindvermogen zonder jaarlijkse box 3-heffing:{" "}
                 {formatCurrency(result.horizon.endNetWorthWithoutBox3)}.
               </p>
               <p className="mt-2 text-[13px] leading-[1.65] text-white/70">
@@ -737,7 +737,7 @@ function CalculatorContent({
                   </div>
                   <ChartLegend
                     items={[
-                      { label: "Zonder box 3 (full compound)", color: "oklch(45% 0.08 236)" },
+                      { label: "Zonder box 3-heffing", color: "oklch(45% 0.08 236)" },
                       { label: "Met box 3", color: "oklch(62% 0.11 35)" },
                     ]}
                   />
