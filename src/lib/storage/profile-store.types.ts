@@ -10,3 +10,9 @@ export type ProfileStore = {
   saveProfile(profile: UserProfile): ProfileStoreResult<UserProfile>;
   clearProfile(): ProfileStoreResult<null>;
 };
+
+export type ProfileStoreAsync = {
+  loadProfile(): Promise<ProfileStoreResult<UserProfile>>;
+  saveProfile(profile: UserProfile): Promise<ProfileStoreResult<UserProfile>>;
+  clearProfile(): Promise<ProfileStoreResult<null>>;
+};

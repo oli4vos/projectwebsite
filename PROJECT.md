@@ -132,9 +132,13 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/lib/user-profile.ts`: local-first profieltype + sanitizing/normalisatie
 - `src/lib/storage/profile-store.types.ts`: centrale store-interface voor profielopslag (load/save/clear contract)
 - `src/lib/storage/local-profile-store.ts`: huidige localStorage-implementatie achter store-abstraction
+- `src/lib/storage/local-profile-store-instance.ts`: gedeelde local store-instantie voor sync + async adapters
 - `src/lib/storage/profile-store.ts`: centrale store-selectie (nu localStorage) voor hooks/components
 - `src/lib/storage/storage-mode.ts`: opslagmodus-resolver (`local` / `hybrid` / `remote`) via `NEXT_PUBLIC_PROFILE_STORAGE_MODE`
 - `src/lib/storage/remote-profile-store.ts`: voorbereidende remote/hybrid stub met veilige local fallback
+- `src/lib/storage/profile-store-async.ts`: async entrypoint naast sync profielstore (nog niet actief in UI)
+- `src/lib/storage/local-profile-store-async.ts`: async adapter rond de bestaande local store
+- `src/lib/storage/remote-profile-store-async.ts`: async remote/hybrid stub met lokale fallback
 - `src/lib/user-preferences.ts`: local-first voorkeuren voor uitlegdiepte (`basic` / `standard` / `advanced`)
 - `src/lib/profile-tool-mapping.ts`: centrale mapping van profielwaarden naar tool-defaults
 - `src/lib/profile-prefill.ts`: gedeelde helper voor consistente tool-prefill-flow
@@ -174,7 +178,11 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - De actieve implementatie blijft local-first (`local-profile-store`) en gebruikt dezelfde storage key/event als voorheen.
 - Gedrag in de live site blijft gelijk: browser-only opslag, geen server, geen auth, geen sync.
 - Deze laag maakt een latere database-backed store mogelijk achter feature flag, zonder directe UI- of rekengedragswijziging.
-- Echte database/auth-fase komt later en vereist waarschijnlijk async store-contracten; dat is bewust nog niet geactiveerd.
+- Er bestaan nu twee contracten:
+  - sync `ProfileStore` voor de huidige live flow (`useUserProfile`);
+  - async `ProfileStoreAsync` als voorbereiding op remote/database.
+- Async store is voorbereid maar nog niet geactiveerd in de UI-flow.
+- Echte database/auth-fase komt later en vereist implementatie van de remote async store zonder local fallback.
 
 ## Huidige tools
 
