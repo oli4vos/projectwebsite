@@ -140,6 +140,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/lib/storage/local-profile-store-async.ts`: async adapter rond de bestaande local store
 - `src/lib/storage/remote-profile-store-async.ts`: async remote/hybrid stub met lokale fallback
 - `src/lib/supabase/config.ts` + `src/lib/supabase/browser-client.ts`: optionele browser-safe Supabase configuratie (no-op zonder env vars)
+- `src/lib/auth/auth-session.ts` + `src/lib/auth/*.ts`: optioneel auth-session contract met veilige unauthenticated fallback
 - `.env.example`: publieke voorbeeldvariabelen voor storage mode en optionele Supabase clientconfig
 - `src/lib/user-preferences.ts`: local-first voorkeuren voor uitlegdiepte (`basic` / `standard` / `advanced`)
 - `src/lib/profile-tool-mapping.ts`: centrale mapping van profielwaarden naar tool-defaults
@@ -187,6 +188,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - Async store is voorbereid maar nog niet geactiveerd in de UI-flow.
 - Echte database/auth-fase komt later en vereist implementatie van de remote async store zonder local fallback.
 - Supabase is in deze fase optioneel: zonder `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` blijft runtime volledig local/no-op.
+- Auth is voorbereid maar niet actief als verplichte flow; zonder account blijft de site volledig bruikbaar.
 - Databasefase is nu expliciet gedocumenteerd, maar runtime blijft local-first en static-safe.
 
 ## Huidige tools
