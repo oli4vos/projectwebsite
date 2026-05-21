@@ -23,6 +23,8 @@
   --text-lead: clamp(1.05rem, 1rem + 0.35vw, 1.25rem);
   --text-h1: clamp(2rem, 1.4rem + 3vw, 4.5rem);
   --text-h2: clamp(1.5rem, 1.2rem + 1.4vw, 2.75rem);
+  --density-scale: 1;
+  --space-scale: 1;
 }
 
 @theme inline {
@@ -63,7 +65,7 @@ body {
     linear-gradient(180deg, var(--paper) 0%, #f2ede4 100%);
   color: var(--ink);
   font-family: var(--font-ui), system-ui, sans-serif;
-  font-size: var(--text-body);
+  font-size: calc(var(--text-body) * var(--density-scale));
   line-height: 1.6;
   font-feature-settings: "ss01", "cv11";
   text-rendering: optimizeLegibility;
@@ -192,21 +194,73 @@ input::placeholder {
 }
 
 .text-fluid-lead {
-  font-size: var(--text-lead);
+  font-size: calc(var(--text-lead) * var(--density-scale));
 }
 
 .text-fluid-h1 {
-  font-size: var(--text-h1);
+  font-size: calc(var(--text-h1) * var(--density-scale));
   line-height: 1.04;
 }
 
 .text-fluid-h2 {
-  font-size: var(--text-h2);
+  font-size: calc(var(--text-h2) * var(--density-scale));
   line-height: 1.12;
 }
 
 .page-shell {
   margin-inline: auto;
   width: min(100%, 80rem);
-  padding-inline: clamp(1rem, 1.8vw, 2.5rem);
+  padding-inline: calc(clamp(1rem, 1.8vw, 2.5rem) * var(--space-scale));
+}
+
+/* Responsive density layer: keeps content readable in split-screen and short viewports */
+@media (max-width: 1280px) {
+  :root {
+    --density-scale: 0.98;
+    --space-scale: 0.96;
+  }
+}
+
+@media (max-width: 1080px) {
+  :root {
+    --density-scale: 0.95;
+    --space-scale: 0.92;
+  }
+}
+
+@media (max-width: 900px) {
+  :root {
+    --density-scale: 0.93;
+    --space-scale: 0.9;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --density-scale: 1;
+    --space-scale: 1;
+  }
+}
+
+/* Laptop split-screen / low-height windows */
+@media (max-height: 820px) and (min-width: 769px) {
+  :root {
+    --density-scale: 0.94;
+    --space-scale: 0.9;
+  }
+}
+
+@media (max-height: 700px) and (min-width: 769px) {
+  :root {
+    --density-scale: 0.9;
+    --space-scale: 0.86;
+  }
+}
+
+/* Keep native form controls from overflowing in narrow columns */
+input,
+select,
+textarea,
+button {
+  max-width: 100%;
 }
