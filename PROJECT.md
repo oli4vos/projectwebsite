@@ -145,6 +145,8 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `.github/workflows/ci.yml`: sequentiële CI-checks voor generate/test/lint/typecheck/build
 - `.github/workflows/deploy-pages.yml`: deploy draait pas na succesvolle `CI` (`workflow_run`) op `main`; handmatige deploy via `workflow_dispatch` blijft mogelijk
 - `GO_LIVE_CHECKLIST.md`: vaste release-gate voor juridische copy, CI, aannames, monitoring en export bij browser-only livegang
+- `RELEASE_NOTES.md`: release-overzicht met datum + commit + scope
+- `ASSUMPTION_CHANGELOG.md`: expliciet logboek voor wijzigingen in aannames/percentages
 
 ## Huidige tools
 
