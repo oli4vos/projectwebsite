@@ -4,8 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { BtnLink, Logo } from "@/components/ui";
-import { appRegistry } from "@/lib/app-registry";
-import { getGroupAnchorForCategory } from "@/lib/tool-groups";
+import { toAnchorId } from "@/lib/anchor-ids";
+import { toolGroups } from "@/lib/tool-groups";
 
 const navItems = [
   { href: "/#apps", label: "Overzicht" },
@@ -13,9 +13,10 @@ const navItems = [
   { href: "/#aannames", label: "Aannames" },
 ] as const;
 
-const headerCategories = Array.from(
-  new Set(appRegistry.map((app) => app.category)),
-);
+const headerCategories = toolGroups.map((group) => ({
+  label: group.title,
+  href: `/#${toAnchorId(group.title, "groep")}`,
+}));
 
 function navClassName() {
   return "inline-flex min-h-11 items-center rounded-full px-3 py-2 text-[var(--muted)] transition hover:bg-white/70 hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2";
@@ -61,9 +62,6 @@ export function SiteHeader() {
     };
   }, []);
 
-  const getCategoryLink = (category: string) =>
-    `/#${getGroupAnchorForCategory(category)}`;
-
   return (
     <header className="hair-b sticky top-0 z-20 bg-[rgba(245,241,234,0.78)] backdrop-blur-md">
       <div className="page-shell py-3">
@@ -78,11 +76,11 @@ export function SiteHeader() {
           <nav className="hidden items-center gap-2 text-[13.5px] md:flex">
             {headerCategories.map((category) => (
               <Link
-                key={category}
-                href={getCategoryLink(category)}
+                key={category.label}
+                href={category.href}
                 className={navClassName()}
               >
-                {category}
+                {category.label}
               </Link>
             ))}
             {navItems.map((item) => (
@@ -117,11 +115,11 @@ export function SiteHeader() {
             <nav className="mt-3 flex min-h-11 items-center gap-2 overflow-x-auto pb-1 text-[13.5px] md:hidden">
               {headerCategories.map((category) => (
                 <Link
-                  key={category}
-                  href={getCategoryLink(category)}
+                  key={category.label}
+                  href={category.href}
                   className={`${navClassName()} shrink-0`}
                 >
-                  {category}
+                  {category.label}
                 </Link>
               ))}
             </nav>
@@ -149,11 +147,11 @@ export function SiteHeader() {
             <nav className="mt-3 flex min-h-11 items-center gap-2 overflow-x-auto pb-1 text-[13.5px] md:hidden">
               {headerCategories.map((category) => (
                 <Link
-                  key={category}
-                  href={getCategoryLink(category)}
+                  key={category.label}
+                  href={category.href}
                   className={`${navClassName()} shrink-0`}
                 >
-                  {category}
+                  {category.label}
                 </Link>
               ))}
               {navItems.map((item) => (
