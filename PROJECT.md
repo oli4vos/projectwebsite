@@ -147,6 +147,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `GO_LIVE_CHECKLIST.md`: vaste release-gate voor juridische copy, CI, aannames, monitoring en export bij browser-only livegang
 - `RELEASE_NOTES.md`: release-overzicht met datum + commit + scope
 - `ASSUMPTION_CHANGELOG.md`: expliciet logboek voor wijzigingen in aannames/percentages
+- `src/lib/runtime-monitoring.ts` + `src/components/RuntimeMonitoringBootstrap.tsx`: privacy-first frontend runtime monitoring (error/unhandledrejection), met release-tag en optionele webhook via `NEXT_PUBLIC_MONITORING_WEBHOOK_URL`
 
 ## Huidige tools
 
