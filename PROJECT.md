@@ -129,7 +129,10 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/lib/app-types.ts`: manifest-typen
 - `src/lib/categories.ts`: mapping van categorie/slug naar visueel category-type
 - `src/lib/market.ts`: homepage-marktcontext met externe fetches en fallbacks
-- `src/lib/user-profile.ts`: local-first profieltype, sanitizing en localStorage helpers
+- `src/lib/user-profile.ts`: local-first profieltype + sanitizing/normalisatie
+- `src/lib/storage/profile-store.types.ts`: centrale store-interface voor profielopslag (load/save/clear contract)
+- `src/lib/storage/local-profile-store.ts`: huidige localStorage-implementatie achter store-abstraction
+- `src/lib/storage/profile-store.ts`: centrale store-selectie (nu localStorage) voor hooks/components
 - `src/lib/user-preferences.ts`: local-first voorkeuren voor uitlegdiepte (`basic` / `standard` / `advanced`)
 - `src/lib/profile-tool-mapping.ts`: centrale mapping van profielwaarden naar tool-defaults
 - `src/lib/profile-prefill.ts`: gedeelde helper voor consistente tool-prefill-flow
@@ -157,6 +160,13 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/lib/runtime-monitoring.ts` + `src/components/RuntimeMonitoringBootstrap.tsx`: privacy-first frontend runtime monitoring (error/unhandledrejection), met release-tag en optionele webhook via `NEXT_PUBLIC_MONITORING_WEBHOOK_URL`
 - `src/lib/feature-flags.ts`: centrale flags voor tijdelijk uit/aan zetten van productfunctionaliteit (o.a. profiel en kennisniveau)
 - `FUNCTIONALITY_STATUS.md`: centrale statuslijst met actief/uitgeschakeld/toekomstig + heractivatiestappen
+
+### Profielopslag (voorbereid op databasevariant)
+
+- Profielopslag loopt nu via een store-abstraction (`ProfileStore`), niet meer direct vanuit de hook naar `localStorage`.
+- De actieve implementatie blijft local-first (`local-profile-store`) en gebruikt dezelfde storage key/event als voorheen.
+- Gedrag in de live site blijft gelijk: browser-only opslag, geen server, geen auth, geen sync.
+- Deze laag maakt een latere database-backed store mogelijk achter feature flag, zonder directe UI- of rekengedragswijziging.
 
 ## Huidige tools
 

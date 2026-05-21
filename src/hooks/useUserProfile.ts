@@ -5,14 +5,16 @@ import { ENABLE_PROFILE } from "@/lib/feature-flags";
 import {
   USER_PROFILE_STORAGE_KEY,
   USER_PROFILE_STORAGE_EVENT,
-  clearUserProfile,
   defaultUserProfile,
-  loadUserProfile,
   mergeProfilePatch,
   profileHasValues,
-  saveUserProfile,
   type UserProfile,
 } from "@/lib/user-profile";
+import {
+  clearUserProfileFromStore,
+  loadUserProfileFromStore,
+  saveUserProfileToStore,
+} from "@/lib/storage/profile-store";
 
 function subscribeToUserProfile(callback: () => void) {
   if (typeof window === "undefined") {
@@ -41,15 +43,15 @@ function subscribeToUserProfile(callback: () => void) {
 export function useUserProfile() {
   const profile = useSyncExternalStore<UserProfile>(
     ENABLE_PROFILE ? subscribeToUserProfile : () => () => undefined,
-    ENABLE_PROFILE ? loadUserProfile : () => defaultUserProfile,
-    ENABLE_PROFILE ? loadUserProfile : () => defaultUserProfile,
+    ENABLE_PROFILE ? loadUserProfileFromStore : () => defaultUserProfile,
+    ENABLE_PROFILE ? loadUserProfileFromStore : () => defaultUserProfile,
   );
 
   function saveProfile(nextProfile: UserProfile) {
     if (!ENABLE_PROFILE) {
       return nextProfile;
     }
-    return saveUserProfile(nextProfile);
+    return saveUserProfileToStore(nextProfile);
   }
 
   function mergeProfile(nextPatch: Partial<UserProfile>) {
@@ -64,7 +66,7 @@ export function useUserProfile() {
     if (!ENABLE_PROFILE) {
       return;
     }
-    clearUserProfile();
+    clearUserProfileFromStore();
   }
 
   return {
