@@ -148,6 +148,10 @@ function roundMoney(value: number | undefined) {
   if (!Number.isFinite(value)) return 0;
   return Math.max(Math.round(value as number), 0);
 }
+function roundRate(value: number | undefined) {
+  if (!Number.isFinite(value)) return 0;
+  return Math.max(Math.round((value as number) * 100) / 100, 0);
+}
 function clampScore(value: number) {
   if (!Number.isFinite(value)) return 0;
   return Math.min(Math.max(Math.round(value), 0), 100);
@@ -162,6 +166,11 @@ function getRiskAdjustment(riskProfile: RiskProfile | undefined) {
   if (riskProfile === "conservative") return { investing: -10, pension: 4 };
   if (riskProfile === "offensive") return { investing: 10, pension: -2 };
   return { investing: 0, pension: 0 };
+}
+function getRiskReturnFactor(riskProfile: RiskProfile | undefined) {
+  if (riskProfile === "offensive") return 1;
+  if (riskProfile === "conservative") return 0.5;
+  return 0.8;
 }
 function byScoreDesc(a: Candidate, b: Candidate) {
   if (b.score !== a.score) return b.score - a.score;
@@ -195,6 +204,8 @@ export function calculateVolgendeEuroPriorities(input: VolgendeEuroInput): Volge
   const targetHomePrice = roundMoney(sanitizeMoney(input.targetHomePrice));
   const ownFunds = roundMoney(sanitizeMoney(input.ownFunds));
   const riskAdjustment = getRiskAdjustment(riskProfile);
+  const riskReturnFactor = getRiskReturnFactor(riskProfile);
+  const adjustedExpectedReturn = roundRate(expectedAnnualReturn * riskReturnFactor);
 
   const estimatedStatutoryMonthlyPayment =
     studentDebtAmount > 0
@@ -265,7 +276,11 @@ export function calculateVolgendeEuroPriorities(input: VolgendeEuroInput): Volge
   const debtAmountGiven = hasValue(input.expensiveDebtAmount);
   if (hasExpensiveDebt) {
     if (debtRateGiven || debtAmountGiven) {
-      const score = clampScore(84 + (expensiveDebtRate >= 8 ? 10 : 0));
+      const debtOutrunsReturn =
+        hasValue(input.expectedAnnualReturn) && expensiveDebtRate > adjustedExpectedReturn;
+      const score = clampScore(
+        debtOutrunsReturn ? 99 : 84 + (expensiveDebtRate >= 8 ? 10 : 0),
+      );
       candidates.push({
         key: "expensiveDebt",
         title: TITLES.expensiveDebt,
@@ -276,8 +291,12 @@ export function calculateVolgendeEuroPriorities(input: VolgendeEuroInput): Volge
         targetAmount: expensiveDebtAmount > 0 ? 0 : undefined,
         currentAmount: expensiveDebtAmount > 0 ? expensiveDebtAmount : undefined,
         actionLabel: "Los je dure schuld af tot €0",
-        whyThisStep: `Dure schuld met ${expensiveDebtRate.toFixed(1)}% rente is een zekere kostenpost.`,
-        whyBeforeNext: "Deze rente stopt direct als je aflost; dat effect is vaak zekerder dan verwacht beleggingsrendement.",
+        whyThisStep: debtOutrunsReturn
+          ? `Je schuld-rente (${expensiveDebtRate.toFixed(1)}%) ligt boven je risicogecorrigeerde rendement (${adjustedExpectedReturn.toFixed(1)}%). Dan is aflossen nu logischer dan beleggen.`
+          : `Dure schuld met ${expensiveDebtRate.toFixed(1)}% rente is een zekere kostenpost.`,
+        whyBeforeNext: debtOutrunsReturn
+          ? "Als schuld-rente hoger ligt dan verwacht rendement, wint aflossen meestal direct."
+          : "Deze rente stopt direct als je aflost; dat effect is vaak zekerder dan verwacht beleggingsrendement.",
         nextTrigger: "Ga door naar volgende stap zodra deze schuld is afgebouwd.",
       });
       if (!(expensiveDebtAmount > 0)) {
@@ -301,7 +320,13 @@ export function calculateVolgendeEuroPriorities(input: VolgendeEuroInput): Volge
 
   if (hasValue(input.studentDebtAmount)) {
     if (studentDebtAmount > 0) {
-      const score = clampScore(44 + (duoRate >= 4 ? 10 : duoRate <= 2.5 ? -8 : 0) + (hasHousingGoal ? 6 : 0));
+      const debtOutrunsReturn =
+        hasValue(input.expectedAnnualReturn) && duoRate > adjustedExpectedReturn;
+      const score = clampScore(
+        debtOutrunsReturn
+          ? 95
+          : 44 + (duoRate >= 4 ? 10 : duoRate <= 2.5 ? -8 : 0) + (hasHousingGoal ? 6 : 0),
+      );
       candidates.push({
         key: "studentDebtExtra",
         title: TITLES.studentDebtExtra,
@@ -309,11 +334,15 @@ export function calculateVolgendeEuroPriorities(input: VolgendeEuroInput): Volge
         applicability: "relevant",
         currentAmount: studentDebtAmount,
         actionLabel: "Overweeg extra aflossen boven je verplichte DUO-bedrag",
-        whyThisStep:
+        whyThisStep: debtOutrunsReturn
+          ? `Je DUO-rente (${duoRate.toFixed(2)}%) ligt boven je risicogecorrigeerde rendement (${adjustedExpectedReturn.toFixed(2)}%). Dan is extra aflossen meestal logischer dan beleggen.`
+          :
           duoRate <= 2.5
             ? `Bij lage DUO-rente (${duoRate.toFixed(2)}%) is extra aflossen niet automatisch de eerste stap.`
             : `Met DUO-rente van ${duoRate.toFixed(2)}% kan extra aflossen relevanter worden.`,
-        whyBeforeNext: "Je verplichte DUO-betaling loopt sowieso door; de keuze gaat alleen over vrijwillig extra aflossen.",
+        whyBeforeNext: debtOutrunsReturn
+          ? "Bij hogere schuld-rente dan verwacht rendement is eerst aflossen financieel vaak sterker."
+          : "Je verplichte DUO-betaling loopt sowieso door; de keuze gaat alleen over vrijwillig extra aflossen.",
         nextTrigger: `Je indicatieve wettelijke DUO-bedrag is ongeveer €${roundMoney(estimatedStatutoryMonthlyPayment).toLocaleString("nl-NL")} per maand.`,
       });
     }
@@ -518,6 +547,7 @@ export function calculateVolgendeEuroPriorities(input: VolgendeEuroInput): Volge
     warnings: [
       "Deze beslis-tool is educatief en geeft geen persoonlijk financieel advies.",
       "Gebruik dit stappenplan als startpunt en reken belangrijke keuzes daarna door in de verdiepende tools.",
+      `Rendementscorrectie voor vergelijking: offensief 100%, neutraal 80%, defensief 50% (hier gebruikt: ${adjustedExpectedReturn.toFixed(2)}%).`,
     ],
   };
 }

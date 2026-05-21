@@ -264,7 +264,7 @@ function CalculatorContent({ initialValues, hasRelevantProfileValues, profilePat
   }
 
   const result = submittedResult;
-  const relevantTopThree = result?.topThree ?? [];
+  const relevantTopSteps = result?.topThree ?? [];
   const insufficient = (result?.priorities ?? []).filter((p) => p.applicability !== "relevant");
 
   const intro = (
@@ -339,11 +339,11 @@ function CalculatorContent({ initialValues, hasRelevantProfileValues, profilePat
 
       {result?.topRecommendation ? (
         <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
-          <h3 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">Top 3 relevante stappen</h3>
+          <h3 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">Volgorde van relevante stappen</h3>
           <div className="mt-4 space-y-3">
-            {relevantTopThree.map((option, index) => (
+            {relevantTopSteps.map((option, index) => (
               <div key={option.key} className="rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3">
-                <div className="font-medium text-[var(--ink)]">{index + 1}. {option.label}</div>
+                <div className="font-medium text-[var(--ink)]">#{index + 1} {option.label}</div>
                 <p className="mt-1 text-[13px] leading-[1.6] text-[var(--muted)]">{option.reason}</p>
               </div>
             ))}
@@ -394,7 +394,8 @@ function CalculatorContent({ initialValues, hasRelevantProfileValues, profilePat
           <p>1) We nemen alleen stappen mee waarvoor je genoeg gegevens invult.</p>
           <p>2) We tonen geen harde aanbeveling als relevante input ontbreekt.</p>
           <p>3) Je verplichte DUO-bedrag blijft altijd context; extra aflossen is de keuze erbovenop.</p>
-          {result ? <p>4) Indicatief wettelijk DUO-bedrag: {formatCurrency(result.duoContext.estimatedStatutoryMonthlyPayment)} per maand.</p> : null}
+          <p>4) Voor de vergelijking corrigeren we verwacht rendement op risicoprofiel: offensief 100%, neutraal 80%, defensief 50%.</p>
+          {result ? <p>5) Indicatief wettelijk DUO-bedrag: {formatCurrency(result.duoContext.estimatedStatutoryMonthlyPayment)} per maand.</p> : null}
         </div>
       </DisclosureSection>
 

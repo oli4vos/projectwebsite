@@ -55,7 +55,7 @@ describe("calculateVolgendeEuroPriorities", () => {
       expect(buffer?.currentAmount).toBe(1000);
     });
 
-    it("allocates the available amount across buffer and expensive debt in order", () => {
+    it("allocates the available amount across expensive debt and buffer when debt outpaces return", () => {
       const result = calculateVolgendeEuroPriorities({
         extraAmount: 15000,
         currentBuffer: 1000,
@@ -68,12 +68,12 @@ describe("calculateVolgendeEuroPriorities", () => {
       });
       const buffer = getStep(result, "buffer");
       const debt = getStep(result, "expensiveDebt");
-      expectStepBefore(result, "buffer", "expensiveDebt");
+      expectStepBefore(result, "expensiveDebt", "buffer");
       expectStepBefore(result, "expensiveDebt", "freeInvesting");
-      expect(buffer?.allocatedAmount).toBe(9000);
-      expect(buffer?.remainingAfterStep).toBe(6000);
       expect(debt?.allocatedAmount).toBe(6000);
-      expect(debt?.remainingAfterStep).toBe(0);
+      expect(debt?.remainingAfterStep).toBe(9000);
+      expect(buffer?.allocatedAmount).toBe(9000);
+      expect(buffer?.remainingAfterStep).toBe(0);
     });
 
     it("puts expensive debt before investing when interest is high and buffer is sufficient", () => {
@@ -90,6 +90,48 @@ describe("calculateVolgendeEuroPriorities", () => {
       });
       expectStepBefore(result, "expensiveDebt", "freeInvesting");
       expect(getStep(result, "expensiveDebt")?.whyThisStep.toLowerCase()).toMatch(/rente|schuld/);
+    });
+
+    it("puts student debt first when duo rate is above risk-adjusted expected return", () => {
+      const result = calculateVolgendeEuroPriorities({
+        extraAmount: 1000,
+        currentBuffer: 20000,
+        targetBuffer: 12000,
+        studentDebtAmount: 30000,
+        duoRate: 7,
+        expectedAnnualReturn: 6,
+        horizonYears: 20,
+        riskProfile: "neutral",
+      });
+      expect(result.priorityPlan[0]?.key).toBe("studentDebtExtra");
+      expect(getStep(result, "studentDebtExtra")?.whyThisStep.toLowerCase()).toMatch(
+        /risicogecorrigeerde rendement/,
+      );
+    });
+
+    it("applies risk-profile correction in debt-vs-return comparison", () => {
+      const conservative = calculateVolgendeEuroPriorities({
+        extraAmount: 1000,
+        currentBuffer: 20000,
+        targetBuffer: 12000,
+        studentDebtAmount: 20000,
+        duoRate: 5,
+        expectedAnnualReturn: 6,
+        horizonYears: 20,
+        riskProfile: "conservative",
+      });
+      const offensive = calculateVolgendeEuroPriorities({
+        extraAmount: 1000,
+        currentBuffer: 20000,
+        targetBuffer: 12000,
+        studentDebtAmount: 20000,
+        duoRate: 5,
+        expectedAnnualReturn: 6,
+        horizonYears: 20,
+        riskProfile: "offensive",
+      });
+      expect(conservative.priorityPlan[0]?.key).toBe("studentDebtExtra");
+      expect(offensive.priorityPlan[0]?.key).not.toBe("studentDebtExtra");
     });
 
     it("puts investing higher when buffer is sufficient, debt is absent and horizon is long", () => {
@@ -311,6 +353,15 @@ describe("calculateVolgendeEuroPriorities", () => {
       expect(result.topThree.length).toBeGreaterThan(0);
       expect(result.topThree.every((item: TestPriority) => item.applicability === "relevant")).toBe(true);
       expect(result.topThree.length).toBeLessThanOrEqual(3);
+    });
+
+    it("returns topThree with available relevant count when fewer than three items exist", () => {
+      const result = calculateVolgendeEuroPriorities({
+        extraAmount: 1000,
+        currentBuffer: 1000,
+        targetBuffer: 5000,
+      });
+      expect(result.topThree.length).toBe(1);
     });
   });
 });
