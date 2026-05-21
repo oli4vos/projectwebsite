@@ -15,9 +15,12 @@ import { calculateMortgageDeductionAbolitionImpact } from "./logic";
 
 type FormState = {
   taxYear: string;
+  firstMortgageYear: string;
   taxableIncome: string;
   remainingMortgageDebt: string;
   mortgageRatePercent: string;
+  mortgageType: "annuity" | "linear" | "interestOnly";
+  remainingMortgageTermYears: string;
   annualMortgageInterestOverride: string;
   horizonYears: string;
 };
@@ -26,18 +29,24 @@ type ValidationErrors = Partial<Record<keyof FormState, string>>;
 
 const defaultValues: FormState = {
   taxYear: String(getDefaultFinancialYear()),
+  firstMortgageYear: String(getDefaultFinancialYear()),
   taxableIncome: "",
   remainingMortgageDebt: "",
   mortgageRatePercent: "",
+  mortgageType: "annuity",
+  remainingMortgageTermYears: "30",
   annualMortgageInterestOverride: "",
   horizonYears: "10",
 };
 
 const exampleValues: FormState = {
   taxYear: String(getDefaultFinancialYear()),
+  firstMortgageYear: "2020",
   taxableIncome: "70000",
   remainingMortgageDebt: "350000",
   mortgageRatePercent: "4.0",
+  mortgageType: "annuity",
+  remainingMortgageTermYears: "30",
   annualMortgageInterestOverride: "",
   horizonYears: "10",
 };
@@ -57,14 +66,24 @@ function parseNumber(value: string) {
 function validate(values: FormState) {
   const errors: ValidationErrors = {};
   const taxYear = parseNumber(values.taxYear);
+  const firstMortgageYear = parseNumber(values.firstMortgageYear);
   const taxableIncome = parseNumber(values.taxableIncome);
   const remainingMortgageDebt = parseNumber(values.remainingMortgageDebt);
   const mortgageRatePercent = parseNumber(values.mortgageRatePercent);
+  const remainingMortgageTermYears = parseNumber(values.remainingMortgageTermYears);
   const annualMortgageInterestOverride = parseNumber(values.annualMortgageInterestOverride);
   const horizonYears = parseNumber(values.horizonYears);
 
   if (taxYear === undefined || !Number.isFinite(taxYear) || taxYear < 2000 || taxYear > 2200) {
     errors.taxYear = "Gebruik een geldig belastingjaar.";
+  }
+  if (
+    firstMortgageYear === undefined ||
+    !Number.isFinite(firstMortgageYear) ||
+    firstMortgageYear < 1980 ||
+    firstMortgageYear > 2200
+  ) {
+    errors.firstMortgageYear = "Gebruik een geldig eerste hypotheekjaar.";
   }
   if (taxableIncome === undefined || !Number.isFinite(taxableIncome) || taxableIncome < 0) {
     errors.taxableIncome = "Gebruik 0 of een hoger belastbaar inkomen.";
@@ -83,6 +102,14 @@ function validate(values: FormState) {
     mortgageRatePercent > 25
   ) {
     errors.mortgageRatePercent = "Gebruik een rente tussen 0 en 25 procent.";
+  }
+  if (
+    remainingMortgageTermYears === undefined ||
+    !Number.isFinite(remainingMortgageTermYears) ||
+    remainingMortgageTermYears < 1 ||
+    remainingMortgageTermYears > 40
+  ) {
+    errors.remainingMortgageTermYears = "Gebruik een resterende looptijd tussen 1 en 40 jaar.";
   }
   if (
     annualMortgageInterestOverride !== undefined &&
@@ -105,9 +132,12 @@ function validate(values: FormState) {
       Object.keys(errors).length === 0
         ? {
             taxYear: Math.round(taxYear ?? getDefaultFinancialYear()),
+            firstMortgageYear: Math.round(firstMortgageYear ?? getDefaultFinancialYear()),
             taxableIncome: taxableIncome ?? 0,
             remainingMortgageDebt: remainingMortgageDebt ?? 0,
             mortgageRatePercent: mortgageRatePercent ?? 0,
+            mortgageType: values.mortgageType,
+            remainingMortgageTermYears: Math.round(remainingMortgageTermYears ?? 30),
             annualMortgageInterestOverride,
             horizonYears: Math.round(horizonYears ?? 10),
           }
@@ -209,6 +239,12 @@ export default function Calculator() {
           </label>
 
           <label className="grid gap-2">
+            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Eerste hypotheekjaar</span>
+            <input inputMode="numeric" value={formValues.firstMortgageYear} onChange={(event) => updateField("firstMortgageYear", event.target.value)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
+            <FieldError message={activeErrors.firstMortgageYear} />
+          </label>
+
+          <label className="grid gap-2">
             <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Belastbaar inkomen</span>
             <input inputMode="decimal" value={formValues.taxableIncome} onChange={(event) => updateField("taxableIncome", event.target.value)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
             <FieldError message={activeErrors.taxableIncome} />
@@ -224,6 +260,21 @@ export default function Calculator() {
             <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Hypotheekrente per jaar (%)</span>
             <input inputMode="decimal" value={formValues.mortgageRatePercent} onChange={(event) => updateField("mortgageRatePercent", event.target.value)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
             <FieldError message={activeErrors.mortgageRatePercent} />
+          </label>
+
+          <label className="grid gap-2">
+            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Hypotheekvorm</span>
+            <select value={formValues.mortgageType} onChange={(event) => updateField("mortgageType", event.target.value as FormState["mortgageType"])} className="ring-focus hair h-12 rounded-md border bg-white px-4 text-[15px] text-[var(--ink)] outline-none">
+              <option value="annuity">Annuïtair</option>
+              <option value="linear">Lineair</option>
+              <option value="interestOnly">Aflossingsvrij</option>
+            </select>
+          </label>
+
+          <label className="grid gap-2">
+            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Resterende hypotheeklooptijd (jaren)</span>
+            <input inputMode="decimal" value={formValues.remainingMortgageTermYears} onChange={(event) => updateField("remainingMortgageTermYears", event.target.value)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
+            <FieldError message={activeErrors.remainingMortgageTermYears} />
           </label>
 
           <label className="grid gap-2">
@@ -284,6 +335,10 @@ export default function Calculator() {
                 <ResultRow label="Netto rente mét aftrek" value={formatCurrency(result.annualNetCostWithDeduction)} />
                 <ResultRow label="Netto rente zonder aftrek" value={formatCurrency(result.annualNetCostWithoutDeduction)} />
                 <ResultRow label="Jaarverschil zonder aftrek" value={formatCurrency(result.annualDifference)} accent />
+                <ResultRow label="Hypotheekvorm" value={result.mortgageType === "annuity" ? "Annuïtair" : result.mortgageType === "linear" ? "Lineair" : "Aflossingsvrij"} />
+                <ResultRow label="Resterende hypotheeklooptijd" value={`${result.remainingMortgageTermYears} jaar`} />
+                <ResultRow label="Eerste hypotheekjaar" value={String(result.firstMortgageYear)} />
+                <ResultRow label="Resterende jaren renteaftrek" value={`${result.remainingDeductionYears} jaar`} />
               </div>
             </div>
           ) : null}
@@ -333,7 +388,8 @@ export default function Calculator() {
           >
             <ul className="space-y-2 text-[13px] leading-[1.65] text-[var(--muted)]">
               <li>We schatten eerst je jaarlijkse bruto hypotheekrente.</li>
-              <li>Daarna berekenen we indicatief het aftrekvoordeel via de centrale tax-laag.</li>
+              <li>Die schatting volgt je hypotheekvorm (annuïtair, lineair of aflossingsvrij) en resterende looptijd.</li>
+              <li>Daarna berekenen we indicatief het aftrekvoordeel via de centrale tax-laag, alleen zolang je nog aftrekjaren hebt.</li>
               <li>Scenario zonder aftrek = bruto rente als netto kostenpost.</li>
             </ul>
           </DisclosureSection>
