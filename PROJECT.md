@@ -85,6 +85,11 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `app-registry.ts` bevat alleen metadata.
 - `app-components.tsx` lazy-loadt calculatorcomponenten via `next/dynamic`.
 - Geen runtime filesystem discovery in de browser.
+- Functionele zichtbaarheid wordt waar mogelijk via feature-flags gestuurd in plaats van code te verwijderen.
+- Oude functionaliteiten die later terug kunnen komen worden standaard:
+  - in UI/UX verborgen;
+  - functioneel uitgezet;
+  - technisch in code behouden voor snelle heractivatie.
 
 ## Huidige routes
 
@@ -150,6 +155,8 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `ASSUMPTION_CHANGELOG.md`: expliciet logboek voor wijzigingen in aannames/percentages
 - `INCIDENT_RESPONSE.md`: incidentproces met ernstniveaus, reactietijden en communicatieformat
 - `src/lib/runtime-monitoring.ts` + `src/components/RuntimeMonitoringBootstrap.tsx`: privacy-first frontend runtime monitoring (error/unhandledrejection), met release-tag en optionele webhook via `NEXT_PUBLIC_MONITORING_WEBHOOK_URL`
+- `src/lib/feature-flags.ts`: centrale flags voor tijdelijk uit/aan zetten van productfunctionaliteit (o.a. profiel en kennisniveau)
+- `FUNCTIONALITY_STATUS.md`: centrale statuslijst met actief/uitgeschakeld/toekomstig + heractivatiestappen
 
 ## Huidige tools
 
@@ -258,6 +265,19 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - centrale constants altijd via `src/lib/financial-constants` en met regressietests op jaar-fallbacks;
   - DUO-berekeningen via `src/lib/duo` testen op sanitizing, scenario's en clamping;
   - belastingen via `src/lib/tax` testen op indicatieve box 1/box 3/mortgage-interest paden;
+
+## Functionality Lifecycle
+
+- Oude functionaliteit wordt bij voorkeur niet hard verwijderd als herintroductie mogelijk gewenst is.
+- Gebruik feature-flags om functionaliteit tijdelijk uit te zetten.
+- Verberg uitgeschakelde functionaliteit in:
+  - UI (geen zichtbare CTA’s of links),
+  - UX-flow (niet als pad aanbieden),
+  - gedrag (fallbacks zonder die feature).
+- Houd altijd in `FUNCTIONALITY_STATUS.md` bij:
+  - wat aan staat;
+  - wat bewust uit staat;
+  - hoe het weer geactiveerd wordt.
   - profielkoppeling altijd via `profile-tool-mapping` + `profile-prefill` en met regressietests;
   - tool-specifieke `logic.ts` alleen testen op gedrag dat niet al in centrale lagen zit.
 - `npm run check` draait lokaal dezelfde sequentie als CI inclusief registry-verificatie.
