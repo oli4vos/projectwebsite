@@ -1,5 +1,6 @@
 import { defaultUserProfile, sanitizeUserProfile, type UserProfile } from "@/lib/user-profile";
 import { localProfileStoreAsync } from "@/lib/storage/local-profile-store-async";
+import { recordProfileSyncEvent } from "@/lib/storage/profile-sync-events";
 import { createRemoteProfileStoreAsync } from "@/lib/storage/remote-profile-store-async";
 import { resolveProfileSyncPolicy } from "@/lib/storage/profile-sync-policy";
 import type {
@@ -36,6 +37,17 @@ function createEvent(
   return { status, reason, message, at: nowIso() };
 }
 
+function addEvent(
+  events: ProfileSyncEvent[],
+  status: ProfileSyncStatus,
+  reason: ProfileSyncReason,
+  message: string,
+) {
+  const event = createEvent(status, reason, message);
+  events.push(event);
+  recordProfileSyncEvent(event);
+}
+
 function toNullableProfile(profile: UserProfile | null | undefined): UserProfile | null {
   if (!profile) {
     return null;
@@ -65,7 +77,7 @@ export async function syncProfileOnce(options: SyncOptions = {}): Promise<Profil
   const events: ProfileSyncEvent[] = [];
 
   if (mode === "local") {
-    events.push(createEvent("skipped", "localMode", "Sync overgeslagen: local mode is actief."));
+    addEvent(events, "skipped", "localMode", "Sync overgeslagen: local mode is actief.");
     return {
       profile: null,
       status: "skipped",
@@ -82,16 +94,15 @@ export async function syncProfileOnce(options: SyncOptions = {}): Promise<Profil
     const remoteProfile = toNullableProfile(remoteResult.data);
 
     if (remoteResult.error?.includes("fallback")) {
-      events.push(createEvent("fallbackLocal", "supabaseNotConfigured", remoteResult.error));
+      addEvent(events, "fallbackLocal", "supabaseNotConfigured", remoteResult.error);
     }
 
     if (mode === "remote" && !remoteProfile && localProfile) {
-      events.push(
-        createEvent(
-          "fallbackLocal",
-          "notAuthenticated",
-          "Remote mode zonder geldig remote profiel; lokale fallback gebruikt.",
-        ),
+      addEvent(
+        events,
+        "fallbackLocal",
+        "notAuthenticated",
+        "Remote mode zonder geldig remote profiel; lokale fallback gebruikt.",
       );
       return {
         profile: localProfile,
@@ -105,7 +116,7 @@ export async function syncProfileOnce(options: SyncOptions = {}): Promise<Profil
     const decision = resolveProfileSyncPolicy(localProfile, remoteProfile, policy);
 
     if (decision.winner === "none") {
-      events.push(createEvent("idle", decision.reason, "Local en remote zijn gelijk."));
+      addEvent(events, "idle", decision.reason, "Local en remote zijn gelijk.");
       return {
         profile: localProfile ?? remoteProfile ?? null,
         status: "idle",
@@ -116,7 +127,12 @@ export async function syncProfileOnce(options: SyncOptions = {}): Promise<Profil
 
     if (decision.winner === "local" && localProfile) {
       if (remoteProfile && JSON.stringify(localProfile) === JSON.stringify(remoteProfile)) {
-        events.push(createEvent("idle", "sameTimestamp", "Geen sync nodig; profielen zijn inhoudelijk gelijk."));
+        addEvent(
+          events,
+          "idle",
+          "sameTimestamp",
+          "Geen sync nodig; profielen zijn inhoudelijk gelijk.",
+        );
         return {
           profile: localProfile,
           status: "idle",
@@ -126,14 +142,13 @@ export async function syncProfileOnce(options: SyncOptions = {}): Promise<Profil
       }
 
       const pushResult = await stores.remote.saveProfile(localProfile);
-      events.push(
-        createEvent(
-          pushResult.error ? "fallbackLocal" : "pushedLocal",
-          decision.reason,
-          pushResult.error
-            ? `Remote push niet gelukt; lokaal profiel blijft leidend (${pushResult.error}).`
-            : "Lokaal profiel naar remote gepusht.",
-        ),
+      addEvent(
+        events,
+        pushResult.error ? "fallbackLocal" : "pushedLocal",
+        decision.reason,
+        pushResult.error
+          ? `Remote push niet gelukt; lokaal profiel blijft leidend (${pushResult.error}).`
+          : "Lokaal profiel naar remote gepusht.",
       );
       return {
         profile: localProfile,
@@ -146,14 +161,13 @@ export async function syncProfileOnce(options: SyncOptions = {}): Promise<Profil
 
     if (decision.winner === "remote" && remoteProfile) {
       const pullResult = await stores.local.saveProfile(remoteProfile);
-      events.push(
-        createEvent(
-          pullResult.error ? "error" : "pulledRemote",
-          decision.reason,
-          pullResult.error
-            ? `Remote pull niet volledig opgeslagen lokaal (${pullResult.error}).`
-            : "Remote profiel lokaal opgeslagen.",
-        ),
+      addEvent(
+        events,
+        pullResult.error ? "error" : "pulledRemote",
+        decision.reason,
+        pullResult.error
+          ? `Remote pull niet volledig opgeslagen lokaal (${pullResult.error}).`
+          : "Remote profiel lokaal opgeslagen.",
       );
       return {
         profile: remoteProfile,
@@ -164,7 +178,7 @@ export async function syncProfileOnce(options: SyncOptions = {}): Promise<Profil
       };
     }
 
-    events.push(createEvent("fallbackLocal", "unknown", "Onbekende syncstatus; local fallback toegepast."));
+    addEvent(events, "fallbackLocal", "unknown", "Onbekende syncstatus; local fallback toegepast.");
     return {
       profile: localProfile ?? remoteProfile ?? defaultUserProfile,
       status: "fallbackLocal",
@@ -173,7 +187,7 @@ export async function syncProfileOnce(options: SyncOptions = {}): Promise<Profil
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown sync error";
-    events.push(createEvent("error", "unknown", message));
+    addEvent(events, "error", "unknown", message);
     return {
       profile: null,
       status: "error",
