@@ -17,69 +17,60 @@ import { getVolgendeEuroDefaultsFromProfile } from "@/lib/profile-tool-mapping";
 import { calculateVolgendeEuroPriorities, type VolgendeEuroInput } from "./logic";
 
 type FormState = {
-  year: string;
   extraAmount: string;
-  monthlyFreeRoom: string;
   currentBuffer: string;
   targetBuffer: string;
-  hasExpensiveDebt: boolean;
-  expensiveDebtRate: string;
-  expensiveDebtAmount: string;
-  studentDebtAmount: string;
-  duoRate: string;
-  mortgageRate: string;
-  hasJaarruimte: boolean;
-  availableJaarruimte: string;
+  openToInvesting: boolean;
   horizonYears: string;
   expectedAnnualReturn: string;
-  hasHousingGoal: boolean;
+  hasDebt: boolean;
+  primaryDebtIsDuo: boolean;
+  primaryDebtAmount: string;
+  primaryDebtRate: string;
+  hasOtherDebt: boolean;
+  otherDebtAmount: string;
+  otherDebtRate: string;
+  hasMortgage: boolean;
+  mortgageRate: string;
   riskProfile: "conservative" | "neutral" | "offensive";
-  targetHomePrice: string;
-  ownFunds: string;
 };
 
 const exampleValues: FormState = {
-  year: String(getDefaultFinancialYear()),
   extraAmount: "1000",
-  monthlyFreeRoom: "300",
   currentBuffer: "5000",
   targetBuffer: "12000",
-  hasExpensiveDebt: false,
-  expensiveDebtRate: "",
-  expensiveDebtAmount: "",
-  studentDebtAmount: "15000",
-  duoRate: "2.33",
-  mortgageRate: "4",
-  hasJaarruimte: false,
-  availableJaarruimte: "",
+  openToInvesting: true,
   horizonYears: "15",
   expectedAnnualReturn: "5",
-  hasHousingGoal: false,
+  hasDebt: true,
+  primaryDebtIsDuo: true,
+  primaryDebtAmount: "15000",
+  primaryDebtRate: "2.33",
+  hasOtherDebt: false,
+  otherDebtAmount: "",
+  otherDebtRate: "",
+  hasMortgage: true,
+  mortgageRate: "4",
   riskProfile: "neutral",
-  targetHomePrice: "",
-  ownFunds: "",
 };
 
 const defaultValues: FormState = {
-  year: "",
   extraAmount: "",
-  monthlyFreeRoom: "",
   currentBuffer: "",
   targetBuffer: "",
-  hasExpensiveDebt: false,
-  expensiveDebtRate: "",
-  expensiveDebtAmount: "",
-  studentDebtAmount: "",
-  duoRate: "",
-  mortgageRate: "",
-  hasJaarruimte: false,
-  availableJaarruimte: "",
+  openToInvesting: false,
   horizonYears: "",
   expectedAnnualReturn: "",
-  hasHousingGoal: false,
+  hasDebt: false,
+  primaryDebtIsDuo: true,
+  primaryDebtAmount: "",
+  primaryDebtRate: "",
+  hasOtherDebt: false,
+  otherDebtAmount: "",
+  otherDebtRate: "",
+  hasMortgage: false,
+  mortgageRate: "",
   riskProfile: "neutral",
-  targetHomePrice: "",
-  ownFunds: "",
 };
 
 type CalculatorContentProps = {
@@ -102,25 +93,43 @@ function formatCurrency(value: number) {
 }
 
 function toInput(values: FormState): VolgendeEuroInput {
+  const primaryDebtAmount = parseOptionalNumber(values.primaryDebtAmount);
+  const primaryDebtRate = parseOptionalNumber(values.primaryDebtRate);
+  const otherDebtAmount = parseOptionalNumber(values.otherDebtAmount);
+  const otherDebtRate = parseOptionalNumber(values.otherDebtRate);
+  const hasPrimaryNonDuoDebt = values.hasDebt && !values.primaryDebtIsDuo;
+  const hasAnyNonDuoDebt = hasPrimaryNonDuoDebt || values.hasOtherDebt;
+  const combinedNonDuoDebtAmount = (hasPrimaryNonDuoDebt ? primaryDebtAmount ?? 0 : 0) + (values.hasOtherDebt ? otherDebtAmount ?? 0 : 0);
+  const combinedNonDuoDebtRate = hasPrimaryNonDuoDebt
+    ? values.hasOtherDebt
+      ? Math.max(primaryDebtRate ?? 0, otherDebtRate ?? 0)
+      : primaryDebtRate
+    : values.hasOtherDebt
+      ? otherDebtRate
+      : undefined;
+
   return {
-    year: parseOptionalNumber(values.year),
+    year: getDefaultFinancialYear(),
     extraAmount: parseOptionalNumber(values.extraAmount),
-    monthlyFreeRoom: parseOptionalNumber(values.monthlyFreeRoom),
     currentBuffer: parseOptionalNumber(values.currentBuffer),
     targetBuffer: parseOptionalNumber(values.targetBuffer),
-    hasExpensiveDebt: values.hasExpensiveDebt,
-    expensiveDebtRate: values.hasExpensiveDebt ? parseOptionalNumber(values.expensiveDebtRate) : undefined,
-    expensiveDebtAmount: values.hasExpensiveDebt ? parseOptionalNumber(values.expensiveDebtAmount) : undefined,
-    studentDebtAmount: parseOptionalNumber(values.studentDebtAmount),
-    duoRate: parseOptionalNumber(values.duoRate),
-    mortgageRate: parseOptionalNumber(values.mortgageRate),
-    availableJaarruimte: values.hasJaarruimte ? parseOptionalNumber(values.availableJaarruimte) : undefined,
-    horizonYears: parseOptionalNumber(values.horizonYears),
-    expectedAnnualReturn: parseOptionalNumber(values.expectedAnnualReturn),
-    hasHousingGoal: values.hasHousingGoal,
+    hasExpensiveDebt: hasAnyNonDuoDebt,
+    expensiveDebtRate: hasAnyNonDuoDebt ? combinedNonDuoDebtRate : undefined,
+    expensiveDebtAmount: hasAnyNonDuoDebt ? combinedNonDuoDebtAmount : undefined,
+    studentDebtAmount:
+      values.hasDebt && values.primaryDebtIsDuo
+        ? primaryDebtAmount
+        : undefined,
+    duoRate:
+      values.hasDebt && values.primaryDebtIsDuo
+        ? primaryDebtRate
+        : undefined,
+    mortgageRate: values.hasMortgage ? parseOptionalNumber(values.mortgageRate) : undefined,
+    horizonYears: values.openToInvesting ? parseOptionalNumber(values.horizonYears) : undefined,
+    expectedAnnualReturn: values.openToInvesting
+      ? parseOptionalNumber(values.expectedAnnualReturn)
+      : undefined,
     riskProfile: values.riskProfile,
-    targetHomePrice: values.hasHousingGoal ? parseOptionalNumber(values.targetHomePrice) : undefined,
-    ownFunds: values.hasHousingGoal ? parseOptionalNumber(values.ownFunds) : undefined,
   };
 }
 
@@ -131,10 +140,6 @@ function FieldError({ message }: { message?: string }) {
 
 function validate(values: FormState) {
   const errors: Partial<Record<keyof FormState, string>> = {};
-  const year = parseOptionalNumber(values.year);
-  if (year === undefined || !Number.isFinite(year) || year < 2000 || year > 2200) {
-    errors.year = "Gebruik een geldig belastingjaar.";
-  }
   const extraAmount = parseOptionalNumber(values.extraAmount);
   if (extraAmount !== undefined && (!Number.isFinite(extraAmount) || extraAmount < 0)) {
     errors.extraAmount = "Gebruik 0 of een hoger bedrag.";
@@ -182,28 +187,28 @@ function CalculatorContent({ initialValues, hasRelevantProfileValues, profilePat
   const hasDirtyChanges = Boolean(submittedValues) && JSON.stringify(formValues) !== JSON.stringify(submittedValues);
 
   const mobileFlow = useMobileFieldFlow([
-    "year",
     "extraAmount",
-    "monthlyFreeRoom",
     "currentBuffer",
     "targetBuffer",
-    "hasExpensiveDebt",
-    ...(formValues.hasExpensiveDebt ? ["expensiveDebtRate", "expensiveDebtAmount"] : []),
-    "studentDebtAmount",
-    "duoRate",
-    "mortgageRate",
-    "hasJaarruimte",
-    ...(formValues.hasJaarruimte ? ["availableJaarruimte"] : []),
-    "horizonYears",
-    "expectedAnnualReturn",
-    "hasHousingGoal",
-    ...(formValues.hasHousingGoal ? ["targetHomePrice", "ownFunds"] : []),
+    "openToInvesting",
+    ...(formValues.openToInvesting ? ["horizonYears", "expectedAnnualReturn"] : []),
+    "hasDebt",
+    ...(formValues.hasDebt
+      ? [
+          "primaryDebtIsDuo",
+          "primaryDebtAmount",
+          "primaryDebtRate",
+          "hasOtherDebt",
+          ...(formValues.hasOtherDebt ? ["otherDebtAmount", "otherDebtRate"] : []),
+        ]
+      : []),
+    "hasMortgage",
+    ...(formValues.hasMortgage ? ["mortgageRate"] : []),
     "riskProfile",
   ]);
 
   const inputQuality = useMemo(() => {
     const checks = [
-      { label: "belastingjaar", ok: parseOptionalNumber(formValues.year) !== undefined },
       { label: "extra bedrag", ok: parseOptionalNumber(formValues.extraAmount) !== undefined },
       {
         label: "buffer (huidig + gewenst)",
@@ -212,15 +217,15 @@ function CalculatorContent({ initialValues, hasRelevantProfileValues, profilePat
           parseOptionalNumber(formValues.targetBuffer) !== undefined,
       },
       {
-        label: "dure schuld details",
+        label: "schuldgegevens",
         ok:
-          !formValues.hasExpensiveDebt ||
-          parseOptionalNumber(formValues.expensiveDebtRate) !== undefined ||
-          parseOptionalNumber(formValues.expensiveDebtAmount) !== undefined,
+          !formValues.hasDebt ||
+          parseOptionalNumber(formValues.primaryDebtAmount) !== undefined,
       },
       {
         label: "beleggen (horizon + rendement)",
         ok:
+          !formValues.openToInvesting ||
           parseOptionalNumber(formValues.horizonYears) !== undefined &&
           parseOptionalNumber(formValues.expectedAnnualReturn) !== undefined,
       },
@@ -428,16 +433,9 @@ function CalculatorContent({ initialValues, hasRelevantProfileValues, profilePat
     <form className="grid gap-5" onSubmit={onSubmit}>
       {(
         [
-          ["year", "Belastingjaar"],
-          ["extraAmount", "Extra bedrag beschikbaar"],
-          ["monthlyFreeRoom", "Maandelijkse vrije ruimte"],
-          ["currentBuffer", "Huidige buffer"],
-          ["targetBuffer", "Gewenste buffer"],
-          ["studentDebtAmount", "Studieschuld"],
-          ["duoRate", "DUO-rente (%)"],
-          ["mortgageRate", "Hypotheekrente (%)"],
-          ["horizonYears", "Beleggingshorizon (jaren)"],
-          ["expectedAnnualReturn", "Verwacht rendement (%)"],
+          ["extraAmount", "Wat is je geld (extra bedrag nu)"],
+          ["currentBuffer", "Wat is je buffer nu"],
+          ["targetBuffer", "Wat is je gewenste buffer"],
         ] as const
       ).map(([field, label]) => (
         <label key={field} className={mobileFlow.getFieldClassName(field)}>
@@ -453,59 +451,91 @@ function CalculatorContent({ initialValues, hasRelevantProfileValues, profilePat
         </label>
       ))}
 
-      <label className={mobileFlow.getFieldClassName("hasExpensiveDebt")}>
-        <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Dure schuld aanwezig</span>
+      <label className={mobileFlow.getFieldClassName("openToInvesting")}>
+        <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Sta je open voor beleggen?</span>
         <span className="flex items-center gap-3 text-[14px] text-[var(--ink)]">
-          <input type="checkbox" checked={formValues.hasExpensiveDebt} onChange={(event) => updateField("hasExpensiveDebt", event.target.checked)} className="size-4 accent-[var(--accent)]" />
+          <input type="checkbox" checked={formValues.openToInvesting} onChange={(event) => updateField("openToInvesting", event.target.checked)} className="size-4 accent-[var(--accent)]" />
           Ja
         </span>
       </label>
-
-      {formValues.hasExpensiveDebt ? (
+      {formValues.openToInvesting ? (
         <>
-          <label className={mobileFlow.getFieldClassName("expensiveDebtRate")}>
-            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Rente dure schuld (%)</span>
-            <input inputMode="decimal" value={formValues.expensiveDebtRate} onChange={(event) => updateField("expensiveDebtRate", event.target.value)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
+          <label className={mobileFlow.getFieldClassName("horizonYears")}>
+            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Beleggingshorizon (jaren)</span>
+            <input inputMode="decimal" value={formValues.horizonYears} onChange={(event) => updateField("horizonYears", event.target.value)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
           </label>
-          <label className={mobileFlow.getFieldClassName("expensiveDebtAmount")}>
-            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Bedrag dure schuld</span>
-            <input inputMode="decimal" value={formValues.expensiveDebtAmount} onChange={(event) => updateField("expensiveDebtAmount", event.target.value)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
+          <label className={mobileFlow.getFieldClassName("expectedAnnualReturn")}>
+            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Verwacht rendement (%)</span>
+            <input inputMode="decimal" value={formValues.expectedAnnualReturn} onChange={(event) => updateField("expectedAnnualReturn", event.target.value)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
           </label>
         </>
       ) : null}
 
-      <label className={mobileFlow.getFieldClassName("hasJaarruimte")}>
-        <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Jaarruimte beschikbaar</span>
+      <label className={mobileFlow.getFieldClassName("hasDebt")}>
+        <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Heb je schulden?</span>
         <span className="flex items-center gap-3 text-[14px] text-[var(--ink)]">
-          <input type="checkbox" checked={formValues.hasJaarruimte} onChange={(event) => updateField("hasJaarruimte", event.target.checked)} className="size-4 accent-[var(--accent)]" />
+          <input type="checkbox" checked={formValues.hasDebt} onChange={(event) => updateField("hasDebt", event.target.checked)} className="size-4 accent-[var(--accent)]" />
           Ja
         </span>
       </label>
-      {formValues.hasJaarruimte ? (
-        <label className={mobileFlow.getFieldClassName("availableJaarruimte")}>
-          <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Beschikbare jaarruimte</span>
-          <input inputMode="decimal" value={formValues.availableJaarruimte} onChange={(event) => updateField("availableJaarruimte", event.target.value)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
+
+      {formValues.hasDebt ? (
+        <>
+          <label className={mobileFlow.getFieldClassName("primaryDebtIsDuo")}>
+            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Is dit een DUO-schuld?</span>
+            <span className="flex items-center gap-3 text-[14px] text-[var(--ink)]">
+              <input type="checkbox" checked={formValues.primaryDebtIsDuo} onChange={(event) => updateField("primaryDebtIsDuo", event.target.checked)} className="size-4 accent-[var(--accent)]" />
+              Ja
+            </span>
+          </label>
+          <label className={mobileFlow.getFieldClassName("primaryDebtAmount")}>
+            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+              {formValues.primaryDebtIsDuo ? "Bedrag DUO-schuld" : "Bedrag schuld"}
+            </span>
+            <input inputMode="decimal" value={formValues.primaryDebtAmount} onChange={(event) => updateField("primaryDebtAmount", event.target.value)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
+          </label>
+          <label className={mobileFlow.getFieldClassName("primaryDebtRate")}>
+            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+              {formValues.primaryDebtIsDuo ? "DUO-rente (%)" : "Rente schuld (%)"}
+            </span>
+            <input inputMode="decimal" value={formValues.primaryDebtRate} onChange={(event) => updateField("primaryDebtRate", event.target.value)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
+          </label>
+
+          <label className={mobileFlow.getFieldClassName("hasOtherDebt")}>
+            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Heb je nog een andere schuld?</span>
+            <span className="flex items-center gap-3 text-[14px] text-[var(--ink)]">
+              <input type="checkbox" checked={formValues.hasOtherDebt} onChange={(event) => updateField("hasOtherDebt", event.target.checked)} className="size-4 accent-[var(--accent)]" />
+              Ja
+            </span>
+          </label>
+
+          {formValues.hasOtherDebt ? (
+            <>
+              <label className={mobileFlow.getFieldClassName("otherDebtAmount")}>
+                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Bedrag andere schuld</span>
+                <input inputMode="decimal" value={formValues.otherDebtAmount} onChange={(event) => updateField("otherDebtAmount", event.target.value)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
+              </label>
+              <label className={mobileFlow.getFieldClassName("otherDebtRate")}>
+                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Rente andere schuld (%)</span>
+                <input inputMode="decimal" value={formValues.otherDebtRate} onChange={(event) => updateField("otherDebtRate", event.target.value)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
+              </label>
+            </>
+          ) : null}
+        </>
+      ) : null}
+
+      <label className={mobileFlow.getFieldClassName("hasMortgage")}>
+        <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Heb je een hypotheek?</span>
+        <span className="flex items-center gap-3 text-[14px] text-[var(--ink)]">
+          <input type="checkbox" checked={formValues.hasMortgage} onChange={(event) => updateField("hasMortgage", event.target.checked)} className="size-4 accent-[var(--accent)]" />
+          Ja
+        </span>
+      </label>
+      {formValues.hasMortgage ? (
+        <label className={mobileFlow.getFieldClassName("mortgageRate")}>
+          <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Hypotheekrente (%)</span>
+          <input inputMode="decimal" value={formValues.mortgageRate} onChange={(event) => updateField("mortgageRate", event.target.value)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
         </label>
-      ) : null}
-
-      <label className={mobileFlow.getFieldClassName("hasHousingGoal")}>
-        <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Woningdoel actief</span>
-        <span className="flex items-center gap-3 text-[14px] text-[var(--ink)]">
-          <input type="checkbox" checked={formValues.hasHousingGoal} onChange={(event) => updateField("hasHousingGoal", event.target.checked)} className="size-4 accent-[var(--accent)]" />
-          Ja
-        </span>
-      </label>
-      {formValues.hasHousingGoal ? (
-        <>
-          <label className={mobileFlow.getFieldClassName("targetHomePrice")}>
-            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Doel koopprijs</span>
-            <input inputMode="decimal" value={formValues.targetHomePrice} onChange={(event) => updateField("targetHomePrice", event.target.value)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
-          </label>
-          <label className={mobileFlow.getFieldClassName("ownFunds")}>
-            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Eigen geld nu</span>
-            <input inputMode="decimal" value={formValues.ownFunds} onChange={(event) => updateField("ownFunds", event.target.value)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
-          </label>
-        </>
       ) : null}
 
       <label className={mobileFlow.getFieldClassName("riskProfile")}>
