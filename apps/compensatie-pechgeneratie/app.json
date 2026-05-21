@@ -5,7 +5,7 @@
   "type": "frontend",
   "category": "Schulden",
   "tags": ["studieschuld", "pechgeneratie", "DUO", "compensatie", "starter"],
-  "status": "beta",
+  "status": "legacy-draft",
   "visibility": "hidden",
   "version": "1.0.0",
   "entry": "Calculator.tsx"

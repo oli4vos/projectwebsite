@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ResultRow } from "@/components/ResultRow";
+import { ToolActionButton } from "@/components/tool/ToolActionButton";
 import { Pill } from "@/components/ui";
 import { parseOptionalDecimalInput } from "@/lib/number-input";
 import {
@@ -169,13 +170,9 @@ export default function Calculator() {
 
         <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
           <span>Start leeg en vul snel een voorbeeldscenario in.</span>
-          <button
-            type="button"
-            onClick={applyExampleValues}
-            className="rounded-full border hair bg-white px-3 py-2 text-[12px] text-[var(--ink)] transition hover:bg-[var(--paper-soft)]"
-          >
+          <ToolActionButton type="button" onClick={applyExampleValues} variant="secondary" size="sm">
             Start met voorbeeldwaarden
-          </button>
+          </ToolActionButton>
         </div>
 
         <div className="mt-6 grid gap-5">
@@ -305,14 +302,15 @@ export default function Calculator() {
           </label>
         </div>
 
-        <button
+        <ToolActionButton
           type="button"
           onClick={goToResult}
           disabled={!result}
-          className="ring-focus hair mt-6 inline-flex h-11 w-full items-center justify-center rounded-full border bg-[var(--paper)] px-4 text-[14px] text-[var(--ink)] disabled:cursor-not-allowed disabled:opacity-45 md:hidden"
+          variant="secondary"
+          className="mt-6 w-full justify-center md:hidden"
         >
           Bekijk uitkomst
-        </button>
+        </ToolActionButton>
 
         {hasErrors ? (
           <div className="mt-6 rounded-xl border border-[var(--neg-soft)] bg-[var(--neg-soft)]/55 px-4 py-3 text-sm text-[oklch(35%_0.13_28)]">

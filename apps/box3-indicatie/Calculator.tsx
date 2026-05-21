@@ -5,6 +5,7 @@ import { MobileFieldFlowControls } from "@/components/MobileFieldFlowControls";
 import { ResultRow } from "@/components/ResultRow";
 import { ToolDisclosure } from "@/components/ToolDisclosure";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
+import { ToolActionButton, ToolActionLinkButton } from "@/components/tool/ToolActionButton";
 import { Pill } from "@/components/ui";
 import { useMobileFieldFlow } from "@/hooks/useMobileFieldFlow";
 import { useUserProfile } from "@/hooks/useUserProfile";
@@ -237,38 +238,23 @@ function CalculatorContent({
         {hasRelevantProfileValues ? (
           <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
             <span>Profielwaarden gevonden in deze browser.</span>
-            <button
-              type="button"
-              onClick={applyExampleValues}
-              className="rounded-full border hair bg-white px-3 py-2 text-[12px] text-[var(--ink)] transition hover:bg-[var(--paper-soft)]"
-            >
+            <ToolActionButton type="button" onClick={applyExampleValues} variant="secondary" size="sm">
               Start met voorbeeldwaarden
-            </button>
-            <button
-              type="button"
-              onClick={applyProfileValues}
-              className="rounded-full border hair bg-white px-3 py-2 text-[12px] text-[var(--ink)] transition hover:bg-[var(--paper-soft)]"
-            >
+            </ToolActionButton>
+            <ToolActionButton type="button" onClick={applyProfileValues} variant="secondary" size="sm">
               Start met profielwaarden
-            </button>
+            </ToolActionButton>
           </div>
         ) : null}
         {!hasRelevantProfileValues ? (
           <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
             <span>Start leeg en vul snel een voorbeeldscenario in.</span>
-            <button
-              type="button"
-              onClick={applyExampleValues}
-              className="rounded-full border hair bg-white px-3 py-2 text-[12px] text-[var(--ink)] transition hover:bg-[var(--paper-soft)]"
-            >
+            <ToolActionButton type="button" onClick={applyExampleValues} variant="secondary" size="sm">
               Start met voorbeeldwaarden
-            </button>
-            <a
-              href="/profiel"
-              className="rounded-full border hair bg-white px-3 py-2 text-[12px] text-[var(--ink)] transition hover:bg-[var(--paper-soft)]"
-            >
+            </ToolActionButton>
+            <ToolActionLinkButton href="/profiel" variant="secondary" size="sm">
               Start met profielwaarden
-            </a>
+            </ToolActionLinkButton>
           </div>
         ) : null}
 
