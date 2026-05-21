@@ -2,7 +2,11 @@
 
 import { useMemo, useState } from "react";
 import { ChartContainer, ChartLegend } from "@/components/ChartPrimitives";
-import { AreaChart } from "@/components/charts";
+import {
+  AreaChart,
+  getAdaptiveEuroTicks,
+  getAdaptiveYearTicks,
+} from "@/components/charts";
 import { DisclosureSection } from "@/components/DisclosureSection";
 import { ResultRow } from "@/components/ResultRow";
 import { Pill } from "@/components/ui";
@@ -37,6 +41,15 @@ function formatCurrency(value: number, maximumFractionDigits = 0) {
     style: "currency",
     currency: "EUR",
     maximumFractionDigits,
+  }).format(value);
+}
+
+function formatCompactEuro(value: number) {
+  return new Intl.NumberFormat("nl-NL", {
+    style: "currency",
+    currency: "EUR",
+    notation: "compact",
+    maximumFractionDigits: 1,
   }).format(value);
 }
 
@@ -119,6 +132,19 @@ export default function Calculator() {
         },
       ]
     : null;
+  const chartYTicks = result
+    ? getAdaptiveEuroTicks(
+        Math.max(
+          ...result.yearlySummary.map((entry) => entry.annuityNettoSum),
+          ...result.yearlySummary.map((entry) => entry.linearNettoSum),
+        ),
+      )
+    : [];
+  const lastYear = result?.yearlySummary.at(-1)?.year ?? 0;
+  const adaptiveYears = getAdaptiveYearTicks(lastYear);
+  const chartYearTicks = adaptiveYears
+    .filter((year) => year > 0)
+    .filter((year) => result?.yearlySummary.some((entry) => entry.year === year));
 
   function updateField(field: keyof FormState, value: string) {
     setFormValues((current) => ({
@@ -349,17 +375,37 @@ export default function Calculator() {
             </div>
 
             <ChartContainer
-              yearTicks={result.yearlySummary.map((entry) => entry.year)}
+              yearTicks={chartYearTicks}
               chart={
-                <AreaChart
-                  width={620}
-                  height={220}
-                  series={chartSeries}
-                  xValues={result.yearlySummary.map((entry) => entry.year)}
-                  seriesLabels={["Annuïtair netto", "Lineair netto"]}
-                />
+                <div className="grid gap-3 sm:grid-cols-[72px_minmax(0,1fr)]">
+                  <div className="hidden flex-col justify-between text-right text-[11px] text-[var(--soft)] sm:flex">
+                    {chartYTicks
+                      .slice()
+                      .reverse()
+                      .map((tick) => (
+                        <span key={tick}>{formatCompactEuro(tick)}</span>
+                      ))}
+                  </div>
+                  <div className="min-w-0">
+                    <AreaChart
+                      width={620}
+                      height={220}
+                      series={chartSeries}
+                      yTicks={chartYTicks}
+                      xValues={result.yearlySummary.map((entry) => entry.year)}
+                      seriesLabels={["Annuïtair netto", "Lineair netto"]}
+                    />
+                  </div>
+                </div>
               }
             />
+            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-[var(--muted)] sm:hidden">
+              <span>X-as: jaren</span>
+              <span>
+                Y-as: {formatCompactEuro(chartYTicks[0] ?? 0)} tot{" "}
+                {formatCompactEuro(chartYTicks.at(-1) ?? 0)}
+              </span>
+            </div>
           </div>
         ) : null}
 
