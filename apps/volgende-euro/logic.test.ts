@@ -1,14 +1,21 @@
 import { describe, expect, it } from "vitest";
-import { calculateVolgendeEuroPriorities, type PriorityOptionKey } from "./logic";
+import {
+  calculateVolgendeEuroPriorities,
+  type PriorityOptionKey,
+  type PriorityPlanStep,
+} from "./logic";
 
-function getStep(result: ReturnType<typeof calculateVolgendeEuroPriorities>, key: PriorityOptionKey) {
-  return result.priorityPlan.find((step) => step.key === key);
+type TestResult = ReturnType<typeof calculateVolgendeEuroPriorities>;
+type TestPriority = TestResult["priorities"][number];
+
+function getStep(result: TestResult, key: PriorityOptionKey) {
+  return result.priorityPlan.find((step: PriorityPlanStep) => step.key === key);
 }
-function getStepIndex(result: ReturnType<typeof calculateVolgendeEuroPriorities>, key: PriorityOptionKey) {
-  return result.priorityPlan.findIndex((step) => step.key === key);
+function getStepIndex(result: TestResult, key: PriorityOptionKey) {
+  return result.priorityPlan.findIndex((step: PriorityPlanStep) => step.key === key);
 }
 function expectStepBefore(
-  result: ReturnType<typeof calculateVolgendeEuroPriorities>,
+  result: TestResult,
   leftKey: PriorityOptionKey,
   rightKey: PriorityOptionKey,
 ) {
@@ -140,7 +147,7 @@ describe("calculateVolgendeEuroPriorities", () => {
         currentBuffer: 5000,
         targetBuffer: 10000,
       });
-      const keys = result.priorityPlan.map((step) => step.key);
+      const keys = result.priorityPlan.map((step: PriorityPlanStep) => step.key);
       expect(keys).toContain("buffer");
       expect(keys).not.toContain("expensiveDebt");
       expect(keys).not.toContain("studentDebtExtra");
@@ -155,9 +162,9 @@ describe("calculateVolgendeEuroPriorities", () => {
         currentBuffer: 15000,
         targetBuffer: 12000,
       });
-      const bufferPriority = result.priorities.find((item) => item.key === "buffer");
+      const bufferPriority = result.priorities.find((item: TestPriority) => item.key === "buffer");
       expect(bufferPriority?.applicability).toBe("notApplicable");
-      expect(result.priorityPlan.some((step) => step.key === "buffer")).toBe(false);
+      expect(result.priorityPlan.some((step: PriorityPlanStep) => step.key === "buffer")).toBe(false);
     });
 
     it("creates a concrete housing own-funds step when a housing goal is provided", () => {
@@ -201,7 +208,7 @@ describe("calculateVolgendeEuroPriorities", () => {
         horizonYears: 15,
         expectedAnnualReturn: 6,
       });
-      const ranks = result.priorityPlan.map((step) => step.rank);
+      const ranks = result.priorityPlan.map((step: PriorityPlanStep) => step.rank);
       expect(ranks).toEqual(Array.from({ length: ranks.length }, (_, i) => i + 1));
       expect(new Set(ranks).size).toBe(ranks.length);
     });
@@ -277,14 +284,14 @@ describe("calculateVolgendeEuroPriorities", () => {
         targetBuffer: 12000,
       });
       expect(result.topRecommendation).toBeNull();
-      expect(result.priorities.some((item) => item.applicability === "relevant")).toBe(false);
+      expect(result.priorities.some((item: TestPriority) => item.applicability === "relevant")).toBe(false);
     });
 
     it("marks free investing as insufficientData when horizon or return is missing", () => {
       const result = calculateVolgendeEuroPriorities({
         extraAmount: 1500,
       });
-      const investing = result.priorities.find((item) => item.key === "freeInvesting");
+      const investing = result.priorities.find((item: TestPriority) => item.key === "freeInvesting");
       expect(investing?.applicability).toBe("insufficientData");
       expect(investing?.missingFields).toContain("beleggingshorizon");
       expect(investing?.missingFields).toContain("verwacht rendement");
@@ -302,7 +309,7 @@ describe("calculateVolgendeEuroPriorities", () => {
         expectedAnnualReturn: 6,
       });
       expect(result.topThree.length).toBeGreaterThan(0);
-      expect(result.topThree.every((item) => item.applicability === "relevant")).toBe(true);
+      expect(result.topThree.every((item: TestPriority) => item.applicability === "relevant")).toBe(true);
       expect(result.topThree.length).toBeLessThanOrEqual(3);
     });
   });
