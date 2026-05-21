@@ -9,6 +9,7 @@ import {
 } from "@/components/charts";
 import { DisclosureSection } from "@/components/DisclosureSection";
 import { ResultRow } from "@/components/ResultRow";
+import { CalculatorShell } from "@/components/tool/CalculatorShell";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
 import { Pill } from "@/components/ui";
 import { parseOptionalDecimalInput } from "@/lib/number-input";
@@ -166,28 +167,32 @@ export default function Calculator() {
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
-      <section className="min-w-0 rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
-        <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
-          Scenario
-        </div>
-        <h2 className="mt-2 font-serif text-[28px] tracking-[-0.02em] text-[var(--ink)]">
-          Vergelijk twee hypotheekroutes
-        </h2>
-        <p className="mt-3 text-[14px] leading-[1.7] text-[var(--ink-2)]">
-          Deze tool zet annuïtair en lineair naast elkaar. Je ziet niet alleen de
-          eerste maandlast, maar ook wat het verschil in de tijd doet en hoeveel
-          ruimte een beleggingspot kan opvangen.
-        </p>
-
-        <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
+    <CalculatorShell
+      intro={
+        <>
+          <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
+            Scenario
+          </div>
+          <h2 className="mt-2 font-serif text-[28px] tracking-[-0.02em] text-[var(--ink)]">
+            Vergelijk twee hypotheekroutes
+          </h2>
+          <p className="mt-3 text-[14px] leading-[1.7] text-[var(--ink-2)]">
+            Deze tool zet annuïtair en lineair naast elkaar. Je ziet niet alleen de
+            eerste maandlast, maar ook wat het verschil in de tijd doet en hoeveel
+            ruimte een beleggingspot kan opvangen.
+          </p>
+        </>
+      }
+      startActions={
+        <div className="flex flex-wrap items-center gap-3 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
           <span>Start leeg en vul snel een voorbeeldscenario in.</span>
           <ToolActionButton type="button" onClick={applyExampleValues} variant="secondary" size="sm">
             Start met voorbeeldwaarden
           </ToolActionButton>
         </div>
-
-        <div className="mt-6 grid gap-5">
+      }
+      inputs={
+        <div className="grid gap-5">
           <label className="grid gap-2">
             <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
               Hypotheekbedrag
@@ -248,23 +253,20 @@ export default function Calculator() {
             <FieldError message={errors.annualReturnPercent} />
           </label>
         </div>
-
-        <div className="mt-6 border-t border-[var(--hair)] pt-5">
-          <ToolActionButton type="button" onClick={goToResult} disabled={!result} variant="secondary" className="w-full justify-center md:hidden">
+      }
+      submitAction={
+        <div className="flex flex-wrap items-center gap-3 border-t border-[var(--hair)] pt-5">
+          <ToolActionButton type="button" onClick={goToResult} disabled={!result} variant="secondary" full className="md:hidden">
             Bekijk uitkomst
           </ToolActionButton>
-          <div className="text-[11px] uppercase tracking-[0.12em] text-[var(--muted)]">
-            Uitgangspunt
-          </div>
-          <p className="mt-2 text-[12.5px] leading-[1.65] text-[var(--muted)]">
+          <p className="text-[12.5px] leading-[1.65] text-[var(--muted)]">
             De bestaande hypotheeklogica rekent met een vaste belastingfactor en een
             maandelijkse beleggingspot op basis van het netto verschil tussen beide
             routes. Dat maakt de keuze vergelijkbaar en transparant.
           </p>
         </div>
-      </section>
-
-      <section className="min-w-0 space-y-5">
+      }
+      result={
         <div id="tool-result-summary" className="rounded-[1.5rem] bg-[var(--deep)] p-6 text-white shadow-paper-lg">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="text-[11px] uppercase tracking-[0.12em] text-white/55">
@@ -300,7 +302,9 @@ export default function Calculator() {
             </p>
           )}
         </div>
-
+      }
+      details={
+        <>
         <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
           <h2 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
             Kernuitkomsten
@@ -433,7 +437,8 @@ export default function Calculator() {
             Gebruik dit vooral om je scenario scherper te krijgen.
           </p>
         </DisclosureSection>
-      </section>
-    </div>
+        </>
+      }
+    />
   );
 }
