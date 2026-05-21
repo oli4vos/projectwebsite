@@ -26,7 +26,7 @@ export type CalculatorInput = {
   hasPartner?: boolean;
   voluntaryExtraMonthly: number;
   annualInvestmentReturn: number;
-  years: number;
+  years?: number;
   box3EffectEnabled?: boolean;
   taxYear?: number;
   hasFiscalPartner?: boolean;
@@ -38,6 +38,7 @@ export type CalculatorInput = {
 
 export type ProjectionPoint = {
   year: number;
+  remainingDebtWithExtra: number;
   debtStrategyValue: number;
   expectedInvestmentValue: number;
   difference: number;
@@ -94,6 +95,8 @@ export type DuoContext = {
 };
 
 export type CalculatorResult = {
+  effectiveHorizonMonths: number;
+  effectiveHorizonYears: number;
   duoContext: DuoContext;
   totalVoluntaryAmount: number;
   indicativeInterestSavings: number;
@@ -129,6 +132,40 @@ function sanitizeYears(value: number) {
   return Math.max(Math.round(value), 0);
 }
 
+function buildDebtBalanceProjection(input: {
+  years: number;
+  remainingDebt: number;
+  annualDebtRate: number;
+  monthlyPayment: number;
+}) {
+  const years = sanitizeYears(input.years);
+  const monthlyRate = sanitizeDuoPercent(input.annualDebtRate) / 100 / 12;
+  const monthlyPayment = roundMoney(input.monthlyPayment);
+  const balances: number[] = [roundMoney(input.remainingDebt)];
+
+  let balance = roundMoney(input.remainingDebt);
+  const maxMonths = years * 12;
+
+  for (let month = 1; month <= maxMonths; month += 1) {
+    if (balance <= 0 || monthlyPayment <= 0) {
+      if (month % 12 === 0) {
+        balances.push(0);
+      }
+      continue;
+    }
+
+    const interest = roundMoney(balance * monthlyRate);
+    const principalPaid = Math.max(roundMoney(monthlyPayment - interest), 0);
+    balance = roundMoney(Math.max(balance - principalPaid, 0));
+
+    if (month % 12 === 0) {
+      balances.push(roundMoney(balance));
+    }
+  }
+
+  return balances;
+}
+
 function sanitizePositiveYears(value?: number, fallback = 1) {
   if (value === undefined || !Number.isFinite(value)) {
     return fallback;
@@ -138,12 +175,20 @@ function sanitizePositiveYears(value?: number, fallback = 1) {
 
 function buildProjection(input: {
   years: number;
+  remainingDebt: number;
+  totalMonthlyToDuo: number;
   voluntaryExtraMonthly: number;
   annualDebtRate: number;
   annualInvestmentReturn: number;
 }) {
   const years = sanitizeYears(input.years);
   const points: ProjectionPoint[] = [];
+  const debtBalances = buildDebtBalanceProjection({
+    years,
+    remainingDebt: input.remainingDebt,
+    annualDebtRate: input.annualDebtRate,
+    monthlyPayment: input.totalMonthlyToDuo,
+  });
 
   for (let year = 0; year <= years; year += 1) {
     const monthlyExtra = roundMoney(input.voluntaryExtraMonthly);
@@ -163,6 +208,7 @@ function buildProjection(input: {
 
     points.push({
       year,
+      remainingDebtWithExtra: debtBalances[year] ?? 0,
       debtStrategyValue,
       expectedInvestmentValue,
       difference: roundMoney(expectedInvestmentValue - debtStrategyValue),
@@ -321,8 +367,6 @@ export function calculateStudyDebtVsInvesting(
   const hasPartner = input.hasPartner ?? partnerGrossAnnualIncome > 0;
   const voluntaryExtraMonthly = sanitizeDuoMoney(input.voluntaryExtraMonthly);
   const annualInvestmentReturn = sanitizeDuoPercent(input.annualInvestmentReturn);
-  const years = sanitizePositiveYears(input.years, 1);
-  const totalVoluntaryAmount = roundMoney(voluntaryExtraMonthly * years * 12);
 
   const statutoryMonthlyPayment = calculateStatutoryDuoMonthlyPayment({
     repaymentRule,
@@ -361,6 +405,11 @@ export function calculateStudyDebtVsInvesting(
     0,
   );
   const yearsEarlierDebtFree = roundMoney(monthsEarlierDebtFree / 12);
+  const effectiveHorizonMonths = Math.max(payoffWithExtra.monthsRemaining, 1);
+  const effectiveHorizonYears = Math.max(Math.ceil(effectiveHorizonMonths / 12), 1);
+  const totalVoluntaryAmount = roundMoney(
+    voluntaryExtraMonthly * effectiveHorizonYears * 12,
+  );
 
   const repaymentVsInvesting = calculateExtraRepaymentVsInvesting({
     remainingDebt,
@@ -370,7 +419,7 @@ export function calculateStudyDebtVsInvesting(
     extraRepaymentAmount: totalVoluntaryAmount,
     monthlyExtraAmount: voluntaryExtraMonthly,
     expectedAnnualReturn: annualInvestmentReturn,
-    investmentHorizonYears: years,
+    investmentHorizonYears: effectiveHorizonYears,
   });
 
   const debtStrategyValue = roundMoney(
@@ -383,7 +432,9 @@ export function calculateStudyDebtVsInvesting(
   const difference = roundMoney(expectedInvestmentValue - debtStrategyValue);
 
   const projections = buildProjection({
-    years,
+    years: effectiveHorizonYears,
+    remainingDebt,
+    totalMonthlyToDuo,
     voluntaryExtraMonthly,
     annualDebtRate,
     annualInvestmentReturn,
@@ -391,7 +442,7 @@ export function calculateStudyDebtVsInvesting(
 
   const box3Scenario = calculateOptionalBox3Scenario({
     enabled: Boolean(input.box3EffectEnabled),
-    years,
+    years: effectiveHorizonYears,
     annualInvestmentReturn,
     monthlyContribution: voluntaryExtraMonthly,
     taxYear: sanitizeYear(input.taxYear),
@@ -414,6 +465,8 @@ export function calculateStudyDebtVsInvesting(
   ].filter((warning, index, all) => all.indexOf(warning) === index);
 
   return {
+    effectiveHorizonMonths,
+    effectiveHorizonYears,
     duoContext: {
       statutoryMonthlyPayment,
       incomeBasedMonthlyPayment: incomeBased.incomeBasedMonthlyPayment,

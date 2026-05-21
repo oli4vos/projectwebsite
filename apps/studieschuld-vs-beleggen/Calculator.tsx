@@ -4,6 +4,8 @@ import { DisclosureSection } from "@/components/DisclosureSection";
 import { MobileFieldFlowControls } from "@/components/MobileFieldFlowControls";
 import { ResultRow } from "@/components/ResultRow";
 import { ToolDisclosure } from "@/components/ToolDisclosure";
+import { ChartContainer, ChartLegend } from "@/components/ChartPrimitives";
+import { AreaChart, getAdaptiveEuroTicks, getAdaptiveYearTicks } from "@/components/charts";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
 import { ToolActionButton, ToolActionLinkButton } from "@/components/tool/ToolActionButton";
 import { Pill } from "@/components/ui";
@@ -35,7 +37,6 @@ type FormState = {
   partnerGrossAnnualIncome: string;
   voluntaryExtraMonthly: string;
   annualInvestmentReturn: string;
-  years: string;
   box3EffectEnabled: boolean;
   taxYear: string;
   hasFiscalPartner: boolean;
@@ -56,7 +57,6 @@ const exampleValues: FormState = {
   partnerGrossAnnualIncome: "",
   voluntaryExtraMonthly: "150",
   annualInvestmentReturn: "6",
-  years: "10",
   box3EffectEnabled: false,
   taxYear: String(DEFAULT_YEAR),
   hasFiscalPartner: false,
@@ -75,7 +75,6 @@ const defaultValues: FormState = {
   partnerGrossAnnualIncome: "",
   voluntaryExtraMonthly: "",
   annualInvestmentReturn: "",
-  years: "",
   box3EffectEnabled: false,
   taxYear: "",
   hasFiscalPartner: false,
@@ -149,7 +148,6 @@ function validateForm(values: FormState) {
   const partnerGrossAnnualIncome = parseOptionalNumber(values.partnerGrossAnnualIncome);
   const voluntaryExtraMonthly = parseRequiredNumber(values.voluntaryExtraMonthly);
   const annualInvestmentReturn = parseRequiredNumber(values.annualInvestmentReturn);
-  const years = parseRequiredNumber(values.years);
   const taxYear = parseOptionalNumber(values.taxYear);
   const box3BankDeposits = parseOptionalNumber(values.box3BankDeposits);
   const box3InvestmentsAndOtherAssets = parseOptionalNumber(
@@ -203,10 +201,6 @@ function validateForm(values: FormState) {
     errors.annualInvestmentReturn = "Gebruik een rendement tussen 0 en 100.";
   }
 
-  if (!Number.isFinite(years) || years <= 0 || years > 40) {
-    errors.years = "Gebruik een horizon tussen 1 en 40 jaar.";
-  }
-
   if (
     values.box3EffectEnabled &&
     (taxYear === undefined || !Number.isFinite(taxYear) || taxYear < 2000 || taxYear > 2200)
@@ -249,7 +243,6 @@ function validateForm(values: FormState) {
           hasPartner: (partnerGrossAnnualIncome ?? 0) > 0,
           voluntaryExtraMonthly,
           annualInvestmentReturn,
-          years,
           box3EffectEnabled: values.box3EffectEnabled,
           taxYear: values.box3EffectEnabled ? taxYear : undefined,
           hasFiscalPartner: values.hasFiscalPartner,
@@ -319,6 +312,28 @@ function CalculatorContent({
   const result = submittedValidation?.parsedValues
     ? calculateStudyDebtVsInvesting(submittedValidation.parsedValues)
     : null;
+  const horizonChartSeries = result
+    ? [
+        {
+          color: "oklch(55% 0.18 16)",
+          points: result.projections.map((point) => point.remainingDebtWithExtra),
+        },
+        {
+          color: "oklch(45% 0.08 236)",
+          points: result.projections.map((point) => point.expectedInvestmentValue),
+        },
+      ]
+    : null;
+  const horizonXTicks = result ? getAdaptiveYearTicks(result.effectiveHorizonYears) : [];
+  const horizonMaxY = result
+    ? Math.max(
+        ...result.projections.map((point) =>
+          Math.max(point.remainingDebtWithExtra, point.expectedInvestmentValue),
+        ),
+        0,
+      )
+    : 0;
+  const horizonYTicks = getAdaptiveEuroTicks(horizonMaxY);
   const mobileFieldOrder = [
     "repaymentRule",
     "remainingDebt",
@@ -328,7 +343,6 @@ function CalculatorContent({
     "partnerGrossAnnualIncome",
     "voluntaryExtraMonthly",
     "annualInvestmentReturn",
-    "years",
     "box3EffectEnabled",
     ...(formValues.box3EffectEnabled
       ? [
@@ -352,7 +366,6 @@ function CalculatorContent({
       partnerGrossAnnualIncome: errors.partnerGrossAnnualIncome,
       voluntaryExtraMonthly: errors.voluntaryExtraMonthly,
       annualInvestmentReturn: errors.annualInvestmentReturn,
-      years: errors.years,
       taxYear: errors.taxYear,
       box3BankDeposits: errors.box3BankDeposits,
       box3InvestmentsAndOtherAssets: errors.box3InvestmentsAndOtherAssets,
@@ -569,19 +582,13 @@ function CalculatorContent({
             <FieldError message={errors.annualInvestmentReturn} />
           </label>
 
-          <label className={mobileFlow.getFieldClassName("years")}>
-            <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-              Vergelijkingshorizon (jaren)
-            </span>
-            <input
-              inputMode="decimal"
-              value={formValues.years}
-              onChange={(event) => updateField("years", event.target.value)}
-              onKeyDown={mobileFlow.handleEnterAdvance("years", Boolean(errors.years))}
-              className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-            />
-            <FieldError message={errors.years} />
-          </label>
+          <div className="rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
+            <p className="font-medium text-[var(--ink)]">Beleggingshorizon automatisch</p>
+            <p className="mt-1">
+              We rekenen automatisch tot het moment waarop je studieschuld met dit
+              vrijwillige maandbedrag naar verwachting volledig is afgelost.
+            </p>
+          </div>
 
           <label
             className={`${mobileFlow.getFieldClassName("box3EffectEnabled")} rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3`}
@@ -741,7 +748,8 @@ function CalculatorContent({
                 {formatCurrency(result.difference)}
               </div>
               <p className="mt-3 text-[14px] leading-[1.7] text-white/75">
-                Verschil tussen beleggen en vrijwillig extra aflossen in dit scenario.
+                Verschil tussen beleggen en vrijwillig extra aflossen tot aan je
+                verwachte aflosmoment met extra maandbedrag.
               </p>
               <p className="mt-3 text-[13px] leading-[1.65] text-white/70">
                 Je verplichte DUO-bedrag is ongeveer{" "}
@@ -752,7 +760,8 @@ function CalculatorContent({
             </>
           ) : (
             <p className="mt-4 text-[14px] leading-[1.7] text-white/75">
-              Vul geldige invoerwaarden in om de vergelijking te tonen.
+              Vul in wat je weet en klik op Bereken. De tool gebruikt alleen de
+              gegevens die je invult en bepaalt de horizon automatisch.
             </p>
           )}
         </div>
@@ -796,6 +805,11 @@ function CalculatorContent({
                 sub="Indicatief wettelijk/annuïtair bedrag; niet handmatig ingevoerd"
                 accent
               />
+              <ResultRow
+                label="Automatische vergelijkingshorizon"
+                value={`${result.effectiveHorizonYears} jaar`}
+                sub={`Gebaseerd op verwachte aflossing met extra bedrag (${result.effectiveHorizonMonths} maanden)`}
+              />
             </div>
           ) : null}
         </div>
@@ -809,7 +823,7 @@ function CalculatorContent({
               <ResultRow
                 label="Totale vrijwillige ruimte in horizon"
                 value={formatCurrency(result.totalVoluntaryAmount)}
-                sub="Vrijwillige extra maandinleg over de gekozen periode"
+                sub={`Vrijwillige extra maandinleg over ${result.effectiveHorizonYears} jaar (${result.effectiveHorizonMonths} maanden)`}
               />
               <ResultRow
                 label="Waarde bij extra aflossen"
@@ -836,6 +850,51 @@ function CalculatorContent({
           ) : null}
         </div>
 
+        <ToolDisclosure
+          title="Grafiek: schuldverloop en beleggingswaarde"
+          subtitle="Per heel jaar zie je je resterende schuld (met extra aflossen) naast de beleggingswaarde."
+        >
+          {result && horizonChartSeries ? (
+            <div className="space-y-4">
+              <ChartLegend
+                items={[
+                  { label: "Resterende studieschuld", color: "oklch(55% 0.18 16)" },
+                  { label: "Waarde beleggingen", color: "oklch(45% 0.08 236)" },
+                ]}
+              />
+              <div className="grid gap-3 sm:grid-cols-[68px_minmax(0,1fr)]">
+                <div className="hidden flex-col justify-between text-right text-[11px] text-[var(--soft)] sm:flex">
+                  {horizonYTicks
+                    .slice()
+                    .reverse()
+                    .map((tick) => (
+                      <span key={tick}>{formatCurrency(tick)}</span>
+                    ))}
+                </div>
+                <div className="min-w-0">
+                  <ChartContainer
+                    yearTicks={horizonXTicks}
+                    chart={
+                      <AreaChart
+                        width={620}
+                        height={220}
+                        series={horizonChartSeries}
+                        yTicks={horizonYTicks}
+                        xValues={result.projections.map((point) => point.year)}
+                        seriesLabels={["Resterende studieschuld", "Waarde beleggingen"]}
+                      />
+                    }
+                  />
+                </div>
+              </div>
+              <p className="text-[12.5px] leading-[1.6] text-[var(--muted)]">
+                Horizon staat vast op het verwachte moment waarop je schuld is afgelost
+                met dit extra maandbedrag.
+              </p>
+            </div>
+          ) : null}
+        </ToolDisclosure>
+
         <DisclosureSection
           title="Hoe rekenen we dit?"
           subtitle="Verplicht DUO-bedrag eerst, keuze pas op de vrijwillige extra ruimte."
@@ -854,7 +913,11 @@ function CalculatorContent({
               vergelijken we als keuze: extra aflossen of beleggen.
             </p>
             <p>
-              4) Het hypotheek-relevante DUO-bedrag tonen we als indicatief wettelijk
+              4) De vergelijkingshorizon bepalen we automatisch tot het moment dat je
+              schuld met dit extra bedrag naar verwachting is afgelost.
+            </p>
+            <p>
+              5) Het hypotheek-relevante DUO-bedrag tonen we als indicatief wettelijk
               annuïtair bedrag. Dat is in deze tool geen vrij invulveld.
             </p>
           </div>
@@ -927,9 +990,14 @@ function CalculatorContent({
               </ToolDisclosure>
             </div>
           ) : (
-            <p className="text-[13px] leading-[1.65] text-[var(--muted)]">
-              Zet de box 3-optie aan om dit scenario te tonen.
-            </p>
+            <div className="space-y-2 text-[13px] leading-[1.65] text-[var(--muted)]">
+              <p>Box 3-impact staat uit in dit scenario.</p>
+              <p>
+                Kanttekening: de beleggingsuitkomst kan dan te optimistisch lijken,
+                omdat eventuele jaarlijkse box 3-heffing niet is meegenomen.
+              </p>
+              <p>Zet de box 3-optie aan als je dit effect ook wilt zien.</p>
+            </div>
           )}
         </DisclosureSection>
 

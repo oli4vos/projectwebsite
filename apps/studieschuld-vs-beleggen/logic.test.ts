@@ -10,7 +10,6 @@ const baseInput = {
   partnerGrossAnnualIncome: 0,
   voluntaryExtraMonthly: 150,
   annualInvestmentReturn: 6,
-  years: 10,
 };
 
 describe("calculateStudyDebtVsInvesting", () => {
@@ -42,6 +41,27 @@ describe("calculateStudyDebtVsInvesting", () => {
 
     expect(result.duoContext.monthsEarlierDebtFree).toBeGreaterThanOrEqual(0);
     expect(result.duoContext.yearsEarlierDebtFree).toBeGreaterThanOrEqual(0);
+  });
+
+  it("uses payoff-with-extra as automatic investment horizon", () => {
+    const result = calculateStudyDebtVsInvesting(baseInput);
+
+    expect(result.effectiveHorizonMonths).toBeGreaterThanOrEqual(1);
+    expect(result.effectiveHorizonYears).toBe(
+      Math.max(Math.ceil(result.effectiveHorizonMonths / 12), 1),
+    );
+    expect(result.projections[result.projections.length - 1]?.year).toBe(
+      result.effectiveHorizonYears,
+    );
+  });
+
+  it("includes debt balance projection that reaches zero by the end of horizon", () => {
+    const result = calculateStudyDebtVsInvesting(baseInput);
+    const firstPoint = result.projections[0];
+    const lastPoint = result.projections[result.projections.length - 1];
+
+    expect(firstPoint?.remainingDebtWithExtra).toBeGreaterThan(0);
+    expect(lastPoint?.remainingDebtWithExtra ?? Number.POSITIVE_INFINITY).toBeLessThanOrEqual(0.01);
   });
 
   it("keeps base result stable when box3 effect is disabled", () => {

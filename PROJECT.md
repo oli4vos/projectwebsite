@@ -151,8 +151,11 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - focust op verplichte DUO-betaling (wettelijk + draagkracht) versus vrijwillige extra ruimte
   - wettelijk DUO-maandbedrag wordt annuïtair berekend en niet als vrij invulveld gebruikt
   - vrijwillige ruimte boven het verplichte bedrag wordt vergeleken als keuze: extra aflossen of beleggen
+  - beleggingshorizon wordt automatisch gezet tot het verwachte aflosmoment met het gekozen extra maandbedrag (geen losse horizon-input)
+  - bevat uitklapbare grafiek met schuldverloop versus beleggingswaarde per heel jaar
   - gebruikt optioneel centrale tax-laag voor een indicatieve box 3-correctie in de verdiepingslaag
   - box 3-effect wordt jaarlijks toegepast; jaarlijkse heffing wordt uit het beleggingsscenario betaald en telt daarna niet mee in verdere compoundgroei
+  - als box 3-toggle uit staat, toont de tool expliciet dat de beleggingsuitkomst dan mogelijk te optimistisch is
 - `apps/box3-indicatie`
   - aparte box 3-tool met light invoer + beknopte samenvatting + uitklapbare verdieping
   - ondersteunt werkelijk rendement (default) en forfaitair scenario
