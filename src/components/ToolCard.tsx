@@ -26,7 +26,7 @@ export function ToolCard({
   return (
     <Link
       href={href}
-      className={`group relative flex w-full flex-col overflow-hidden rounded-xl border hair bg-white text-left transition duration-200 hover:-translate-y-px hover:shadow-paper focus-visible:-translate-y-px focus-visible:shadow-paper focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 active:translate-y-0 ${
+      className={`group relative flex h-full w-full flex-col overflow-hidden rounded-xl border hair bg-white text-left transition duration-200 hover:-translate-y-px hover:shadow-paper focus-visible:-translate-y-px focus-visible:shadow-paper focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 active:translate-y-0 ${
         dense ? "p-5" : "p-6"
       }`}
     >
@@ -55,7 +55,7 @@ export function ToolCard({
       </p>
 
       {stat ? (
-        <div className="mt-5 flex items-end justify-between gap-3">
+        <div className="mt-auto flex items-end justify-between gap-3 pt-5">
           <div>
             <div className="text-[11px] uppercase tracking-[0.06em] text-[var(--soft)]">
               {statLabel}
@@ -67,7 +67,7 @@ export function ToolCard({
           </span>
         </div>
       ) : (
-        <div className="mt-6 flex items-center justify-between">
+        <div className="mt-auto flex items-center justify-between pt-6">
           <span className="text-[12px] text-[var(--soft)]">Scenario en uitleg</span>
           <span className="text-[13px] font-medium text-[var(--ink)] opacity-80 transition group-hover:translate-x-0.5 group-hover:opacity-100 group-focus-visible:translate-x-0.5 group-focus-visible:opacity-100">
             Openen →

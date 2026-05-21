@@ -115,7 +115,8 @@ export function AreaChart({
 }: AreaChartProps) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const allPoints = series.flatMap((entry) => entry.points);
-  const min = Math.min(...allPoints);
+  const minPoint = Math.min(...allPoints);
+  const min = minPoint >= 0 ? 0 : minPoint;
   const max = Math.max(...allPoints);
   const range = max - min || 1;
   const step = width / Math.max(series[0].points.length - 1, 1);
