@@ -31,13 +31,13 @@ export function CalculatorShell({
 
   return (
     <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] [&>*]:min-w-0">
-      <section className="order-2 min-w-0 rounded-[1.5rem] border hair bg-white p-6 shadow-paper lg:order-1">
+      <section className="order-1 min-w-0 rounded-[1.5rem] border hair bg-white p-6 shadow-paper lg:order-1">
         {intro}
         {startActions ? <div className="mt-4">{startActions}</div> : null}
         {inputs ? <div className="mt-6">{inputs}</div> : null}
         {submitAction ? <div className="mt-4">{submitAction}</div> : null}
       </section>
-      <section className="order-1 min-w-0 space-y-5 lg:order-2">
+      <section className="order-2 min-w-0 space-y-5 lg:order-2">
         {result}
         {details}
         {disclaimer}

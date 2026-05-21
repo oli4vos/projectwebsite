@@ -17,6 +17,14 @@ export function useSubmittedCalculation<T>(initialValues: T) {
   const submit = useCallback(() => {
     setSubmittedValues(formValues);
     setSubmitContextMessage(null);
+    if (typeof window !== "undefined") {
+      window.requestAnimationFrame(() => {
+        document.getElementById("tool-result-summary")?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      });
+    }
   }, [formValues]);
 
   const setValues = useCallback((nextValues: T, message?: string) => {
