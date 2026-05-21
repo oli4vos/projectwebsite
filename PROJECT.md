@@ -139,6 +139,8 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/lib/storage/profile-store-async.ts`: async entrypoint naast sync profielstore (nog niet actief in UI)
 - `src/lib/storage/local-profile-store-async.ts`: async adapter rond de bestaande local store
 - `src/lib/storage/remote-profile-store-async.ts`: async remote/hybrid stub met lokale fallback
+- `src/lib/supabase/config.ts` + `src/lib/supabase/browser-client.ts`: optionele browser-safe Supabase configuratie (no-op zonder env vars)
+- `.env.example`: publieke voorbeeldvariabelen voor storage mode en optionele Supabase clientconfig
 - `src/lib/user-preferences.ts`: local-first voorkeuren voor uitlegdiepte (`basic` / `standard` / `advanced`)
 - `src/lib/profile-tool-mapping.ts`: centrale mapping van profielwaarden naar tool-defaults
 - `src/lib/profile-prefill.ts`: gedeelde helper voor consistente tool-prefill-flow
@@ -184,6 +186,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - async `ProfileStoreAsync` als voorbereiding op remote/database.
 - Async store is voorbereid maar nog niet geactiveerd in de UI-flow.
 - Echte database/auth-fase komt later en vereist implementatie van de remote async store zonder local fallback.
+- Supabase is in deze fase optioneel: zonder `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` blijft runtime volledig local/no-op.
 - Databasefase is nu expliciet gedocumenteerd, maar runtime blijft local-first en static-safe.
 
 ## Huidige tools
