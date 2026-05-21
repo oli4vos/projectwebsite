@@ -5,10 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { BtnLink, Logo } from "@/components/ui";
 import { appRegistry } from "@/lib/app-registry";
-import {
-  getCategoryFallbackToolHref,
-  getGroupAnchorForCategory,
-} from "@/lib/tool-groups";
+import { getGroupAnchorForCategory } from "@/lib/tool-groups";
 
 const navItems = [
   { href: "/#apps", label: "Overzicht" },
@@ -65,9 +62,7 @@ export function SiteHeader() {
   }, []);
 
   const getCategoryLink = (category: string) =>
-    onHome
-      ? `/#${getGroupAnchorForCategory(category)}`
-      : getCategoryFallbackToolHref(category, appRegistry);
+    `/#${getGroupAnchorForCategory(category)}`;
 
   return (
     <header className="hair-b sticky top-0 z-20 bg-[rgba(245,241,234,0.78)] backdrop-blur-md">
