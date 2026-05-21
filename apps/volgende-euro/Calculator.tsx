@@ -250,6 +250,18 @@ function CalculatorContent({ initialValues, hasRelevantProfileValues, profilePat
     document.getElementById("tool-result-summary")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
+  function submitAndScroll() {
+    if (Object.keys(validationErrors).length > 0) {
+      return;
+    }
+    setSubmittedValues(formValues);
+    setSubmitContextMessage(null);
+    document.getElementById("tool-result-summary")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }
+
   const result = submittedResult;
   const relevantTopThree = result?.topThree ?? [];
   const insufficient = (result?.priorities ?? []).filter((p) => p.applicability !== "relevant");
@@ -292,10 +304,10 @@ function CalculatorContent({ initialValues, hasRelevantProfileValues, profilePat
       total={mobileFlow.total}
       canGoPrev={mobileFlow.canGoPrev}
       canGoNext={mobileFlow.canGoNext}
-      canComplete={Boolean(submittedValues)}
+      canComplete={Object.keys(validationErrors).length === 0}
       onPrev={mobileFlow.goPrev}
       onNext={mobileFlow.goNext}
-      onComplete={() => document.getElementById("tool-result-summary")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+      onComplete={submitAndScroll}
     />
   );
 
