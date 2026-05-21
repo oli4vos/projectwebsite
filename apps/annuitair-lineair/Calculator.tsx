@@ -541,7 +541,10 @@ export default function Calculator() {
         </div>
 
         {result?.investmentScenario && chartSeries ? (
-          <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
+          <DisclosureSection
+            title="Verdieping: netto jaarlasten annuïtair vs lineair"
+            subtitle="Uitklapbare grafiek per jaar, alleen zichtbaar als verdieping is ingevuld."
+          >
             <div className="flex items-center justify-between gap-4">
               <div>
                 <div className="text-[11px] uppercase tracking-[0.1em] text-[var(--muted)]">
@@ -592,7 +595,7 @@ export default function Calculator() {
                 {formatCompactEuro(chartYTicks.at(-1) ?? 0)}
               </span>
             </div>
-          </div>
+          </DisclosureSection>
         ) : null}
 
         {result?.investmentScenario ? (

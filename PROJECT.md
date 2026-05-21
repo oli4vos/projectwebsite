@@ -197,8 +197,14 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - rekent met declarabele uren, actieve werkweken en niet-declarabele ruimte via invoer
   - is expliciet geen volledige ZZP/IB-aangifte en gebruikt box 1 alleen als indicatieve referentie
 - `apps/annuitair-lineair`
-  - wrapper rond bestaande JS-logica
-  - bevat oudere rekenscripts in `.js`
+  - vergelijkt netto/bruto maandlasten en totale rentelast tussen annuïtair en lineair
+  - optionele verdieping toont wat maandelijkse netto-verschillen doen als beleggingsinleg/onttrekking
+  - in die verdieping is box 3-effect optioneel mee te nemen
+  - bevat oudere rekenscripts in `.js` als onderliggende rekenkern
+- `apps/hypotheekrenteaftrek-afschaffen`
+  - scenariovergelijking van netto rentelasten mét en zonder hypotheekrenteaftrek
+  - gebruikt centrale `calculateMortgageInterestDeduction`
+  - toont meerjarige tijdlijn en cumulatief verschil als aftrek zou vervallen
 - `apps/hypotheek-impact-studieschuld`
   - indicatieve tool voor de impact van een DUO-maandlast op hypotheekruimte
   - v2 rekent primair via relevante DUO-maandlast -> brutering -> annuïtaire hypotheekimpact

@@ -25,6 +25,7 @@ export const toolGroups: ToolGroup[] = [
       "hypotheek-impact-studieschuld",
       "hypotheek-aflossen-vs-beleggen",
       "annuitair-lineair",
+      "hypotheekrenteaftrek-afschaffen",
     ],
   },
   {
@@ -35,7 +36,7 @@ export const toolGroups: ToolGroup[] = [
   {
     title: "Belasting",
     description: "Rekentools rond box 3 en fiscale afwegingen.",
-    slugs: ["box-3-impact", "jaarruimte-vs-vrij-beleggen"],
+    slugs: ["box-3-impact", "jaarruimte-vs-vrij-beleggen", "hypotheekrenteaftrek-afschaffen"],
   },
   {
     title: "FIRE / financiële vrijheid",
@@ -60,7 +61,11 @@ const categoryToGroupTitle: Record<string, string> = {
 
 const preferredSlugsByCategory: Record<string, string[]> = {
   Schulden: ["studieschuld-vs-beleggen", "hypotheek-impact-studieschuld"],
-  Hypotheek: ["hypotheek-aflossen-vs-beleggen", "annuitair-lineair"],
+  Hypotheek: [
+    "hypotheek-aflossen-vs-beleggen",
+    "annuitair-lineair",
+    "hypotheekrenteaftrek-afschaffen",
+  ],
   Beleggen: ["box-3-impact", "fire-na-belasting"],
   Belasting: ["box-3-impact", "jaarruimte-vs-vrij-beleggen"],
   Werk: ["zzp-uurtarief"],

@@ -42,6 +42,13 @@ export const appComponents: Record<string, AppCalculatorComponent> = {
       </div>
     ),
   }),
+  "hypotheekrenteaftrek-afschaffen": dynamic(() => import("../../apps/hypotheekrenteaftrek-afschaffen/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
   "jaarruimte-vs-vrij-beleggen": dynamic(() => import("../../apps/jaarruimte-vs-vrij-beleggen/Calculator"), {
     loading: () => (
       <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
