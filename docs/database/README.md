@@ -30,6 +30,23 @@ De databasevariant is aanvullend en draait later naast de huidige browser-only f
 - Voorbereid, nog niet actief als verplichte runtime.
 - Geen database vereist voor build of gebruik.
 - Geen auth-flow verplicht in UI.
+- Hybrid sync-orchestrator is voorbereid in code, maar wordt nog niet automatisch door UI/hooks aangeroepen.
+
+## Hybrid sync contract (voorbereid)
+
+- Orchestrator: `syncProfileOnce()` in `src/lib/storage/profile-sync-orchestrator.ts`.
+- Default conflict policy: `preferNewest`.
+- Policy-opties:
+  - `preferNewest`
+  - `preferLocal`
+  - `preferRemote`
+- Bij ontbrekende/ongeldige timestamps kiest de policy veilig local als fallback.
+- Fallback-events bevatten alleen status/reason/message/timestamp en geen profieldata.
+- Eventlog is client-safe en lokaal:
+  - `recordProfileSyncEvent`
+  - `getProfileSyncEvents`
+  - `clearProfileSyncEvents`
+  - max 20 events
 
 ## Toekomstige stappen
 
