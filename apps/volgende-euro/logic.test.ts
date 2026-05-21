@@ -279,5 +279,31 @@ describe("calculateVolgendeEuroPriorities", () => {
       expect(result.topRecommendation).toBeNull();
       expect(result.priorities.some((item) => item.applicability === "relevant")).toBe(false);
     });
+
+    it("marks free investing as insufficientData when horizon or return is missing", () => {
+      const result = calculateVolgendeEuroPriorities({
+        extraAmount: 1500,
+      });
+      const investing = result.priorities.find((item) => item.key === "freeInvesting");
+      expect(investing?.applicability).toBe("insufficientData");
+      expect(investing?.missingFields).toContain("beleggingshorizon");
+      expect(investing?.missingFields).toContain("verwacht rendement");
+    });
+
+    it("limits topThree to relevant options only", () => {
+      const result = calculateVolgendeEuroPriorities({
+        extraAmount: 2500,
+        currentBuffer: 4000,
+        targetBuffer: 12000,
+        hasExpensiveDebt: true,
+        expensiveDebtAmount: 6000,
+        expensiveDebtRate: 14,
+        horizonYears: 20,
+        expectedAnnualReturn: 6,
+      });
+      expect(result.topThree.length).toBeGreaterThan(0);
+      expect(result.topThree.every((item) => item.applicability === "relevant")).toBe(true);
+      expect(result.topThree.length).toBeLessThanOrEqual(3);
+    });
   });
 });
