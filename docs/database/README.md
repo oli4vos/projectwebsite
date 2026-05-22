@@ -32,6 +32,7 @@ De databasevariant is aanvullend en draait later naast de huidige browser-only f
 - Geen auth-flow verplicht in UI.
 - Hybrid sync-orchestrator is voorbereid in code, maar wordt nog niet automatisch door UI/hooks aangeroepen.
 - Er is een handmatige sync-entry voorbereid op `/profiel`, maar alleen als feature flag + mode/config dat toestaan.
+- Saved calculations hebben nu een local-first storage-laag, maar nog zonder UI-koppeling.
 
 ## Hybrid sync contract (voorbereid)
 
@@ -57,4 +58,14 @@ De databasevariant is aanvullend en draait later naast de huidige browser-only f
 2. SQL-schema uit `docs/database/supabase-schema.sql` uitvoeren.
 3. Auth configureren (sessie/account optioneel houden).
 4. Remote async profile store activeren achter feature flag.
-5. Opslag van scenario's (`saved_calculations`) toevoegen in UI.
+5. Scenario-opslag in tools/UI activeren met expliciete gebruikeractie (“Scenario opslaan”).
+
+## Saved calculations (huidige fase)
+
+- Storage contract + local store bestaan al in code:
+  - `src/lib/storage/saved-calculations/saved-calculation.types.ts`
+  - `src/lib/storage/saved-calculations/local-saved-calculation-store.ts`
+  - `src/lib/storage/saved-calculations/saved-calculation-store.ts`
+- Nog geen knoppen/UI actief in tools.
+- Hybrid/remote modes vallen in deze fase nog terug op local store.
+- Bij latere database-activering kan `saved_calculations` uit het schema direct worden gebruikt.

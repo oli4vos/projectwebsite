@@ -142,6 +142,10 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/lib/storage/profile-sync.types.ts` + `src/lib/storage/profile-sync-policy.ts`: sync status/reason/eventmodel en conflict policy primitives
 - `src/lib/storage/profile-sync-orchestrator.ts`: eenmalige hybrid sync-orchestrator (`syncProfileOnce`) met policy-gedreven conflictkeuze
 - `src/lib/storage/profile-sync-events.ts`: lokaal eventlog voor sync-fallbacks (geen profieldata, max 20 events)
+- `src/lib/storage/saved-calculations/saved-calculation.types.ts`: domeincontract voor opgeslagen scenario's/berekeningen
+- `src/lib/storage/saved-calculations/local-saved-calculation-store.ts`: local-first scenario-opslag (max 50, sanitizing, SSR-safe)
+- `src/lib/storage/saved-calculations/saved-calculation-store.ts`: centraal entrypoint met mode-voorbereiding (`local`/`hybrid`/`remote`, nu fallback local)
+- `src/lib/storage/saved-calculations/remote-saved-calculation-store.ts`: remote stub voor toekomstige databasefase
 - `src/components/ProfileSyncPanel.tsx`: optioneel handmatig sync-paneel op profielpagina (feature-flagged)
 - `src/lib/supabase/config.ts` + `src/lib/supabase/browser-client.ts`: optionele browser-safe Supabase configuratie (no-op zonder env vars)
 - `src/lib/auth/auth-session.ts` + `src/lib/auth/*.ts`: optioneel auth-session contract met veilige unauthenticated fallback
@@ -204,6 +208,28 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - Fallback events loggen alleen metadata (status/reason/message/timestamp), nooit volledige profielinhoud.
 - Syncstatus in UI toont alleen metadata/events en geen profielpayload.
 - Databasefase is nu expliciet gedocumenteerd, maar runtime blijft local-first en static-safe.
+
+### Saved calculations (local-first, zonder UI)
+
+- Scenario-opslag bestaat nu als storage-laag, zonder zichtbare UI-koppeling in tools.
+- Doel: later per tool een expliciete “Scenario opslaan”-actie kunnen toevoegen zonder store-refactor.
+- Opslag loopt voorlopig lokaal via `project-site:saved-calculations:v1`.
+- Data per item:
+  - `toolSlug`, `title`, `input`, optioneel `result`, `createdAt`, `updatedAt`, `version`.
+- Sanitizing:
+  - ongeldige items worden genegeerd;
+  - invalid JSON valt veilig terug op lege lijst;
+  - maximaal 50 items, newest-first.
+- Modegedrag:
+  - `local`: lokale opslag;
+  - `hybrid`/`remote`: in deze fase nog veilige fallback naar local.
+- Privacy:
+  - scenario's blijven lokaal totdat account/sync later expliciet wordt geactiveerd.
+- Voor toekomstige UI geldt:
+  - alleen handmatig opslaan (geen autosave);
+  - input snapshot verplicht;
+  - result snapshot optioneel;
+  - duidelijk onderscheid tussen profieldata en scenario-opslag.
 
 ## Huidige tools
 
