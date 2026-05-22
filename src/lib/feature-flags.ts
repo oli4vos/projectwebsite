@@ -3,3 +3,6 @@ export const ENABLE_KNOWLEDGE_LEVEL =
 
 export const ENABLE_PROFILE =
   process.env.NEXT_PUBLIC_ENABLE_PROFILE === "1";
+
+export const ENABLE_PROFILE_SYNC_PANEL =
+  process.env.NEXT_PUBLIC_ENABLE_PROFILE_SYNC_PANEL === "1";

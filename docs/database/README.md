@@ -31,6 +31,7 @@ De databasevariant is aanvullend en draait later naast de huidige browser-only f
 - Geen database vereist voor build of gebruik.
 - Geen auth-flow verplicht in UI.
 - Hybrid sync-orchestrator is voorbereid in code, maar wordt nog niet automatisch door UI/hooks aangeroepen.
+- Er is een handmatige sync-entry voorbereid op `/profiel`, maar alleen als feature flag + mode/config dat toestaan.
 
 ## Hybrid sync contract (voorbereid)
 
@@ -47,6 +48,8 @@ De databasevariant is aanvullend en draait later naast de huidige browser-only f
   - `getProfileSyncEvents`
   - `clearProfileSyncEvents`
   - max 20 events
+- Geen automatische sync: alleen handmatig via knop.
+- Geen verplichte login: zonder sessie blijft lokale opslag leidend.
 
 ## Toekomstige stappen
 

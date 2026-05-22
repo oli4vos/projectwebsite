@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import { ProfileSyncPanel } from "@/components/ProfileSyncPanel";
 import { Btn } from "@/components/ui";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { ENABLE_PROFILE } from "@/lib/feature-flags";
@@ -503,6 +504,7 @@ export default function ProfilePage() {
           onSave={saveProfile}
           onClear={clearProfile}
         />
+        <ProfileSyncPanel />
       </main>
       <SiteFooter />
     </>

@@ -142,6 +142,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/lib/storage/profile-sync.types.ts` + `src/lib/storage/profile-sync-policy.ts`: sync status/reason/eventmodel en conflict policy primitives
 - `src/lib/storage/profile-sync-orchestrator.ts`: eenmalige hybrid sync-orchestrator (`syncProfileOnce`) met policy-gedreven conflictkeuze
 - `src/lib/storage/profile-sync-events.ts`: lokaal eventlog voor sync-fallbacks (geen profieldata, max 20 events)
+- `src/components/ProfileSyncPanel.tsx`: optioneel handmatig sync-paneel op profielpagina (feature-flagged)
 - `src/lib/supabase/config.ts` + `src/lib/supabase/browser-client.ts`: optionele browser-safe Supabase configuratie (no-op zonder env vars)
 - `src/lib/auth/auth-session.ts` + `src/lib/auth/*.ts`: optioneel auth-session contract met veilige unauthenticated fallback
 - `.env.example`: publieke voorbeeldvariabelen voor storage mode en optionele Supabase clientconfig
@@ -190,6 +191,8 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - async `ProfileStoreAsync` als voorbereiding op remote/database.
 - Async store is voorbereid maar nog niet geactiveerd in de UI-flow.
 - Hybrid sync-orchestrator bestaat, maar wordt nog niet automatisch vanuit UI/hooks getriggerd.
+- Er is nu een handmatige sync-entry op `/profiel`, maar alleen bij feature flag + relevante mode/config.
+- Geen automatische background sync: sync gebeurt alleen na klik op “Synchroniseer profiel”.
 - Echte database/auth-fase komt later en vereist implementatie van de remote async store zonder local fallback.
 - Supabase is in deze fase optioneel: zonder `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` blijft runtime volledig local/no-op.
 - Auth is voorbereid maar niet actief als verplichte flow; zonder account blijft de site volledig bruikbaar.
@@ -199,6 +202,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - optioneel `preferLocal`/`preferRemote`;
   - ontbrekende/ongeldige timestamps vallen veilig terug op local.
 - Fallback events loggen alleen metadata (status/reason/message/timestamp), nooit volledige profielinhoud.
+- Syncstatus in UI toont alleen metadata/events en geen profielpayload.
 - Databasefase is nu expliciet gedocumenteerd, maar runtime blijft local-first en static-safe.
 
 ## Huidige tools
