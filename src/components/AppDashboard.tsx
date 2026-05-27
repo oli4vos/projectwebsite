@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { AppManifest } from "@/lib/app-types";
 import { toAnchorId } from "@/lib/anchor-ids";
 import { ENABLE_PROFILE } from "@/lib/feature-flags";
@@ -15,7 +15,38 @@ type AppDashboardProps = {
   apps: AppManifest[];
 };
 
+type AudiencePreset = {
+  id: string;
+  label: string;
+  groups: string[];
+};
+
+const audiencePresets: AudiencePreset[] = [
+  { id: "all", label: "Alles", groups: [] },
+  {
+    id: "oud-student",
+    label: "Oud-student",
+    groups: ["Studieschuld", "Wonen", "Persoonlijke financiën"],
+  },
+  {
+    id: "zzp",
+    label: "ZZP",
+    groups: ["Werk & ZZP", "Belasting", "Persoonlijke financiën"],
+  },
+  {
+    id: "pensioen",
+    label: "Richting pensioen",
+    groups: ["Sparen & beleggen", "Belasting", "FIRE / financiële vrijheid"],
+  },
+  {
+    id: "beleggen",
+    label: "Beleggen algemeen",
+    groups: ["Sparen & beleggen", "Belasting", "FIRE / financiële vrijheid"],
+  },
+];
+
 export function AppDashboard({ apps }: AppDashboardProps) {
+  const [activeAudience, setActiveAudience] = useState<string>("all");
   const appsBySlug = useMemo(
     () =>
       Object.fromEntries(apps.map((app) => [app.slug, app])) as Record<
@@ -38,6 +69,17 @@ export function AppDashboard({ apps }: AppDashboardProps) {
     [appsBySlug],
   );
 
+  const filteredGroupedApps = useMemo(() => {
+    if (activeAudience === "all") {
+      return groupedApps;
+    }
+    const preset = audiencePresets.find((item) => item.id === activeAudience);
+    if (!preset) {
+      return groupedApps;
+    }
+    return groupedApps.filter((group) => preset.groups.includes(group.title));
+  }, [activeAudience, groupedApps]);
+
   return (
     <div className="space-y-8">
       <KnowledgeLevelSelector />
@@ -52,10 +94,26 @@ export function AppDashboard({ apps }: AppDashboardProps) {
         <p className="mt-3 max-w-[62ch] text-[14px] leading-[1.65] text-[var(--ink-2)]">
           Eerst invullen, daarna resultaat. Verdieping staat standaard dicht en open je alleen als je meer uitleg wilt.
         </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {audiencePresets.map((preset) => (
+            <button
+              key={preset.id}
+              type="button"
+              onClick={() => setActiveAudience(preset.id)}
+              className={`rounded-full border px-3 py-1.5 text-[12px] transition ${
+                activeAudience === preset.id
+                  ? "border-[var(--ink)] bg-[var(--deep)] text-white"
+                  : "border-[var(--hair)] bg-white text-[var(--ink)] hover:bg-[var(--paper-soft)]"
+              }`}
+            >
+              {preset.label}
+            </button>
+          ))}
+        </div>
       </section>
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {groupedApps.map((group) => (
+        {filteredGroupedApps.map((group) => (
           <article key={group.title} className="rounded-xl border hair bg-white p-4 shadow-paper">
             <h3 className="font-serif text-[1.2rem] tracking-[-0.01em] text-[var(--ink)]">
               {group.title}
@@ -79,7 +137,7 @@ export function AppDashboard({ apps }: AppDashboardProps) {
       </section>
 
       <section className="space-y-6">
-        {groupedApps.map((group) => (
+        {filteredGroupedApps.map((group) => (
           <section
             id={toAnchorId(group.title, "groep")}
             key={group.title}
