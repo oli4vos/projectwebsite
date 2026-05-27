@@ -67,5 +67,15 @@ De databasevariant is aanvullend en draait later naast de huidige browser-only f
   - `src/lib/storage/saved-calculations/local-saved-calculation-store.ts`
   - `src/lib/storage/saved-calculations/saved-calculation-store.ts`
 - Nog geen knoppen/UI actief in tools.
+- MVP-UI is nu feature-flagged en bewust klein:
+  - alleen `apps/volgende-euro` heeft een handmatige knop “Scenario opslaan”;
+  - `/profiel` toont een eenvoudige lokale scenario-lijst;
+  - geen autosave.
 - Hybrid/remote modes vallen in deze fase nog terug op local store.
 - Bij latere database-activering kan `saved_calculations` uit het schema direct worden gebruikt.
+
+## Volgende stap na MVP
+
+- Scenario openen/herladen in tool toevoegen.
+- Optionele accountkoppeling/sync voor `saved_calculations`.
+- Compact accountdashboard voor opgeslagen scenario's.

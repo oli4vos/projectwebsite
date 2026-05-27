@@ -147,6 +147,8 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/lib/storage/saved-calculations/saved-calculation-store.ts`: centraal entrypoint met mode-voorbereiding (`local`/`hybrid`/`remote`, nu fallback local)
 - `src/lib/storage/saved-calculations/remote-saved-calculation-store.ts`: remote stub voor toekomstige databasefase
 - `src/components/ProfileSyncPanel.tsx`: optioneel handmatig sync-paneel op profielpagina (feature-flagged)
+- `src/components/SaveScenarioButton.tsx`: compacte handmatige “Scenario opslaan”-actie (feature-flagged, geen autosave)
+- `src/components/SavedCalculationsList.tsx`: eenvoudige lijst op `/profiel` met lokaal opgeslagen scenario's en verwijderactie
 - `src/lib/supabase/config.ts` + `src/lib/supabase/browser-client.ts`: optionele browser-safe Supabase configuratie (no-op zonder env vars)
 - `src/lib/auth/auth-session.ts` + `src/lib/auth/*.ts`: optioneel auth-session contract met veilige unauthenticated fallback
 - `.env.example`: publieke voorbeeldvariabelen voor storage mode en optionele Supabase clientconfig
@@ -230,6 +232,20 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - input snapshot verplicht;
   - result snapshot optioneel;
   - duidelijk onderscheid tussen profieldata en scenario-opslag.
+
+### Saved calculations UI MVP (feature-flagged)
+
+- UI staat achter `ENABLE_SAVED_CALCULATIONS` (`NEXT_PUBLIC_ENABLE_SAVED_CALCULATIONS`).
+- Default is uit (`false`), zodat live gedrag gelijk blijft zonder env-wijziging.
+- Eerste referentie-integratie is alleen in `apps/volgende-euro`:
+  - handmatige knop “Scenario opslaan”;
+  - alleen na berekend resultaat;
+  - opslag van input/resultaat als snapshot (geen meebewegen met latere veldwijzigingen).
+- Op `/profiel` staat een compacte lijst “Mijn opgeslagen scenario's”:
+  - local-first weergave;
+  - max 10 nieuwste in de lijst;
+  - verwijderen per item.
+- Geen autosave, geen accountdashboard, geen databasecalls, geen remote sync in deze fase.
 
 ## Huidige tools
 
