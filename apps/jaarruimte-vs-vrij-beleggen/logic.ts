@@ -135,7 +135,7 @@ function chooseHeadline(input: {
 function buildWealthPlanning(input: {
   year: number;
   contributionEligibleForJaarruimte: number;
-  contributionRequested: number;
+  freeInvestingContribution: number;
   currentInvestableAssets: number;
   hasFiscalPartner: boolean;
   expectedAnnualReturn: number;
@@ -150,8 +150,8 @@ function buildWealthPlanning(input: {
       ? Math.max(1 - input.expectedTaxRateAtPayout / 100, 0)
       : 1;
 
-  let investingWithoutBox3 = input.contributionRequested;
-  let investingAfterBox3 = input.contributionRequested;
+  let investingWithoutBox3 = input.freeInvestingContribution;
+  let investingAfterBox3 = input.freeInvestingContribution;
   let cumulativeBox3Tax = 0;
 
   for (let yearIndex = 1; yearIndex <= input.horizonYears; yearIndex += 1) {
@@ -255,9 +255,10 @@ export function calculateJaarruimteVsVrijBeleggen(
     currentTaxRatePercent: currentTaxRateUsed,
     payoutTaxRatePercent: expectedTaxRateAtPayout,
   });
+  const freeInvestingContribution = roundMoney(pensionScenario.netCostNow);
 
   const freeInvestingFutureValueGross = calculateFutureValueLumpSum(
-    contributionRequested,
+    freeInvestingContribution,
     expectedAnnualReturn,
     horizonYears,
   );
@@ -265,7 +266,7 @@ export function calculateJaarruimteVsVrijBeleggen(
   const wealthPlanning = buildWealthPlanning({
     year,
     contributionEligibleForJaarruimte,
-    contributionRequested,
+    freeInvestingContribution,
     currentInvestableAssets,
     hasFiscalPartner,
     expectedAnnualReturn,
@@ -342,8 +343,8 @@ export function calculateJaarruimteVsVrijBeleggen(
       futureValueNetIndicative: pensionScenario.futureValueNetIndicative,
     },
     scenarioFreeInvesting: {
-      contribution: contributionRequested,
-      futureValueGross: freeInvestingFutureValueGross,
+      contribution: freeInvestingContribution,
+      futureValueGross: roundMoney(freeInvestingFutureValueGross),
       additionalBox3TaxIndicative,
       futureValueNetIndicative: freeInvestingFutureValueNetIndicative,
     },

@@ -62,6 +62,24 @@ describe("calculateJaarruimteVsVrijBeleggen", () => {
     expect(result.scenarioPension.taxBenefitNow).toBeGreaterThan(0);
   });
 
+  it("uses net pension cost as free-investing comparison contribution", () => {
+    const result = calculateJaarruimteVsVrijBeleggen({
+      year: 2026,
+      grossAnnualIncome: 70000,
+      availableJaarruimte: 10000,
+      plannedContribution: 5000,
+      expectedAnnualReturn: 5,
+      horizonYears: 20,
+    });
+
+    expect(result.scenarioFreeInvesting.contribution).toBe(
+      result.scenarioPension.netCostNow,
+    );
+    expect(result.scenarioFreeInvesting.contribution).toBeLessThanOrEqual(
+      result.contributionRequested,
+    );
+  });
+
   it("grows free investing pot with positive return", () => {
     const result = calculateJaarruimteVsVrijBeleggen({
       year: 2026,

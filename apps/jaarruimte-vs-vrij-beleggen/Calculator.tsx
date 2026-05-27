@@ -781,6 +781,10 @@ function CalculatorContent({
                 value={formatCurrency(result.scenarioPension.netCostNow)}
               />
               <ResultRow
+                label="Inleg vrij beleggen (zelfde netto budget)"
+                value={formatCurrency(result.scenarioFreeInvesting.contribution)}
+              />
+              <ResultRow
                 label="Pensioenpot eindwaarde (bruto)"
                 value={formatCurrency(result.scenarioPension.futureValueGross)}
               />
@@ -829,12 +833,13 @@ function CalculatorContent({
           {result ? (
             <div className="space-y-2 text-[13px] leading-[1.65] text-[var(--muted)]">
               <p>1) Pensioeninleg wordt begrensd op de ingevulde beschikbare jaarruimte.</p>
+              <p>2) Vrij beleggen rekent met hetzelfde netto budget als de pensioeninleg, zodat de vergelijking eerlijker is.</p>
               <p>
-                2) Box 1-voordeel nu gebruikt het marginale box 1-tarief ({formatPercent(result.currentTaxRateUsed)}%),
+                3) Box 1-voordeel nu gebruikt het marginale box 1-tarief ({formatPercent(result.currentTaxRateUsed)}%),
                 tenzij je zelf een percentage invult.
               </p>
-              <p>3) Beide scenario&apos;s groeien met hetzelfde verwachte rendement over dezelfde horizon.</p>
-              <p>4) Vrij beleggen kan optioneel een indicatief box 3-effect meenemen.</p>
+              <p>4) Beide scenario&apos;s groeien met hetzelfde verwachte rendement over dezelfde horizon.</p>
+              <p>5) Vrij beleggen kan optioneel een indicatief box 3-effect meenemen.</p>
             </div>
           ) : null}
         </DisclosureSection>
