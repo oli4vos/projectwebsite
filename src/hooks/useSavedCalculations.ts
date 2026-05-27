@@ -13,6 +13,7 @@ import type {
   CreateSavedCalculationInput,
   SavedCalculation,
   SavedCalculationId,
+  SavedCalculationStoreResult,
   UpdateSavedCalculationInput,
 } from "@/lib/storage/saved-calculations/saved-calculation.types";
 
@@ -23,12 +24,16 @@ type SavedCalculationsHookResult = {
   lastError: string | null;
   refresh: () => SavedCalculation[];
   getCalculation: (id: SavedCalculationId) => SavedCalculation | null;
-  saveCalculation: (input: CreateSavedCalculationInput) => SavedCalculation;
+  saveCalculation: (
+    input: CreateSavedCalculationInput,
+  ) => SavedCalculationStoreResult<SavedCalculation>;
   updateCalculation: (
     input: UpdateSavedCalculationInput,
-  ) => SavedCalculation | null;
-  deleteCalculation: (id: SavedCalculationId) => boolean;
-  clearCalculations: () => void;
+  ) => SavedCalculationStoreResult<SavedCalculation | null>;
+  deleteCalculation: (
+    id: SavedCalculationId,
+  ) => SavedCalculationStoreResult<boolean>;
+  clearCalculations: () => SavedCalculationStoreResult<null>;
 };
 
 export function useSavedCalculations(): SavedCalculationsHookResult {
@@ -61,27 +66,28 @@ export function useSavedCalculations(): SavedCalculationsHookResult {
     const result = saveSavedCalculation(input);
     setLastError(result.error ?? null);
     applyListState();
-    return result.data;
+    return result;
   }
 
   function updateCalculationFromInput(input: UpdateSavedCalculationInput) {
     const result = updateSavedCalculation(input);
     setLastError(result.error ?? null);
     applyListState();
-    return result.data;
+    return result;
   }
 
   function deleteCalculationById(id: SavedCalculationId) {
     const result = deleteSavedCalculation(id);
     setLastError(result.error ?? null);
     applyListState();
-    return result.data;
+    return result;
   }
 
   function clearCalculationList() {
     const result = clearSavedCalculations();
     setLastError(result.error ?? null);
     applyListState();
+    return result;
   }
 
   return {
