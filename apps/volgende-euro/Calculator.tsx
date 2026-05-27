@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { DisclosureSection } from "@/components/DisclosureSection";
 import { MobileFieldFlowControls } from "@/components/MobileFieldFlowControls";
 import { ResultRow } from "@/components/ResultRow";
+import { SaveScenarioButton } from "@/components/SaveScenarioButton";
 import { ToolDisclosure } from "@/components/ToolDisclosure";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
@@ -271,6 +272,32 @@ function CalculatorContent({ initialValues, hasRelevantProfileValues, profilePat
   const result = submittedResult;
   const relevantTopSteps = result?.topThree ?? [];
   const insufficient = (result?.priorities ?? []).filter((p) => p.applicability !== "relevant");
+  const scenarioTitle = result?.topRecommendation
+    ? `Volgende euro — ${result.topRecommendation.label}`
+    : "Volgende euro scenario";
+  const scenarioInputSnapshot = submittedValues ? toInput(submittedValues) : null;
+  const scenarioResultSnapshot = result
+    ? {
+        topRecommendation: result.topRecommendation
+          ? {
+              key: result.topRecommendation.key,
+              label: result.topRecommendation.label,
+              reason: result.topRecommendation.reason,
+            }
+          : null,
+        topSteps: result.topThree.map((item) => ({
+          key: item.key,
+          label: item.label,
+          reason: item.reason,
+          applicability: item.applicability,
+        })),
+        missingDataSummary: insufficient.map((item) => ({
+          key: item.key,
+          label: item.label,
+          missingFields: item.missingFields ?? [],
+        })),
+      }
+    : undefined;
 
   const intro = (
     <>
@@ -344,6 +371,16 @@ function CalculatorContent({ initialValues, hasRelevantProfileValues, profilePat
 
       {result?.topRecommendation ? (
         <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
+          <div className="mb-4">
+            <SaveScenarioButton
+              toolSlug="volgende-euro"
+              defaultTitle={scenarioTitle}
+              input={scenarioInputSnapshot}
+              result={scenarioResultSnapshot}
+              disabled={!result || !scenarioInputSnapshot}
+              disabledReason="Bereken eerst een scenario."
+            />
+          </div>
           <h3 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">Volgorde van relevante stappen</h3>
           <div className="mt-4 space-y-3">
             {relevantTopSteps.map((option, index) => (
