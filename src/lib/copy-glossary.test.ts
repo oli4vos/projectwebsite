@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
+  findGlossaryMatches,
   getDisclaimerTypeLabel,
   getDuoSituationLabel,
   getEmploymentTypeLabel,
+  getGlossaryEntry,
   getGlossaryExplanation,
   getGlossaryLabel,
   getOutputTypeLabel,
@@ -87,10 +89,49 @@ describe("copy glossary fallbacks and explanations", () => {
       "fiscalePartner",
       "jaarlijksOpnamepercentage",
       "indicatieveBerekening",
+      "hypotheekrenteaftrek",
+      "eigenGeld",
+      "achterafBetalen",
+      "kindgebondenBudget",
+      "zorgtoeslag",
+      "scenario",
     ] as const;
 
     for (const term of terms) {
       expect(getGlossaryExplanation(term).trim().length).toBeGreaterThan(0);
     }
+  });
+
+  it("returns full glossary entries", () => {
+    const entry = getGlossaryEntry("eigenGeld");
+
+    expect(entry.label).toBe("Eigen geld");
+    expect(entry.explanation).toContain("zelf inbrengt");
+    expect(entry.aliases).toContain("eigen geld");
+  });
+
+  it("finds glossary terms in plain text without overlapping matches", () => {
+    const matches = findGlossaryMatches(
+      "Vergelijk eigen geld, hypotheekrenteaftrek, BNPL en scenario's.",
+    );
+
+    expect(matches.map((match) => match.term)).toEqual([
+      "eigenGeld",
+      "hypotheekrenteaftrek",
+      "achterafBetalen",
+      "scenario",
+    ]);
+    expect(matches.map((match) => match.text)).toEqual([
+      "eigen geld",
+      "hypotheekrenteaftrek",
+      "BNPL",
+      "scenario's",
+    ]);
+  });
+
+  it("does not match terms inside longer words", () => {
+    const matches = findGlossaryMatches("Leaseauto en rendementen zijn niet hetzelfde.");
+
+    expect(matches).toEqual([]);
   });
 });

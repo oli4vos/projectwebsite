@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AppRenderer } from "@/components/AppRenderer";
+import { GlossaryText } from "@/components/GlossaryText";
 import { KnowledgeLevelHint } from "@/components/KnowledgeLevelHint";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -98,7 +99,7 @@ export default async function AppDetailPage({ params }: AppDetailPageProps) {
               {app.title}
             </h1>
             <p className="text-fluid-lead mt-5 max-w-[62ch] leading-[1.7] text-[var(--ink-2)]">
-              {app.description}
+              <GlossaryText text={app.description} />
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
               {app.tags.map((tag) => (

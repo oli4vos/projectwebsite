@@ -15,6 +15,7 @@ import { ENABLE_PROFILE } from "@/lib/feature-flags";
 import { toolGroups } from "@/lib/tool-groups";
 import { BtnLink } from "@/components/ui";
 import { AppCard } from "./AppCard";
+import { GlossaryText } from "./GlossaryText";
 import { KnowledgeLevelSelector } from "./KnowledgeLevelSelector";
 import { PersonalRoute } from "./PersonalRoute";
 
@@ -110,10 +111,10 @@ export function AppDashboard({ apps }: AppDashboardProps) {
             {activeAudiencePreset.userQuestion}
           </p>
           <p className="mt-2 text-[13px] leading-[1.6] text-[var(--muted)]">
-            {activeAudiencePreset.summary}
+            <GlossaryText text={activeAudiencePreset.summary} />
           </p>
           <p className="mt-2 text-[12.5px] leading-[1.55] text-[var(--soft)]">
-            {activeAudiencePreset.researchSignal}
+            <GlossaryText text={activeAudiencePreset.researchSignal} />
           </p>
           {recommendedRouteApps.length > 0 ? (
             <div className="mt-4 grid gap-2 md:grid-cols-3">
@@ -138,7 +139,7 @@ export function AppDashboard({ apps }: AppDashboardProps) {
           ) : null}
           {activeAudiencePreset.futureOpportunity ? (
             <p className="mt-3 text-[12.5px] leading-[1.55] text-[var(--muted)]">
-              {activeAudiencePreset.futureOpportunity}
+              <GlossaryText text={activeAudiencePreset.futureOpportunity} />
             </p>
           ) : null}
         </div>
@@ -151,7 +152,7 @@ export function AppDashboard({ apps }: AppDashboardProps) {
               {group.title}
             </h3>
             <p className="mt-2 text-[13px] leading-[1.6] text-[var(--muted)]">
-              {group.description}
+              <GlossaryText text={group.description} />
             </p>
             <div className="mt-3 flex items-center justify-between">
               <span className="text-[12px] text-[var(--soft)]">
@@ -181,7 +182,7 @@ export function AppDashboard({ apps }: AppDashboardProps) {
                   {group.title}
                 </h4>
                 <p className="mt-2 max-w-[60ch] text-[13.5px] leading-[1.65] text-[var(--muted)]">
-                  {group.description}
+                  <GlossaryText text={group.description} />
                 </p>
               </div>
               <span className="text-[12px] text-[var(--soft)]">
