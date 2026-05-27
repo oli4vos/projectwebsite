@@ -1,0 +1,29 @@
+{
+  "slug": "private-lease-impact-hypotheek",
+  "title": "Impact private lease op hypotheek (concept)",
+  "description": "Concepttool om indicatief te zien wat een maandelijkse private lease kan doen met je hypotheekruimte.",
+  "type": "frontend",
+  "category": "Hypotheek",
+  "tags": [
+    "hypotheek",
+    "private lease",
+    "lasten"
+  ],
+  "status": "draft",
+  "visibility": "hidden",
+  "reasonHint": "Handig als je wilt verkennen hoe vaste leasekosten je hypotheekruimte kunnen beïnvloeden.",
+  "assumptionsUsed": [
+    "mortgage"
+  ],
+  "calculationDomains": [
+    "housing",
+    "cashflow"
+  ],
+  "riskLevel": "medium",
+  "disclaimerType": "mortgageIndicative",
+  "outputType": "singleResult",
+  "requiredProfileFields": [],
+  "version": "1.0.0",
+  "entry": "Calculator.tsx"
+}
+
