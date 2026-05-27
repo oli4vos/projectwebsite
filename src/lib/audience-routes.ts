@@ -42,6 +42,7 @@ export const audienceRoutes: AudienceRoute[] = [
       "Jongvolwassenen en oud-studenten zoeken vooral grip op studieschuld, wonen en de eerste grote geldkeuzes.",
     groups: ["Studieschuld", "Wonen", "Persoonlijke financiën"],
     primaryToolSlugs: [
+      "schulden-volgorde",
       "volgende-euro",
       "studieschuld-vs-beleggen",
       "hypotheek-impact-studieschuld",
@@ -57,12 +58,11 @@ export const audienceRoutes: AudienceRoute[] = [
       "Woonlasten drukken relatief zwaar bij jonge en alleenstaande huurders; woningkeuzes vragen daarom maandlast- en stresstestdenken.",
     groups: ["Wonen", "Studieschuld", "Belasting"],
     primaryToolSlugs: [
+      "koop-vs-huur",
       "hypotheek-impact-studieschuld",
       "annuitair-lineair",
       "hypotheekrenteaftrek-afschaffen",
     ],
-    futureOpportunity:
-      "Er staat nu een hidden concepttool klaar voor koop-vs-huur met eigen geld, maandlast en rente-stresstest.",
   },
   {
     id: "zzp",
@@ -85,12 +85,11 @@ export const audienceRoutes: AudienceRoute[] = [
       "Kredieten, achteraf betalen en betalingsachterstanden vragen om een concrete volgorde in plaats van losse percentages.",
     groups: ["Persoonlijke financiën", "Studieschuld", "Wonen"],
     primaryToolSlugs: [
+      "schulden-volgorde",
       "volgende-euro",
       "studieschuld-vs-beleggen",
       "hypotheek-aflossen-vs-beleggen",
     ],
-    futureOpportunity:
-      "Er staat nu een hidden concepttool klaar voor schulden-volgorde met achteraf betalen, creditcard, DUO en hypotheek.",
   },
   {
     id: "gezin-kind-18",
@@ -101,9 +100,12 @@ export const audienceRoutes: AudienceRoute[] = [
     researchSignal:
       "Overgangsmomenten zoals een kind dat 18 wordt, werkuren en toeslagen veroorzaken juist behoefte aan eenvoudige scenario's.",
     groups: ["Persoonlijke financiën", "Werk & ZZP", "Belasting"],
-    primaryToolSlugs: ["volgende-euro", "zzp-uurtarief", "box-3-impact"],
-    futureOpportunity:
-      "Er staat nu een hidden concepttool klaar voor kind-wordt-18 met kinderbijslag, kindgebonden budget, zorgverzekering en studiekosten.",
+    primaryToolSlugs: [
+      "kind-wordt-18-impact",
+      "volgende-euro",
+      "zzp-uurtarief",
+      "box-3-impact",
+    ],
   },
   {
     id: "pensioen-fire",

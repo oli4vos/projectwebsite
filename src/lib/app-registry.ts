@@ -292,6 +292,67 @@ export const appRegistry = [
     "entry": "Calculator.tsx"
   },
   {
+    "slug": "kind-wordt-18-impact",
+    "title": "Kind wordt 18: maandimpact",
+    "description": "Bekijk kinderbijslag, kindgebonden budget, zorgverzekering, zorgtoeslag en studiekosten als maandimpact.",
+    "type": "frontend",
+    "category": "Persoonlijke financiën",
+    "tags": [
+      "gezin",
+      "kind 18",
+      "toeslagen",
+      "zorgverzekering",
+      "studiekosten"
+    ],
+    "status": "beta",
+    "visibility": "public",
+    "requiredProfileFields": [],
+    "reasonHint": "Handig als je wilt zien wat er in je maandruimte verandert rond de 18e verjaardag van je kind.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "cashflow",
+      "tax"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "indicative",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "koop-vs-huur",
+    "title": "Kopen of huren?",
+    "description": "Vergelijk huren en kopen op maandlast, eigen geld en rente-stresstest.",
+    "type": "frontend",
+    "category": "Hypotheek",
+    "tags": [
+      "wonen",
+      "huur",
+      "koop",
+      "hypotheek",
+      "rente-stresstest"
+    ],
+    "status": "beta",
+    "visibility": "public",
+    "requiredProfileFields": [],
+    "reasonHint": "Handig als je kopen en huren wilt vergelijken op maandlast, eigen geld en renterisico.",
+    "assumptionsUsed": [
+      "mortgage"
+    ],
+    "calculationDomains": [
+      "housing",
+      "mortgage",
+      "cashflow"
+    ],
+    "riskLevel": "high",
+    "disclaimerType": "mortgageIndicative",
+    "outputType": "scenarioComparison",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
     "slug": "prive-beleggen-eindvermogen",
     "title": "Wat wordt mijn eindvermogen met beleggen?",
     "description": "Bereken je verwachte eindvermogen bij maandelijks beleggen, inclusief box 3-heffing zodra je boven de vrijstelling uitkomt.",
@@ -329,6 +390,38 @@ export const appRegistry = [
     "riskLevel": "high",
     "disclaimerType": "taxIndicative",
     "outputType": "timeline",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "schulden-volgorde",
+    "title": "Welke schuld eerst?",
+    "description": "Zet dure schulden, DUO, hypotheek en achteraf betalen in een extra-aflosvolgorde.",
+    "type": "frontend",
+    "category": "Schulden",
+    "tags": [
+      "schulden",
+      "BNPL",
+      "DUO",
+      "hypotheek",
+      "aflossen"
+    ],
+    "status": "beta",
+    "visibility": "public",
+    "requiredProfileFields": [],
+    "reasonHint": "Handig als je wilt zien welke schuld bij extra geld waarschijnlijk eerst aandacht vraagt.",
+    "assumptionsUsed": [
+      "duo",
+      "mortgage"
+    ],
+    "calculationDomains": [
+      "cashflow",
+      "studentDebt",
+      "mortgage"
+    ],
+    "riskLevel": "high",
+    "disclaimerType": "financialEducation",
+    "outputType": "checklist",
     "version": "1.0.0",
     "entry": "Calculator.tsx"
   },

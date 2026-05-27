@@ -19,20 +19,20 @@ Dit document koppelt `ideetjes.txt` aan de huidige implementatie.
 - DUO met meerdere schuld-delen is verwerkt in `studieschuld-vs-beleggen`.
 - Impact private lease op hypotheek staat als hidden/draft tool klaar.
 - Doelgroepingangen op homepage zijn uitgewerkt als centrale geldroutes met filters, scrollankers en aanbevolen starttools.
-- Algemene financiële begrippen worden via centrale glossary klikbaar gemaakt op plekken waar `GlossaryText` wordt gebruikt.
-- Koop-vs-huur, schulden-volgorde en kind-wordt-18 staan als hidden/draft tools klaar met centrale planninghelpers.
+- Algemene financiële begrippen worden via centrale glossary klikbaar gemaakt op homepage, toolintro's, toolkaarten en gedeelde resultaatcomponenten.
+- Koop-vs-huur, schulden-volgorde en kind-wordt-18 staan nu als publieke beta-tools live met centrale planninghelpers.
 - Scenario’s vergelijken is als feature-flagged MVP toegevoegd op basis van de twee meest recente lokale scenario’s.
 
 ## Deels verwerkt / aandachtspunt
 
 - “Hypotheek op basis van inkomen”: gebeurt deels via hypotheektools/profielcontext, maar geen losse dedicated intakeflow op homepage.
 - “Menu op scroll minimaliseren”: niet als vaste, centrale behavior op alle schermen geborgd.
-- Begrippen-uitleg is nog niet automatisch over elke losse tekstnode in alle bestaande tools uitgerold; nieuwe copy kan `GlossaryText` gebruiken.
+- Begrippen-uitleg blijft afhankelijk van gedeelde componenten of expliciet `GlossaryText` in toolcopy; vrije tekstblokken zonder gedeelde component blijven handmatig.
 
 ## Open punten (nog niet gebouwd)
 
-- Koop-vs-huur, schulden-volgorde en kind-wordt-18 moeten nog inhoudelijk worden getest met echte gebruikers voordat ze publiek worden gezet.
 - Scenario’s openen/herladen in de oorspronkelijke tool is nog niet gebouwd.
+- Private-lease impacttool staat nog als hidden/draft en is nog niet publiek gevalideerd.
 
 ## Nieuwe verbetering in deze ronde
 
@@ -43,6 +43,6 @@ Dit document koppelt `ideetjes.txt` aan de huidige implementatie.
 
 ## Aanbevolen vervolgbatch
 
-1. UX-review van de drie hidden/draft tools voordat ze naar `visibility: "public"` gaan.
-2. Begrippen-uitleg verder toepassen in bestaande calculators.
-3. Scenario’s openen/herladen in de oorspronkelijke tool.
+1. Scenario’s openen/herladen in de oorspronkelijke tool toevoegen.
+2. Begrippen-uitleg verder toepassen in losse tooltekst die nog buiten gedeelde componenten valt.
+3. Private-lease impacttool inhoudelijk nalopen en dan pas eventueel publiek zetten.

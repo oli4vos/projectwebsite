@@ -56,7 +56,28 @@ export const appComponents: Record<string, AppCalculatorComponent> = {
       </div>
     ),
   }),
+  "kind-wordt-18-impact": dynamic(() => import("../../apps/kind-wordt-18-impact/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "koop-vs-huur": dynamic(() => import("../../apps/koop-vs-huur/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
   "prive-beleggen-eindvermogen": dynamic(() => import("../../apps/prive-beleggen-eindvermogen/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "schulden-volgorde": dynamic(() => import("../../apps/schulden-volgorde/Calculator"), {
     loading: () => (
       <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
         Rekentool laden...

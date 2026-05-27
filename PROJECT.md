@@ -319,15 +319,15 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - staat als draft in de codebase met `visibility: "hidden"`
   - conceptuele indicatie van private lease-impact op hypotheekruimte
 - `apps/koop-vs-huur`
-  - staat als draft in de codebase met `visibility: "hidden"`
+  - staat nu als publieke beta-tool in de bibliotheek
   - conceptuele vergelijking van huren en kopen op maandlast, eigen geld en rente-stresstest
   - gebruikt centrale planninghelper `calculateBuyVsRent`
 - `apps/schulden-volgorde`
-  - staat als draft in de codebase met `visibility: "hidden"`
+  - staat nu als publieke beta-tool in de bibliotheek
   - zet achteraf betalen, creditcard, DUO, hypotheek en overige schulden in een extra-aflosvolgorde
   - gebruikt centrale planninghelper `calculateDebtPriority`
 - `apps/kind-wordt-18-impact`
-  - staat als draft in de codebase met `visibility: "hidden"`
+  - staat nu als publieke beta-tool in de bibliotheek
   - brengt kinderbijslag, kindgebonden budget, zorgverzekering, zorgtoeslag en studiekosten terug naar maandimpact
   - gebruikt centrale planninghelper `calculateChild18Impact`
 

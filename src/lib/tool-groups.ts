@@ -11,12 +11,16 @@ export const toolGroups: ToolGroup[] = [
   {
     title: "Persoonlijke financiën",
     description: "Voor je eerste prioriteit als je extra geld overhoudt.",
-    slugs: ["volgende-euro"],
+    slugs: ["volgende-euro", "schulden-volgorde", "kind-wordt-18-impact"],
   },
   {
     title: "Studieschuld",
     description: "Vergelijk verplicht aflossen, extra aflossen en alternatieven.",
-    slugs: ["studieschuld-vs-beleggen", "hypotheek-impact-studieschuld"],
+    slugs: [
+      "studieschuld-vs-beleggen",
+      "schulden-volgorde",
+      "hypotheek-impact-studieschuld",
+    ],
   },
   {
     title: "Wonen",
@@ -25,6 +29,7 @@ export const toolGroups: ToolGroup[] = [
       "hypotheek-impact-studieschuld",
       "hypotheek-aflossen-vs-beleggen",
       "annuitair-lineair",
+      "koop-vs-huur",
       "hypotheekrenteaftrek-afschaffen",
     ],
   },
@@ -65,8 +70,13 @@ const categoryToGroupTitle: Record<string, string> = {
 };
 
 const preferredSlugsByCategory: Record<string, string[]> = {
-  Schulden: ["studieschuld-vs-beleggen", "hypotheek-impact-studieschuld"],
+  Schulden: [
+    "schulden-volgorde",
+    "studieschuld-vs-beleggen",
+    "hypotheek-impact-studieschuld",
+  ],
   Hypotheek: [
+    "koop-vs-huur",
     "hypotheek-aflossen-vs-beleggen",
     "annuitair-lineair",
     "hypotheekrenteaftrek-afschaffen",
@@ -74,7 +84,11 @@ const preferredSlugsByCategory: Record<string, string[]> = {
   Beleggen: ["prive-beleggen-eindvermogen", "box-3-impact", "fire-na-belasting"],
   Belasting: ["box-3-impact", "jaarruimte-vs-vrij-beleggen"],
   Werk: ["zzp-uurtarief"],
-  "Persoonlijke financiën": ["volgende-euro"],
+  "Persoonlijke financiën": [
+    "volgende-euro",
+    "schulden-volgorde",
+    "kind-wordt-18-impact",
+  ],
 };
 
 export function getGroupAnchorForCategory(category: string) {

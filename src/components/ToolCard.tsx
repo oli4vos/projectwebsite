@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CATEGORY_LABEL, type Category } from "@/lib/categories";
 import { CategoryDot, Pill } from "@/components/ui";
+import { GlossaryText } from "@/components/GlossaryText";
 
 interface ToolCardProps {
   cat: Category;
@@ -51,7 +52,7 @@ export function ToolCard({
       </h3>
 
       <p className="mt-2 line-clamp-3 text-[13.5px] leading-[1.55] text-[var(--muted)]">
-        {blurb}
+        <GlossaryText text={blurb} />
       </p>
 
       {stat ? (

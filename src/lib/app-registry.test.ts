@@ -18,6 +18,9 @@ describe("generated app registry", () => {
     expect(appRegistryBySlug["volgende-euro"]).toBeDefined();
     expect(appRegistryBySlug["hypotheek-aflossen-vs-beleggen"]).toBeDefined();
     expect(appRegistryBySlug["zzp-uurtarief"]).toBeDefined();
+    expect(appRegistryBySlug["koop-vs-huur"]).toBeDefined();
+    expect(appRegistryBySlug["schulden-volgorde"]).toBeDefined();
+    expect(appRegistryBySlug["kind-wordt-18-impact"]).toBeDefined();
   });
 
   it("keeps manifest metadata consistent for disclaimer and output type", () => {
