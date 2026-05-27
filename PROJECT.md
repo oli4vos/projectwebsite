@@ -104,7 +104,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/app/globals.css`: design tokens, typografie, helpers, visuele basis
 - `src/components/SiteHeader.tsx`: topnavigatie en CTA's
 - `src/components/SiteFooter.tsx`: footerlinks
-- `src/components/AppDashboard.tsx`: bibliotheek-first homepageflow met kennisniveaukeuze, categoriekaarten en tools per onderwerp
+- `src/components/AppDashboard.tsx`: bibliotheek-first homepageflow met doelgroep-/geldroutes, categoriekaarten en tools per onderwerp
 - `src/components/AppCard.tsx`: vertaalt manifest naar card-props
 - `src/components/ToolCard.tsx`: daadwerkelijke kaart-UI
 - `src/components/AppRenderer.tsx`: pakt lazy toolcomponent op basis van slug
@@ -115,6 +115,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/app/apps/[slug]/page.tsx`: toont ook manifestmetadata (domeinen, aannames, output/disclaimer/risico) zonder de dashboardflow zwaarder te maken
 - Homepage en dashboard zijn nu bibliotheek-first:
   - primaire navigatie via categorieën en tools per onderwerp
+  - doelgroep-/geldroutes zijn centrale configuratie en sturen naar relevante toolgroepen
   - hero is kort en taakgericht, zonder lange uitlegblokken
   - kennisniveau-keuze (Basis / Normaal / Verdiept) wordt lokaal opgeslagen
   - persoonlijke route blijft beschikbaar maar staat lager en compacter
@@ -127,6 +128,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 ## Huidige data/config
 
 - `src/lib/app-types.ts`: manifest-typen
+- `src/lib/audience-routes.ts`: centrale doelgroep-/geldroutes met copy, relevante groepen en aanbevolen starttools
 - `src/lib/categories.ts`: mapping van categorie/slug naar visueel category-type
 - `src/lib/market.ts`: homepage-marktcontext met externe fetches en fallbacks
 - `src/lib/user-profile.ts`: local-first profieltype + sanitizing/normalisatie

@@ -31,7 +31,12 @@ export const toolGroups: ToolGroup[] = [
   {
     title: "Sparen & beleggen",
     description: "Voor vermogensopbouw met belastingimpact en flexibiliteit.",
-    slugs: ["box-3-impact", "jaarruimte-vs-vrij-beleggen", "fire-na-belasting"],
+    slugs: [
+      "prive-beleggen-eindvermogen",
+      "box-3-impact",
+      "jaarruimte-vs-vrij-beleggen",
+      "fire-na-belasting",
+    ],
   },
   {
     title: "Belasting",
@@ -66,7 +71,7 @@ const preferredSlugsByCategory: Record<string, string[]> = {
     "annuitair-lineair",
     "hypotheekrenteaftrek-afschaffen",
   ],
-  Beleggen: ["box-3-impact", "fire-na-belasting"],
+  Beleggen: ["prive-beleggen-eindvermogen", "box-3-impact", "fire-na-belasting"],
   Belasting: ["box-3-impact", "jaarruimte-vs-vrij-beleggen"],
   Werk: ["zzp-uurtarief"],
   "Persoonlijke financiën": ["volgende-euro"],

@@ -16,18 +16,21 @@ Dit document koppelt `ideetjes.txt` aan de huidige implementatie.
 - Vermogensplanning export (CSV/PDF) aanwezig in `jaarruimte-vs-vrij-beleggen`.
 - Jaarruimte-help link naar Belastingdienst staat in UI.
 - `volgende-euro` submit-driven gemaakt met relevantie op ingevulde velden.
+- DUO met meerdere schuld-delen is verwerkt in `studieschuld-vs-beleggen`.
+- Impact private lease op hypotheek staat als hidden/draft tool klaar.
+- Doelgroepingangen op homepage zijn uitgewerkt als centrale geldroutes met filters, scrollankers en aanbevolen starttools.
 
 ## Deels verwerkt / aandachtspunt
 
-- “Snel overzicht per doelgroep”: homepage is categorie-first, maar doelgroepingangen zijn nog niet expliciet als aparte doelgroepnavigatie uitgewerkt.
 - “Hypotheek op basis van inkomen”: gebeurt deels via hypotheektools/profielcontext, maar geen losse dedicated intakeflow op homepage.
 - “Menu op scroll minimaliseren”: niet als vaste, centrale behavior op alle schermen geborgd.
+- “Gezin / kind wordt 18”: als doelgroep-/geldroute aanwezig, maar nog zonder eigen rekentool.
 
 ## Open punten (nog niet gebouwd)
 
-- DUO met meerdere schuld-delen als herhaalbare invoercomponent.
-- Impact private lease op hypotheek (bewust buiten doelgroep genoteerd).
-- Volledig uitgewerkte doelgroep-landingsstructuur (oud-student, zzp, richting pensioen).
+- Dedicated koop-vs-huur route met eigen geld, maandlast en rente-stresstest.
+- Brede schulden-volgorde checker voor BNPL, creditcard, lening, DUO en hypotheek.
+- Kind-wordt-18 impacttool met kinderbijslag, kindgebonden budget, zorgverzekering en studiekosten.
 
 ## Nieuwe verbetering in deze ronde
 
@@ -38,6 +41,6 @@ Dit document koppelt `ideetjes.txt` aan de huidige implementatie.
 
 ## Aanbevolen vervolgbatch
 
-1. DUO multi-schuld-delen (herhaalbare debt blocks + aggregatie).
-2. Doelgroepingangen op homepage als optionele snelle filters.
-3. Dedicated private-lease impact tool (hidden/draft eerst).
+1. Koop-vs-huur route met eigen geld, maandlast en rente-stresstest.
+2. Brede schulden-volgorde checker, hidden/draft eerst.
+3. Kind-wordt-18 impacttool, hidden/draft eerst.

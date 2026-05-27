@@ -4,6 +4,13 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { AppManifest } from "@/lib/app-types";
 import { toAnchorId } from "@/lib/anchor-ids";
+import {
+  audienceRoutes,
+  filterGroupsForAudience,
+  getAudienceRoute,
+  getAudienceRouteAnchorId,
+  getAudienceRouteApps,
+} from "@/lib/audience-routes";
 import { ENABLE_PROFILE } from "@/lib/feature-flags";
 import { toolGroups } from "@/lib/tool-groups";
 import { BtnLink } from "@/components/ui";
@@ -14,50 +21,6 @@ import { PersonalRoute } from "./PersonalRoute";
 type AppDashboardProps = {
   apps: AppManifest[];
 };
-
-type AudiencePreset = {
-  id: string;
-  label: string;
-  groups: string[];
-  summary: string;
-};
-
-const audiencePresets: AudiencePreset[] = [
-  {
-    id: "all",
-    label: "Alles",
-    groups: [],
-    summary: "Toon alle onderwerpen en kies daarna een tool die past bij je vraag.",
-  },
-  {
-    id: "oud-student",
-    label: "Oud-student",
-    groups: ["Studieschuld", "Wonen", "Persoonlijke financiën"],
-    summary:
-      "Focus op studieschuld, koopwoningimpact en de keuze wat je met extra maandruimte doet.",
-  },
-  {
-    id: "zzp",
-    label: "ZZP",
-    groups: ["Werk & ZZP", "Belasting", "Persoonlijke financiën"],
-    summary:
-      "Focus op uurtarief, belastingdruk en keuzes rond buffer, pensioen en flexibiliteit.",
-  },
-  {
-    id: "pensioen",
-    label: "Richting pensioen",
-    groups: ["Sparen & beleggen", "Belasting", "FIRE / financiële vrijheid"],
-    summary:
-      "Focus op vermogensgroei, jaarruimte en netto uitkomsten richting financiële rust later.",
-  },
-  {
-    id: "beleggen",
-    label: "Beleggen algemeen",
-    groups: ["Sparen & beleggen", "Belasting", "FIRE / financiële vrijheid"],
-    summary:
-      "Focus op eindvermogen, box 3-effect en vergelijking van beleggingsscenario’s.",
-  },
-];
 
 export function AppDashboard({ apps }: AppDashboardProps) {
   const [activeAudience, setActiveAudience] = useState<string>("all");
@@ -84,31 +47,23 @@ export function AppDashboard({ apps }: AppDashboardProps) {
   );
 
   const filteredGroupedApps = useMemo(() => {
-    if (activeAudience === "all") {
-      return groupedApps;
-    }
-    const preset = audiencePresets.find((item) => item.id === activeAudience);
-    if (!preset) {
-      return groupedApps;
-    }
-    return groupedApps.filter((group) => preset.groups.includes(group.title));
+    return filterGroupsForAudience(groupedApps, activeAudience);
   }, [activeAudience, groupedApps]);
 
   const activeAudiencePreset = useMemo(
-    () =>
-      audiencePresets.find((preset) => preset.id === activeAudience) ??
-      audiencePresets[0],
+    () => getAudienceRoute(activeAudience),
     [activeAudience],
+  );
+
+  const recommendedRouteApps = useMemo(
+    () => getAudienceRouteApps(activeAudience, apps),
+    [activeAudience, apps],
   );
 
   function applyAudienceFilter(nextAudienceId: string) {
     setActiveAudience(nextAudienceId);
 
-    const preset = audiencePresets.find((item) => item.id === nextAudienceId);
-    const targetGroupTitle = preset?.groups?.[0];
-    const targetId = targetGroupTitle
-      ? toAnchorId(targetGroupTitle, "groep")
-      : "apps";
+    const targetId = getAudienceRouteAnchorId(nextAudienceId);
 
     requestAnimationFrame(() => {
       document
@@ -132,7 +87,7 @@ export function AppDashboard({ apps }: AppDashboardProps) {
           Eerst invullen, daarna resultaat. Verdieping staat standaard dicht en open je alleen als je meer uitleg wilt.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
-          {audiencePresets.map((preset) => (
+          {audienceRoutes.map((preset) => (
             <button
               key={preset.id}
               type="button"
@@ -147,9 +102,46 @@ export function AppDashboard({ apps }: AppDashboardProps) {
             </button>
           ))}
         </div>
-        <p className="mt-3 text-[13px] leading-[1.6] text-[var(--muted)]">
-          {activeAudiencePreset.summary}
-        </p>
+        <div className="mt-4 rounded-xl border hair bg-[var(--paper)] p-4">
+          <div className="text-[11px] uppercase tracking-[0.12em] text-[var(--soft)]">
+            Routehulp
+          </div>
+          <p className="mt-2 text-[14px] font-medium leading-[1.55] text-[var(--ink)]">
+            {activeAudiencePreset.userQuestion}
+          </p>
+          <p className="mt-2 text-[13px] leading-[1.6] text-[var(--muted)]">
+            {activeAudiencePreset.summary}
+          </p>
+          <p className="mt-2 text-[12.5px] leading-[1.55] text-[var(--soft)]">
+            {activeAudiencePreset.researchSignal}
+          </p>
+          {recommendedRouteApps.length > 0 ? (
+            <div className="mt-4 grid gap-2 md:grid-cols-3">
+              {recommendedRouteApps.map((app) => (
+                <Link
+                  key={app.slug}
+                  href={`/apps/${app.slug}`}
+                  className="group rounded-lg border hair bg-white p-3 transition hover:-translate-y-px hover:shadow-paper focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 active:translate-y-0"
+                >
+                  <div className="text-[10px] uppercase tracking-[0.1em] text-[var(--soft)]">
+                    Startpunt
+                  </div>
+                  <div className="mt-1 text-[13px] font-medium leading-[1.35] text-[var(--ink)]">
+                    {app.title}
+                  </div>
+                  <div className="mt-2 text-[12px] text-[var(--muted)] transition group-hover:text-[var(--ink)]">
+                    Open tool →
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : null}
+          {activeAudiencePreset.futureOpportunity ? (
+            <p className="mt-3 text-[12.5px] leading-[1.55] text-[var(--muted)]">
+              {activeAudiencePreset.futureOpportunity}
+            </p>
+          ) : null}
+        </div>
       </section>
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
