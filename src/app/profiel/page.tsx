@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { ProfileSyncPanel } from "@/components/ProfileSyncPanel";
 import { SavedCalculationsList } from "@/components/SavedCalculationsList";
+import { SavedScenarioComparison } from "@/components/SavedScenarioComparison";
 import { Btn } from "@/components/ui";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { ENABLE_PROFILE } from "@/lib/feature-flags";
@@ -507,6 +508,7 @@ export default function ProfilePage() {
         />
         <ProfileSyncPanel />
         <SavedCalculationsList />
+        <SavedScenarioComparison />
       </main>
       <SiteFooter />
     </>

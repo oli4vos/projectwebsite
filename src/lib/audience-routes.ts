@@ -62,7 +62,7 @@ export const audienceRoutes: AudienceRoute[] = [
       "hypotheekrenteaftrek-afschaffen",
     ],
     futureOpportunity:
-      "Logische vervolgstap: een koop-vs-huur route met eigen geld, maandlast en rente-stresstest.",
+      "Er staat nu een hidden concepttool klaar voor koop-vs-huur met eigen geld, maandlast en rente-stresstest.",
   },
   {
     id: "zzp",
@@ -90,7 +90,7 @@ export const audienceRoutes: AudienceRoute[] = [
       "hypotheek-aflossen-vs-beleggen",
     ],
     futureOpportunity:
-      "Logische vervolgstap: een brede schulden-volgorde checker voor BNPL, creditcard, lening, DUO en hypotheek.",
+      "Er staat nu een hidden concepttool klaar voor schulden-volgorde met achteraf betalen, creditcard, DUO en hypotheek.",
   },
   {
     id: "gezin-kind-18",
@@ -103,7 +103,7 @@ export const audienceRoutes: AudienceRoute[] = [
     groups: ["Persoonlijke financiën", "Werk & ZZP", "Belasting"],
     primaryToolSlugs: ["volgende-euro", "zzp-uurtarief", "box-3-impact"],
     futureOpportunity:
-      "Logische vervolgstap: een kind-wordt-18 impacttool met kinderbijslag, kindgebonden budget, zorgverzekering en studiekosten.",
+      "Er staat nu een hidden concepttool klaar voor kind-wordt-18 met kinderbijslag, kindgebonden budget, zorgverzekering en studiekosten.",
   },
   {
     id: "pensioen-fire",

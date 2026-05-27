@@ -1,0 +1,19 @@
+{
+  "slug": "koop-vs-huur",
+  "title": "Kopen of huren? (concept)",
+  "description": "Concepttool om maandlast, eigen geld en rente-stresstest naast elkaar te zetten.",
+  "type": "frontend",
+  "category": "Hypotheek",
+  "tags": ["wonen", "huur", "koop", "hypotheek", "rente-stresstest"],
+  "status": "draft",
+  "visibility": "hidden",
+  "reasonHint": "Handig als je kopen en huren wilt vergelijken op maandlast, eigen geld en renterisico.",
+  "assumptionsUsed": ["mortgage"],
+  "calculationDomains": ["housing", "mortgage", "cashflow"],
+  "riskLevel": "high",
+  "disclaimerType": "mortgageIndicative",
+  "outputType": "scenarioComparison",
+  "requiredProfileFields": [],
+  "version": "1.0.0",
+  "entry": "Calculator.tsx"
+}

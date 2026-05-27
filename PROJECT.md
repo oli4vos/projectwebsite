@@ -151,6 +151,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/components/ProfileSyncPanel.tsx`: optioneel handmatig sync-paneel op profielpagina (feature-flagged)
 - `src/components/SaveScenarioButton.tsx`: compacte handmatige “Scenario opslaan”-actie (feature-flagged, geen autosave)
 - `src/components/SavedCalculationsList.tsx`: eenvoudige lijst op `/profiel` met lokaal opgeslagen scenario's en verwijderactie
+- `src/components/SavedScenarioComparison.tsx`: feature-flagged vergelijking van de twee meest recente lokale scenario's
 - `src/lib/supabase/config.ts` + `src/lib/supabase/browser-client.ts`: optionele browser-safe Supabase configuratie (no-op zonder env vars)
 - `src/lib/auth/auth-session.ts` + `src/lib/auth/*.ts`: optioneel auth-session contract met veilige unauthenticated fallback
 - `.env.example`: publieke voorbeeldvariabelen voor storage mode en optionele Supabase clientconfig
@@ -162,7 +163,9 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/lib/chart-utils.ts`: centrale format/tick helpers voor grafieken (hele jaren + eurolabels)
 - `src/lib/number-input.ts`: centrale parser voor numerieke invoer; komma wordt als decimaalpunt behandeld
 - `src/lib/copy-glossary.ts`: centrale woordenlijst voor gebruikerstaal bij financiële termen en enumlabels
+- `src/components/GlossaryText.tsx`: maakt bekende financiële begrippen klikbaar met korte hover/focus-uitleg
 - `src/lib/duo/`: centrale DUO-domeinlaag met wettelijk maandbedrag, relevant maandbedrag per situatie en scenariofuncties voor extra aflossen
+- `src/lib/planning/`: centrale planninghelpers voor doelgroep-/levensgebeurtenis-tools zoals koop-vs-huur, schulden-volgorde en kind-wordt-18
 - `src/lib/duo/calculations.test.ts`: regressietests voor centrale DUO-berekenfuncties
 - `src/lib/tax/`: centrale indicatieve tax-laag voor box 1, hypotheekrenteaftrek en box 3
 - `src/lib/pension/`: centrale indicatieve pensioenlaag voor inleg-/uitkeringsscenario's (jaarruimte/lijfrente)
@@ -312,6 +315,21 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `apps/compensatie-pechgeneratie`
   - staat als draft in de codebase met `visibility: "hidden"`
   - wordt daardoor niet opgenomen in dashboard/route-registry
+- `apps/private-lease-impact-hypotheek`
+  - staat als draft in de codebase met `visibility: "hidden"`
+  - conceptuele indicatie van private lease-impact op hypotheekruimte
+- `apps/koop-vs-huur`
+  - staat als draft in de codebase met `visibility: "hidden"`
+  - conceptuele vergelijking van huren en kopen op maandlast, eigen geld en rente-stresstest
+  - gebruikt centrale planninghelper `calculateBuyVsRent`
+- `apps/schulden-volgorde`
+  - staat als draft in de codebase met `visibility: "hidden"`
+  - zet achteraf betalen, creditcard, DUO, hypotheek en overige schulden in een extra-aflosvolgorde
+  - gebruikt centrale planninghelper `calculateDebtPriority`
+- `apps/kind-wordt-18-impact`
+  - staat als draft in de codebase met `visibility: "hidden"`
+  - brengt kinderbijslag, kindgebonden budget, zorgverzekering, zorgtoeslag en studiekosten terug naar maandimpact
+  - gebruikt centrale planninghelper `calculateChild18Impact`
 
 ## Profiel-MVP
 
