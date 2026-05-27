@@ -44,6 +44,10 @@ type FormState = {
   box3BankDeposits: string;
   box3InvestmentsAndOtherAssets: string;
   box3Debts: string;
+  debtParts: Array<{
+    amount: string;
+    annualDebtRate: string;
+  }>;
 };
 
 type ValidationErrors = Partial<Record<keyof FormState, string>>;
@@ -64,6 +68,7 @@ const exampleValues: FormState = {
   box3BankDeposits: "0",
   box3InvestmentsAndOtherAssets: "0",
   box3Debts: "0",
+  debtParts: [],
 };
 
 const defaultValues: FormState = {
@@ -82,6 +87,7 @@ const defaultValues: FormState = {
   box3BankDeposits: "",
   box3InvestmentsAndOtherAssets: "",
   box3Debts: "",
+  debtParts: [],
 };
 
 type CalculatorContentProps = {
@@ -155,6 +161,14 @@ function validateForm(values: FormState) {
     values.box3InvestmentsAndOtherAssets,
   );
   const box3Debts = parseOptionalNumber(values.box3Debts);
+  const parsedDebtParts = values.debtParts.map((part, index) => {
+    const amount = parseOptionalNumber(part.amount);
+    const annualDebtRate = parseOptionalNumber(part.annualDebtRate);
+    return { index, amount, annualDebtRate };
+  });
+  const effectiveDebtParts = parsedDebtParts.filter(
+    (part) => part.amount !== undefined || part.annualDebtRate !== undefined,
+  );
 
   if (!Number.isFinite(remainingDebt) || remainingDebt < 0) {
     errors.remainingDebt = "Gebruik 0 of een hogere resterende studieschuld.";
@@ -165,6 +179,23 @@ function validateForm(values: FormState) {
     (!Number.isFinite(annualDebtRate) || annualDebtRate < 0 || annualDebtRate > 100)
   ) {
     errors.annualDebtRate = "Gebruik een rente tussen 0 en 100.";
+  }
+
+  for (const part of effectiveDebtParts) {
+    if (
+      part.amount !== undefined &&
+      (!Number.isFinite(part.amount) || part.amount < 0)
+    ) {
+      errors.remainingDebt = "Gebruik 0 of een hoger bedrag per schulddeel.";
+    }
+    if (
+      part.annualDebtRate !== undefined &&
+      (!Number.isFinite(part.annualDebtRate) ||
+        part.annualDebtRate < 0 ||
+        part.annualDebtRate > 100)
+    ) {
+      errors.annualDebtRate = "Gebruik een rente tussen 0 en 100 per schulddeel.";
+    }
   }
 
   if (
@@ -235,9 +266,29 @@ function validateForm(values: FormState) {
   const parsedValues: CalculatorInput | null =
     Object.keys(errors).length === 0
       ? {
+          remainingDebt:
+            effectiveDebtParts.length > 0
+              ? effectiveDebtParts.reduce((sum, part) => sum + (part.amount ?? 0), 0)
+              : remainingDebt,
+          annualDebtRate:
+            effectiveDebtParts.length > 0
+              ? (() => {
+                  const weightedDenominator = effectiveDebtParts.reduce(
+                    (sum, part) => sum + (part.amount ?? 0),
+                    0,
+                  );
+                  if (weightedDenominator <= 0) {
+                    return annualDebtRate;
+                  }
+                  const weightedNumerator = effectiveDebtParts.reduce(
+                    (sum, part) =>
+                      sum + (part.amount ?? 0) * (part.annualDebtRate ?? 0),
+                    0,
+                  );
+                  return weightedNumerator / weightedDenominator;
+                })()
+              : annualDebtRate,
           repaymentRule: values.repaymentRule,
-          remainingDebt,
-          annualDebtRate,
           remainingTermYears,
           grossAnnualIncome,
           partnerGrossAnnualIncome,
@@ -378,6 +429,33 @@ function CalculatorContent({
     setFormValues((current) => ({ ...current, [field]: value }));
   }
 
+  function addDebtPart() {
+    setFormValues((current) => ({
+      ...current,
+      debtParts: [...current.debtParts, { amount: "", annualDebtRate: "" }],
+    }));
+  }
+
+  function removeDebtPart(index: number) {
+    setFormValues((current) => ({
+      ...current,
+      debtParts: current.debtParts.filter((_, partIndex) => partIndex !== index),
+    }));
+  }
+
+  function updateDebtPart(
+    index: number,
+    field: "amount" | "annualDebtRate",
+    value: string,
+  ) {
+    setFormValues((current) => ({
+      ...current,
+      debtParts: current.debtParts.map((part, partIndex) =>
+        partIndex === index ? { ...part, [field]: value } : part,
+      ),
+    }));
+  }
+
   function applyProfileValues() {
     setValues(
       mergeProfilePatchIntoValues(formValues, profilePatch),
@@ -494,6 +572,61 @@ function CalculatorContent({
             />
             <FieldError message={errors.annualDebtRate} />
           </label>
+
+          <div className="rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                Heb je meerdere DUO-schulddelen?
+              </span>
+              <ToolActionButton type="button" onClick={addDebtPart} variant="secondary" size="sm">
+                Voeg schulddeel toe
+              </ToolActionButton>
+            </div>
+            <p className="mt-2 text-[12.5px] leading-[1.6] text-[var(--muted)]">
+              Vul per extra schulddeel bedrag en rente in. We tellen bedragen op en rekenen met een gewogen gemiddelde rente.
+            </p>
+            {formValues.debtParts.length > 0 ? (
+              <div className="mt-3 grid gap-3">
+                {formValues.debtParts.map((part, index) => (
+                  <div key={`debt-part-${index}`} className="rounded-lg border border-[var(--hair)] bg-white p-3">
+                    <div className="mb-2 flex items-center justify-between">
+                      <p className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                        Schulddeel {index + 2}
+                      </p>
+                      <ToolActionButton
+                        type="button"
+                        onClick={() => removeDebtPart(index)}
+                        variant="secondary"
+                        size="sm"
+                      >
+                        Verwijder
+                      </ToolActionButton>
+                    </div>
+                    <div className="grid gap-2 md:grid-cols-2">
+                      <input
+                        inputMode="decimal"
+                        value={part.amount}
+                        onChange={(event) =>
+                          updateDebtPart(index, "amount", event.target.value)
+                        }
+                        placeholder="Bedrag schulddeel"
+                        className="ring-focus hair h-11 rounded-md border bg-white px-4 font-mono text-[15px] tabular text-[var(--ink)] outline-none"
+                      />
+                      <input
+                        inputMode="decimal"
+                        value={part.annualDebtRate}
+                        onChange={(event) =>
+                          updateDebtPart(index, "annualDebtRate", event.target.value)
+                        }
+                        placeholder="Rente (%) schulddeel"
+                        className="ring-focus hair h-11 rounded-md border bg-white px-4 font-mono text-[15px] tabular text-[var(--ink)] outline-none"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </div>
 
           <label className={mobileFlow.getFieldClassName("remainingTermYears")}>
             <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
