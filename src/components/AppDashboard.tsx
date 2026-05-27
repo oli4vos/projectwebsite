@@ -19,29 +19,43 @@ type AudiencePreset = {
   id: string;
   label: string;
   groups: string[];
+  summary: string;
 };
 
 const audiencePresets: AudiencePreset[] = [
-  { id: "all", label: "Alles", groups: [] },
+  {
+    id: "all",
+    label: "Alles",
+    groups: [],
+    summary: "Toon alle onderwerpen en kies daarna een tool die past bij je vraag.",
+  },
   {
     id: "oud-student",
     label: "Oud-student",
     groups: ["Studieschuld", "Wonen", "Persoonlijke financiën"],
+    summary:
+      "Focus op studieschuld, koopwoningimpact en de keuze wat je met extra maandruimte doet.",
   },
   {
     id: "zzp",
     label: "ZZP",
     groups: ["Werk & ZZP", "Belasting", "Persoonlijke financiën"],
+    summary:
+      "Focus op uurtarief, belastingdruk en keuzes rond buffer, pensioen en flexibiliteit.",
   },
   {
     id: "pensioen",
     label: "Richting pensioen",
     groups: ["Sparen & beleggen", "Belasting", "FIRE / financiële vrijheid"],
+    summary:
+      "Focus op vermogensgroei, jaarruimte en netto uitkomsten richting financiële rust later.",
   },
   {
     id: "beleggen",
     label: "Beleggen algemeen",
     groups: ["Sparen & beleggen", "Belasting", "FIRE / financiële vrijheid"],
+    summary:
+      "Focus op eindvermogen, box 3-effect en vergelijking van beleggingsscenario’s.",
   },
 ];
 
@@ -80,6 +94,29 @@ export function AppDashboard({ apps }: AppDashboardProps) {
     return groupedApps.filter((group) => preset.groups.includes(group.title));
   }, [activeAudience, groupedApps]);
 
+  const activeAudiencePreset = useMemo(
+    () =>
+      audiencePresets.find((preset) => preset.id === activeAudience) ??
+      audiencePresets[0],
+    [activeAudience],
+  );
+
+  function applyAudienceFilter(nextAudienceId: string) {
+    setActiveAudience(nextAudienceId);
+
+    const preset = audiencePresets.find((item) => item.id === nextAudienceId);
+    const targetGroupTitle = preset?.groups?.[0];
+    const targetId = targetGroupTitle
+      ? toAnchorId(targetGroupTitle, "groep")
+      : "apps";
+
+    requestAnimationFrame(() => {
+      document
+        .getElementById(targetId)
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+
   return (
     <div className="space-y-8">
       <KnowledgeLevelSelector />
@@ -99,7 +136,7 @@ export function AppDashboard({ apps }: AppDashboardProps) {
             <button
               key={preset.id}
               type="button"
-              onClick={() => setActiveAudience(preset.id)}
+              onClick={() => applyAudienceFilter(preset.id)}
               className={`rounded-full border px-3 py-1.5 text-[12px] transition ${
                 activeAudience === preset.id
                   ? "border-[var(--ink)] bg-[var(--deep)] text-white"
@@ -110,6 +147,9 @@ export function AppDashboard({ apps }: AppDashboardProps) {
             </button>
           ))}
         </div>
+        <p className="mt-3 text-[13px] leading-[1.6] text-[var(--muted)]">
+          {activeAudiencePreset.summary}
+        </p>
       </section>
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
