@@ -4,7 +4,11 @@ import { useMemo } from "react";
 import { useSavedCalculations } from "@/hooks/useSavedCalculations";
 import { ENABLE_SAVED_CALCULATIONS } from "@/lib/feature-flags";
 import { appRegistryBySlug } from "@/lib/app-registry";
-import { ToolActionButton } from "@/components/tool/ToolActionButton";
+import { buildSavedCalculationHref } from "@/lib/storage/saved-calculations/saved-calculation-links";
+import {
+  ToolActionButton,
+  ToolActionLinkButton,
+} from "@/components/tool/ToolActionButton";
 
 function formatDateTime(value: string) {
   const parsed = new Date(value);
@@ -66,16 +70,25 @@ export function SavedCalculationsList() {
                       Bijgewerkt: {formatDateTime(item.updatedAt)}
                     </p>
                   </div>
-                  <ToolActionButton
-                    type="button"
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => {
-                      deleteCalculation(item.id);
-                    }}
-                  >
-                    Verwijder
-                  </ToolActionButton>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <ToolActionLinkButton
+                      href={buildSavedCalculationHref(item.toolSlug, item.id)}
+                      variant="secondary"
+                      size="sm"
+                    >
+                      Heropen scenario
+                    </ToolActionLinkButton>
+                    <ToolActionButton
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => {
+                        deleteCalculation(item.id);
+                      }}
+                    >
+                      Verwijder
+                    </ToolActionButton>
+                  </div>
                 </div>
               </li>
             );
@@ -91,4 +104,3 @@ export function SavedCalculationsList() {
     </section>
   );
 }
-

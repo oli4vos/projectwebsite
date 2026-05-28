@@ -1,4 +1,4 @@
-# Ideetjes Audit (2026-05-27)
+# Ideetjes Audit (2026-05-28)
 
 Dit document koppelt `ideetjes.txt` aan de huidige implementatie.
 
@@ -22,6 +22,7 @@ Dit document koppelt `ideetjes.txt` aan de huidige implementatie.
 - Algemene financiële begrippen worden via centrale glossary klikbaar gemaakt op homepage, toolintro's, toolkaarten en gedeelde resultaatcomponenten.
 - Koop-vs-huur, schulden-volgorde en kind-wordt-18 staan nu als publieke beta-tools live met centrale planninghelpers.
 - Scenario’s vergelijken is als feature-flagged MVP toegevoegd op basis van de twee meest recente lokale scenario’s.
+- Scenario’s kunnen nu vanuit `/profiel` direct worden heropend in de oorspronkelijke tool via een centrale scenario-linkflow.
 
 ## Deels verwerkt / aandachtspunt
 
@@ -31,7 +32,6 @@ Dit document koppelt `ideetjes.txt` aan de huidige implementatie.
 
 ## Open punten (nog niet gebouwd)
 
-- Scenario’s openen/herladen in de oorspronkelijke tool is nog niet gebouwd.
 - Private-lease impacttool staat nog als hidden/draft en is nog niet publiek gevalideerd.
 
 ## Nieuwe verbetering in deze ronde
@@ -43,6 +43,6 @@ Dit document koppelt `ideetjes.txt` aan de huidige implementatie.
 
 ## Aanbevolen vervolgbatch
 
-1. Scenario’s openen/herladen in de oorspronkelijke tool toevoegen.
-2. Begrippen-uitleg verder toepassen in losse tooltekst die nog buiten gedeelde componenten valt.
-3. Private-lease impacttool inhoudelijk nalopen en dan pas eventueel publiek zetten.
+1. Begrippen-uitleg verder toepassen in losse tooltekst die nog buiten gedeelde componenten valt.
+2. Private-lease impacttool inhoudelijk nalopen en dan pas eventueel publiek zetten.
+3. Scenario-heropenflow uitbreiden voor extra tools zodra daar scenario-opslag actief wordt.

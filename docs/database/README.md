@@ -32,7 +32,7 @@ De databasevariant is aanvullend en draait later naast de huidige browser-only f
 - Geen auth-flow verplicht in UI.
 - Hybrid sync-orchestrator is voorbereid in code, maar wordt nog niet automatisch door UI/hooks aangeroepen.
 - Er is een handmatige sync-entry voorbereid op `/profiel`, maar alleen als feature flag + mode/config dat toestaan.
-- Saved calculations hebben nu een local-first storage-laag, maar nog zonder UI-koppeling.
+- Saved calculations hebben nu een local-first storage-laag met een kleine feature-flagged MVP-UI.
 
 ## Hybrid sync contract (voorbereid)
 
@@ -66,16 +66,15 @@ De databasevariant is aanvullend en draait later naast de huidige browser-only f
   - `src/lib/storage/saved-calculations/saved-calculation.types.ts`
   - `src/lib/storage/saved-calculations/local-saved-calculation-store.ts`
   - `src/lib/storage/saved-calculations/saved-calculation-store.ts`
-- Nog geen knoppen/UI actief in tools.
-- MVP-UI is nu feature-flagged en bewust klein:
+- MVP-UI is feature-flagged en bewust klein:
   - alleen `apps/volgende-euro` heeft een handmatige knop “Scenario opslaan”;
   - `/profiel` toont een eenvoudige lokale scenario-lijst;
+  - opgeslagen scenario’s zijn daar direct te heropenen in de oorspronkelijke tool;
   - geen autosave.
 - Hybrid/remote modes vallen in deze fase nog terug op local store.
 - Bij latere database-activering kan `saved_calculations` uit het schema direct worden gebruikt.
 
 ## Volgende stap na MVP
 
-- Scenario openen/herladen in tool toevoegen.
 - Optionele accountkoppeling/sync voor `saved_calculations`.
 - Compact accountdashboard voor opgeslagen scenario's.

@@ -4,7 +4,9 @@ import { useMemo } from "react";
 import { useSavedCalculations } from "@/hooks/useSavedCalculations";
 import { ENABLE_SAVED_CALCULATIONS } from "@/lib/feature-flags";
 import { appRegistryBySlug } from "@/lib/app-registry";
+import { buildSavedCalculationHref } from "@/lib/storage/saved-calculations/saved-calculation-links";
 import { summarizeSavedCalculation } from "@/lib/storage/saved-calculations/saved-calculation-summary";
+import { ToolActionLinkButton } from "@/components/tool/ToolActionButton";
 
 function formatDate(value: string) {
   const parsed = new Date(value);
@@ -31,9 +33,8 @@ export function SavedScenarioComparison() {
         Scenario&apos;s vergelijken
       </div>
       <p className="mt-2 max-w-[62ch] text-[13.5px] leading-[1.65] text-[var(--muted)]">
-        Snelle vergelijking van je twee meest recente lokale scenario&apos;s. Dit
-        opent nog geen scenario opnieuw in de tool; het laat wel zien wat je hebt
-        opgeslagen.
+        Snelle vergelijking van je twee meest recente lokale scenario&apos;s. Je
+        kunt elk scenario direct opnieuw openen in de oorspronkelijke tool.
       </p>
 
       <div className="mt-4 grid gap-4 md:grid-cols-2">
@@ -62,6 +63,18 @@ export function SavedScenarioComparison() {
               <p className="mt-3 text-[12px] text-[var(--soft)]">
                 Opgeslagen: {formatDate(calculation.createdAt)}
               </p>
+              <div className="mt-3">
+                <ToolActionLinkButton
+                  href={buildSavedCalculationHref(
+                    calculation.toolSlug,
+                    calculation.id,
+                  )}
+                  variant="secondary"
+                  size="sm"
+                >
+                  Heropen scenario
+                </ToolActionLinkButton>
+              </div>
             </article>
           );
         })}

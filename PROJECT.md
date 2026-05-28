@@ -147,10 +147,11 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/lib/storage/saved-calculations/saved-calculation.types.ts`: domeincontract voor opgeslagen scenario's/berekeningen
 - `src/lib/storage/saved-calculations/local-saved-calculation-store.ts`: local-first scenario-opslag (max 50, sanitizing, SSR-safe)
 - `src/lib/storage/saved-calculations/saved-calculation-store.ts`: centraal entrypoint met mode-voorbereiding (`local`/`hybrid`/`remote`, nu fallback local)
+- `src/lib/storage/saved-calculations/saved-calculation-links.ts`: centrale deep-link helpers voor scenario-heropenflow (`savedCalculationId`)
 - `src/lib/storage/saved-calculations/remote-saved-calculation-store.ts`: remote stub voor toekomstige databasefase
 - `src/components/ProfileSyncPanel.tsx`: optioneel handmatig sync-paneel op profielpagina (feature-flagged)
 - `src/components/SaveScenarioButton.tsx`: compacte handmatige “Scenario opslaan”-actie (feature-flagged, geen autosave)
-- `src/components/SavedCalculationsList.tsx`: eenvoudige lijst op `/profiel` met lokaal opgeslagen scenario's en verwijderactie
+- `src/components/SavedCalculationsList.tsx`: eenvoudige lijst op `/profiel` met lokaal opgeslagen scenario's, heropen-link en verwijderactie
 - `src/components/SavedScenarioComparison.tsx`: feature-flagged vergelijking van de twee meest recente lokale scenario's
 - `src/lib/supabase/config.ts` + `src/lib/supabase/browser-client.ts`: optionele browser-safe Supabase configuratie (no-op zonder env vars)
 - `src/lib/auth/auth-session.ts` + `src/lib/auth/*.ts`: optioneel auth-session contract met veilige unauthenticated fallback
@@ -216,9 +217,9 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - Syncstatus in UI toont alleen metadata/events en geen profielpayload.
 - Databasefase is nu expliciet gedocumenteerd, maar runtime blijft local-first en static-safe.
 
-### Saved calculations (local-first, zonder UI)
+### Saved calculations (local-first, feature-flagged MVP)
 
-- Scenario-opslag bestaat nu als storage-laag, zonder zichtbare UI-koppeling in tools.
+- Scenario-opslag draait local-first en is UI-matig bewust klein gehouden achter feature flag.
 - Doel: later per tool een expliciete “Scenario opslaan”-actie kunnen toevoegen zonder store-refactor.
 - Opslag loopt voorlopig lokaal via `project-site:saved-calculations:v1`.
 - Data per item:
@@ -232,7 +233,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - `hybrid`/`remote`: in deze fase nog veilige fallback naar local.
 - Privacy:
   - scenario's blijven lokaal totdat account/sync later expliciet wordt geactiveerd.
-- Voor toekomstige UI geldt:
+- Voor de huidige en toekomstige UI geldt:
   - alleen handmatig opslaan (geen autosave);
   - input snapshot verplicht;
   - result snapshot optioneel;
@@ -249,7 +250,8 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - Op `/profiel` staat een compacte lijst “Mijn opgeslagen scenario's”:
   - local-first weergave;
   - max 10 nieuwste in de lijst;
-  - verwijderen per item.
+  - verwijderen per item;
+  - direct heropenen in de oorspronkelijke tool via `savedCalculationId` queryflow.
 - Geen autosave, geen accountdashboard, geen databasecalls, geen remote sync in deze fase.
 
 ## Huidige tools

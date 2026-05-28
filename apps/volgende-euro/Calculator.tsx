@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { DisclosureSection } from "@/components/DisclosureSection";
 import { MobileFieldFlowControls } from "@/components/MobileFieldFlowControls";
 import { ResultRow } from "@/components/ResultRow";
@@ -15,6 +16,8 @@ import { getDefaultFinancialYear } from "@/lib/financial-constants";
 import { parseOptionalDecimalInput } from "@/lib/number-input";
 import { createProfilePrefillState, mergeProfilePatchIntoValues } from "@/lib/profile-prefill";
 import { getVolgendeEuroDefaultsFromProfile } from "@/lib/profile-tool-mapping";
+import { getSavedCalculation } from "@/lib/storage/saved-calculations/saved-calculation-store";
+import { getSavedCalculationIdFromSearchParams } from "@/lib/storage/saved-calculations/saved-calculation-links";
 import { calculateVolgendeEuroPriorities, type VolgendeEuroInput } from "./logic";
 
 type FormState = {
@@ -134,6 +137,83 @@ function toInput(values: FormState): VolgendeEuroInput {
   };
 }
 
+function toFormNumber(value: number | undefined) {
+  return value === undefined ? "" : String(value);
+}
+
+function asNonNegativeNumber(value: unknown) {
+  if (typeof value !== "number" || !Number.isFinite(value) || value < 0) {
+    return undefined;
+  }
+
+  return value;
+}
+
+function asRiskProfile(value: unknown): FormState["riskProfile"] {
+  if (value === "conservative" || value === "neutral" || value === "offensive") {
+    return value;
+  }
+
+  return "neutral";
+}
+
+function scheduleScenarioStateUpdate(callback: () => void) {
+  if (typeof queueMicrotask === "function") {
+    queueMicrotask(callback);
+    return;
+  }
+
+  Promise.resolve().then(callback);
+}
+
+function restoreFormStateFromSavedInput(input: unknown): FormState | null {
+  if (!input || typeof input !== "object" || Array.isArray(input)) {
+    return null;
+  }
+
+  const candidate = input as Partial<VolgendeEuroInput>;
+  const extraAmount = asNonNegativeNumber(candidate.extraAmount);
+  const currentBuffer = asNonNegativeNumber(candidate.currentBuffer);
+  const targetBuffer = asNonNegativeNumber(candidate.targetBuffer);
+  const studentDebtAmount = asNonNegativeNumber(candidate.studentDebtAmount);
+  const duoRate = asNonNegativeNumber(candidate.duoRate);
+  const expensiveDebtAmount = asNonNegativeNumber(candidate.expensiveDebtAmount);
+  const expensiveDebtRate = asNonNegativeNumber(candidate.expensiveDebtRate);
+  const mortgageRate = asNonNegativeNumber(candidate.mortgageRate);
+  const horizonYears = asNonNegativeNumber(candidate.horizonYears);
+  const expectedAnnualReturn = asNonNegativeNumber(candidate.expectedAnnualReturn);
+  const hasExpensiveDebt = candidate.hasExpensiveDebt === true;
+  const hasStudentDebt = studentDebtAmount !== undefined;
+
+  const hasDebt = hasStudentDebt || hasExpensiveDebt;
+  const primaryDebtIsDuo = hasStudentDebt;
+  const hasOtherDebt = hasStudentDebt && hasExpensiveDebt;
+
+  return {
+    extraAmount: toFormNumber(extraAmount),
+    currentBuffer: toFormNumber(currentBuffer),
+    targetBuffer: toFormNumber(targetBuffer),
+    openToInvesting:
+      horizonYears !== undefined || expectedAnnualReturn !== undefined,
+    horizonYears: toFormNumber(horizonYears),
+    expectedAnnualReturn: toFormNumber(expectedAnnualReturn),
+    hasDebt,
+    primaryDebtIsDuo,
+    primaryDebtAmount: hasDebt
+      ? toFormNumber(hasStudentDebt ? studentDebtAmount : expensiveDebtAmount)
+      : "",
+    primaryDebtRate: hasDebt
+      ? toFormNumber(hasStudentDebt ? duoRate : expensiveDebtRate)
+      : "",
+    hasOtherDebt,
+    otherDebtAmount: hasOtherDebt ? toFormNumber(expensiveDebtAmount) : "",
+    otherDebtRate: hasOtherDebt ? toFormNumber(expensiveDebtRate) : "",
+    hasMortgage: mortgageRate !== undefined,
+    mortgageRate: toFormNumber(mortgageRate),
+    riskProfile: asRiskProfile(candidate.riskProfile),
+  };
+}
+
 function FieldError({ message }: { message?: string }) {
   if (!message) return null;
   return <p className="text-sm text-red-700">{message}</p>;
@@ -169,9 +249,14 @@ export default function Calculator() {
 }
 
 function CalculatorContent({ initialValues, hasRelevantProfileValues, profilePatch }: CalculatorContentProps) {
+  const searchParams = useSearchParams();
+  const savedCalculationId = getSavedCalculationIdFromSearchParams(searchParams);
   const [formValues, setFormValues] = useState<FormState>(initialValues);
   const [submittedValues, setSubmittedValues] = useState<FormState | null>(null);
   const [submitContextMessage, setSubmitContextMessage] = useState<string | null>(null);
+  const [lastLoadedScenarioId, setLastLoadedScenarioId] = useState<string | null>(
+    null,
+  );
   const validationErrors = validate(formValues);
   const errors = Object.fromEntries(
     Object.entries(validationErrors).filter(([field]) => {
@@ -235,6 +320,52 @@ function CalculatorContent({ initialValues, hasRelevantProfileValues, profilePat
     const missing = checks.filter((check) => !check.ok).map((check) => check.label);
     return { total: checks.length, filled, missing };
   }, [formValues]);
+
+  useEffect(() => {
+    if (!savedCalculationId || savedCalculationId === lastLoadedScenarioId) {
+      return;
+    }
+
+    const savedResult = getSavedCalculation(savedCalculationId);
+    const savedCalculation = savedResult.data;
+
+    if (!savedCalculation || savedCalculation.toolSlug !== "volgende-euro") {
+      scheduleScenarioStateUpdate(() => {
+        setSubmitContextMessage(
+          "Opgeslagen scenario niet gevonden voor deze tool.",
+        );
+        setLastLoadedScenarioId(savedCalculationId);
+      });
+      return;
+    }
+
+    const restoredFormState = restoreFormStateFromSavedInput(
+      savedCalculation.input,
+    );
+
+    if (!restoredFormState) {
+      scheduleScenarioStateUpdate(() => {
+        setSubmitContextMessage(
+          "Scenario kon niet worden geladen door onvolledige gegevens.",
+        );
+        setLastLoadedScenarioId(savedCalculationId);
+      });
+      return;
+    }
+
+    scheduleScenarioStateUpdate(() => {
+      setFormValues(restoredFormState);
+      setSubmittedValues(restoredFormState);
+      setSubmitContextMessage(`Scenario geladen: ${savedCalculation.title}`);
+      setLastLoadedScenarioId(savedCalculationId);
+
+      requestAnimationFrame(() => {
+        document
+          .getElementById("tool-result-summary")
+          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    });
+  }, [savedCalculationId, lastLoadedScenarioId]);
 
   function updateField<K extends keyof FormState>(field: K, value: FormState[K]) {
     setFormValues((current) => ({ ...current, [field]: value }));
