@@ -1,0 +1,14 @@
+import {
+  executeProfile,
+  type GenericCalculationInput,
+  type GenericCalculationResult,
+} from "../_artifact_shared/runtime";
+
+export type ToolInput = GenericCalculationInput;
+export type ToolResult = GenericCalculationResult;
+
+export const TOOL_PROFILE = "linear_loan" as const;
+
+export function calculateLineaireLeningAflossen(input: ToolInput): ToolResult {
+  return executeProfile(TOOL_PROFILE, input);
+}

@@ -5,6 +5,7 @@
   "scripts": {
     "create:tool": "node scripts/create-tool.mjs",
     "generate:apps": "node scripts/generate-app-registry.mjs",
+    "import:artifact-tools": "node scripts/import-artifact-staging-to-apps.mjs",
     "predev": "npm run generate:apps",
     "dev": "next dev",
     "prebuild": "npm run generate:apps",

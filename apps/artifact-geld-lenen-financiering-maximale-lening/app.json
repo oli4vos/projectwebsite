@@ -1,0 +1,26 @@
+{
+  "slug": "artifact-geld-lenen-financiering-maximale-lening",
+  "title": "Maximale lening (Artifacts)",
+  "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+  "type": "frontend",
+  "category": "Artifacts (invulbladen)",
+  "tags": [
+    "artifact-import",
+    "geld-lenen-financiering",
+    "invulblad"
+  ],
+  "status": "draft",
+  "visibility": "public",
+  "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+  "assumptionsUsed": [
+    "tax"
+  ],
+  "calculationDomains": [
+    "cashflow"
+  ],
+  "riskLevel": "medium",
+  "disclaimerType": "financialEducation",
+  "outputType": "singleResult",
+  "version": "1.0.0",
+  "entry": "Calculator.tsx"
+}

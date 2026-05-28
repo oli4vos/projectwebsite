@@ -23,15 +23,27 @@ type AppDashboardProps = {
   apps: AppManifest[];
 };
 
+function isArtifactImportedApp(app: AppManifest) {
+  return app.tags.includes("artifact-import");
+}
+
 export function AppDashboard({ apps }: AppDashboardProps) {
   const [activeAudience, setActiveAudience] = useState<string>("all");
+  const artifactApps = useMemo(
+    () => apps.filter(isArtifactImportedApp),
+    [apps],
+  );
+  const primaryApps = useMemo(
+    () => apps.filter((app) => !isArtifactImportedApp(app)),
+    [apps],
+  );
   const appsBySlug = useMemo(
     () =>
-      Object.fromEntries(apps.map((app) => [app.slug, app])) as Record<
+      Object.fromEntries(primaryApps.map((app) => [app.slug, app])) as Record<
         string,
         AppManifest
       >,
-    [apps],
+    [primaryApps],
   );
 
   const groupedApps = useMemo(
@@ -57,8 +69,8 @@ export function AppDashboard({ apps }: AppDashboardProps) {
   );
 
   const recommendedRouteApps = useMemo(
-    () => getAudienceRouteApps(activeAudience, apps),
-    [activeAudience, apps],
+    () => getAudienceRouteApps(activeAudience, primaryApps),
+    [activeAudience, primaryApps],
   );
 
   function applyAudienceFilter(nextAudienceId: string) {
@@ -200,7 +212,30 @@ export function AppDashboard({ apps }: AppDashboardProps) {
 
       {ENABLE_PROFILE ? (
         <section id="persoonlijk">
-          <PersonalRoute apps={apps} />
+          <PersonalRoute apps={primaryApps} />
+        </section>
+      ) : null}
+
+      {artifactApps.length > 0 ? (
+        <section
+          id="apps-artifacts"
+          className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper"
+        >
+          <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
+            Aparte categorie
+          </div>
+          <h4 className="mt-2 font-serif text-[clamp(1.2rem,1.05rem+0.7vw,1.5rem)] tracking-[-0.015em] text-[var(--ink)]">
+            Artifacts tools (invulbladen)
+          </h4>
+          <p className="mt-2 max-w-[70ch] text-[13.5px] leading-[1.65] text-[var(--muted)]">
+            Deze tools komen rechtstreeks uit ingevulde artifacts en staan bewust
+            los van de reguliere toolgroepen.
+          </p>
+          <div className="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {artifactApps.map((app) => (
+              <AppCard key={app.slug} app={app} />
+            ))}
+          </div>
         </section>
       ) : null}
 
@@ -232,9 +267,12 @@ export function AppDashboard({ apps }: AppDashboardProps) {
           <p className="mt-2 text-[14px] leading-[1.65] text-[var(--ink-2)]">
             Bekijk met welke percentages en standaardwaarden de site rekent.
           </p>
-          <div className="mt-3">
+          <div className="mt-3 flex flex-wrap gap-2">
             <BtnLink href="/variabelen" kind="outline" size="md">
               Naar aannames
+            </BtnLink>
+            <BtnLink href="/kennisbank" kind="outline" size="md">
+              Naar kennisbank
             </BtnLink>
           </div>
         </div>

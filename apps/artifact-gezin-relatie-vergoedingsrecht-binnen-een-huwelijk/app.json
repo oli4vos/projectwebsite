@@ -1,0 +1,26 @@
+{
+  "slug": "artifact-gezin-relatie-vergoedingsrecht-binnen-een-huwelijk",
+  "title": "Vergoedingsrecht binnen een huwelijk (Artifacts)",
+  "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+  "type": "frontend",
+  "category": "Artifacts (invulbladen)",
+  "tags": [
+    "artifact-import",
+    "gezin-relatie",
+    "invulblad"
+  ],
+  "status": "draft",
+  "visibility": "public",
+  "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+  "assumptionsUsed": [
+    "tax"
+  ],
+  "calculationDomains": [
+    "cashflow"
+  ],
+  "riskLevel": "medium",
+  "disclaimerType": "financialEducation",
+  "outputType": "singleResult",
+  "version": "1.0.0",
+  "entry": "Calculator.tsx"
+}

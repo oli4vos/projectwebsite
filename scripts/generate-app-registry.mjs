@@ -343,6 +343,7 @@ async function main() {
   const appDirectories = appDirectoryEntries
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name)
+    .filter((name) => !name.startsWith("_"))
     .sort((left, right) => left.localeCompare(right));
 
   const manifests = [];

@@ -1,0 +1,29 @@
+{
+  "slug": "artifact-hypotheek-wonen-huren-of-kopen",
+  "title": "Huren of kopen (Artifacts)",
+  "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+  "type": "frontend",
+  "category": "Artifacts (invulbladen)",
+  "tags": [
+    "artifact-import",
+    "hypotheek-wonen",
+    "invulblad"
+  ],
+  "status": "draft",
+  "visibility": "public",
+  "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+  "assumptionsUsed": [
+    "mortgage",
+    "tax"
+  ],
+  "calculationDomains": [
+    "mortgage",
+    "housing",
+    "cashflow"
+  ],
+  "riskLevel": "medium",
+  "disclaimerType": "financialEducation",
+  "outputType": "singleResult",
+  "version": "1.0.0",
+  "entry": "Calculator.tsx"
+}
