@@ -2940,6 +2940,223 @@ export const appRegistry = [
     "entry": "Calculator.tsx"
   },
   {
+    "slug": "artifact-kalender-vrije-tijd-aantal-werkdagen",
+    "title": "Aantal werkdagen (Artifacts)",
+    "description": "Bereken werkdagen in een periode met optionele uitsluiting van Nederlandse feestdagen.",
+    "type": "frontend",
+    "category": "Artifacts (invulbladen)",
+    "tags": [
+      "artifact-import",
+      "kalender-vrije-tijd",
+      "werkdagen",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "charts"
+    ],
+    "calculationDomains": [
+      "cashflow"
+    ],
+    "riskLevel": "low",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-kalender-vrije-tijd-begin-of-einddatum",
+    "title": "Begin- of einddatum (Artifacts)",
+    "description": "Bereken een begin- of einddatum op basis van een bekende datum en periodecomponenten.",
+    "type": "frontend",
+    "category": "Artifacts (invulbladen)",
+    "tags": [
+      "artifact-import",
+      "kalender-vrije-tijd",
+      "datum",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "charts"
+    ],
+    "calculationDomains": [
+      "cashflow"
+    ],
+    "riskLevel": "low",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-kalender-vrije-tijd-dag-van-de-week",
+    "title": "Dag van de week (Artifacts)",
+    "description": "Bepaal op welke weekdag een datum valt, inclusief ISO-weeknummer en dagnummer in het jaar.",
+    "type": "frontend",
+    "category": "Artifacts (invulbladen)",
+    "tags": [
+      "artifact-import",
+      "kalender-vrije-tijd",
+      "weekdag",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "charts"
+    ],
+    "calculationDomains": [
+      "cashflow"
+    ],
+    "riskLevel": "low",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-kalender-vrije-tijd-eerstvolgende-of-vorige-weekdag",
+    "title": "Eerstvolgende of vorige weekdag (Artifacts)",
+    "description": "Bereken de eerstvolgende of vorige weekdag vanaf een opgegeven datum.",
+    "type": "frontend",
+    "category": "Artifacts (invulbladen)",
+    "tags": [
+      "artifact-import",
+      "kalender-vrije-tijd",
+      "weekdag",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "charts"
+    ],
+    "calculationDomains": [
+      "cashflow"
+    ],
+    "riskLevel": "low",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-kalender-vrije-tijd-feestdagen",
+    "title": "Feestdagen (Artifacts)",
+    "description": "Toon Nederlandse feestdagen voor een gekozen jaar, inclusief vaste en beweeglijke dagen.",
+    "type": "frontend",
+    "category": "Artifacts (invulbladen)",
+    "tags": [
+      "artifact-import",
+      "kalender-vrije-tijd",
+      "feestdagen",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "charts"
+    ],
+    "calculationDomains": [
+      "cashflow"
+    ],
+    "riskLevel": "low",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-kalender-vrije-tijd-periode-duur",
+    "title": "Periode duur (Artifacts)",
+    "description": "Bereken de duur tussen twee datums in dagen, weken en kalendercomponenten.",
+    "type": "frontend",
+    "category": "Artifacts (invulbladen)",
+    "tags": [
+      "artifact-import",
+      "kalender-vrije-tijd",
+      "periode",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "charts"
+    ],
+    "calculationDomains": [
+      "cashflow"
+    ],
+    "riskLevel": "low",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-kalender-vrije-tijd-schoolvakanties",
+    "title": "Schoolvakanties (Artifacts)",
+    "description": "Toon schoolvakantieperiodes per schooljaar en regio op basis van een interne dataset.",
+    "type": "frontend",
+    "category": "Artifacts (invulbladen)",
+    "tags": [
+      "artifact-import",
+      "kalender-vrije-tijd",
+      "schoolvakanties",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "charts"
+    ],
+    "calculationDomains": [
+      "cashflow"
+    ],
+    "riskLevel": "low",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-kalender-vrije-tijd-wisselkoers-valuta",
+    "title": "Wisselkoers valuta (Artifacts)",
+    "description": "Reken bedragen om tussen valuta met optionele koersopslag en vaste kosten.",
+    "type": "frontend",
+    "category": "Artifacts (invulbladen)",
+    "tags": [
+      "artifact-import",
+      "kalender-vrije-tijd",
+      "valuta",
+      "wisselkoers",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "investment"
+    ],
+    "calculationDomains": [
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
     "slug": "box-3-impact",
     "title": "Wat kost mijn vermogen in box 3?",
     "description": "Zie hoeveel belasting je indicatief betaalt over spaargeld, beleggingen en schulden.",

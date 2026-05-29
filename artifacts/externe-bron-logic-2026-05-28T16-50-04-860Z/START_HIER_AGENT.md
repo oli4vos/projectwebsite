@@ -116,6 +116,14 @@ Optioneel maar aanbevolen:
 - Alles blijft in `artifacts/` tot expliciete opdracht om te verplaatsen.
 - Niet schrijven naar `apps/` in deze fase.
 
+## UX- en validatiestandaard (verplicht)
+
+- Alle zichtbare gebruikerscopy is Nederlands.
+- Elke tool heeft gelaagdheid: invoerblok, korte samenvatting en uitklapbare detailuitleg.
+- Mobiele invoer gebruikt stapsgewijze veldflow (`MobileFieldFlowControls`) zodat het scherm schoon blijft.
+- Validatie is strikt: geen stille fallback naar `0` bij lege/ongeldige invoer.
+- Uitkomsten tonen altijd gebruikte aannames/broncontext waar relevant.
+
 ## Outputstatus die agent moet rapporteren
 
 Per tool minimaal:

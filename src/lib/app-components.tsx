@@ -749,6 +749,62 @@ export const appComponents: Record<string, AppCalculatorComponent> = {
       </div>
     ),
   }),
+  "artifact-kalender-vrije-tijd-aantal-werkdagen": dynamic(() => import("../../apps/artifact-kalender-vrije-tijd-aantal-werkdagen/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "artifact-kalender-vrije-tijd-begin-of-einddatum": dynamic(() => import("../../apps/artifact-kalender-vrije-tijd-begin-of-einddatum/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "artifact-kalender-vrije-tijd-dag-van-de-week": dynamic(() => import("../../apps/artifact-kalender-vrije-tijd-dag-van-de-week/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "artifact-kalender-vrije-tijd-eerstvolgende-of-vorige-weekdag": dynamic(() => import("../../apps/artifact-kalender-vrije-tijd-eerstvolgende-of-vorige-weekdag/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "artifact-kalender-vrije-tijd-feestdagen": dynamic(() => import("../../apps/artifact-kalender-vrije-tijd-feestdagen/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "artifact-kalender-vrije-tijd-periode-duur": dynamic(() => import("../../apps/artifact-kalender-vrije-tijd-periode-duur/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "artifact-kalender-vrije-tijd-schoolvakanties": dynamic(() => import("../../apps/artifact-kalender-vrije-tijd-schoolvakanties/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "artifact-kalender-vrije-tijd-wisselkoers-valuta": dynamic(() => import("../../apps/artifact-kalender-vrije-tijd-wisselkoers-valuta/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
   "box-3-impact": dynamic(() => import("../../apps/box-3-impact/Calculator"), {
     loading: () => (
       <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">

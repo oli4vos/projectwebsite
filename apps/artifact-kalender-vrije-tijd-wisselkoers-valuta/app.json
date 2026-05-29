@@ -1,0 +1,28 @@
+{
+  "slug": "artifact-kalender-vrije-tijd-wisselkoers-valuta",
+  "title": "Wisselkoers valuta (Artifacts)",
+  "description": "Reken bedragen om tussen valuta met optionele koersopslag en vaste kosten.",
+  "type": "frontend",
+  "category": "Artifacts (invulbladen)",
+  "tags": [
+    "artifact-import",
+    "kalender-vrije-tijd",
+    "valuta",
+    "wisselkoers",
+    "invulblad"
+  ],
+  "status": "draft",
+  "visibility": "public",
+  "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+  "assumptionsUsed": [
+    "investment"
+  ],
+  "calculationDomains": [
+    "cashflow"
+  ],
+  "riskLevel": "medium",
+  "disclaimerType": "financialEducation",
+  "outputType": "singleResult",
+  "version": "1.0.0",
+  "entry": "Calculator.tsx"
+}

@@ -1,0 +1,27 @@
+{
+  "slug": "artifact-kalender-vrije-tijd-dag-van-de-week",
+  "title": "Dag van de week (Artifacts)",
+  "description": "Bepaal op welke weekdag een datum valt, inclusief ISO-weeknummer en dagnummer in het jaar.",
+  "type": "frontend",
+  "category": "Artifacts (invulbladen)",
+  "tags": [
+    "artifact-import",
+    "kalender-vrije-tijd",
+    "weekdag",
+    "invulblad"
+  ],
+  "status": "draft",
+  "visibility": "public",
+  "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+  "assumptionsUsed": [
+    "charts"
+  ],
+  "calculationDomains": [
+    "cashflow"
+  ],
+  "riskLevel": "low",
+  "disclaimerType": "financialEducation",
+  "outputType": "singleResult",
+  "version": "1.0.0",
+  "entry": "Calculator.tsx"
+}
