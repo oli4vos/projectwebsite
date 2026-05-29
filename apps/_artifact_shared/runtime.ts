@@ -22,6 +22,23 @@ export type ToolProfile =
   | "roman_numerals"
   | "dcf_valuation"
   | "percentage_composition"
+  | "loan_amortization_schedule"
+  | "revolving_credit_comparison"
+  | "loan_total_cost"
+  | "loan_amount_from_payment"
+  | "installment_purchase_cost"
+  | "financial_lease_payment"
+  | "loan_remaining_balance_after_period"
+  | "loan_term_months"
+  | "loan_monthly_payment"
+  | "max_loan_from_budget"
+  | "personal_loan_comparison"
+  | "loan_interest_rate"
+  | "financial_lease_interest_rate"
+  | "financial_lease_remaining_balance"
+  | "loan_remaining_balance"
+  | "student_loan_repayment"
+  | "debt_growth"
   | "generic_contract";
 
 export type GenericCalculationInput = Record<string, unknown>;
@@ -311,6 +328,170 @@ function getPaymentsPerYear(input: GenericCalculationInput) {
 
 function getAnnualRate(input: GenericCalculationInput) {
   return readNumber(input, NAME_ALIASES.annualRate) ?? readNumber(input, NAME_ALIASES.percentage);
+}
+
+function monthlyRateFromAnnual(annualRatePercentage: number) {
+  return annualRatePercentage / 100 / 12;
+}
+
+function annuityPaymentAmount(principal: number, monthlyRate: number, periods: number) {
+  if (monthlyRate === 0) return principal / periods;
+  return (principal * monthlyRate) / (1 - (1 + monthlyRate) ** -periods);
+}
+
+function annuityPrincipalAmount(payment: number, monthlyRate: number, periods: number) {
+  if (monthlyRate === 0) return payment * periods;
+  return (payment * (1 - (1 + monthlyRate) ** -periods)) / monthlyRate;
+}
+
+function validateLoanBounds({
+  principal,
+  annualRate,
+  periods,
+}: {
+  principal?: number;
+  annualRate?: number;
+  periods?: number;
+}) {
+  const errors: string[] = [];
+  if (principal === undefined || principal <= 0) errors.push("Vul een positief leenbedrag in.");
+  if (annualRate === undefined || annualRate < 0 || annualRate > 100) {
+    errors.push("Vul een geldig rentepercentage in.");
+  }
+  if (periods === undefined || periods <= 0) errors.push("Vul een positieve looptijd in.");
+  return errors;
+}
+
+function simulateDebtWithFixedPayment({
+  principal,
+  monthlyRate,
+  monthlyPayment,
+  months,
+  maxMonths = 2400,
+}: {
+  principal: number;
+  monthlyRate: number;
+  monthlyPayment: number;
+  months: number;
+  maxMonths?: number;
+}) {
+  if (months > maxMonths) {
+    return {
+      error: "De looptijd is te lang voor deze berekening.",
+    } as const;
+  }
+
+  let remaining = principal;
+  let totalInterest = 0;
+  let totalPaid = 0;
+  let totalPrincipalPaid = 0;
+  let paidMonths = 0;
+  let lastPayment = 0;
+
+  for (let month = 1; month <= months; month += 1) {
+    if (remaining <= 0) break;
+
+    const interest = remaining * monthlyRate;
+    if (monthlyRate > 0 && monthlyPayment <= interest + 1e-12) {
+      return {
+        error: "De maandbetaling is te laag om de schuld af te lossen.",
+      } as const;
+    }
+
+    let principalPart = monthlyPayment - interest;
+    let paidThisMonth = monthlyPayment;
+
+    if (principalPart >= remaining) {
+      principalPart = remaining;
+      paidThisMonth = interest + principalPart;
+    }
+
+    remaining = Math.max(0, remaining - principalPart);
+    totalInterest += interest;
+    totalPaid += paidThisMonth;
+    totalPrincipalPaid += principalPart;
+    paidMonths += 1;
+    lastPayment = paidThisMonth;
+  }
+
+  return {
+    remaining,
+    totalInterest,
+    totalPaid,
+    totalPrincipalPaid,
+    paidMonths,
+    lastPayment,
+  } as const;
+}
+
+function solveMonthlyRateByPayment({
+  principal,
+  payment,
+  periods,
+  maxAnnualRatePercentage = 100,
+}: {
+  principal: number;
+  payment: number;
+  periods: number;
+  maxAnnualRatePercentage?: number;
+}) {
+  const minPaymentAtZeroRate = principal / periods;
+  if (payment < minPaymentAtZeroRate - 1e-9) return undefined;
+  if (Math.abs(payment - minPaymentAtZeroRate) <= 1e-9) return 0;
+
+  const highRate = maxAnnualRatePercentage / 100 / 12;
+  const paymentAtHigh = annuityPaymentAmount(principal, highRate, periods);
+  if (payment > paymentAtHigh + 1e-9) return undefined;
+
+  let low = 0;
+  let high = highRate;
+  for (let i = 0; i < 120; i += 1) {
+    const mid = (low + high) / 2;
+    const midPayment = annuityPaymentAmount(principal, mid, periods);
+    if (midPayment > payment) high = mid;
+    else low = mid;
+  }
+  return (low + high) / 2;
+}
+
+function solveMonthlyRateForFinancialLease({
+  financing,
+  monthlyPayment,
+  residualValue,
+  periods,
+  maxAnnualRatePercentage = 100,
+}: {
+  financing: number;
+  monthlyPayment: number;
+  residualValue: number;
+  periods: number;
+  maxAnnualRatePercentage?: number;
+}) {
+  const presentValueAtZero = (monthlyPayment * periods) + residualValue;
+  if (presentValueAtZero < financing - 1e-9) return undefined;
+  if (Math.abs(presentValueAtZero - financing) <= 1e-9) return 0;
+
+  const pvForRate = (monthlyRate: number) => {
+    if (monthlyRate === 0) return presentValueAtZero;
+    return (
+      (monthlyPayment * (1 - (1 + monthlyRate) ** -periods)) / monthlyRate +
+      residualValue / (1 + monthlyRate) ** periods
+    );
+  };
+
+  const highRate = maxAnnualRatePercentage / 100 / 12;
+  const presentValueAtHigh = pvForRate(highRate);
+  if (presentValueAtHigh > financing + 1e-9) return undefined;
+
+  let low = 0;
+  let high = highRate;
+  for (let i = 0; i < 120; i += 1) {
+    const mid = (low + high) / 2;
+    const pv = pvForRate(mid);
+    if (pv > financing) low = mid;
+    else high = mid;
+  }
+  return (low + high) / 2;
 }
 
 function invalid(profile: ToolProfile, errors: string[]): GenericCalculationResult {
@@ -952,6 +1133,742 @@ function percentageComposition(profile: ToolProfile, input: GenericCalculationIn
   };
 }
 
+function loanAmortizationSchedule(profile: ToolProfile, input: GenericCalculationInput): GenericCalculationResult {
+  const principal = readNumber(input, NAME_ALIASES.principal);
+  const annualRate = getAnnualRate(input);
+  const periods = getPeriods(input);
+
+  const errors = validateLoanBounds({ principal, annualRate, periods });
+  if (periods !== undefined && periods > 1200) errors.push("De looptijd is te lang voor deze berekening.");
+  if (errors.length > 0) return invalid(profile, errors);
+
+  const monthlyRate = monthlyRateFromAnnual(annualRate);
+  const monthlyPayment = annuityPaymentAmount(principal, monthlyRate, periods);
+  const simulation = simulateDebtWithFixedPayment({
+    principal,
+    monthlyRate,
+    monthlyPayment,
+    months: periods,
+    maxMonths: 1200,
+  });
+  if ("error" in simulation) return invalid(profile, [simulation.error]);
+
+  return {
+    isValid: true,
+    errors: [],
+    warnings: [],
+    profile,
+    outputs: {
+      monthlyPayment: round(monthlyPayment),
+      periods,
+      totalPaid: round(simulation.totalPaid),
+      totalInterest: round(simulation.totalInterest),
+      endRemainingBalance: round(simulation.remaining),
+    },
+  };
+}
+
+function revolvingCreditComparison(profile: ToolProfile, input: GenericCalculationInput): GenericCalculationResult {
+  const principal =
+    readNumber(input, ["principal", "restschuld", "schuld", "leenbedrag"]) ??
+    readNumber(input, ["oldPrincipal"]);
+  const oldAnnualRate = readNumber(input, ["oldAnnualRate", "oudeRente", "renteOud"]);
+  const newAnnualRate = readNumber(input, ["newAnnualRate", "nieuweRente", "renteNieuw"]);
+  const oldMonthlyPayment = readNumber(input, ["oldMonthlyPayment", "maandbetalingOud", "payment"]);
+  const newMonthlyPayment =
+    readNumber(input, ["newMonthlyPayment", "maandbetalingNieuw"]) ?? oldMonthlyPayment;
+
+  const errors: string[] = [];
+  if (principal === undefined || principal <= 0) errors.push("Vul een geldige restschuld in.");
+  if (oldAnnualRate === undefined || oldAnnualRate < 0 || oldAnnualRate > 100) {
+    errors.push("Vul een geldige oude rente in.");
+  }
+  if (newAnnualRate === undefined || newAnnualRate < 0 || newAnnualRate > 100) {
+    errors.push("Vul een geldige nieuwe rente in.");
+  }
+  if (oldMonthlyPayment === undefined || oldMonthlyPayment <= 0) {
+    errors.push("Vul een geldige maandbetaling in voor het oude krediet.");
+  }
+  if (newMonthlyPayment === undefined || newMonthlyPayment <= 0) {
+    errors.push("Vul een geldige maandbetaling in voor het nieuwe krediet.");
+  }
+  if (errors.length > 0) return invalid(profile, errors);
+
+  const oldSimulation = simulateDebtWithFixedPayment({
+    principal,
+    monthlyRate: monthlyRateFromAnnual(oldAnnualRate),
+    monthlyPayment: oldMonthlyPayment,
+    months: 2400,
+    maxMonths: 2400,
+  });
+  if ("error" in oldSimulation) return invalid(profile, [oldSimulation.error]);
+
+  const newSimulation = simulateDebtWithFixedPayment({
+    principal,
+    monthlyRate: monthlyRateFromAnnual(newAnnualRate),
+    monthlyPayment: newMonthlyPayment,
+    months: 2400,
+    maxMonths: 2400,
+  });
+  if ("error" in newSimulation) return invalid(profile, [newSimulation.error]);
+
+  if (oldSimulation.remaining > 0 || newSimulation.remaining > 0) {
+    return invalid(profile, ["De looptijd overschrijdt de maximale simulatieduur."]);
+  }
+
+  const savingsInterest = oldSimulation.totalInterest - newSimulation.totalInterest;
+  const savingsTotal = oldSimulation.totalPaid - newSimulation.totalPaid;
+  const advice =
+    savingsTotal > 0
+      ? "Nieuw krediet lijkt voordeliger."
+      : savingsTotal < 0
+        ? "Bestaand krediet lijkt voordeliger."
+        : "Beide kredieten zijn vergelijkbaar.";
+
+  return {
+    isValid: true,
+    errors: [],
+    warnings: [],
+    profile,
+    outputs: {
+      oldTermMonths: oldSimulation.paidMonths,
+      newTermMonths: newSimulation.paidMonths,
+      oldTotalInterest: round(oldSimulation.totalInterest),
+      newTotalInterest: round(newSimulation.totalInterest),
+      savingsInterest: round(savingsInterest),
+      savingsTotal: round(savingsTotal),
+      advice,
+    },
+  };
+}
+
+function loanTotalCost(profile: ToolProfile, input: GenericCalculationInput): GenericCalculationResult {
+  const principal = readNumber(input, NAME_ALIASES.principal);
+  const annualRate = getAnnualRate(input);
+  const periods = getPeriods(input);
+
+  const errors = validateLoanBounds({ principal, annualRate, periods });
+  if (periods !== undefined && periods > 1200) errors.push("De looptijd is te lang voor deze berekening.");
+  if (errors.length > 0) return invalid(profile, errors);
+
+  const monthlyPayment = annuityPaymentAmount(principal, monthlyRateFromAnnual(annualRate), periods);
+  const totalPaid = monthlyPayment * periods;
+  const loanCosts = totalPaid - principal;
+
+  return {
+    isValid: true,
+    errors: [],
+    warnings: [],
+    profile,
+    outputs: {
+      monthlyPayment: round(monthlyPayment),
+      totalPaid: round(totalPaid),
+      loanCosts: round(loanCosts),
+      loanCostPercentage: round((loanCosts / principal) * 100, 6),
+      periods,
+    },
+  };
+}
+
+function loanAmountFromPayment(profile: ToolProfile, input: GenericCalculationInput): GenericCalculationResult {
+  const payment = readNumber(input, NAME_ALIASES.payment);
+  const annualRate = getAnnualRate(input);
+  const periods = getPeriods(input);
+
+  const errors: string[] = [];
+  if (payment === undefined || payment <= 0) errors.push("Vul een positief maandbedrag in.");
+  if (annualRate === undefined || annualRate < 0 || annualRate > 100) {
+    errors.push("Vul een geldig rentepercentage in.");
+  }
+  if (periods === undefined || periods <= 0) errors.push("Vul een positieve looptijd in.");
+  if (periods !== undefined && periods > 1200) errors.push("De looptijd is te lang voor deze berekening.");
+  if (errors.length > 0) return invalid(profile, errors);
+
+  const principal = annuityPrincipalAmount(payment, monthlyRateFromAnnual(annualRate), periods);
+  const totalPaid = payment * periods;
+  const totalInterest = totalPaid - principal;
+
+  return {
+    isValid: true,
+    errors: [],
+    warnings: [],
+    profile,
+    outputs: {
+      loanAmount: round(principal),
+      monthlyPayment: round(payment),
+      totalPaid: round(totalPaid),
+      totalInterest: round(totalInterest),
+      periods,
+    },
+  };
+}
+
+function installmentPurchaseCost(profile: ToolProfile, input: GenericCalculationInput): GenericCalculationResult {
+  const purchasePrice = readNumber(input, ["purchasePrice", "aankoopbedrag"]);
+  const downPayment = readNumber(input, ["downPayment", "aanbetaling"]) ?? 0;
+  const annualRate = getAnnualRate(input);
+  const periods = getPeriods(input);
+
+  const errors: string[] = [];
+  if (purchasePrice === undefined || purchasePrice <= 0) errors.push("Vul een geldig aankoopbedrag in.");
+  if (downPayment < 0) errors.push("Aanbetaling mag niet negatief zijn.");
+  if (purchasePrice !== undefined && downPayment > purchasePrice) {
+    errors.push("Aanbetaling mag niet hoger zijn dan het aankoopbedrag.");
+  }
+  if (annualRate === undefined || annualRate < 0 || annualRate > 100) {
+    errors.push("Vul een geldig rentepercentage in.");
+  }
+  if (periods === undefined || periods <= 0) errors.push("Vul een positieve looptijd in.");
+  if (errors.length > 0) return invalid(profile, errors);
+
+  const financingAmount = purchasePrice - downPayment;
+  const monthlyPayment =
+    financingAmount === 0
+      ? 0
+      : annuityPaymentAmount(financingAmount, monthlyRateFromAnnual(annualRate), periods);
+  const totalInstallments = monthlyPayment * periods;
+  const totalPaid = downPayment + totalInstallments;
+  const extraCosts = totalPaid - purchasePrice;
+  const totalInterest = totalInstallments - financingAmount;
+
+  return {
+    isValid: true,
+    errors: [],
+    warnings: [],
+    profile,
+    outputs: {
+      financingAmount: round(financingAmount),
+      monthlyPayment: round(monthlyPayment),
+      totalPaid: round(totalPaid),
+      extraCosts: round(extraCosts),
+      totalInterest: round(totalInterest),
+      periods,
+    },
+  };
+}
+
+function financialLeasePayment(profile: ToolProfile, input: GenericCalculationInput): GenericCalculationResult {
+  const purchasePrice = readNumber(input, ["purchasePrice", "aanschafwaarde"]);
+  const downPayment = readNumber(input, ["downPayment", "aanbetaling"]) ?? 0;
+  const residualValue = readNumber(input, ["residualValue", "slottermijn", "restwaarde"]) ?? 0;
+  const annualRate = getAnnualRate(input);
+  const periods = getPeriods(input);
+
+  const errors: string[] = [];
+  if (purchasePrice === undefined || purchasePrice <= 0) errors.push("Vul een geldige aanschafwaarde in.");
+  if (downPayment < 0) errors.push("Aanbetaling mag niet negatief zijn.");
+  if (purchasePrice !== undefined && downPayment > purchasePrice) {
+    errors.push("Aanbetaling mag niet hoger zijn dan de aanschafwaarde.");
+  }
+  if (residualValue < 0) errors.push("Slottermijn mag niet negatief zijn.");
+  if (annualRate === undefined || annualRate < 0 || annualRate > 100) {
+    errors.push("Vul een geldig rentepercentage in.");
+  }
+  if (periods === undefined || periods <= 0) errors.push("Vul een positieve looptijd in.");
+  if (errors.length > 0) return invalid(profile, errors);
+
+  const financingAmount = purchasePrice - downPayment;
+  if (residualValue > financingAmount) {
+    return invalid(profile, ["Slottermijn mag niet hoger zijn dan het financieringsbedrag."]);
+  }
+
+  const monthlyRate = monthlyRateFromAnnual(annualRate);
+  const monthlyPayment =
+    monthlyRate === 0
+      ? (financingAmount - residualValue) / periods
+      : ((financingAmount - residualValue / (1 + monthlyRate) ** periods) * monthlyRate) /
+        (1 - (1 + monthlyRate) ** -periods);
+  const totalPaid = downPayment + (monthlyPayment * periods) + residualValue;
+  const totalInterest = totalPaid - purchasePrice;
+
+  return {
+    isValid: true,
+    errors: [],
+    warnings: [],
+    profile,
+    outputs: {
+      leasePaymentPerMonth: round(monthlyPayment),
+      financingAmount: round(financingAmount),
+      residualValue: round(residualValue),
+      totalPaid: round(totalPaid),
+      totalInterest: round(totalInterest),
+      periods,
+    },
+  };
+}
+
+function loanRemainingBalanceAfterPeriod(profile: ToolProfile, input: GenericCalculationInput): GenericCalculationResult {
+  const principal = readNumber(input, NAME_ALIASES.principal);
+  const payment = readNumber(input, NAME_ALIASES.payment);
+  const annualRate = getAnnualRate(input);
+  const monthsPaid = Math.round(readNumber(input, ["monthsPaid", "verstrekenMaanden", "periode"]) ?? 0);
+
+  const errors: string[] = [];
+  if (principal === undefined || principal <= 0) errors.push("Vul een geldige beginschuld in.");
+  if (payment === undefined || payment <= 0) errors.push("Vul een geldige maandbetaling in.");
+  if (annualRate === undefined || annualRate < 0 || annualRate > 100) {
+    errors.push("Vul een geldig rentepercentage in.");
+  }
+  if (!Number.isFinite(monthsPaid) || monthsPaid < 0) errors.push("Vul een geldige periode in maanden in.");
+  if (monthsPaid > 2400) errors.push("De periode is te lang voor deze berekening.");
+  if (errors.length > 0) return invalid(profile, errors);
+
+  const monthlyRate = monthlyRateFromAnnual(annualRate);
+  if (monthsPaid === 0) {
+    return {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      profile,
+      outputs: {
+        remainingBalance: round(principal),
+        monthsPaid: 0,
+        totalPaid: 0,
+        totalInterestPaid: 0,
+        totalPrincipalPaid: 0,
+      },
+    };
+  }
+
+  const simulation = simulateDebtWithFixedPayment({
+    principal,
+    monthlyRate,
+    monthlyPayment: payment,
+    months: monthsPaid,
+    maxMonths: 2400,
+  });
+  if ("error" in simulation) return invalid(profile, [simulation.error]);
+
+  return {
+    isValid: true,
+    errors: [],
+    warnings: [],
+    profile,
+    outputs: {
+      remainingBalance: round(simulation.remaining),
+      monthsPaid: simulation.paidMonths,
+      totalPaid: round(simulation.totalPaid),
+      totalInterestPaid: round(simulation.totalInterest),
+      totalPrincipalPaid: round(simulation.totalPrincipalPaid),
+    },
+  };
+}
+
+function loanTermMonths(profile: ToolProfile, input: GenericCalculationInput): GenericCalculationResult {
+  const principal = readNumber(input, NAME_ALIASES.principal);
+  const payment = readNumber(input, NAME_ALIASES.payment);
+  const annualRate = getAnnualRate(input);
+
+  const errors: string[] = [];
+  if (principal === undefined || principal <= 0) errors.push("Vul een geldige beginschuld in.");
+  if (payment === undefined || payment <= 0) errors.push("Vul een geldige maandbetaling in.");
+  if (annualRate === undefined || annualRate < 0 || annualRate > 100) {
+    errors.push("Vul een geldig rentepercentage in.");
+  }
+  if (errors.length > 0) return invalid(profile, errors);
+
+  const monthlyRate = monthlyRateFromAnnual(annualRate);
+  let exactMonths: number;
+  if (monthlyRate === 0) {
+    exactMonths = principal / payment;
+  } else {
+    if (payment <= principal * monthlyRate) {
+      return invalid(profile, ["De maandbetaling is te laag om de schuld af te lossen."]);
+    }
+    exactMonths = -Math.log(1 - (principal * monthlyRate) / payment) / Math.log(1 + monthlyRate);
+  }
+
+  if (!Number.isFinite(exactMonths) || exactMonths <= 0) {
+    return invalid(profile, ["De looptijd kon niet worden berekend."]);
+  }
+
+  const months = Math.ceil(exactMonths);
+  if (months > 2400) return invalid(profile, ["De looptijd is te lang voor deze berekening."]);
+
+  const simulation = simulateDebtWithFixedPayment({
+    principal,
+    monthlyRate,
+    monthlyPayment: payment,
+    months,
+    maxMonths: 2400,
+  });
+  if ("error" in simulation) return invalid(profile, [simulation.error]);
+
+  return {
+    isValid: true,
+    errors: [],
+    warnings: [],
+    profile,
+    outputs: {
+      months,
+      years: round(months / 12, 4),
+      yearsPart: Math.floor(months / 12),
+      monthsPart: months % 12,
+      totalPaid: round(simulation.totalPaid),
+      totalInterest: round(simulation.totalInterest),
+      lastPayment: round(simulation.lastPayment),
+    },
+  };
+}
+
+function loanMonthlyPayment(profile: ToolProfile, input: GenericCalculationInput): GenericCalculationResult {
+  const principal = readNumber(input, NAME_ALIASES.principal);
+  const annualRate = getAnnualRate(input);
+  const periods = Math.round(readNumber(input, ["periods", "looptijdMaanden", "maanden"]) ?? 0);
+
+  const errors = validateLoanBounds({ principal, annualRate, periods });
+  if (periods !== undefined && periods > 1200) errors.push("De looptijd is te lang voor deze berekening.");
+  if (errors.length > 0) return invalid(profile, errors);
+
+  const monthlyPayment = annuityPaymentAmount(principal, monthlyRateFromAnnual(annualRate), periods);
+  const totalPaid = monthlyPayment * periods;
+
+  return {
+    isValid: true,
+    errors: [],
+    warnings: [],
+    profile,
+    outputs: {
+      monthlyPayment: round(monthlyPayment),
+      totalPaid: round(totalPaid),
+      totalInterest: round(totalPaid - principal),
+      periods,
+    },
+  };
+}
+
+function maxLoanFromBudget(profile: ToolProfile, input: GenericCalculationInput): GenericCalculationResult {
+  const directMaxMonthly = readNumber(input, ["maxMonthlyPayment", "maximaalMaandbedrag"]);
+  const netIncome = readNumber(input, ["netIncome", "nettoInkomen"]);
+  const fixedCosts = readNumber(input, ["fixedCosts", "vasteLasten"]);
+  const minimumLiving = readNumber(input, ["minimumLiving", "minimaleLeefruimte"]);
+  const annualRate = getAnnualRate(input);
+  const periods = Math.round(readNumber(input, ["periods", "looptijdMaanden", "maanden"]) ?? 0);
+
+  const errors: string[] = [];
+  let monthlyBudget = directMaxMonthly;
+  if (monthlyBudget === undefined) {
+    if (netIncome === undefined || fixedCosts === undefined || minimumLiving === undefined) {
+      errors.push("Vul een maximaal maandbedrag in of complete inkomensgegevens.");
+    } else {
+      monthlyBudget = netIncome - fixedCosts - minimumLiving;
+    }
+  }
+  if (monthlyBudget === undefined || !Number.isFinite(monthlyBudget) || monthlyBudget <= 0) {
+    errors.push("Er is geen positieve maandruimte beschikbaar.");
+  }
+  if (annualRate === undefined || annualRate < 0 || annualRate > 100) {
+    errors.push("Vul een geldig rentepercentage in.");
+  }
+  if (!Number.isFinite(periods) || periods <= 0) errors.push("Vul een positieve looptijd in.");
+  if (periods > 1200) errors.push("De looptijd is te lang voor deze berekening.");
+  if (errors.length > 0) return invalid(profile, errors);
+
+  const maxLoan = annuityPrincipalAmount(monthlyBudget, monthlyRateFromAnnual(annualRate), periods);
+  return {
+    isValid: true,
+    errors: [],
+    warnings: [],
+    profile,
+    outputs: {
+      maxLoan: round(maxLoan),
+      maxMonthlyPayment: round(monthlyBudget),
+      monthlyBudget: round(monthlyBudget),
+      periods,
+      annualRate: round(annualRate, 6),
+    },
+  };
+}
+
+function personalLoanComparison(profile: ToolProfile, input: GenericCalculationInput): GenericCalculationResult {
+  const loanAmountA = readNumber(input, ["loanAmountA", "leenbedragA", "principalA", "leenbedrag"]);
+  const loanAmountB =
+    readNumber(input, ["loanAmountB", "leenbedragB", "principalB"]) ?? loanAmountA;
+  const annualRateA = readNumber(input, ["annualRateA", "renteA"]);
+  const annualRateB = readNumber(input, ["annualRateB", "renteB"]);
+  const periodsA = Math.round(readNumber(input, ["periodsA", "looptijdMaandenA", "periods"]) ?? 0);
+  const periodsB = Math.round(readNumber(input, ["periodsB", "looptijdMaandenB", "periods"]) ?? 0);
+
+  const errors: string[] = [];
+  if (loanAmountA === undefined || loanAmountA <= 0 || loanAmountB === undefined || loanAmountB <= 0) {
+    errors.push("Vul geldige leenbedragen in voor beide leningen.");
+  }
+  if (annualRateA === undefined || annualRateA < 0 || annualRateA > 100) errors.push("Vul een geldige rente voor lening A in.");
+  if (annualRateB === undefined || annualRateB < 0 || annualRateB > 100) errors.push("Vul een geldige rente voor lening B in.");
+  if (periodsA <= 0 || periodsB <= 0) errors.push("Vul geldige looptijden in.");
+  if (periodsA > 1200 || periodsB > 1200) errors.push("De looptijd is te lang voor deze berekening.");
+  if (errors.length > 0) return invalid(profile, errors);
+
+  const monthlyA = annuityPaymentAmount(loanAmountA, monthlyRateFromAnnual(annualRateA), periodsA);
+  const monthlyB = annuityPaymentAmount(loanAmountB, monthlyRateFromAnnual(annualRateB), periodsB);
+  const totalPaidA = monthlyA * periodsA;
+  const totalPaidB = monthlyB * periodsB;
+  const totalInterestA = totalPaidA - loanAmountA;
+  const totalInterestB = totalPaidB - loanAmountB;
+  const cheaper = totalPaidA < totalPaidB ? "Lening A" : totalPaidB < totalPaidA ? "Lening B" : "Gelijk";
+  const savings = Math.abs(totalPaidA - totalPaidB);
+
+  return {
+    isValid: true,
+    errors: [],
+    warnings: [],
+    profile,
+    outputs: {
+      monthlyPaymentA: round(monthlyA),
+      monthlyPaymentB: round(monthlyB),
+      totalInterestA: round(totalInterestA),
+      totalInterestB: round(totalInterestB),
+      totalPaidA: round(totalPaidA),
+      totalPaidB: round(totalPaidB),
+      cheapestOption: cheaper,
+      savings: round(savings),
+    },
+  };
+}
+
+function loanInterestRate(profile: ToolProfile, input: GenericCalculationInput): GenericCalculationResult {
+  const principal = readNumber(input, NAME_ALIASES.principal);
+  const payment = readNumber(input, NAME_ALIASES.payment);
+  const periods = Math.round(readNumber(input, ["periods", "looptijdMaanden", "maanden"]) ?? 0);
+
+  const errors: string[] = [];
+  if (principal === undefined || principal <= 0) errors.push("Vul een positief leenbedrag in.");
+  if (payment === undefined || payment <= 0) errors.push("Vul een positief maandbedrag in.");
+  if (!Number.isFinite(periods) || periods <= 0) errors.push("Vul een positieve looptijd in.");
+  if (errors.length > 0) return invalid(profile, errors);
+
+  const monthlyRate = solveMonthlyRateByPayment({ principal, payment, periods, maxAnnualRatePercentage: 100 });
+  if (monthlyRate === undefined) {
+    return invalid(profile, ["De ingevoerde waarden passen niet bij een positieve rente tot 100% per jaar."]);
+  }
+
+  const annualRate = monthlyRate * 12 * 100;
+  const totalPaid = payment * periods;
+
+  return {
+    isValid: true,
+    errors: [],
+    warnings: [],
+    profile,
+    outputs: {
+      annualRatePercentage: round(annualRate, 6),
+      monthlyRatePercentage: round(monthlyRate * 100, 6),
+      totalPaid: round(totalPaid),
+      totalInterest: round(totalPaid - principal),
+    },
+  };
+}
+
+function financialLeaseInterestRate(profile: ToolProfile, input: GenericCalculationInput): GenericCalculationResult {
+  const purchasePrice = readNumber(input, ["purchasePrice", "aanschafwaarde"]);
+  const downPayment = readNumber(input, ["downPayment", "aanbetaling"]) ?? 0;
+  const residualValue = readNumber(input, ["residualValue", "slottermijn", "restwaarde"]) ?? 0;
+  const monthlyPayment = readNumber(input, ["payment", "maandtermijn", "leasetermijn"]);
+  const periods = Math.round(readNumber(input, ["periods", "looptijdMaanden", "maanden"]) ?? 0);
+
+  const errors: string[] = [];
+  if (purchasePrice === undefined || purchasePrice <= 0) errors.push("Vul een geldige aanschafwaarde in.");
+  if (downPayment < 0) errors.push("Aanbetaling mag niet negatief zijn.");
+  if (purchasePrice !== undefined && downPayment > purchasePrice) errors.push("Aanbetaling mag niet hoger zijn dan de aanschafwaarde.");
+  if (monthlyPayment === undefined || monthlyPayment <= 0) errors.push("Vul een geldige maandtermijn in.");
+  if (!Number.isFinite(periods) || periods <= 0) errors.push("Vul een positieve looptijd in.");
+  if (errors.length > 0) return invalid(profile, errors);
+
+  const financingAmount = purchasePrice - downPayment;
+  if (residualValue < 0 || residualValue > financingAmount) {
+    return invalid(profile, ["Vul een geldige slottermijn in."]);
+  }
+
+  const monthlyRate = solveMonthlyRateForFinancialLease({
+    financing: financingAmount,
+    monthlyPayment,
+    residualValue,
+    periods,
+    maxAnnualRatePercentage: 100,
+  });
+  if (monthlyRate === undefined) {
+    return invalid(profile, ["De ingevoerde waarden passen niet bij een niet-negatieve rente tot 100% per jaar."]);
+  }
+
+  const annualRate = monthlyRate * 12 * 100;
+  const totalPaid = downPayment + (monthlyPayment * periods) + residualValue;
+
+  return {
+    isValid: true,
+    errors: [],
+    warnings: [],
+    profile,
+    outputs: {
+      annualRatePercentage: round(annualRate, 6),
+      monthlyRatePercentage: round(monthlyRate * 100, 6),
+      financingAmount: round(financingAmount),
+      totalPaid: round(totalPaid),
+      totalInterest: round(totalPaid - purchasePrice),
+    },
+  };
+}
+
+function financialLeaseRemainingBalance(profile: ToolProfile, input: GenericCalculationInput): GenericCalculationResult {
+  const purchasePrice = readNumber(input, ["purchasePrice", "aanschafwaarde"]);
+  const downPayment = readNumber(input, ["downPayment", "aanbetaling"]) ?? 0;
+  const residualValue = readNumber(input, ["residualValue", "slottermijn", "restwaarde"]) ?? 0;
+  const annualRate = getAnnualRate(input);
+  const periods = Math.round(readNumber(input, ["periods", "looptijdMaanden", "maanden"]) ?? 0);
+  const monthsPaid = Math.round(readNumber(input, ["monthsPaid", "verstrekenMaanden"]) ?? 0);
+  const monthlyPaymentInput = readNumber(input, ["payment", "maandtermijn", "leasetermijn"]);
+
+  const errors: string[] = [];
+  if (purchasePrice === undefined || purchasePrice <= 0) errors.push("Vul een geldige aanschafwaarde in.");
+  if (downPayment < 0) errors.push("Aanbetaling mag niet negatief zijn.");
+  if (purchasePrice !== undefined && downPayment > purchasePrice) errors.push("Aanbetaling mag niet hoger zijn dan de aanschafwaarde.");
+  if (annualRate === undefined || annualRate < 0 || annualRate > 100) errors.push("Vul een geldig rentepercentage in.");
+  if (!Number.isFinite(periods) || periods <= 0) errors.push("Vul een positieve looptijd in.");
+  if (!Number.isFinite(monthsPaid) || monthsPaid < 0 || monthsPaid > periods) {
+    errors.push("Vul een geldige verstreken periode in.");
+  }
+  if (errors.length > 0) return invalid(profile, errors);
+
+  const financingAmount = purchasePrice - downPayment;
+  if (residualValue < 0 || residualValue > financingAmount) {
+    return invalid(profile, ["Vul een geldige slottermijn in."]);
+  }
+
+  const monthlyRate = monthlyRateFromAnnual(annualRate);
+  const monthlyPayment =
+    monthlyPaymentInput ??
+    (monthlyRate === 0
+      ? (financingAmount - residualValue) / periods
+      : ((financingAmount - residualValue / (1 + monthlyRate) ** periods) * monthlyRate) /
+        (1 - (1 + monthlyRate) ** -periods));
+
+  const simulation = simulateDebtWithFixedPayment({
+    principal: financingAmount,
+    monthlyRate,
+    monthlyPayment,
+    months: monthsPaid,
+    maxMonths: 2400,
+  });
+  if ("error" in simulation) return invalid(profile, [simulation.error]);
+
+  return {
+    isValid: true,
+    errors: [],
+    warnings: [],
+    profile,
+    outputs: {
+      remainingBalance: round(simulation.remaining),
+      monthsPaid: simulation.paidMonths,
+      totalPaid: round(simulation.totalPaid),
+      totalInterestPaid: round(simulation.totalInterest),
+      totalPrincipalPaid: round(simulation.totalPrincipalPaid),
+      residualValue: round(residualValue),
+    },
+  };
+}
+
+function loanRemainingBalance(profile: ToolProfile, input: GenericCalculationInput): GenericCalculationResult {
+  return loanRemainingBalanceAfterPeriod(profile, input);
+}
+
+function studentLoanRepayment(profile: ToolProfile, input: GenericCalculationInput): GenericCalculationResult {
+  const principal = readNumber(input, NAME_ALIASES.principal);
+  const annualRate = getAnnualRate(input);
+  const years = readNumber(input, ["repaymentYears", "terugbetaalTermijnJaren", "years"]);
+  const monthlyPaymentInput = readNumber(input, NAME_ALIASES.payment);
+
+  const errors: string[] = [];
+  if (principal === undefined || principal <= 0) errors.push("Vul een geldige studieschuld in.");
+  if (annualRate === undefined || annualRate < 0 || annualRate > 100) errors.push("Vul een geldig rentepercentage in.");
+  if (years === undefined || years <= 0) errors.push("Vul een geldige terugbetaaltermijn in jaren in.");
+  if (monthlyPaymentInput !== undefined && monthlyPaymentInput <= 0) {
+    errors.push("Vul een geldig maandbedrag in.");
+  }
+  if (errors.length > 0) return invalid(profile, errors);
+
+  const periods = Math.round(years * 12);
+  const monthlyRate = monthlyRateFromAnnual(annualRate);
+  const monthlyPayment =
+    monthlyPaymentInput ??
+    annuityPaymentAmount(principal, monthlyRate, periods);
+
+  let remaining = principal;
+  let totalPaid = 0;
+  let totalInterest = 0;
+  for (let month = 1; month <= periods; month += 1) {
+    if (remaining <= 0) break;
+    const interest = remaining * monthlyRate;
+    let principalPart = monthlyPayment - interest;
+    let paidThisMonth = monthlyPayment;
+    if (principalPart >= remaining) {
+      principalPart = remaining;
+      paidThisMonth = interest + principalPart;
+    }
+    remaining = Math.max(0, remaining - principalPart);
+    totalPaid += paidThisMonth;
+    totalInterest += interest;
+  }
+
+  const warnings: string[] = [];
+  if (monthlyRate > 0 && monthlyPayment <= principal * monthlyRate) {
+    warnings.push("Het maandbedrag ligt op of onder de rentelast van de eerste maand.");
+  }
+
+  return {
+    isValid: true,
+    errors: [],
+    warnings,
+    profile,
+    outputs: {
+      monthlyPayment: round(monthlyPayment),
+      periods,
+      years: round(periods / 12, 2),
+      totalPaid: round(totalPaid),
+      totalInterest: round(totalInterest),
+      remainingDebtAfterTerm: round(remaining),
+    },
+  };
+}
+
+function debtGrowth(profile: ToolProfile, input: GenericCalculationInput): GenericCalculationResult {
+  const principal = readNumber(input, NAME_ALIASES.principal);
+  const annualRate = getAnnualRate(input);
+  const monthlyPayment = readNumber(input, NAME_ALIASES.payment) ?? 0;
+  const periods = Math.round(readNumber(input, ["periods", "aantalMaanden", "maanden"]) ?? 0);
+
+  const errors: string[] = [];
+  if (principal === undefined || principal <= 0) errors.push("Vul een geldige beginschuld in.");
+  if (annualRate === undefined || annualRate < 0 || annualRate > 100) errors.push("Vul een geldig rentepercentage in.");
+  if (!Number.isFinite(periods) || periods <= 0) errors.push("Vul een geldige periode in maanden in.");
+  if (monthlyPayment < 0) errors.push("Maandbetaling mag niet negatief zijn.");
+  if (periods > 1200) errors.push("De periode is te lang voor deze berekening.");
+  if (errors.length > 0) return invalid(profile, errors);
+
+  const monthlyRate = monthlyRateFromAnnual(annualRate);
+  let remaining = principal;
+  let totalInterest = 0;
+  let totalPaid = 0;
+  for (let month = 1; month <= periods; month += 1) {
+    const interest = remaining * monthlyRate;
+    remaining = remaining + interest - monthlyPayment;
+    totalInterest += interest;
+    totalPaid += monthlyPayment;
+  }
+
+  return {
+    isValid: true,
+    errors: [],
+    warnings: [],
+    profile,
+    outputs: {
+      finalDebt: round(remaining),
+      debtIncrease: round(remaining - principal),
+      totalInterest: round(totalInterest),
+      totalPaid: round(totalPaid),
+      periods,
+    },
+  };
+}
+
 function genericContract(profile: ToolProfile, input: GenericCalculationInput): GenericCalculationResult {
   const numericValues = Object.values(input).map((value) => toNumber(value)).filter((value): value is number => value !== undefined);
   if (numericValues.length === 0) {
@@ -1028,6 +1945,40 @@ export function executeProfile(profile: ToolProfile, input: GenericCalculationIn
       return dcfValuation(profile, input);
     case "percentage_composition":
       return percentageComposition(profile, input);
+    case "loan_amortization_schedule":
+      return loanAmortizationSchedule(profile, input);
+    case "revolving_credit_comparison":
+      return revolvingCreditComparison(profile, input);
+    case "loan_total_cost":
+      return loanTotalCost(profile, input);
+    case "loan_amount_from_payment":
+      return loanAmountFromPayment(profile, input);
+    case "installment_purchase_cost":
+      return installmentPurchaseCost(profile, input);
+    case "financial_lease_payment":
+      return financialLeasePayment(profile, input);
+    case "loan_remaining_balance_after_period":
+      return loanRemainingBalanceAfterPeriod(profile, input);
+    case "loan_term_months":
+      return loanTermMonths(profile, input);
+    case "loan_monthly_payment":
+      return loanMonthlyPayment(profile, input);
+    case "max_loan_from_budget":
+      return maxLoanFromBudget(profile, input);
+    case "personal_loan_comparison":
+      return personalLoanComparison(profile, input);
+    case "loan_interest_rate":
+      return loanInterestRate(profile, input);
+    case "financial_lease_interest_rate":
+      return financialLeaseInterestRate(profile, input);
+    case "financial_lease_remaining_balance":
+      return financialLeaseRemainingBalance(profile, input);
+    case "loan_remaining_balance":
+      return loanRemainingBalance(profile, input);
+    case "student_loan_repayment":
+      return studentLoanRepayment(profile, input);
+    case "debt_growth":
+      return debtGrowth(profile, input);
     case "generic_contract":
       return genericContract(profile, input);
     default:
@@ -1090,6 +2041,116 @@ export function getProfileFixture(profile: ToolProfile): ProfileFixture {
       };
     case "percentage_composition":
       return { input: { percentage1: 10, percentage2: 20 }, expectValid: true };
+    case "loan_amortization_schedule":
+      return { input: { principal: 10000, annualRate: 6, periods: 12 }, expectValid: true };
+    case "revolving_credit_comparison":
+      return {
+        input: {
+          principal: 10000,
+          oldAnnualRate: 10,
+          newAnnualRate: 6,
+          oldMonthlyPayment: 250,
+          newMonthlyPayment: 250,
+        },
+        expectValid: true,
+      };
+    case "loan_total_cost":
+      return { input: { principal: 10000, annualRate: 6, periods: 12 }, expectValid: true };
+    case "loan_amount_from_payment":
+      return { input: { payment: 860.66, annualRate: 6, periods: 12 }, expectValid: true };
+    case "installment_purchase_cost":
+      return {
+        input: { purchasePrice: 1200, downPayment: 0, annualRate: 12, periods: 12 },
+        expectValid: true,
+      };
+    case "financial_lease_payment":
+      return {
+        input: {
+          purchasePrice: 30000,
+          downPayment: 5000,
+          residualValue: 5000,
+          annualRate: 6,
+          periods: 60,
+        },
+        expectValid: true,
+      };
+    case "loan_remaining_balance_after_period":
+      return {
+        input: {
+          principal: 10000,
+          payment: 860.66,
+          annualRate: 6,
+          monthsPaid: 6,
+        },
+        expectValid: true,
+      };
+    case "loan_term_months":
+      return {
+        input: { principal: 10000, payment: 860.66, annualRate: 6 },
+        expectValid: true,
+      };
+    case "loan_monthly_payment":
+      return { input: { principal: 10000, annualRate: 6, periods: 12 }, expectValid: true };
+    case "max_loan_from_budget":
+      return {
+        input: { maxMonthlyPayment: 250, annualRate: 6, periods: 60 },
+        expectValid: true,
+      };
+    case "personal_loan_comparison":
+      return {
+        input: {
+          loanAmountA: 10000,
+          annualRateA: 6,
+          periodsA: 60,
+          loanAmountB: 10000,
+          annualRateB: 8,
+          periodsB: 60,
+        },
+        expectValid: true,
+      };
+    case "loan_interest_rate":
+      return {
+        input: { principal: 10000, payment: 860.66, periods: 12 },
+        expectValid: true,
+      };
+    case "financial_lease_interest_rate":
+      return {
+        input: {
+          purchasePrice: 20000,
+          downPayment: 0,
+          residualValue: 5000,
+          periods: 48,
+          payment: 350.68,
+        },
+        expectValid: true,
+      };
+    case "financial_lease_remaining_balance":
+      return {
+        input: {
+          purchasePrice: 20000,
+          downPayment: 0,
+          residualValue: 5000,
+          annualRate: 5,
+          periods: 48,
+          monthsPaid: 24,
+        },
+        expectValid: true,
+      };
+    case "loan_remaining_balance":
+      return {
+        input: { principal: 10000, payment: 860.66, annualRate: 6, monthsPaid: 6 },
+        expectValid: true,
+      };
+    case "student_loan_repayment":
+      return {
+        input: { principal: 30000, annualRate: 2, repaymentYears: 35 },
+        expectValid: true,
+      };
+    case "debt_growth":
+      return {
+        input: { principal: 10000, annualRate: 12, payment: 0, periods: 12 },
+        expectValid: true,
+      };
     case "generic_contract":
     default:
       return { input: { valueA: 100, valueB: 250 }, expectValid: true };

@@ -7,7 +7,7 @@ import {
 export type ToolInput = GenericCalculationInput;
 export type ToolResult = GenericCalculationResult;
 
-export const TOOL_PROFILE = "annuity_payment" as const;
+export const TOOL_PROFILE = "loan_monthly_payment" as const;
 
 export function calculateMaandbedragVoorAflossingLening(input: ToolInput): ToolResult {
   return executeProfile(TOOL_PROFILE, input);

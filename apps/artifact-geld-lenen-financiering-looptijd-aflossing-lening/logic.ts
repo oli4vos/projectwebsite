@@ -7,7 +7,7 @@ import {
 export type ToolInput = GenericCalculationInput;
 export type ToolResult = GenericCalculationResult;
 
-export const TOOL_PROFILE = "annuity_term" as const;
+export const TOOL_PROFILE = "loan_term_months" as const;
 
 export function calculateLooptijdAflossingLening(input: ToolInput): ToolResult {
   return executeProfile(TOOL_PROFILE, input);

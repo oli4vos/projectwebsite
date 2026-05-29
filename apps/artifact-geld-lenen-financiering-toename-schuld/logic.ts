@@ -7,7 +7,7 @@ import {
 export type ToolInput = GenericCalculationInput;
 export type ToolResult = GenericCalculationResult;
 
-export const TOOL_PROFILE = "generic_contract" as const;
+export const TOOL_PROFILE = "debt_growth" as const;
 
 export function calculateToenameSchuld(input: ToolInput): ToolResult {
   return executeProfile(TOOL_PROFILE, input);
