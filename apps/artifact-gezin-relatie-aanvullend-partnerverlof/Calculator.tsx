@@ -5,7 +5,7 @@ import { getProfileFixture } from "../_artifact_shared/runtime";
 import { calculateAanvullendPartnerverlof, TOOL_PROFILE } from "./logic";
 
 const TOOL_TITLE = "Aanvullend partnerverlof";
-const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE).input;
+const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE, "artifact-gezin-relatie-aanvullend-partnerverlof").input;
 
 export default function Calculator() {
   return (

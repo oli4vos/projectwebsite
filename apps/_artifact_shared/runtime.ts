@@ -1986,7 +1986,141 @@ export function executeProfile(profile: ToolProfile, input: GenericCalculationIn
   }
 }
 
-export function getProfileFixture(profile: ToolProfile): ProfileFixture {
+function getGenericFixtureForTool(toolSlug?: string): ProfileFixture {
+  if (toolSlug?.startsWith("artifact-pensioen-aow-")) {
+    return {
+      input: {
+        brutoPensioenPerMaand: 2400,
+        aowPerMaand: 1345,
+        aanvullendInkomenPerMaand: 250,
+        leeftijdJaren: 67,
+      },
+      expectValid: true,
+    };
+  }
+
+  if (toolSlug?.startsWith("artifact-hypotheek-wonen-")) {
+    return {
+      input: {
+        woningWaarde: 475000,
+        hypotheekBedrag: 340000,
+        rentePercentage: 4.1,
+        looptijdJaren: 30,
+      },
+      expectValid: true,
+    };
+  }
+
+  if (toolSlug?.startsWith("artifact-gezin-relatie-")) {
+    return {
+      input: {
+        nettoInkomenOuder1: 3200,
+        nettoInkomenOuder2: 2700,
+        aantalKinderen: 2,
+        kostenPerKindPerMaand: 450,
+      },
+      expectValid: true,
+    };
+  }
+
+  if (toolSlug?.startsWith("artifact-geld-lenen-financiering-")) {
+    return {
+      input: {
+        leenbedrag: 25000,
+        rentePercentage: 6.2,
+        looptijdMaanden: 60,
+        maandbedrag: 485,
+      },
+      expectValid: true,
+    };
+  }
+
+  if (toolSlug?.startsWith("artifact-basis-berekeningen-")) {
+    return {
+      input: {
+        startBedrag: 10000,
+        percentage: 5,
+        looptijdJaren: 10,
+        periodiekeInleg: 100,
+      },
+      expectValid: true,
+    };
+  }
+
+  if (toolSlug?.startsWith("artifact-sparen-beleggen-")) {
+    return {
+      input: {
+        startVermogen: 25000,
+        maandelijkseInleg: 350,
+        verwachtRendementProcent: 6,
+        looptijdJaren: 15,
+      },
+      expectValid: true,
+    };
+  }
+
+  if (toolSlug?.startsWith("artifact-schenken-erven-")) {
+    return {
+      input: {
+        schenkingBedrag: 25000,
+        vrijstelling: 6650,
+        tariefProcent: 10,
+        belastbareGrondslag: 18350,
+      },
+      expectValid: true,
+    };
+  }
+
+  if (toolSlug?.startsWith("artifact-werk-inkomen-ontslag-")) {
+    return {
+      input: {
+        brutoMaandloon: 4200,
+        nettoMaandloon: 2950,
+        arbeidsurenPerWeek: 40,
+        vakantiegeldPercentage: 8,
+      },
+      expectValid: true,
+    };
+  }
+
+  if (toolSlug?.startsWith("artifact-ondernemen-zzp-dga-")) {
+    return {
+      input: {
+        jaaromzet: 120000,
+        zakelijkeKosten: 35000,
+        uurtarief: 95,
+        declarabeleUrenPerJaar: 1200,
+      },
+      expectValid: true,
+    };
+  }
+
+  if (toolSlug?.startsWith("artifact-kalender-vrije-tijd-")) {
+    return {
+      input: {
+        aantalDagen: 30,
+        aantalWerkdagen: 22,
+        feestdagenInPeriode: 1,
+      },
+      expectValid: true,
+    };
+  }
+
+  if (toolSlug?.startsWith("artifact-overig-")) {
+    return {
+      input: {
+        basisBedrag: 1000,
+        percentage: 12.5,
+        periodeInMaanden: 12,
+      },
+      expectValid: true,
+    };
+  }
+
+  return { input: { valueA: 100, valueB: 250 }, expectValid: true };
+}
+
+export function getProfileFixture(profile: ToolProfile, toolSlug?: string): ProfileFixture {
   switch (profile) {
     case "annuity_payment":
       return { input: { principal: 100000, annualRate: 5, years: 30 }, expectValid: true };
@@ -2153,6 +2287,6 @@ export function getProfileFixture(profile: ToolProfile): ProfileFixture {
       };
     case "generic_contract":
     default:
-      return { input: { valueA: 100, valueB: 250 }, expectValid: true };
+      return getGenericFixtureForTool(toolSlug);
   }
 }

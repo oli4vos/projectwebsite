@@ -5,7 +5,7 @@ import { getProfileFixture } from "../_artifact_shared/runtime";
 import { calculateKinderbijslagBerekenen, TOOL_PROFILE } from "./logic";
 
 const TOOL_TITLE = "Kinderbijslag berekenen";
-const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE).input;
+const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE, "artifact-gezin-relatie-kinderbijslag-berekenen").input;
 
 export default function Calculator() {
   return (

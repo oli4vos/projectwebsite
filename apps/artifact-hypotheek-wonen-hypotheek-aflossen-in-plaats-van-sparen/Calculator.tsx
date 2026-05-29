@@ -5,7 +5,7 @@ import { getProfileFixture } from "../_artifact_shared/runtime";
 import { calculateHypotheekAflossenInPlaatsVanSparen, TOOL_PROFILE } from "./logic";
 
 const TOOL_TITLE = "Hypotheek aflossen in plaats van sparen";
-const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE).input;
+const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE, "artifact-hypotheek-wonen-hypotheek-aflossen-in-plaats-van-sparen").input;
 
 export default function Calculator() {
   return (

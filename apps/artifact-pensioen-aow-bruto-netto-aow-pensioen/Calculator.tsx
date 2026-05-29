@@ -5,7 +5,7 @@ import { getProfileFixture } from "../_artifact_shared/runtime";
 import { calculateBrutoNettoAowPensioen, TOOL_PROFILE } from "./logic";
 
 const TOOL_TITLE = "Bruto-netto AOW & pensioen";
-const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE).input;
+const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE, "artifact-pensioen-aow-bruto-netto-aow-pensioen").input;
 
 export default function Calculator() {
   return (

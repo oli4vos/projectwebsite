@@ -5,7 +5,7 @@ import { getProfileFixture } from "../_artifact_shared/runtime";
 import { calculatePensioensparenBuitenBox3, TOOL_PROFILE } from "./logic";
 
 const TOOL_TITLE = "Pensioensparen buiten box3";
-const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE).input;
+const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE, "artifact-pensioen-aow-pensioensparen-buiten-box3").input;
 
 export default function Calculator() {
   return (

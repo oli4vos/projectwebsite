@@ -5,7 +5,7 @@ import { getProfileFixture } from "../_artifact_shared/runtime";
 import { calculateRestschuldBijFinancialLease, TOOL_PROFILE } from "./logic";
 
 const TOOL_TITLE = "Restschuld bij financial lease";
-const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE).input;
+const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE, "artifact-geld-lenen-financiering-restschuld-bij-financial-lease").input;
 
 export default function Calculator() {
   return (

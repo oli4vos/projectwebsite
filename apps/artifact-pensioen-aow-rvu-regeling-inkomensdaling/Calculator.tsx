@@ -5,7 +5,7 @@ import { getProfileFixture } from "../_artifact_shared/runtime";
 import { calculateRvuRegelingInkomensdaling, TOOL_PROFILE } from "./logic";
 
 const TOOL_TITLE = "RVU-regeling - inkomensdaling";
-const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE).input;
+const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE, "artifact-pensioen-aow-rvu-regeling-inkomensdaling").input;
 
 export default function Calculator() {
   return (

@@ -5,7 +5,7 @@ import { getProfileFixture } from "../_artifact_shared/runtime";
 import { calculateJaarruimteBelastingteruggave, TOOL_PROFILE } from "./logic";
 
 const TOOL_TITLE = "Jaarruimte & belastingteruggave";
-const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE).input;
+const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE, "artifact-pensioen-aow-jaarruimte-belastingteruggave").input;
 
 export default function Calculator() {
   return (

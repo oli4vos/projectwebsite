@@ -5,7 +5,7 @@ import { getProfileFixture } from "../_artifact_shared/runtime";
 import { calculateRestschuldBerekenenAflossen, TOOL_PROFILE } from "./logic";
 
 const TOOL_TITLE = "Restschuld berekenen & aflossen";
-const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE).input;
+const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE, "artifact-hypotheek-wonen-restschuld-berekenen-aflossen").input;
 
 export default function Calculator() {
   return (

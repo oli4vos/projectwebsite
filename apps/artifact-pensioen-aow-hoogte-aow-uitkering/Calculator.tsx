@@ -5,7 +5,7 @@ import { getProfileFixture } from "../_artifact_shared/runtime";
 import { calculateHoogteAowUitkering, TOOL_PROFILE } from "./logic";
 
 const TOOL_TITLE = "Hoogte AOW-uitkering";
-const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE).input;
+const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE, "artifact-pensioen-aow-hoogte-aow-uitkering").input;
 
 export default function Calculator() {
   return (

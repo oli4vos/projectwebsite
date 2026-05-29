@@ -5,7 +5,7 @@ import { getProfileFixture } from "../_artifact_shared/runtime";
 import { calculateRomeinseCijfers, TOOL_PROFILE } from "./logic";
 
 const TOOL_TITLE = "Romeinse cijfers";
-const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE).input;
+const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE, "artifact-basis-berekeningen-romeinse-cijfers").input;
 
 export default function Calculator() {
   return (

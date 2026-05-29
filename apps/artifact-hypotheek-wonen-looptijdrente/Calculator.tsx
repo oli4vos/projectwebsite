@@ -5,7 +5,7 @@ import { getProfileFixture } from "../_artifact_shared/runtime";
 import { calculateLooptijdrente, TOOL_PROFILE } from "./logic";
 
 const TOOL_TITLE = "Looptijdrente";
-const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE).input;
+const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE, "artifact-hypotheek-wonen-looptijdrente").input;
 
 export default function Calculator() {
   return (

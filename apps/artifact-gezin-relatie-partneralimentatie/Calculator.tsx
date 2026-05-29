@@ -5,7 +5,7 @@ import { getProfileFixture } from "../_artifact_shared/runtime";
 import { calculatePartneralimentatie, TOOL_PROFILE } from "./logic";
 
 const TOOL_TITLE = "Partneralimentatie";
-const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE).input;
+const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE, "artifact-gezin-relatie-partneralimentatie").input;
 
 export default function Calculator() {
   return (

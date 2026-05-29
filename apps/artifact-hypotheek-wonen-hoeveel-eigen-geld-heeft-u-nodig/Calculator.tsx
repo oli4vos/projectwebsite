@@ -5,7 +5,7 @@ import { getProfileFixture } from "../_artifact_shared/runtime";
 import { calculateHoeveelEigenGeldHeeftUNodig, TOOL_PROFILE } from "./logic";
 
 const TOOL_TITLE = "Hoeveel eigen geld heeft u nodig";
-const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE).input;
+const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE, "artifact-hypotheek-wonen-hoeveel-eigen-geld-heeft-u-nodig").input;
 
 export default function Calculator() {
   return (

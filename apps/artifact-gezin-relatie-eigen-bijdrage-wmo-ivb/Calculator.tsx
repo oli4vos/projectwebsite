@@ -5,7 +5,7 @@ import { getProfileFixture } from "../_artifact_shared/runtime";
 import { calculateEigenBijdrageWmoIvb, TOOL_PROFILE } from "./logic";
 
 const TOOL_TITLE = "Eigen bijdrage Wmo (ivb)";
-const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE).input;
+const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE, "artifact-gezin-relatie-eigen-bijdrage-wmo-ivb").input;
 
 export default function Calculator() {
   return (

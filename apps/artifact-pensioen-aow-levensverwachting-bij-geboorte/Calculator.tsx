@@ -5,7 +5,7 @@ import { getProfileFixture } from "../_artifact_shared/runtime";
 import { calculateLevensverwachtingBijGeboorte, TOOL_PROFILE } from "./logic";
 
 const TOOL_TITLE = "Levensverwachting bij geboorte";
-const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE).input;
+const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE, "artifact-pensioen-aow-levensverwachting-bij-geboorte").input;
 
 export default function Calculator() {
   return (

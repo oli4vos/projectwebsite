@@ -5,7 +5,7 @@ import { getProfileFixture } from "../_artifact_shared/runtime";
 import { calculateMaximaleBoetevrijeHypotheekaflossing, TOOL_PROFILE } from "./logic";
 
 const TOOL_TITLE = "Maximale boetevrije hypotheekaflossing";
-const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE).input;
+const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE, "artifact-hypotheek-wonen-maximale-boetevrije-hypotheekaflossing").input;
 
 export default function Calculator() {
   return (

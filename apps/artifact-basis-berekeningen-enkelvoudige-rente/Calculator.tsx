@@ -5,7 +5,7 @@ import { getProfileFixture } from "../_artifact_shared/runtime";
 import { calculateEnkelvoudigeRente, TOOL_PROFILE } from "./logic";
 
 const TOOL_TITLE = "Enkelvoudige rente";
-const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE).input;
+const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE, "artifact-basis-berekeningen-enkelvoudige-rente").input;
 
 export default function Calculator() {
   return (

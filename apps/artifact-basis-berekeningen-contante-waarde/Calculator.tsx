@@ -5,7 +5,7 @@ import { getProfileFixture } from "../_artifact_shared/runtime";
 import { calculateContanteWaarde, TOOL_PROFILE } from "./logic";
 
 const TOOL_TITLE = "Contante waarde";
-const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE).input;
+const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE, "artifact-basis-berekeningen-contante-waarde").input;
 
 export default function Calculator() {
   return (

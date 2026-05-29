@@ -5,7 +5,7 @@ import { getProfileFixture } from "../_artifact_shared/runtime";
 import { calculateUitkeringenUitEenBancaireLijfrente, TOOL_PROFILE } from "./logic";
 
 const TOOL_TITLE = "Uitkeringen uit een bancaire lijfrente";
-const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE).input;
+const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE, "artifact-pensioen-aow-uitkeringen-uit-een-bancaire-lijfrente").input;
 
 export default function Calculator() {
   return (

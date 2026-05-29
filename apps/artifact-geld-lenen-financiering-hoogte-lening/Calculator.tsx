@@ -5,7 +5,7 @@ import { getProfileFixture } from "../_artifact_shared/runtime";
 import { calculateHoogteLening, TOOL_PROFILE } from "./logic";
 
 const TOOL_TITLE = "Hoogte lening";
-const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE).input;
+const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE, "artifact-geld-lenen-financiering-hoogte-lening").input;
 
 export default function Calculator() {
   return (

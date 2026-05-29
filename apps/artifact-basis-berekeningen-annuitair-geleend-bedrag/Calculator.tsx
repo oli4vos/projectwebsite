@@ -5,7 +5,7 @@ import { getProfileFixture } from "../_artifact_shared/runtime";
 import { calculateAnnuitairGeleendBedrag, TOOL_PROFILE } from "./logic";
 
 const TOOL_TITLE = "Annuïtair geleend bedrag";
-const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE).input;
+const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE, "artifact-basis-berekeningen-annuitair-geleend-bedrag").input;
 
 export default function Calculator() {
   return (

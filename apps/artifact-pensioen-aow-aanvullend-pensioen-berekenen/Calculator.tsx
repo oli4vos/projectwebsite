@@ -5,7 +5,7 @@ import { getProfileFixture } from "../_artifact_shared/runtime";
 import { calculateAanvullendPensioenBerekenen, TOOL_PROFILE } from "./logic";
 
 const TOOL_TITLE = "Aanvullend pensioen berekenen";
-const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE).input;
+const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE, "artifact-pensioen-aow-aanvullend-pensioen-berekenen").input;
 
 export default function Calculator() {
   return (

@@ -5,7 +5,7 @@ import { getProfileFixture } from "../_artifact_shared/runtime";
 import { calculateDoorlopendKredietVergelijken, TOOL_PROFILE } from "./logic";
 
 const TOOL_TITLE = "Doorlopend krediet vergelijken";
-const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE).input;
+const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE, "artifact-geld-lenen-financiering-doorlopend-krediet-vergelijken").input;
 
 export default function Calculator() {
   return (

@@ -5,7 +5,7 @@ import { getProfileFixture } from "../_artifact_shared/runtime";
 import { calculateGeldLenenKostGeld, TOOL_PROFILE } from "./logic";
 
 const TOOL_TITLE = "Geld lenen kost geld";
-const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE).input;
+const DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE, "artifact-geld-lenen-financiering-geld-lenen-kost-geld").input;
 
 export default function Calculator() {
   return (
