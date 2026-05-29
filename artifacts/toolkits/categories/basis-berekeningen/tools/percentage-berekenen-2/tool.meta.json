@@ -1,0 +1,23 @@
+{
+  "title": "Percentage berekenen",
+  "slug": "percentage-berekenen-2",
+  "categorySlug": "basis-berekeningen",
+  "categoryTitle": "Basis Berekeningen",
+  "sourceUrl": "https://www.externe-bron.nl/berekenen/percentage-berekenen-uit-percentages.html",
+  "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/basis-berekeningen-logic-invulblad.md",
+  "status": "ready",
+  "invul": {
+    "filled": 13,
+    "total": 13,
+    "completionPercent": 100
+  },
+  "migrationTarget": {
+    "appDir": "apps/percentage-berekenen-2",
+    "requiredFiles": [
+      "app.json",
+      "logic.ts",
+      "logic.test.ts",
+      "Calculator.tsx"
+    ]
+  }
+}

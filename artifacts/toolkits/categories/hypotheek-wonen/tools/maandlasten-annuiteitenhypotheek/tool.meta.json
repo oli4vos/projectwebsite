@@ -1,0 +1,23 @@
+{
+  "title": "Maandlasten annuïteitenhypotheek",
+  "slug": "maandlasten-annuiteitenhypotheek",
+  "categorySlug": "hypotheek-wonen",
+  "categoryTitle": "Hypotheek Wonen",
+  "sourceUrl": "https://www.externe-bron.nl/hypotheek/maandlasten-annuiteitenhypotheek.html",
+  "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/hypotheek-wonen-logic-invulblad.md",
+  "status": "ready",
+  "invul": {
+    "filled": 13,
+    "total": 13,
+    "completionPercent": 100
+  },
+  "migrationTarget": {
+    "appDir": "apps/maandlasten-annuiteitenhypotheek",
+    "requiredFiles": [
+      "app.json",
+      "logic.ts",
+      "logic.test.ts",
+      "Calculator.tsx"
+    ]
+  }
+}

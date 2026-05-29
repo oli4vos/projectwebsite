@@ -1,0 +1,33 @@
+{
+  "slug": "basis-berekeningen-contante-waarde",
+  "title": "Contante waarde",
+  "description": "Staging-tool op basis van artifacts-contract: Contante waarde.",
+  "type": "frontend",
+  "category": "Basis Berekeningen",
+  "tags": [
+    "artifact-staging",
+    "draft",
+    "present_value"
+  ],
+  "status": "draft",
+  "visibility": "hidden",
+  "reasonHint": "Deze tool staat in artifacts-staging en is nog niet live gekoppeld.",
+  "assumptionsUsed": [
+    "financialEducation"
+  ],
+  "calculationDomains": [
+    "cashflow"
+  ],
+  "riskLevel": "medium",
+  "disclaimerType": "financialEducation",
+  "outputType": "singleResult",
+  "requiredProfileFields": [],
+  "version": "1.0.0",
+  "entry": "Calculator.tsx",
+  "staging": {
+    "profile": "present_value",
+    "sourceUrl": "https://www.externe-bron.nl/berekenen/contante-waarde.html",
+    "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/basis-berekeningen-logic-invulblad.md",
+    "generatedAt": "2026-05-28T22:49:15.952Z"
+  }
+}

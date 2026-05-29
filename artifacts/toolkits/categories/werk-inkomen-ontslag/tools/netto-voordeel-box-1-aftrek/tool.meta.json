@@ -1,0 +1,23 @@
+{
+  "title": "Netto voordeel box 1 aftrek",
+  "slug": "netto-voordeel-box-1-aftrek",
+  "categorySlug": "werk-inkomen-ontslag",
+  "categoryTitle": "Werk Inkomen Ontslag",
+  "sourceUrl": "https://www.externe-bron.nl/inkomen/netto-voordeel-box-1-aftrek.html",
+  "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/werk-inkomen-ontslag-logic-invulblad.md",
+  "status": "needs-spec",
+  "invul": {
+    "filled": 0,
+    "total": 13,
+    "completionPercent": 0
+  },
+  "migrationTarget": {
+    "appDir": "apps/netto-voordeel-box-1-aftrek",
+    "requiredFiles": [
+      "app.json",
+      "logic.ts",
+      "logic.test.ts",
+      "Calculator.tsx"
+    ]
+  }
+}

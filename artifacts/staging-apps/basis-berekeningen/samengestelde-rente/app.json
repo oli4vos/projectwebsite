@@ -1,0 +1,33 @@
+{
+  "slug": "basis-berekeningen-samengestelde-rente",
+  "title": "Samengestelde rente",
+  "description": "Staging-tool op basis van artifacts-contract: Samengestelde rente.",
+  "type": "frontend",
+  "category": "Basis Berekeningen",
+  "tags": [
+    "artifact-staging",
+    "draft",
+    "compound_interest"
+  ],
+  "status": "draft",
+  "visibility": "hidden",
+  "reasonHint": "Deze tool staat in artifacts-staging en is nog niet live gekoppeld.",
+  "assumptionsUsed": [
+    "financialEducation"
+  ],
+  "calculationDomains": [
+    "cashflow"
+  ],
+  "riskLevel": "medium",
+  "disclaimerType": "financialEducation",
+  "outputType": "singleResult",
+  "requiredProfileFields": [],
+  "version": "1.0.0",
+  "entry": "Calculator.tsx",
+  "staging": {
+    "profile": "compound_interest",
+    "sourceUrl": "https://www.externe-bron.nl/berekenen/samengestelde-rente.html",
+    "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/basis-berekeningen-logic-invulblad.md",
+    "generatedAt": "2026-05-28T22:49:15.968Z"
+  }
+}

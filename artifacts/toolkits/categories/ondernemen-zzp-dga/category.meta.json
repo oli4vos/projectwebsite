@@ -1,0 +1,16 @@
+{
+  "categorySlug": "ondernemen-zzp-dga",
+  "categoryTitle": "Ondernemen Zzp Dga",
+  "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/ondernemen-zzp-dga-logic-invulblad.md",
+  "tools": 45,
+  "invul": {
+    "filled": 0,
+    "total": 585,
+    "completionPercent": 0
+  },
+  "statuses": {
+    "ready": 0,
+    "partial": 0,
+    "needsSpec": 45
+  }
+}

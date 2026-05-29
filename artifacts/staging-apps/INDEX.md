@@ -1,0 +1,114 @@
+# Artifacts Staging Apps
+
+Deze map bevat automatisch gegenereerde staging-apps uit ingevulde invulbladen.
+Verplaats niets naar `apps/` totdat dat expliciet gevraagd wordt.
+
+Gegenereerd op: 2026-05-28T22:49:16.107Z
+Aantal tools: 105
+
+- [Annuïtair geleend bedrag](artifacts/staging-apps/basis-berekeningen/annuitair-geleend-bedrag) — `basis-berekeningen` / `generic_contract`
+- [Annuïteit berekenen](artifacts/staging-apps/basis-berekeningen/annuiteit-berekenen) — `basis-berekeningen` / `annuity_payment`
+- [Bedrag/getal berekenen](artifacts/staging-apps/basis-berekeningen/bedrag-getal-berekenen) — `basis-berekeningen` / `value_from_percentage`
+- [Breuk berekenen](artifacts/staging-apps/basis-berekeningen/breuk-berekenen) — `basis-berekeningen` / `generic_contract`
+- [Cijfer berekenen](artifacts/staging-apps/basis-berekeningen/cijfer-berekenen) — `basis-berekeningen` / `generic_contract`
+- [Contante waarde](artifacts/staging-apps/basis-berekeningen/contante-waarde) — `basis-berekeningen` / `present_value`
+- [Contante waarde voor een reeks betalingen](artifacts/staging-apps/basis-berekeningen/contante-waarde-voor-een-reeks-betalingen) — `basis-berekeningen` / `present_value_annuity`
+- [Effectieve rente](artifacts/staging-apps/basis-berekeningen/effectieve-rente) — `basis-berekeningen` / `effective_rate`
+- [Enkelvoudige rente](artifacts/staging-apps/basis-berekeningen/enkelvoudige-rente) — `basis-berekeningen` / `simple_interest`
+- [Gemiddelde cijfer](artifacts/staging-apps/basis-berekeningen/gemiddelde-cijfer) — `basis-berekeningen` / `generic_contract`
+- [Gewogen gemiddelde rentepercentage](artifacts/staging-apps/basis-berekeningen/gewogen-gemiddelde-rentepercentage) — `basis-berekeningen` / `weighted_average_rate`
+- [Lineaire lening aflossen](artifacts/staging-apps/basis-berekeningen/lineaire-lening-aflossen) — `basis-berekeningen` / `linear_loan`
+- [Looptijd annuïteit berekenen](artifacts/staging-apps/basis-berekeningen/looptijd-annuiteit-berekenen) — `basis-berekeningen` / `annuity_term`
+- [Nominale rente](artifacts/staging-apps/basis-berekeningen/nominale-rente) — `basis-berekeningen` / `nominal_rate`
+- [Percentage berekenen](artifacts/staging-apps/basis-berekeningen/percentage-berekenen) — `basis-berekeningen` / `percentage_of_total`
+- [Percentage berekenen](artifacts/staging-apps/basis-berekeningen/percentage-berekenen-2) — `basis-berekeningen` / `percentage_of_total`
+- [Romeinse cijfers](artifacts/staging-apps/basis-berekeningen/romeinse-cijfers) — `basis-berekeningen` / `generic_contract`
+- [Samengestelde rente](artifacts/staging-apps/basis-berekeningen/samengestelde-rente) — `basis-berekeningen` / `compound_interest`
+- [Toekomstige waarde](artifacts/staging-apps/basis-berekeningen/toekomstige-waarde) — `basis-berekeningen` / `future_value`
+- [Waardebepaling via cashflow, DCF-methode](artifacts/staging-apps/basis-berekeningen/waardebepaling-via-cashflow-dcf-methode) — `basis-berekeningen` / `generic_contract`
+- [Aflossingstermijnen lening](artifacts/staging-apps/geld-lenen-financiering/aflossingstermijnen-lening) — `geld-lenen-financiering` / `generic_contract`
+- [Doorlopend krediet vergelijken](artifacts/staging-apps/geld-lenen-financiering/doorlopend-krediet-vergelijken) — `geld-lenen-financiering` / `generic_contract`
+- [Geld lenen kost geld](artifacts/staging-apps/geld-lenen-financiering/geld-lenen-kost-geld) — `geld-lenen-financiering` / `generic_contract`
+- [Hoogte lening](artifacts/staging-apps/geld-lenen-financiering/hoogte-lening) — `geld-lenen-financiering` / `generic_contract`
+- [Kopen op afbetaling](artifacts/staging-apps/geld-lenen-financiering/kopen-op-afbetaling) — `geld-lenen-financiering` / `generic_contract`
+- [Leasetermijn financial lease](artifacts/staging-apps/geld-lenen-financiering/leasetermijn-financial-lease) — `geld-lenen-financiering` / `generic_contract`
+- [Lening aflossen](artifacts/staging-apps/geld-lenen-financiering/lening-aflossen) — `geld-lenen-financiering` / `generic_contract`
+- [Looptijd aflossing lening](artifacts/staging-apps/geld-lenen-financiering/looptijd-aflossing-lening) — `geld-lenen-financiering` / `annuity_term`
+- [Maandbedrag voor aflossing lening](artifacts/staging-apps/geld-lenen-financiering/maandbedrag-voor-aflossing-lening) — `geld-lenen-financiering` / `annuity_payment`
+- [Maximale lening](artifacts/staging-apps/geld-lenen-financiering/maximale-lening) — `geld-lenen-financiering` / `generic_contract`
+- [Persoonlijke lening vergelijken](artifacts/staging-apps/geld-lenen-financiering/persoonlijke-lening-vergelijken) — `geld-lenen-financiering` / `generic_contract`
+- [Rente bij lening](artifacts/staging-apps/geld-lenen-financiering/rente-bij-lening) — `geld-lenen-financiering` / `simple_interest`
+- [Rente in financial lease](artifacts/staging-apps/geld-lenen-financiering/rente-in-financial-lease) — `geld-lenen-financiering` / `simple_interest`
+- [Restschuld bij financial lease](artifacts/staging-apps/geld-lenen-financiering/restschuld-bij-financial-lease) — `geld-lenen-financiering` / `generic_contract`
+- [Restschuld lening](artifacts/staging-apps/geld-lenen-financiering/restschuld-lening) — `geld-lenen-financiering` / `generic_contract`
+- [Studiefinanciering terugbetalen](artifacts/staging-apps/geld-lenen-financiering/studiefinanciering-terugbetalen) — `geld-lenen-financiering` / `generic_contract`
+- [Toename schuld](artifacts/staging-apps/geld-lenen-financiering/toename-schuld) — `geld-lenen-financiering` / `generic_contract`
+- [Aanvullend partnerverlof](artifacts/staging-apps/gezin-relatie/aanvullend-partnerverlof) — `gezin-relatie` / `generic_contract`
+- [Betaald ouderschapsverlof](artifacts/staging-apps/gezin-relatie/betaald-ouderschapsverlof) — `gezin-relatie` / `generic_contract`
+- [Eigen bijdrage Wmo (ivb)](artifacts/staging-apps/gezin-relatie/eigen-bijdrage-wmo-ivb) — `gezin-relatie` / `generic_contract`
+- [Gesubsidieerde rechtsbijstand](artifacts/staging-apps/gezin-relatie/gesubsidieerde-rechtsbijstand) — `gezin-relatie` / `generic_contract`
+- [Indexering alimentatie](artifacts/staging-apps/gezin-relatie/indexering-alimentatie) — `gezin-relatie` / `indexed_amount`
+- [Kinderalimentatie](artifacts/staging-apps/gezin-relatie/kinderalimentatie) — `gezin-relatie` / `generic_contract`
+- [Kinderbijslag berekenen](artifacts/staging-apps/gezin-relatie/kinderbijslag-berekenen) — `gezin-relatie` / `generic_contract`
+- [Kosten kinderopvang](artifacts/staging-apps/gezin-relatie/kosten-kinderopvang) — `gezin-relatie` / `generic_contract`
+- [Partner uitkopen uit eigen woning](artifacts/staging-apps/gezin-relatie/partner-uitkopen-uit-eigen-woning) — `gezin-relatie` / `generic_contract`
+- [Partneralimentatie](artifacts/staging-apps/gezin-relatie/partneralimentatie) — `gezin-relatie` / `generic_contract`
+- [Trouwen en een bruiloft](artifacts/staging-apps/gezin-relatie/trouwen-en-een-bruiloft) — `gezin-relatie` / `generic_contract`
+- [Vergoedingsrecht binnen een huwelijk](artifacts/staging-apps/gezin-relatie/vergoedingsrecht-binnen-een-huwelijk) — `gezin-relatie` / `generic_contract`
+- [Actuele hypotheekrente](artifacts/staging-apps/hypotheek-wonen/actuele-hypotheekrente) — `hypotheek-wonen` / `generic_contract`
+- [Aflosboete Wet Hillen](artifacts/staging-apps/hypotheek-wonen/aflosboete-wet-hillen) — `hypotheek-wonen` / `generic_contract`
+- [Aflossingseis hypotheekrenteaftrek](artifacts/staging-apps/hypotheek-wonen/aflossingseis-hypotheekrenteaftrek) — `hypotheek-wonen` / `generic_contract`
+- [Aflossingsvrije hypotheek tussentijds aflossen](artifacts/staging-apps/hypotheek-wonen/aflossingsvrije-hypotheek-tussentijds-aflossen) — `hypotheek-wonen` / `generic_contract`
+- [Aftrekbare hypotheekrente berekenen](artifacts/staging-apps/hypotheek-wonen/aftrekbare-hypotheekrente-berekenen) — `hypotheek-wonen` / `generic_contract`
+- [Annuïteit berekenen](artifacts/staging-apps/hypotheek-wonen/annuiteit-berekenen) — `hypotheek-wonen` / `annuity_payment`
+- [Banksparen Eigen Woning](artifacts/staging-apps/hypotheek-wonen/banksparen-eigen-woning) — `hypotheek-wonen` / `future_value`
+- [Boeterente berekenen](artifacts/staging-apps/hypotheek-wonen/boeterente-berekenen) — `hypotheek-wonen` / `generic_contract`
+- [Boeterente in rentemiddeling](artifacts/staging-apps/hypotheek-wonen/boeterente-in-rentemiddeling) — `hypotheek-wonen` / `generic_contract`
+- [Dalende risico opslag](artifacts/staging-apps/hypotheek-wonen/dalende-risico-opslag) — `hypotheek-wonen` / `generic_contract`
+- [Effectieve hypotheekrente](artifacts/staging-apps/hypotheek-wonen/effectieve-hypotheekrente) — `hypotheek-wonen` / `effective_rate`
+- [Eigenwoningforfait](artifacts/staging-apps/hypotheek-wonen/eigenwoningforfait) — `hypotheek-wonen` / `generic_contract`
+- [Familiebank hypotheek](artifacts/staging-apps/hypotheek-wonen/familiebank-hypotheek) — `hypotheek-wonen` / `generic_contract`
+- [Hoeveel eigen geld heeft u nodig](artifacts/staging-apps/hypotheek-wonen/hoeveel-eigen-geld-heeft-u-nodig) — `hypotheek-wonen` / `generic_contract`
+- [Hogere maximale hypotheek](artifacts/staging-apps/hypotheek-wonen/hogere-maximale-hypotheek) — `hypotheek-wonen` / `generic_contract`
+- [Huis onder water aflossen](artifacts/staging-apps/hypotheek-wonen/huis-onder-water-aflossen) — `hypotheek-wonen` / `generic_contract`
+- [Huren of kopen](artifacts/staging-apps/hypotheek-wonen/huren-of-kopen) — `hypotheek-wonen` / `generic_contract`
+- [Hypotheek aflossen](artifacts/staging-apps/hypotheek-wonen/hypotheek-aflossen) — `hypotheek-wonen` / `generic_contract`
+- [Hypotheek aflossen in plaats van sparen](artifacts/staging-apps/hypotheek-wonen/hypotheek-aflossen-in-plaats-van-sparen) — `hypotheek-wonen` / `generic_contract`
+- [Hypotheek deels aflossen](artifacts/staging-apps/hypotheek-wonen/hypotheek-deels-aflossen) — `hypotheek-wonen` / `generic_contract`
+- [Hypotheek extra aflossen](artifacts/staging-apps/hypotheek-wonen/hypotheek-extra-aflossen) — `hypotheek-wonen` / `generic_contract`
+- [Hypotheek maandlasten bij nieuwbouw](artifacts/staging-apps/hypotheek-wonen/hypotheek-maandlasten-bij-nieuwbouw) — `hypotheek-wonen` / `generic_contract`
+- [Hypotheek maandlasten na rentewijziging](artifacts/staging-apps/hypotheek-wonen/hypotheek-maandlasten-na-rentewijziging) — `hypotheek-wonen` / `generic_contract`
+- [Hypotheek meenemen bij verhuizen](artifacts/staging-apps/hypotheek-wonen/hypotheek-meenemen-bij-verhuizen) — `hypotheek-wonen` / `generic_contract`
+- [Hypotheek oversluiten](artifacts/staging-apps/hypotheek-wonen/hypotheek-oversluiten) — `hypotheek-wonen` / `generic_contract`
+- [Hypotheek rentevaste periode](artifacts/staging-apps/hypotheek-wonen/hypotheek-rentevaste-periode) — `hypotheek-wonen` / `generic_contract`
+- [Hypotheek uit eigen bv](artifacts/staging-apps/hypotheek-wonen/hypotheek-uit-eigen-bv) — `hypotheek-wonen` / `generic_contract`
+- [Hypotheekrente vooruit betalen](artifacts/staging-apps/hypotheek-wonen/hypotheekrente-vooruit-betalen) — `hypotheek-wonen` / `generic_contract`
+- [Hypotheekrenteaftrek](artifacts/staging-apps/hypotheek-wonen/hypotheekrenteaftrek) — `hypotheek-wonen` / `generic_contract`
+- [Kan ik dat huis betalen?](artifacts/staging-apps/hypotheek-wonen/kan-ik-dat-huis-betalen) — `hypotheek-wonen` / `generic_contract`
+- [Kapitaalverzekering uitkeren](artifacts/staging-apps/hypotheek-wonen/kapitaalverzekering-uitkeren) — `hypotheek-wonen` / `generic_contract`
+- [Kosten hypotheekvormen](artifacts/staging-apps/hypotheek-wonen/kosten-hypotheekvormen) — `hypotheek-wonen` / `generic_contract`
+- [Kosten koper](artifacts/staging-apps/hypotheek-wonen/kosten-koper) — `hypotheek-wonen` / `generic_contract`
+- [Krediethypotheek](artifacts/staging-apps/hypotheek-wonen/krediethypotheek) — `hypotheek-wonen` / `generic_contract`
+- [Looptijdrente](artifacts/staging-apps/hypotheek-wonen/looptijdrente) — `hypotheek-wonen` / `generic_contract`
+- [Maandlasten annuïteitenhypotheek](artifacts/staging-apps/hypotheek-wonen/maandlasten-annuiteitenhypotheek) — `hypotheek-wonen` / `annuity_payment`
+- [Maandlasten lineaire hypotheek](artifacts/staging-apps/hypotheek-wonen/maandlasten-lineaire-hypotheek) — `hypotheek-wonen` / `linear_loan`
+- [Maximale boetevrije hypotheekaflossing](artifacts/staging-apps/hypotheek-wonen/maximale-boetevrije-hypotheekaflossing) — `hypotheek-wonen` / `generic_contract`
+- [Maximale erfpacht hypotheek](artifacts/staging-apps/hypotheek-wonen/maximale-erfpacht-hypotheek) — `hypotheek-wonen` / `generic_contract`
+- [Maximale huizenprijs](artifacts/staging-apps/hypotheek-wonen/maximale-huizenprijs) — `hypotheek-wonen` / `generic_contract`
+- [Maximale hypotheek](artifacts/staging-apps/hypotheek-wonen/maximale-hypotheek) — `hypotheek-wonen` / `generic_contract`
+- [Maximale hypotheek na verhuizen](artifacts/staging-apps/hypotheek-wonen/maximale-hypotheek-na-verhuizen) — `hypotheek-wonen` / `generic_contract`
+- [Maximale hypotheek ondernemer](artifacts/staging-apps/hypotheek-wonen/maximale-hypotheek-ondernemer) — `hypotheek-wonen` / `generic_contract`
+- [Maximale hypotheek uit maandlasten](artifacts/staging-apps/hypotheek-wonen/maximale-hypotheek-uit-maandlasten) — `hypotheek-wonen` / `generic_contract`
+- [Maximale verhuurhypotheek](artifacts/staging-apps/hypotheek-wonen/maximale-verhuurhypotheek) — `hypotheek-wonen` / `generic_contract`
+- [Netto hypotheek maandlasten](artifacts/staging-apps/hypotheek-wonen/netto-hypotheek-maandlasten) — `hypotheek-wonen` / `generic_contract`
+- [Netto voordeel hypotheekrenteaftrek](artifacts/staging-apps/hypotheek-wonen/netto-voordeel-hypotheekrenteaftrek) — `hypotheek-wonen` / `generic_contract`
+- [Opeethypotheek](artifacts/staging-apps/hypotheek-wonen/opeethypotheek) — `hypotheek-wonen` / `generic_contract`
+- [Overdrachtsbelasting](artifacts/staging-apps/hypotheek-wonen/overdrachtsbelasting) — `hypotheek-wonen` / `generic_contract`
+- [Overwaarde huis opeten](artifacts/staging-apps/hypotheek-wonen/overwaarde-huis-opeten) — `hypotheek-wonen` / `generic_contract`
+- [Prijsontwikkeling huizenprijzen](artifacts/staging-apps/hypotheek-wonen/prijsontwikkeling-huizenprijzen) — `hypotheek-wonen` / `generic_contract`
+- [Rentemiddeling](artifacts/staging-apps/hypotheek-wonen/rentemiddeling) — `hypotheek-wonen` / `generic_contract`
+- [Restschuld berekenen & aflossen](artifacts/staging-apps/hypotheek-wonen/restschuld-berekenen-aflossen) — `hypotheek-wonen` / `generic_contract`
+- [Stijging maandlasten annuïteitenhypotheek](artifacts/staging-apps/hypotheek-wonen/stijging-maandlasten-annuiteitenhypotheek) — `hypotheek-wonen` / `annuity_payment`
+- [Tariefsaanpassing aftrek kosten eigen woning](artifacts/staging-apps/hypotheek-wonen/tariefsaanpassing-aftrek-kosten-eigen-woning) — `hypotheek-wonen` / `generic_contract`
+- [Totale netto kosten van een hypotheek](artifacts/staging-apps/hypotheek-wonen/totale-netto-kosten-van-een-hypotheek) — `hypotheek-wonen` / `generic_contract`
+

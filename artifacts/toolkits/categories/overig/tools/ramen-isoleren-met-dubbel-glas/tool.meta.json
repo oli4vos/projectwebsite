@@ -1,0 +1,23 @@
+{
+  "title": "Ramen isoleren met dubbel glas",
+  "slug": "ramen-isoleren-met-dubbel-glas",
+  "categorySlug": "overig",
+  "categoryTitle": "Overig",
+  "sourceUrl": "https://www.externe-bron.nl/wonen/energiebesparing-raam-isoleren.html",
+  "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/overig-logic-invulblad.md",
+  "status": "needs-spec",
+  "invul": {
+    "filled": 0,
+    "total": 13,
+    "completionPercent": 0
+  },
+  "migrationTarget": {
+    "appDir": "apps/ramen-isoleren-met-dubbel-glas",
+    "requiredFiles": [
+      "app.json",
+      "logic.ts",
+      "logic.test.ts",
+      "Calculator.tsx"
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "title": "Hoeveel eigen geld heeft u nodig",
+  "slug": "hoeveel-eigen-geld-heeft-u-nodig",
+  "categorySlug": "hypotheek-wonen",
+  "categoryTitle": "Hypotheek Wonen",
+  "sourceUrl": "https://www.externe-bron.nl/hypotheek-en-wonen/huis-kopen-hoeveel-eigen-geld.html",
+  "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/hypotheek-wonen-logic-invulblad.md",
+  "status": "ready",
+  "invul": {
+    "filled": 13,
+    "total": 13,
+    "completionPercent": 100
+  },
+  "migrationTarget": {
+    "appDir": "apps/hoeveel-eigen-geld-heeft-u-nodig",
+    "requiredFiles": [
+      "app.json",
+      "logic.ts",
+      "logic.test.ts",
+      "Calculator.tsx"
+    ]
+  }
+}

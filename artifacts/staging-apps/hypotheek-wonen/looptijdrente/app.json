@@ -1,0 +1,33 @@
+{
+  "slug": "hypotheek-wonen-looptijdrente",
+  "title": "Looptijdrente",
+  "description": "Staging-tool op basis van artifacts-contract: Looptijdrente.",
+  "type": "frontend",
+  "category": "Hypotheek Wonen",
+  "tags": [
+    "artifact-staging",
+    "draft",
+    "generic_contract"
+  ],
+  "status": "draft",
+  "visibility": "hidden",
+  "reasonHint": "Deze tool staat in artifacts-staging en is nog niet live gekoppeld.",
+  "assumptionsUsed": [
+    "financialEducation"
+  ],
+  "calculationDomains": [
+    "cashflow"
+  ],
+  "riskLevel": "medium",
+  "disclaimerType": "financialEducation",
+  "outputType": "singleResult",
+  "requiredProfileFields": [],
+  "version": "1.0.0",
+  "entry": "Calculator.tsx",
+  "staging": {
+    "profile": "generic_contract",
+    "sourceUrl": "https://www.externe-bron.nl/hypotheek/looptijdrente-berekenen.html",
+    "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/hypotheek-wonen-logic-invulblad.md",
+    "generatedAt": "2026-05-28T22:49:16.075Z"
+  }
+}

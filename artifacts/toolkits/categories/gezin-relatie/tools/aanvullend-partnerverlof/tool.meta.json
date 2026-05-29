@@ -1,0 +1,23 @@
+{
+  "title": "Aanvullend partnerverlof",
+  "slug": "aanvullend-partnerverlof",
+  "categorySlug": "gezin-relatie",
+  "categoryTitle": "Gezin Relatie",
+  "sourceUrl": "https://www.externe-bron.nl/kinderen/aanvullend-partnerverlof-berekenen.html",
+  "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/gezin-relatie-logic-invulblad.md",
+  "status": "ready",
+  "invul": {
+    "filled": 13,
+    "total": 13,
+    "completionPercent": 100
+  },
+  "migrationTarget": {
+    "appDir": "apps/aanvullend-partnerverlof",
+    "requiredFiles": [
+      "app.json",
+      "logic.ts",
+      "logic.test.ts",
+      "Calculator.tsx"
+    ]
+  }
+}

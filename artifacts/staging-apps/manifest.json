@@ -1,0 +1,737 @@
+[
+  {
+    "categorySlug": "basis-berekeningen",
+    "title": "Annuïtair geleend bedrag",
+    "slug": "annuitair-geleend-bedrag",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/basis-berekeningen/annuitair-geleend-bedrag"
+  },
+  {
+    "categorySlug": "basis-berekeningen",
+    "title": "Annuïteit berekenen",
+    "slug": "annuiteit-berekenen",
+    "profile": "annuity_payment",
+    "path": "artifacts/staging-apps/basis-berekeningen/annuiteit-berekenen"
+  },
+  {
+    "categorySlug": "basis-berekeningen",
+    "title": "Bedrag/getal berekenen",
+    "slug": "bedrag-getal-berekenen",
+    "profile": "value_from_percentage",
+    "path": "artifacts/staging-apps/basis-berekeningen/bedrag-getal-berekenen"
+  },
+  {
+    "categorySlug": "basis-berekeningen",
+    "title": "Breuk berekenen",
+    "slug": "breuk-berekenen",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/basis-berekeningen/breuk-berekenen"
+  },
+  {
+    "categorySlug": "basis-berekeningen",
+    "title": "Cijfer berekenen",
+    "slug": "cijfer-berekenen",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/basis-berekeningen/cijfer-berekenen"
+  },
+  {
+    "categorySlug": "basis-berekeningen",
+    "title": "Contante waarde",
+    "slug": "contante-waarde",
+    "profile": "present_value",
+    "path": "artifacts/staging-apps/basis-berekeningen/contante-waarde"
+  },
+  {
+    "categorySlug": "basis-berekeningen",
+    "title": "Contante waarde voor een reeks betalingen",
+    "slug": "contante-waarde-voor-een-reeks-betalingen",
+    "profile": "present_value_annuity",
+    "path": "artifacts/staging-apps/basis-berekeningen/contante-waarde-voor-een-reeks-betalingen"
+  },
+  {
+    "categorySlug": "basis-berekeningen",
+    "title": "Effectieve rente",
+    "slug": "effectieve-rente",
+    "profile": "effective_rate",
+    "path": "artifacts/staging-apps/basis-berekeningen/effectieve-rente"
+  },
+  {
+    "categorySlug": "basis-berekeningen",
+    "title": "Enkelvoudige rente",
+    "slug": "enkelvoudige-rente",
+    "profile": "simple_interest",
+    "path": "artifacts/staging-apps/basis-berekeningen/enkelvoudige-rente"
+  },
+  {
+    "categorySlug": "basis-berekeningen",
+    "title": "Gemiddelde cijfer",
+    "slug": "gemiddelde-cijfer",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/basis-berekeningen/gemiddelde-cijfer"
+  },
+  {
+    "categorySlug": "basis-berekeningen",
+    "title": "Gewogen gemiddelde rentepercentage",
+    "slug": "gewogen-gemiddelde-rentepercentage",
+    "profile": "weighted_average_rate",
+    "path": "artifacts/staging-apps/basis-berekeningen/gewogen-gemiddelde-rentepercentage"
+  },
+  {
+    "categorySlug": "basis-berekeningen",
+    "title": "Lineaire lening aflossen",
+    "slug": "lineaire-lening-aflossen",
+    "profile": "linear_loan",
+    "path": "artifacts/staging-apps/basis-berekeningen/lineaire-lening-aflossen"
+  },
+  {
+    "categorySlug": "basis-berekeningen",
+    "title": "Looptijd annuïteit berekenen",
+    "slug": "looptijd-annuiteit-berekenen",
+    "profile": "annuity_term",
+    "path": "artifacts/staging-apps/basis-berekeningen/looptijd-annuiteit-berekenen"
+  },
+  {
+    "categorySlug": "basis-berekeningen",
+    "title": "Nominale rente",
+    "slug": "nominale-rente",
+    "profile": "nominal_rate",
+    "path": "artifacts/staging-apps/basis-berekeningen/nominale-rente"
+  },
+  {
+    "categorySlug": "basis-berekeningen",
+    "title": "Percentage berekenen",
+    "slug": "percentage-berekenen",
+    "profile": "percentage_of_total",
+    "path": "artifacts/staging-apps/basis-berekeningen/percentage-berekenen"
+  },
+  {
+    "categorySlug": "basis-berekeningen",
+    "title": "Percentage berekenen",
+    "slug": "percentage-berekenen-2",
+    "profile": "percentage_of_total",
+    "path": "artifacts/staging-apps/basis-berekeningen/percentage-berekenen-2"
+  },
+  {
+    "categorySlug": "basis-berekeningen",
+    "title": "Romeinse cijfers",
+    "slug": "romeinse-cijfers",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/basis-berekeningen/romeinse-cijfers"
+  },
+  {
+    "categorySlug": "basis-berekeningen",
+    "title": "Samengestelde rente",
+    "slug": "samengestelde-rente",
+    "profile": "compound_interest",
+    "path": "artifacts/staging-apps/basis-berekeningen/samengestelde-rente"
+  },
+  {
+    "categorySlug": "basis-berekeningen",
+    "title": "Toekomstige waarde",
+    "slug": "toekomstige-waarde",
+    "profile": "future_value",
+    "path": "artifacts/staging-apps/basis-berekeningen/toekomstige-waarde"
+  },
+  {
+    "categorySlug": "basis-berekeningen",
+    "title": "Waardebepaling via cashflow, DCF-methode",
+    "slug": "waardebepaling-via-cashflow-dcf-methode",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/basis-berekeningen/waardebepaling-via-cashflow-dcf-methode"
+  },
+  {
+    "categorySlug": "geld-lenen-financiering",
+    "title": "Aflossingstermijnen lening",
+    "slug": "aflossingstermijnen-lening",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/geld-lenen-financiering/aflossingstermijnen-lening"
+  },
+  {
+    "categorySlug": "geld-lenen-financiering",
+    "title": "Doorlopend krediet vergelijken",
+    "slug": "doorlopend-krediet-vergelijken",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/geld-lenen-financiering/doorlopend-krediet-vergelijken"
+  },
+  {
+    "categorySlug": "geld-lenen-financiering",
+    "title": "Geld lenen kost geld",
+    "slug": "geld-lenen-kost-geld",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/geld-lenen-financiering/geld-lenen-kost-geld"
+  },
+  {
+    "categorySlug": "geld-lenen-financiering",
+    "title": "Hoogte lening",
+    "slug": "hoogte-lening",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/geld-lenen-financiering/hoogte-lening"
+  },
+  {
+    "categorySlug": "geld-lenen-financiering",
+    "title": "Kopen op afbetaling",
+    "slug": "kopen-op-afbetaling",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/geld-lenen-financiering/kopen-op-afbetaling"
+  },
+  {
+    "categorySlug": "geld-lenen-financiering",
+    "title": "Leasetermijn financial lease",
+    "slug": "leasetermijn-financial-lease",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/geld-lenen-financiering/leasetermijn-financial-lease"
+  },
+  {
+    "categorySlug": "geld-lenen-financiering",
+    "title": "Lening aflossen",
+    "slug": "lening-aflossen",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/geld-lenen-financiering/lening-aflossen"
+  },
+  {
+    "categorySlug": "geld-lenen-financiering",
+    "title": "Looptijd aflossing lening",
+    "slug": "looptijd-aflossing-lening",
+    "profile": "annuity_term",
+    "path": "artifacts/staging-apps/geld-lenen-financiering/looptijd-aflossing-lening"
+  },
+  {
+    "categorySlug": "geld-lenen-financiering",
+    "title": "Maandbedrag voor aflossing lening",
+    "slug": "maandbedrag-voor-aflossing-lening",
+    "profile": "annuity_payment",
+    "path": "artifacts/staging-apps/geld-lenen-financiering/maandbedrag-voor-aflossing-lening"
+  },
+  {
+    "categorySlug": "geld-lenen-financiering",
+    "title": "Maximale lening",
+    "slug": "maximale-lening",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/geld-lenen-financiering/maximale-lening"
+  },
+  {
+    "categorySlug": "geld-lenen-financiering",
+    "title": "Persoonlijke lening vergelijken",
+    "slug": "persoonlijke-lening-vergelijken",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/geld-lenen-financiering/persoonlijke-lening-vergelijken"
+  },
+  {
+    "categorySlug": "geld-lenen-financiering",
+    "title": "Rente bij lening",
+    "slug": "rente-bij-lening",
+    "profile": "simple_interest",
+    "path": "artifacts/staging-apps/geld-lenen-financiering/rente-bij-lening"
+  },
+  {
+    "categorySlug": "geld-lenen-financiering",
+    "title": "Rente in financial lease",
+    "slug": "rente-in-financial-lease",
+    "profile": "simple_interest",
+    "path": "artifacts/staging-apps/geld-lenen-financiering/rente-in-financial-lease"
+  },
+  {
+    "categorySlug": "geld-lenen-financiering",
+    "title": "Restschuld bij financial lease",
+    "slug": "restschuld-bij-financial-lease",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/geld-lenen-financiering/restschuld-bij-financial-lease"
+  },
+  {
+    "categorySlug": "geld-lenen-financiering",
+    "title": "Restschuld lening",
+    "slug": "restschuld-lening",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/geld-lenen-financiering/restschuld-lening"
+  },
+  {
+    "categorySlug": "geld-lenen-financiering",
+    "title": "Studiefinanciering terugbetalen",
+    "slug": "studiefinanciering-terugbetalen",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/geld-lenen-financiering/studiefinanciering-terugbetalen"
+  },
+  {
+    "categorySlug": "geld-lenen-financiering",
+    "title": "Toename schuld",
+    "slug": "toename-schuld",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/geld-lenen-financiering/toename-schuld"
+  },
+  {
+    "categorySlug": "gezin-relatie",
+    "title": "Aanvullend partnerverlof",
+    "slug": "aanvullend-partnerverlof",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/gezin-relatie/aanvullend-partnerverlof"
+  },
+  {
+    "categorySlug": "gezin-relatie",
+    "title": "Betaald ouderschapsverlof",
+    "slug": "betaald-ouderschapsverlof",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/gezin-relatie/betaald-ouderschapsverlof"
+  },
+  {
+    "categorySlug": "gezin-relatie",
+    "title": "Eigen bijdrage Wmo (ivb)",
+    "slug": "eigen-bijdrage-wmo-ivb",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/gezin-relatie/eigen-bijdrage-wmo-ivb"
+  },
+  {
+    "categorySlug": "gezin-relatie",
+    "title": "Gesubsidieerde rechtsbijstand",
+    "slug": "gesubsidieerde-rechtsbijstand",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/gezin-relatie/gesubsidieerde-rechtsbijstand"
+  },
+  {
+    "categorySlug": "gezin-relatie",
+    "title": "Indexering alimentatie",
+    "slug": "indexering-alimentatie",
+    "profile": "indexed_amount",
+    "path": "artifacts/staging-apps/gezin-relatie/indexering-alimentatie"
+  },
+  {
+    "categorySlug": "gezin-relatie",
+    "title": "Kinderalimentatie",
+    "slug": "kinderalimentatie",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/gezin-relatie/kinderalimentatie"
+  },
+  {
+    "categorySlug": "gezin-relatie",
+    "title": "Kinderbijslag berekenen",
+    "slug": "kinderbijslag-berekenen",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/gezin-relatie/kinderbijslag-berekenen"
+  },
+  {
+    "categorySlug": "gezin-relatie",
+    "title": "Kosten kinderopvang",
+    "slug": "kosten-kinderopvang",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/gezin-relatie/kosten-kinderopvang"
+  },
+  {
+    "categorySlug": "gezin-relatie",
+    "title": "Partner uitkopen uit eigen woning",
+    "slug": "partner-uitkopen-uit-eigen-woning",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/gezin-relatie/partner-uitkopen-uit-eigen-woning"
+  },
+  {
+    "categorySlug": "gezin-relatie",
+    "title": "Partneralimentatie",
+    "slug": "partneralimentatie",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/gezin-relatie/partneralimentatie"
+  },
+  {
+    "categorySlug": "gezin-relatie",
+    "title": "Trouwen en een bruiloft",
+    "slug": "trouwen-en-een-bruiloft",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/gezin-relatie/trouwen-en-een-bruiloft"
+  },
+  {
+    "categorySlug": "gezin-relatie",
+    "title": "Vergoedingsrecht binnen een huwelijk",
+    "slug": "vergoedingsrecht-binnen-een-huwelijk",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/gezin-relatie/vergoedingsrecht-binnen-een-huwelijk"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Actuele hypotheekrente",
+    "slug": "actuele-hypotheekrente",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/actuele-hypotheekrente"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Aflosboete Wet Hillen",
+    "slug": "aflosboete-wet-hillen",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/aflosboete-wet-hillen"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Aflossingseis hypotheekrenteaftrek",
+    "slug": "aflossingseis-hypotheekrenteaftrek",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/aflossingseis-hypotheekrenteaftrek"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Aflossingsvrije hypotheek tussentijds aflossen",
+    "slug": "aflossingsvrije-hypotheek-tussentijds-aflossen",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/aflossingsvrije-hypotheek-tussentijds-aflossen"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Aftrekbare hypotheekrente berekenen",
+    "slug": "aftrekbare-hypotheekrente-berekenen",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/aftrekbare-hypotheekrente-berekenen"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Annuïteit berekenen",
+    "slug": "annuiteit-berekenen",
+    "profile": "annuity_payment",
+    "path": "artifacts/staging-apps/hypotheek-wonen/annuiteit-berekenen"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Banksparen Eigen Woning",
+    "slug": "banksparen-eigen-woning",
+    "profile": "future_value",
+    "path": "artifacts/staging-apps/hypotheek-wonen/banksparen-eigen-woning"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Boeterente berekenen",
+    "slug": "boeterente-berekenen",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/boeterente-berekenen"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Boeterente in rentemiddeling",
+    "slug": "boeterente-in-rentemiddeling",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/boeterente-in-rentemiddeling"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Dalende risico opslag",
+    "slug": "dalende-risico-opslag",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/dalende-risico-opslag"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Effectieve hypotheekrente",
+    "slug": "effectieve-hypotheekrente",
+    "profile": "effective_rate",
+    "path": "artifacts/staging-apps/hypotheek-wonen/effectieve-hypotheekrente"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Eigenwoningforfait",
+    "slug": "eigenwoningforfait",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/eigenwoningforfait"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Familiebank hypotheek",
+    "slug": "familiebank-hypotheek",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/familiebank-hypotheek"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Hoeveel eigen geld heeft u nodig",
+    "slug": "hoeveel-eigen-geld-heeft-u-nodig",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/hoeveel-eigen-geld-heeft-u-nodig"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Hogere maximale hypotheek",
+    "slug": "hogere-maximale-hypotheek",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/hogere-maximale-hypotheek"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Huis onder water aflossen",
+    "slug": "huis-onder-water-aflossen",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/huis-onder-water-aflossen"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Huren of kopen",
+    "slug": "huren-of-kopen",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/huren-of-kopen"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Hypotheek aflossen",
+    "slug": "hypotheek-aflossen",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/hypotheek-aflossen"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Hypotheek aflossen in plaats van sparen",
+    "slug": "hypotheek-aflossen-in-plaats-van-sparen",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/hypotheek-aflossen-in-plaats-van-sparen"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Hypotheek deels aflossen",
+    "slug": "hypotheek-deels-aflossen",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/hypotheek-deels-aflossen"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Hypotheek extra aflossen",
+    "slug": "hypotheek-extra-aflossen",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/hypotheek-extra-aflossen"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Hypotheek maandlasten bij nieuwbouw",
+    "slug": "hypotheek-maandlasten-bij-nieuwbouw",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/hypotheek-maandlasten-bij-nieuwbouw"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Hypotheek maandlasten na rentewijziging",
+    "slug": "hypotheek-maandlasten-na-rentewijziging",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/hypotheek-maandlasten-na-rentewijziging"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Hypotheek meenemen bij verhuizen",
+    "slug": "hypotheek-meenemen-bij-verhuizen",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/hypotheek-meenemen-bij-verhuizen"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Hypotheek oversluiten",
+    "slug": "hypotheek-oversluiten",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/hypotheek-oversluiten"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Hypotheek rentevaste periode",
+    "slug": "hypotheek-rentevaste-periode",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/hypotheek-rentevaste-periode"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Hypotheek uit eigen bv",
+    "slug": "hypotheek-uit-eigen-bv",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/hypotheek-uit-eigen-bv"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Hypotheekrente vooruit betalen",
+    "slug": "hypotheekrente-vooruit-betalen",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/hypotheekrente-vooruit-betalen"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Hypotheekrenteaftrek",
+    "slug": "hypotheekrenteaftrek",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/hypotheekrenteaftrek"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Kan ik dat huis betalen?",
+    "slug": "kan-ik-dat-huis-betalen",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/kan-ik-dat-huis-betalen"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Kapitaalverzekering uitkeren",
+    "slug": "kapitaalverzekering-uitkeren",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/kapitaalverzekering-uitkeren"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Kosten hypotheekvormen",
+    "slug": "kosten-hypotheekvormen",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/kosten-hypotheekvormen"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Kosten koper",
+    "slug": "kosten-koper",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/kosten-koper"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Krediethypotheek",
+    "slug": "krediethypotheek",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/krediethypotheek"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Looptijdrente",
+    "slug": "looptijdrente",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/looptijdrente"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Maandlasten annuïteitenhypotheek",
+    "slug": "maandlasten-annuiteitenhypotheek",
+    "profile": "annuity_payment",
+    "path": "artifacts/staging-apps/hypotheek-wonen/maandlasten-annuiteitenhypotheek"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Maandlasten lineaire hypotheek",
+    "slug": "maandlasten-lineaire-hypotheek",
+    "profile": "linear_loan",
+    "path": "artifacts/staging-apps/hypotheek-wonen/maandlasten-lineaire-hypotheek"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Maximale boetevrije hypotheekaflossing",
+    "slug": "maximale-boetevrije-hypotheekaflossing",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/maximale-boetevrije-hypotheekaflossing"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Maximale erfpacht hypotheek",
+    "slug": "maximale-erfpacht-hypotheek",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/maximale-erfpacht-hypotheek"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Maximale huizenprijs",
+    "slug": "maximale-huizenprijs",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/maximale-huizenprijs"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Maximale hypotheek",
+    "slug": "maximale-hypotheek",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/maximale-hypotheek"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Maximale hypotheek na verhuizen",
+    "slug": "maximale-hypotheek-na-verhuizen",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/maximale-hypotheek-na-verhuizen"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Maximale hypotheek ondernemer",
+    "slug": "maximale-hypotheek-ondernemer",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/maximale-hypotheek-ondernemer"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Maximale hypotheek uit maandlasten",
+    "slug": "maximale-hypotheek-uit-maandlasten",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/maximale-hypotheek-uit-maandlasten"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Maximale verhuurhypotheek",
+    "slug": "maximale-verhuurhypotheek",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/maximale-verhuurhypotheek"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Netto hypotheek maandlasten",
+    "slug": "netto-hypotheek-maandlasten",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/netto-hypotheek-maandlasten"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Netto voordeel hypotheekrenteaftrek",
+    "slug": "netto-voordeel-hypotheekrenteaftrek",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/netto-voordeel-hypotheekrenteaftrek"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Opeethypotheek",
+    "slug": "opeethypotheek",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/opeethypotheek"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Overdrachtsbelasting",
+    "slug": "overdrachtsbelasting",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/overdrachtsbelasting"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Overwaarde huis opeten",
+    "slug": "overwaarde-huis-opeten",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/overwaarde-huis-opeten"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Prijsontwikkeling huizenprijzen",
+    "slug": "prijsontwikkeling-huizenprijzen",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/prijsontwikkeling-huizenprijzen"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Rentemiddeling",
+    "slug": "rentemiddeling",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/rentemiddeling"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Restschuld berekenen & aflossen",
+    "slug": "restschuld-berekenen-aflossen",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/restschuld-berekenen-aflossen"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Stijging maandlasten annuïteitenhypotheek",
+    "slug": "stijging-maandlasten-annuiteitenhypotheek",
+    "profile": "annuity_payment",
+    "path": "artifacts/staging-apps/hypotheek-wonen/stijging-maandlasten-annuiteitenhypotheek"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Tariefsaanpassing aftrek kosten eigen woning",
+    "slug": "tariefsaanpassing-aftrek-kosten-eigen-woning",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/tariefsaanpassing-aftrek-kosten-eigen-woning"
+  },
+  {
+    "categorySlug": "hypotheek-wonen",
+    "title": "Totale netto kosten van een hypotheek",
+    "slug": "totale-netto-kosten-van-een-hypotheek",
+    "profile": "generic_contract",
+    "path": "artifacts/staging-apps/hypotheek-wonen/totale-netto-kosten-van-een-hypotheek"
+  }
+]

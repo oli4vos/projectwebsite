@@ -1,0 +1,26 @@
+{
+  "slug": "dag-van-de-week",
+  "title": "Dag van de week",
+  "description": "Draft op basis van artifacts-contract: Dag van de week.",
+  "type": "frontend",
+  "category": "Kalender Vrije Tijd",
+  "tags": [
+    "artifact-generated",
+    "draft"
+  ],
+  "status": "draft",
+  "visibility": "hidden",
+  "reasonHint": "Deze tool is gegenereerd uit artifacts en nog niet gevalideerd voor publicatie.",
+  "assumptionsUsed": [
+    "mortgage"
+  ],
+  "calculationDomains": [
+    "cashflow"
+  ],
+  "riskLevel": "medium",
+  "disclaimerType": "financialEducation",
+  "outputType": "singleResult",
+  "requiredProfileFields": [],
+  "version": "1.0.0",
+  "entry": "Calculator.tsx"
+}

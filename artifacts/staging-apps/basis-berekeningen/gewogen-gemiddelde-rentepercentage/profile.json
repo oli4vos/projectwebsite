@@ -1,0 +1,9 @@
+{
+  "profile": "weighted_average_rate",
+  "title": "Gewogen gemiddelde rentepercentage",
+  "slug": "gewogen-gemiddelde-rentepercentage",
+  "categorySlug": "basis-berekeningen",
+  "sourceUrl": "https://www.externe-bron.nl/berekenen/gewogen-gemiddelde-rentepercentage.html",
+  "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/basis-berekeningen-logic-invulblad.md",
+  "generatedAt": "2026-05-28T22:49:15.960Z"
+}

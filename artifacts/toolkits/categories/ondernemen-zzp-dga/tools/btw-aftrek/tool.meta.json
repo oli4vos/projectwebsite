@@ -1,0 +1,23 @@
+{
+  "title": "Btw-aftrek",
+  "slug": "btw-aftrek",
+  "categorySlug": "ondernemen-zzp-dga",
+  "categoryTitle": "Ondernemen Zzp Dga",
+  "sourceUrl": "https://www.externe-bron.nl/ondernemen/btw-aftrek-deels-vrijgestelde-omzet.html",
+  "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/ondernemen-zzp-dga-logic-invulblad.md",
+  "status": "needs-spec",
+  "invul": {
+    "filled": 0,
+    "total": 13,
+    "completionPercent": 0
+  },
+  "migrationTarget": {
+    "appDir": "apps/btw-aftrek",
+    "requiredFiles": [
+      "app.json",
+      "logic.ts",
+      "logic.test.ts",
+      "Calculator.tsx"
+    ]
+  }
+}

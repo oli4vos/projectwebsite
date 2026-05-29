@@ -1,0 +1,9 @@
+{
+  "profile": "present_value_annuity",
+  "title": "Contante waarde voor een reeks betalingen",
+  "slug": "contante-waarde-voor-een-reeks-betalingen",
+  "categorySlug": "basis-berekeningen",
+  "sourceUrl": "https://www.externe-bron.nl/berekenen/contante-waarde-reeks-betalingen.html",
+  "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/basis-berekeningen-logic-invulblad.md",
+  "generatedAt": "2026-05-28T22:49:15.954Z"
+}

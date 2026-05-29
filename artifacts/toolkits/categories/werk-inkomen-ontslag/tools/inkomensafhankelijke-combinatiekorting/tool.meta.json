@@ -1,0 +1,23 @@
+{
+  "title": "Inkomensafhankelijke combinatiekorting",
+  "slug": "inkomensafhankelijke-combinatiekorting",
+  "categorySlug": "werk-inkomen-ontslag",
+  "categoryTitle": "Werk Inkomen Ontslag",
+  "sourceUrl": "https://www.externe-bron.nl/werk-en-inkomen/inkomensafhankelijke-combinatiekorting.html",
+  "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/werk-inkomen-ontslag-logic-invulblad.md",
+  "status": "needs-spec",
+  "invul": {
+    "filled": 0,
+    "total": 13,
+    "completionPercent": 0
+  },
+  "migrationTarget": {
+    "appDir": "apps/inkomensafhankelijke-combinatiekorting",
+    "requiredFiles": [
+      "app.json",
+      "logic.ts",
+      "logic.test.ts",
+      "Calculator.tsx"
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "title": "Box 2 belastingdruk",
+  "slug": "box-2-belastingdruk",
+  "categorySlug": "ondernemen-zzp-dga",
+  "categoryTitle": "Ondernemen Zzp Dga",
+  "sourceUrl": "https://www.externe-bron.nl/ondernemen/box-2-belastingdruk.html",
+  "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/ondernemen-zzp-dga-logic-invulblad.md",
+  "status": "needs-spec",
+  "invul": {
+    "filled": 0,
+    "total": 13,
+    "completionPercent": 0
+  },
+  "migrationTarget": {
+    "appDir": "apps/box-2-belastingdruk",
+    "requiredFiles": [
+      "app.json",
+      "logic.ts",
+      "logic.test.ts",
+      "Calculator.tsx"
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "title": "Belasting box 3 in 2026 t.o.v. 2025",
+  "slug": "belasting-box-3-in-2026-t-o-v-2025",
+  "categorySlug": "sparen-beleggen",
+  "categoryTitle": "Sparen Beleggen",
+  "sourceUrl": "https://www.externe-bron.nl/sparen-en-beleggen/belasting-box3-spaargeld-vermogen.html",
+  "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/sparen-beleggen-logic-invulblad.md",
+  "status": "needs-spec",
+  "invul": {
+    "filled": 0,
+    "total": 13,
+    "completionPercent": 0
+  },
+  "migrationTarget": {
+    "appDir": "apps/belasting-box-3-in-2026-t-o-v-2025",
+    "requiredFiles": [
+      "app.json",
+      "logic.ts",
+      "logic.test.ts",
+      "Calculator.tsx"
+    ]
+  }
+}

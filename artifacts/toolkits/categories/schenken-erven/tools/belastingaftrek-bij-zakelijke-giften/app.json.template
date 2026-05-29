@@ -1,0 +1,26 @@
+{
+  "slug": "belastingaftrek-bij-zakelijke-giften",
+  "title": "Belastingaftrek bij zakelijke giften",
+  "description": "Draft op basis van artifacts-contract: Belastingaftrek bij zakelijke giften.",
+  "type": "frontend",
+  "category": "Schenken Erven",
+  "tags": [
+    "artifact-generated",
+    "draft"
+  ],
+  "status": "draft",
+  "visibility": "hidden",
+  "reasonHint": "Deze tool is gegenereerd uit artifacts en nog niet gevalideerd voor publicatie.",
+  "assumptionsUsed": [
+    "mortgage"
+  ],
+  "calculationDomains": [
+    "cashflow"
+  ],
+  "riskLevel": "medium",
+  "disclaimerType": "financialEducation",
+  "outputType": "singleResult",
+  "requiredProfileFields": [],
+  "version": "1.0.0",
+  "entry": "Calculator.tsx"
+}

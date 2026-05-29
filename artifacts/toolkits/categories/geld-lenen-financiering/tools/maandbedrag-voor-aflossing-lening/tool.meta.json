@@ -1,0 +1,23 @@
+{
+  "title": "Maandbedrag voor aflossing lening",
+  "slug": "maandbedrag-voor-aflossing-lening",
+  "categorySlug": "geld-lenen-financiering",
+  "categoryTitle": "Geld Lenen Financiering",
+  "sourceUrl": "https://www.externe-bron.nl/lenen-en-krediet/maandbedrag-aflossen-lening.html",
+  "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/geld-lenen-financiering-logic-invulblad.md",
+  "status": "ready",
+  "invul": {
+    "filled": 13,
+    "total": 13,
+    "completionPercent": 100
+  },
+  "migrationTarget": {
+    "appDir": "apps/maandbedrag-voor-aflossing-lening",
+    "requiredFiles": [
+      "app.json",
+      "logic.ts",
+      "logic.test.ts",
+      "Calculator.tsx"
+    ]
+  }
+}

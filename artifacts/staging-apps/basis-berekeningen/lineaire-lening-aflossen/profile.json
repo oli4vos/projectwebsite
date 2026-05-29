@@ -1,0 +1,9 @@
+{
+  "profile": "linear_loan",
+  "title": "Lineaire lening aflossen",
+  "slug": "lineaire-lening-aflossen",
+  "categorySlug": "basis-berekeningen",
+  "sourceUrl": "https://www.externe-bron.nl/berekenen/lineaire-lening-aflossen.html",
+  "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/basis-berekeningen-logic-invulblad.md",
+  "generatedAt": "2026-05-28T22:49:15.962Z"
+}

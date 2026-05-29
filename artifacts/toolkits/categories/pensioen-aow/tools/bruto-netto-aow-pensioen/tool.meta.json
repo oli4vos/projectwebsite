@@ -1,0 +1,23 @@
+{
+  "title": "Bruto-netto AOW & pensioen",
+  "slug": "bruto-netto-aow-pensioen",
+  "categorySlug": "pensioen-aow",
+  "categoryTitle": "Pensioen Aow",
+  "sourceUrl": "https://www.externe-bron.nl/pensioen/bruto-netto-aow-pensioen.html",
+  "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/pensioen-aow-logic-invulblad.md",
+  "status": "needs-spec",
+  "invul": {
+    "filled": 0,
+    "total": 13,
+    "completionPercent": 0
+  },
+  "migrationTarget": {
+    "appDir": "apps/bruto-netto-aow-pensioen",
+    "requiredFiles": [
+      "app.json",
+      "logic.ts",
+      "logic.test.ts",
+      "Calculator.tsx"
+    ]
+  }
+}

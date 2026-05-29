@@ -1,0 +1,183 @@
+{
+  "generatedAt": "2026-05-28T22:40:26.795Z",
+  "sourceRoot": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z",
+  "outputRoot": "artifacts/toolkits",
+  "categories": [
+    {
+      "categorySlug": "basis-berekeningen",
+      "categoryTitle": "Basis Berekeningen",
+      "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/basis-berekeningen-logic-invulblad.md",
+      "tools": 20,
+      "invul": {
+        "filled": 260,
+        "total": 260,
+        "completionPercent": 100
+      },
+      "statuses": {
+        "ready": 20,
+        "partial": 0,
+        "needsSpec": 0
+      }
+    },
+    {
+      "categorySlug": "geld-lenen-financiering",
+      "categoryTitle": "Geld Lenen Financiering",
+      "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/geld-lenen-financiering-logic-invulblad.md",
+      "tools": 17,
+      "invul": {
+        "filled": 221,
+        "total": 221,
+        "completionPercent": 100
+      },
+      "statuses": {
+        "ready": 17,
+        "partial": 0,
+        "needsSpec": 0
+      }
+    },
+    {
+      "categorySlug": "gezin-relatie",
+      "categoryTitle": "Gezin Relatie",
+      "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/gezin-relatie-logic-invulblad.md",
+      "tools": 12,
+      "invul": {
+        "filled": 156,
+        "total": 156,
+        "completionPercent": 100
+      },
+      "statuses": {
+        "ready": 12,
+        "partial": 0,
+        "needsSpec": 0
+      }
+    },
+    {
+      "categorySlug": "hypotheek-wonen",
+      "categoryTitle": "Hypotheek Wonen",
+      "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/hypotheek-wonen-logic-invulblad.md",
+      "tools": 56,
+      "invul": {
+        "filled": 728,
+        "total": 728,
+        "completionPercent": 100
+      },
+      "statuses": {
+        "ready": 56,
+        "partial": 0,
+        "needsSpec": 0
+      }
+    },
+    {
+      "categorySlug": "kalender-vrije-tijd",
+      "categoryTitle": "Kalender Vrije Tijd",
+      "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/kalender-vrije-tijd-logic-invulblad.md",
+      "tools": 8,
+      "invul": {
+        "filled": 0,
+        "total": 104,
+        "completionPercent": 0
+      },
+      "statuses": {
+        "ready": 0,
+        "partial": 0,
+        "needsSpec": 8
+      }
+    },
+    {
+      "categorySlug": "ondernemen-zzp-dga",
+      "categoryTitle": "Ondernemen Zzp Dga",
+      "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/ondernemen-zzp-dga-logic-invulblad.md",
+      "tools": 45,
+      "invul": {
+        "filled": 0,
+        "total": 585,
+        "completionPercent": 0
+      },
+      "statuses": {
+        "ready": 0,
+        "partial": 0,
+        "needsSpec": 45
+      }
+    },
+    {
+      "categorySlug": "overig",
+      "categoryTitle": "Overig",
+      "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/overig-logic-invulblad.md",
+      "tools": 12,
+      "invul": {
+        "filled": 0,
+        "total": 156,
+        "completionPercent": 0
+      },
+      "statuses": {
+        "ready": 0,
+        "partial": 0,
+        "needsSpec": 12
+      }
+    },
+    {
+      "categorySlug": "pensioen-aow",
+      "categoryTitle": "Pensioen Aow",
+      "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/pensioen-aow-logic-invulblad.md",
+      "tools": 28,
+      "invul": {
+        "filled": 0,
+        "total": 364,
+        "completionPercent": 0
+      },
+      "statuses": {
+        "ready": 0,
+        "partial": 0,
+        "needsSpec": 28
+      }
+    },
+    {
+      "categorySlug": "schenken-erven",
+      "categoryTitle": "Schenken Erven",
+      "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/schenken-erven-logic-invulblad.md",
+      "tools": 14,
+      "invul": {
+        "filled": 0,
+        "total": 182,
+        "completionPercent": 0
+      },
+      "statuses": {
+        "ready": 0,
+        "partial": 0,
+        "needsSpec": 14
+      }
+    },
+    {
+      "categorySlug": "sparen-beleggen",
+      "categoryTitle": "Sparen Beleggen",
+      "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/sparen-beleggen-logic-invulblad.md",
+      "tools": 29,
+      "invul": {
+        "filled": 0,
+        "total": 377,
+        "completionPercent": 0
+      },
+      "statuses": {
+        "ready": 0,
+        "partial": 0,
+        "needsSpec": 29
+      }
+    },
+    {
+      "categorySlug": "werk-inkomen-ontslag",
+      "categoryTitle": "Werk Inkomen Ontslag",
+      "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/werk-inkomen-ontslag-logic-invulblad.md",
+      "tools": 60,
+      "invul": {
+        "filled": 0,
+        "total": 780,
+        "completionPercent": 0
+      },
+      "statuses": {
+        "ready": 0,
+        "partial": 0,
+        "needsSpec": 60
+      }
+    }
+  ]
+}

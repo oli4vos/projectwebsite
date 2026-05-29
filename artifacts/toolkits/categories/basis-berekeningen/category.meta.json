@@ -1,0 +1,16 @@
+{
+  "categorySlug": "basis-berekeningen",
+  "categoryTitle": "Basis Berekeningen",
+  "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/basis-berekeningen-logic-invulblad.md",
+  "tools": 20,
+  "invul": {
+    "filled": 260,
+    "total": 260,
+    "completionPercent": 100
+  },
+  "statuses": {
+    "ready": 20,
+    "partial": 0,
+    "needsSpec": 0
+  }
+}

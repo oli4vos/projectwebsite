@@ -1,0 +1,23 @@
+{
+  "title": "Spaargeld/vermogen opmaken",
+  "slug": "spaargeld-vermogen-opmaken",
+  "categorySlug": "sparen-beleggen",
+  "categoryTitle": "Sparen Beleggen",
+  "sourceUrl": "https://www.externe-bron.nl/sparen-en-beleggen/spaargeld-opmaken.html",
+  "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/sparen-beleggen-logic-invulblad.md",
+  "status": "needs-spec",
+  "invul": {
+    "filled": 0,
+    "total": 13,
+    "completionPercent": 0
+  },
+  "migrationTarget": {
+    "appDir": "apps/spaargeld-vermogen-opmaken",
+    "requiredFiles": [
+      "app.json",
+      "logic.ts",
+      "logic.test.ts",
+      "Calculator.tsx"
+    ]
+  }
+}

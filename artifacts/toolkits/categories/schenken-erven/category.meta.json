@@ -1,0 +1,16 @@
+{
+  "categorySlug": "schenken-erven",
+  "categoryTitle": "Schenken Erven",
+  "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/schenken-erven-logic-invulblad.md",
+  "tools": 14,
+  "invul": {
+    "filled": 0,
+    "total": 182,
+    "completionPercent": 0
+  },
+  "statuses": {
+    "ready": 0,
+    "partial": 0,
+    "needsSpec": 14
+  }
+}

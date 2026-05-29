@@ -1,0 +1,23 @@
+{
+  "title": "Eigen bijdrage Wmo (ivb)",
+  "slug": "eigen-bijdrage-wmo-ivb",
+  "categorySlug": "gezin-relatie",
+  "categoryTitle": "Gezin Relatie",
+  "sourceUrl": "https://www.externe-bron.nl/gezin-en-relatie/eigen-bijdrage-wmo.html",
+  "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/gezin-relatie-logic-invulblad.md",
+  "status": "ready",
+  "invul": {
+    "filled": 13,
+    "total": 13,
+    "completionPercent": 100
+  },
+  "migrationTarget": {
+    "appDir": "apps/eigen-bijdrage-wmo-ivb",
+    "requiredFiles": [
+      "app.json",
+      "logic.ts",
+      "logic.test.ts",
+      "Calculator.tsx"
+    ]
+  }
+}

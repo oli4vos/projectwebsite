@@ -1,0 +1,26 @@
+{
+  "slug": "bruto-netto-salaris",
+  "title": "Bruto-netto salaris",
+  "description": "Draft op basis van artifacts-contract: Bruto-netto salaris.",
+  "type": "frontend",
+  "category": "Werk Inkomen Ontslag",
+  "tags": [
+    "artifact-generated",
+    "draft"
+  ],
+  "status": "draft",
+  "visibility": "hidden",
+  "reasonHint": "Deze tool is gegenereerd uit artifacts en nog niet gevalideerd voor publicatie.",
+  "assumptionsUsed": [
+    "mortgage"
+  ],
+  "calculationDomains": [
+    "cashflow"
+  ],
+  "riskLevel": "medium",
+  "disclaimerType": "financialEducation",
+  "outputType": "singleResult",
+  "requiredProfileFields": [],
+  "version": "1.0.0",
+  "entry": "Calculator.tsx"
+}

@@ -1,0 +1,23 @@
+{
+  "title": "Waarde verhuurde woning",
+  "slug": "waarde-verhuurde-woning",
+  "categorySlug": "schenken-erven",
+  "categoryTitle": "Schenken Erven",
+  "sourceUrl": "https://www.externe-bron.nl/schenken-en-erven/waarde-verhuurde-woning.html",
+  "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/schenken-erven-logic-invulblad.md",
+  "status": "needs-spec",
+  "invul": {
+    "filled": 0,
+    "total": 13,
+    "completionPercent": 0
+  },
+  "migrationTarget": {
+    "appDir": "apps/waarde-verhuurde-woning",
+    "requiredFiles": [
+      "app.json",
+      "logic.ts",
+      "logic.test.ts",
+      "Calculator.tsx"
+    ]
+  }
+}

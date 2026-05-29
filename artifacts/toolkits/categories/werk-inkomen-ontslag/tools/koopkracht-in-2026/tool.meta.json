@@ -1,0 +1,23 @@
+{
+  "title": "Koopkracht in 2026",
+  "slug": "koopkracht-in-2026",
+  "categorySlug": "werk-inkomen-ontslag",
+  "categoryTitle": "Werk Inkomen Ontslag",
+  "sourceUrl": "https://www.externe-bron.nl/werk-en-inkomen/koopkracht-verandering.html",
+  "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/werk-inkomen-ontslag-logic-invulblad.md",
+  "status": "needs-spec",
+  "invul": {
+    "filled": 0,
+    "total": 13,
+    "completionPercent": 0
+  },
+  "migrationTarget": {
+    "appDir": "apps/koopkracht-in-2026",
+    "requiredFiles": [
+      "app.json",
+      "logic.ts",
+      "logic.test.ts",
+      "Calculator.tsx"
+    ]
+  }
+}

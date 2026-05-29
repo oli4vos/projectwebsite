@@ -1,0 +1,23 @@
+{
+  "title": "Warmtepomp besparing & terugverdientijd",
+  "slug": "warmtepomp-besparing-terugverdientijd",
+  "categorySlug": "overig",
+  "categoryTitle": "Overig",
+  "sourceUrl": "https://www.externe-bron.nl/wonen/warmtepomp-besparing-terugverdientijd-berekenen.html",
+  "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/overig-logic-invulblad.md",
+  "status": "needs-spec",
+  "invul": {
+    "filled": 0,
+    "total": 13,
+    "completionPercent": 0
+  },
+  "migrationTarget": {
+    "appDir": "apps/warmtepomp-besparing-terugverdientijd",
+    "requiredFiles": [
+      "app.json",
+      "logic.ts",
+      "logic.test.ts",
+      "Calculator.tsx"
+    ]
+  }
+}

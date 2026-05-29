@@ -1,0 +1,33 @@
+{
+  "slug": "basis-berekeningen-annuiteit-berekenen",
+  "title": "Annuïteit berekenen",
+  "description": "Staging-tool op basis van artifacts-contract: Annuïteit berekenen.",
+  "type": "frontend",
+  "category": "Basis Berekeningen",
+  "tags": [
+    "artifact-staging",
+    "draft",
+    "annuity_payment"
+  ],
+  "status": "draft",
+  "visibility": "hidden",
+  "reasonHint": "Deze tool staat in artifacts-staging en is nog niet live gekoppeld.",
+  "assumptionsUsed": [
+    "financialEducation"
+  ],
+  "calculationDomains": [
+    "cashflow"
+  ],
+  "riskLevel": "medium",
+  "disclaimerType": "financialEducation",
+  "outputType": "singleResult",
+  "requiredProfileFields": [],
+  "version": "1.0.0",
+  "entry": "Calculator.tsx",
+  "staging": {
+    "profile": "annuity_payment",
+    "sourceUrl": "https://www.externe-bron.nl/berekenen/annuiteit.html",
+    "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/basis-berekeningen-logic-invulblad.md",
+    "generatedAt": "2026-05-28T22:49:15.944Z"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "categorySlug": "hypotheek-wonen",
+  "categoryTitle": "Hypotheek Wonen",
+  "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/hypotheek-wonen-logic-invulblad.md",
+  "tools": 56,
+  "invul": {
+    "filled": 728,
+    "total": 728,
+    "completionPercent": 100
+  },
+  "statuses": {
+    "ready": 56,
+    "partial": 0,
+    "needsSpec": 0
+  }
+}

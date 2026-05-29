@@ -1,0 +1,16 @@
+{
+  "categorySlug": "overig",
+  "categoryTitle": "Overig",
+  "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/overig-logic-invulblad.md",
+  "tools": 12,
+  "invul": {
+    "filled": 0,
+    "total": 156,
+    "completionPercent": 0
+  },
+  "statuses": {
+    "ready": 0,
+    "partial": 0,
+    "needsSpec": 12
+  }
+}

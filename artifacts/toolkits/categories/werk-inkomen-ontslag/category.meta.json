@@ -1,0 +1,16 @@
+{
+  "categorySlug": "werk-inkomen-ontslag",
+  "categoryTitle": "Werk Inkomen Ontslag",
+  "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/werk-inkomen-ontslag-logic-invulblad.md",
+  "tools": 60,
+  "invul": {
+    "filled": 0,
+    "total": 780,
+    "completionPercent": 0
+  },
+  "statuses": {
+    "ready": 0,
+    "partial": 0,
+    "needsSpec": 60
+  }
+}

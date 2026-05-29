@@ -1,0 +1,23 @@
+{
+  "title": "Periode duur",
+  "slug": "periode-duur",
+  "categorySlug": "kalender-vrije-tijd",
+  "categoryTitle": "Kalender Vrije Tijd",
+  "sourceUrl": "https://www.externe-bron.nl/modules/vakantie/periode-tussen-twee-datums.html",
+  "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/kalender-vrije-tijd-logic-invulblad.md",
+  "status": "needs-spec",
+  "invul": {
+    "filled": 0,
+    "total": 13,
+    "completionPercent": 0
+  },
+  "migrationTarget": {
+    "appDir": "apps/periode-duur",
+    "requiredFiles": [
+      "app.json",
+      "logic.ts",
+      "logic.test.ts",
+      "Calculator.tsx"
+    ]
+  }
+}

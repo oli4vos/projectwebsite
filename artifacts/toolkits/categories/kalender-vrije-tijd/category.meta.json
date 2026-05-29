@@ -1,0 +1,16 @@
+{
+  "categorySlug": "kalender-vrije-tijd",
+  "categoryTitle": "Kalender Vrije Tijd",
+  "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/kalender-vrije-tijd-logic-invulblad.md",
+  "tools": 8,
+  "invul": {
+    "filled": 0,
+    "total": 104,
+    "completionPercent": 0
+  },
+  "statuses": {
+    "ready": 0,
+    "partial": 0,
+    "needsSpec": 8
+  }
+}

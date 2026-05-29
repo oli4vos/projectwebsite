@@ -1,0 +1,26 @@
+{
+  "slug": "pensioensparen-buiten-box3",
+  "title": "Pensioensparen buiten box3",
+  "description": "Draft op basis van artifacts-contract: Pensioensparen buiten box3.",
+  "type": "frontend",
+  "category": "Pensioen Aow",
+  "tags": [
+    "artifact-generated",
+    "draft"
+  ],
+  "status": "draft",
+  "visibility": "hidden",
+  "reasonHint": "Deze tool is gegenereerd uit artifacts en nog niet gevalideerd voor publicatie.",
+  "assumptionsUsed": [
+    "mortgage"
+  ],
+  "calculationDomains": [
+    "cashflow"
+  ],
+  "riskLevel": "medium",
+  "disclaimerType": "financialEducation",
+  "outputType": "singleResult",
+  "requiredProfileFields": [],
+  "version": "1.0.0",
+  "entry": "Calculator.tsx"
+}

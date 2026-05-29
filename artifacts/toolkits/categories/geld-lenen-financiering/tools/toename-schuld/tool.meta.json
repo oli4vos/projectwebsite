@@ -1,0 +1,23 @@
+{
+  "title": "Toename schuld",
+  "slug": "toename-schuld",
+  "categorySlug": "geld-lenen-financiering",
+  "categoryTitle": "Geld Lenen Financiering",
+  "sourceUrl": "https://www.externe-bron.nl/lenen-en-krediet/toename-schuld-lening.html",
+  "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/geld-lenen-financiering-logic-invulblad.md",
+  "status": "ready",
+  "invul": {
+    "filled": 13,
+    "total": 13,
+    "completionPercent": 100
+  },
+  "migrationTarget": {
+    "appDir": "apps/toename-schuld",
+    "requiredFiles": [
+      "app.json",
+      "logic.ts",
+      "logic.test.ts",
+      "Calculator.tsx"
+    ]
+  }
+}

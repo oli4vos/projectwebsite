@@ -1,0 +1,16 @@
+{
+  "categorySlug": "geld-lenen-financiering",
+  "categoryTitle": "Geld Lenen Financiering",
+  "sourceInvulblad": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z/geld-lenen-financiering-logic-invulblad.md",
+  "tools": 17,
+  "invul": {
+    "filled": 221,
+    "total": 221,
+    "completionPercent": 100
+  },
+  "statuses": {
+    "ready": 17,
+    "partial": 0,
+    "needsSpec": 0
+  }
+}

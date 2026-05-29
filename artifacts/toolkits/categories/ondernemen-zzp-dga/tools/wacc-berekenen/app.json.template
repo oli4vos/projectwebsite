@@ -1,0 +1,26 @@
+{
+  "slug": "wacc-berekenen",
+  "title": "WACC berekenen",
+  "description": "Draft op basis van artifacts-contract: WACC berekenen.",
+  "type": "frontend",
+  "category": "Ondernemen Zzp Dga",
+  "tags": [
+    "artifact-generated",
+    "draft"
+  ],
+  "status": "draft",
+  "visibility": "hidden",
+  "reasonHint": "Deze tool is gegenereerd uit artifacts en nog niet gevalideerd voor publicatie.",
+  "assumptionsUsed": [
+    "mortgage"
+  ],
+  "calculationDomains": [
+    "cashflow"
+  ],
+  "riskLevel": "medium",
+  "disclaimerType": "financialEducation",
+  "outputType": "singleResult",
+  "requiredProfileFields": [],
+  "version": "1.0.0",
+  "entry": "Calculator.tsx"
+}
