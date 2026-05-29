@@ -2,11 +2,16 @@
 
 import { useMemo, useState } from "react";
 import { DisclosureSection } from "@/components/DisclosureSection";
+import { FieldError } from "@/components/forms/FieldError";
 import { GlossaryText } from "@/components/GlossaryText";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
 import { parseOptionalDecimalInput } from "@/lib/number-input";
-import { calculateDebtPriority, type DebtKind } from "./logic";
+import {
+  calculateDebtPriority,
+  type DebtKind,
+  type DebtPriorityInput,
+} from "./logic";
 
 type DebtFormRow = {
   kind: DebtKind;
@@ -17,6 +22,17 @@ type DebtFormRow = {
 type FormState = {
   extraAmount: string;
   debts: DebtFormRow[];
+};
+
+type DebtRowErrors = {
+  amount?: string;
+  interestRate?: string;
+};
+
+type ValidationErrors = {
+  extraAmount?: string;
+  debts: DebtRowErrors[];
+  form?: string;
 };
 
 const defaultValues: FormState = {
@@ -47,20 +63,97 @@ function formatCurrency(value: number) {
   }).format(value);
 }
 
+function validateForm(values: FormState) {
+  const debts: DebtRowErrors[] = values.debts.map(() => ({}));
+  const extraAmount = parseOptionalDecimalInput(values.extraAmount);
+  const errors: ValidationErrors = { debts };
+  const parsedDebts: DebtPriorityInput["debts"] = [];
+  let hasDebtWithAmount = false;
+
+  if (extraAmount === undefined || !Number.isFinite(extraAmount) || extraAmount < 0) {
+    errors.extraAmount = "Gebruik 0 of een hoger bedrag.";
+  }
+
+  for (const [index, debt] of values.debts.entries()) {
+    let amount: number | undefined;
+    let interestRate: number | undefined;
+    const hasAmountInput = debt.amount.trim().length > 0;
+    const hasRateInput = debt.interestRate.trim().length > 0;
+
+    if (hasAmountInput) {
+      const parsedAmount = parseOptionalDecimalInput(debt.amount);
+      if (parsedAmount === undefined || !Number.isFinite(parsedAmount) || parsedAmount < 0) {
+        debts[index].amount = "Gebruik 0 of een hoger bedrag.";
+      } else {
+        amount = parsedAmount;
+      }
+    }
+
+    if (hasRateInput) {
+      const parsedRate = parseOptionalDecimalInput(debt.interestRate);
+      if (
+        parsedRate === undefined ||
+        !Number.isFinite(parsedRate) ||
+        parsedRate < 0 ||
+        parsedRate > 100
+      ) {
+        debts[index].interestRate = "Gebruik een rente tussen 0 en 100.";
+      } else {
+        interestRate = parsedRate;
+      }
+    }
+
+    if (hasAmountInput && amount !== undefined && amount > 0 && interestRate === undefined) {
+      debts[index].interestRate = "Vul rente in (0 t/m 100) voor deze schuld.";
+    }
+
+    if (hasRateInput && interestRate !== undefined && (amount === undefined || amount <= 0)) {
+      debts[index].amount = "Vul een schuldbedrag hoger dan 0 in.";
+    }
+
+    if (amount !== undefined && amount > 0 && interestRate !== undefined) {
+      hasDebtWithAmount = true;
+    }
+
+    parsedDebts.push({
+      kind: debt.kind,
+      amount,
+      interestRate,
+    });
+  }
+
+  const hasDebtErrors = debts.some((debt) => Boolean(debt.amount || debt.interestRate));
+  if (!hasDebtWithAmount && !hasDebtErrors) {
+    errors.form = "Vul minimaal één schuld met bedrag en rente in.";
+  }
+
+  const hasErrors =
+    Boolean(errors.extraAmount) ||
+    Boolean(errors.form) ||
+    errors.debts.some((debt) => Boolean(debt.amount || debt.interestRate));
+
+  const parsedValues: DebtPriorityInput | null = hasErrors
+    ? null
+    : {
+        extraAmount,
+        debts: parsedDebts,
+      };
+
+  return { errors, parsedValues };
+}
+
 export default function Calculator() {
   const [values, setValues] = useState<FormState>(defaultValues);
   const [submitted, setSubmitted] = useState<FormState | null>(null);
+  const [didSubmitAttempt, setDidSubmitAttempt] = useState(false);
+  const validation = validateForm(values);
+  const { errors, parsedValues } = validation;
 
   const result = useMemo(() => {
     if (!submitted) return null;
-    return calculateDebtPriority({
-      extraAmount: parseOptionalDecimalInput(submitted.extraAmount),
-      debts: submitted.debts.map((debt) => ({
-        kind: debt.kind,
-        amount: parseOptionalDecimalInput(debt.amount),
-        interestRate: parseOptionalDecimalInput(debt.interestRate),
-      })),
-    });
+    const submittedValidation = validateForm(submitted);
+    if (!submittedValidation.parsedValues) return null;
+    return calculateDebtPriority(submittedValidation.parsedValues);
   }, [submitted]);
 
   function updateDebt(index: number, patch: Partial<DebtFormRow>) {
@@ -92,6 +185,8 @@ export default function Calculator() {
           className="grid gap-4"
           onSubmit={(event) => {
             event.preventDefault();
+            setDidSubmitAttempt(true);
+            if (!parsedValues) return;
             setSubmitted(values);
           }}
         >
@@ -107,6 +202,13 @@ export default function Calculator() {
               }
               className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] text-[var(--ink)] outline-none"
             />
+            <FieldError
+              message={
+                didSubmitAttempt || values.extraAmount.trim().length > 0
+                  ? errors.extraAmount
+                  : undefined
+              }
+            />
           </label>
 
           <div className="grid gap-3">
@@ -116,26 +218,47 @@ export default function Calculator() {
                   {kindLabels[debt.kind]}
                 </div>
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                  <input
-                    inputMode="decimal"
-                    placeholder="Bedrag"
-                    value={debt.amount}
-                    onChange={(event) => updateDebt(index, { amount: event.target.value })}
-                    className="ring-focus hair h-11 rounded-md border bg-white px-3 font-mono text-[15px] outline-none"
-                  />
-                  <input
-                    inputMode="decimal"
-                    placeholder="Rente %"
-                    value={debt.interestRate}
-                    onChange={(event) =>
-                      updateDebt(index, { interestRate: event.target.value })
-                    }
-                    className="ring-focus hair h-11 rounded-md border bg-white px-3 font-mono text-[15px] outline-none"
-                  />
+                  <label className="grid gap-1">
+                    <input
+                      inputMode="decimal"
+                      placeholder="Bedrag"
+                      value={debt.amount}
+                      onChange={(event) =>
+                        updateDebt(index, { amount: event.target.value })
+                      }
+                      className="ring-focus hair h-11 rounded-md border bg-white px-3 font-mono text-[15px] outline-none"
+                    />
+                    <FieldError
+                      message={
+                        didSubmitAttempt || debt.amount.trim().length > 0
+                          ? errors.debts[index]?.amount
+                          : undefined
+                      }
+                    />
+                  </label>
+                  <label className="grid gap-1">
+                    <input
+                      inputMode="decimal"
+                      placeholder="Rente %"
+                      value={debt.interestRate}
+                      onChange={(event) =>
+                        updateDebt(index, { interestRate: event.target.value })
+                      }
+                      className="ring-focus hair h-11 rounded-md border bg-white px-3 font-mono text-[15px] outline-none"
+                    />
+                    <FieldError
+                      message={
+                        didSubmitAttempt || debt.interestRate.trim().length > 0
+                          ? errors.debts[index]?.interestRate
+                          : undefined
+                      }
+                    />
+                  </label>
                 </div>
               </div>
             ))}
           </div>
+          <FieldError message={didSubmitAttempt ? errors.form : undefined} />
 
           <ToolActionButton type="submit" variant="submit" size="md" full>
             Bereken volgorde

@@ -2,11 +2,12 @@
 
 import { useMemo, useState } from "react";
 import { DisclosureSection } from "@/components/DisclosureSection";
+import { FieldError } from "@/components/forms/FieldError";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
 import { GlossaryText } from "@/components/GlossaryText";
 import { parseOptionalDecimalInput } from "@/lib/number-input";
-import { calculateBuyVsRent } from "./logic";
+import { calculateBuyVsRent, type BuyVsRentInput } from "./logic";
 
 type FormState = {
   monthlyRent: string;
@@ -17,6 +18,8 @@ type FormState = {
   monthlyOwnerCosts: string;
   stressRateIncrease: string;
 };
+
+type ValidationErrors = Partial<Record<keyof FormState, string>>;
 
 const defaultValues: FormState = {
   monthlyRent: "",
@@ -37,16 +40,106 @@ function formatCurrency(value: number) {
   }).format(value);
 }
 
+function parseRequiredMoney(rawValue: string, field: keyof FormState, errors: ValidationErrors) {
+  const parsed = parseOptionalDecimalInput(rawValue);
+  if (parsed === undefined || !Number.isFinite(parsed) || parsed < 0) {
+    errors[field] = "Gebruik 0 of een hoger bedrag.";
+    return undefined;
+  }
+
+  return parsed;
+}
+
+function parseRequiredPercent(
+  rawValue: string,
+  field: keyof FormState,
+  errors: ValidationErrors,
+  min: number,
+  max: number,
+) {
+  const parsed = parseOptionalDecimalInput(rawValue);
+  if (parsed === undefined || !Number.isFinite(parsed) || parsed < min || parsed > max) {
+    errors[field] = `Gebruik een percentage tussen ${min} en ${max}.`;
+    return undefined;
+  }
+
+  return parsed;
+}
+
+function parseRequiredYears(
+  rawValue: string,
+  field: keyof FormState,
+  errors: ValidationErrors,
+  min: number,
+  max: number,
+) {
+  const parsed = parseOptionalDecimalInput(rawValue);
+  if (parsed === undefined || !Number.isFinite(parsed) || parsed < min || parsed > max) {
+    errors[field] = `Gebruik een looptijd tussen ${min} en ${max} jaar.`;
+    return undefined;
+  }
+
+  return parsed;
+}
+
+function validateForm(values: FormState) {
+  const errors: ValidationErrors = {};
+  const monthlyRent = parseRequiredMoney(values.monthlyRent, "monthlyRent", errors);
+  const purchasePrice = parseRequiredMoney(values.purchasePrice, "purchasePrice", errors);
+  const ownFunds = parseRequiredMoney(values.ownFunds, "ownFunds", errors);
+  const mortgageRate = parseRequiredPercent(values.mortgageRate, "mortgageRate", errors, 0, 20);
+  const mortgageTermYears = parseRequiredYears(
+    values.mortgageTermYears,
+    "mortgageTermYears",
+    errors,
+    1,
+    40,
+  );
+  const monthlyOwnerCosts = parseRequiredMoney(
+    values.monthlyOwnerCosts,
+    "monthlyOwnerCosts",
+    errors,
+  );
+  const stressRateIncrease = parseRequiredPercent(
+    values.stressRateIncrease,
+    "stressRateIncrease",
+    errors,
+    0,
+    10,
+  );
+
+  if (purchasePrice !== undefined && purchasePrice <= 0) {
+    errors.purchasePrice = "Gebruik een woningprijs hoger dan 0.";
+  }
+
+  const parsedValues: BuyVsRentInput | null =
+    Object.keys(errors).length === 0
+      ? {
+          monthlyRent,
+          purchasePrice,
+          ownFunds,
+          mortgageRate,
+          mortgageTermYears,
+          monthlyOwnerCosts,
+          stressRateIncrease,
+        }
+      : null;
+
+  return { errors, parsedValues };
+}
+
 function Field({
   label,
   value,
   onChange,
   suffix,
+  error,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   suffix?: string;
+  error?: string;
 }) {
   return (
     <label className="grid gap-2">
@@ -62,6 +155,7 @@ function Field({
         />
         {suffix ? <span className="ml-2 text-[13px] text-[var(--muted)]">{suffix}</span> : null}
       </div>
+      <FieldError message={error} />
     </label>
   );
 }
@@ -69,18 +163,22 @@ function Field({
 export default function Calculator() {
   const [values, setValues] = useState<FormState>(defaultValues);
   const [submitted, setSubmitted] = useState<FormState | null>(null);
+  const [didSubmitAttempt, setDidSubmitAttempt] = useState(false);
+  const validation = validateForm(values);
+  const { errors, parsedValues } = validation;
+  const visibleErrors = Object.fromEntries(
+    Object.entries(errors).filter(([field]) => {
+      if (didSubmitAttempt) return true;
+      const value = values[field as keyof FormState];
+      return typeof value === "string" ? value.trim().length > 0 : false;
+    }),
+  ) as ValidationErrors;
 
   const result = useMemo(() => {
     if (!submitted) return null;
-    return calculateBuyVsRent({
-      monthlyRent: parseOptionalDecimalInput(submitted.monthlyRent),
-      purchasePrice: parseOptionalDecimalInput(submitted.purchasePrice),
-      ownFunds: parseOptionalDecimalInput(submitted.ownFunds),
-      mortgageRate: parseOptionalDecimalInput(submitted.mortgageRate),
-      mortgageTermYears: parseOptionalDecimalInput(submitted.mortgageTermYears),
-      monthlyOwnerCosts: parseOptionalDecimalInput(submitted.monthlyOwnerCosts),
-      stressRateIncrease: parseOptionalDecimalInput(submitted.stressRateIncrease),
-    });
+    const submittedValidation = validateForm(submitted);
+    if (!submittedValidation.parsedValues) return null;
+    return calculateBuyVsRent(submittedValidation.parsedValues);
   }, [submitted]);
 
   return (
@@ -103,34 +201,41 @@ export default function Calculator() {
           className="grid gap-4"
           onSubmit={(event) => {
             event.preventDefault();
+            setDidSubmitAttempt(true);
+            if (!parsedValues) return;
             setSubmitted(values);
           }}
         >
           <Field
             label="Huidige huur per maand"
             value={values.monthlyRent}
+            error={visibleErrors.monthlyRent}
             onChange={(value) => setValues((current) => ({ ...current, monthlyRent: value }))}
           />
           <Field
             label="Gewenste woningprijs"
             value={values.purchasePrice}
+            error={visibleErrors.purchasePrice}
             onChange={(value) => setValues((current) => ({ ...current, purchasePrice: value }))}
           />
           <Field
             label="Eigen geld"
             value={values.ownFunds}
+            error={visibleErrors.ownFunds}
             onChange={(value) => setValues((current) => ({ ...current, ownFunds: value }))}
           />
           <Field
             label="Hypotheekrente"
             suffix="%"
             value={values.mortgageRate}
+            error={visibleErrors.mortgageRate}
             onChange={(value) => setValues((current) => ({ ...current, mortgageRate: value }))}
           />
           <Field
             label="Looptijd hypotheek"
             suffix="jaar"
             value={values.mortgageTermYears}
+            error={visibleErrors.mortgageTermYears}
             onChange={(value) =>
               setValues((current) => ({ ...current, mortgageTermYears: value }))
             }
@@ -138,6 +243,7 @@ export default function Calculator() {
           <Field
             label="Extra eigenaarslasten per maand"
             value={values.monthlyOwnerCosts}
+            error={visibleErrors.monthlyOwnerCosts}
             onChange={(value) =>
               setValues((current) => ({ ...current, monthlyOwnerCosts: value }))
             }
@@ -146,6 +252,7 @@ export default function Calculator() {
             label="Rente-stresstest"
             suffix="% hoger"
             value={values.stressRateIncrease}
+            error={visibleErrors.stressRateIncrease}
             onChange={(value) =>
               setValues((current) => ({ ...current, stressRateIncrease: value }))
             }

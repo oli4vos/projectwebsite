@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { DisclosureSection } from "@/components/DisclosureSection";
+import { FieldError } from "@/components/forms/FieldError";
 import { MobileFieldFlowControls } from "@/components/MobileFieldFlowControls";
 import { ResultRow } from "@/components/ResultRow";
 import { SaveScenarioButton } from "@/components/SaveScenarioButton";
@@ -38,6 +39,8 @@ type FormState = {
   mortgageRate: string;
   riskProfile: "conservative" | "neutral" | "offensive";
 };
+
+type ValidationErrors = Partial<Record<keyof FormState, string>>;
 
 const exampleValues: FormState = {
   extraAmount: "1000",
@@ -214,18 +217,89 @@ function restoreFormStateFromSavedInput(input: unknown): FormState | null {
   };
 }
 
-function FieldError({ message }: { message?: string }) {
-  if (!message) return null;
-  return <p className="text-sm text-red-700">{message}</p>;
+function validateRequiredMoney(
+  values: FormState,
+  field: keyof FormState,
+  errors: ValidationErrors,
+) {
+  const parsed = parseOptionalNumber(values[field] as string);
+  if (parsed === undefined || !Number.isFinite(parsed) || parsed < 0) {
+    errors[field] = "Gebruik 0 of een hoger bedrag.";
+    return undefined;
+  }
+
+  return parsed;
 }
 
-function validate(values: FormState) {
-  const errors: Partial<Record<keyof FormState, string>> = {};
-  const extraAmount = parseOptionalNumber(values.extraAmount);
-  if (extraAmount !== undefined && (!Number.isFinite(extraAmount) || extraAmount < 0)) {
-    errors.extraAmount = "Gebruik 0 of een hoger bedrag.";
+function validateRequiredPercent(
+  values: FormState,
+  field: keyof FormState,
+  errors: ValidationErrors,
+  max: number,
+) {
+  const parsed = parseOptionalNumber(values[field] as string);
+  if (parsed === undefined || !Number.isFinite(parsed) || parsed < 0 || parsed > max) {
+    errors[field] = `Gebruik een percentage tussen 0 en ${max}.`;
+    return undefined;
   }
-  return errors;
+
+  return parsed;
+}
+
+function validateForm(values: FormState) {
+  const errors: ValidationErrors = {};
+  validateRequiredMoney(values, "extraAmount", errors);
+  validateRequiredMoney(values, "currentBuffer", errors);
+  validateRequiredMoney(values, "targetBuffer", errors);
+
+  if (values.openToInvesting) {
+    const horizonYears = parseOptionalNumber(values.horizonYears);
+    if (
+      horizonYears === undefined ||
+      !Number.isFinite(horizonYears) ||
+      horizonYears <= 0 ||
+      horizonYears > 60
+    ) {
+      errors.horizonYears = "Gebruik een horizon tussen 1 en 60 jaar.";
+    }
+
+    validateRequiredPercent(values, "expectedAnnualReturn", errors, 100);
+  }
+
+  if (values.hasDebt) {
+    const primaryDebtAmount = parseOptionalNumber(values.primaryDebtAmount);
+    if (
+      primaryDebtAmount === undefined ||
+      !Number.isFinite(primaryDebtAmount) ||
+      primaryDebtAmount <= 0
+    ) {
+      errors.primaryDebtAmount = "Gebruik een schuldbedrag hoger dan 0.";
+    }
+
+    validateRequiredPercent(values, "primaryDebtRate", errors, 100);
+
+    if (values.hasOtherDebt) {
+      const otherDebtAmount = parseOptionalNumber(values.otherDebtAmount);
+      if (
+        otherDebtAmount === undefined ||
+        !Number.isFinite(otherDebtAmount) ||
+        otherDebtAmount <= 0
+      ) {
+        errors.otherDebtAmount = "Gebruik een schuldbedrag hoger dan 0.";
+      }
+
+      validateRequiredPercent(values, "otherDebtRate", errors, 100);
+    }
+  }
+
+  if (values.hasMortgage) {
+    validateRequiredPercent(values, "mortgageRate", errors, 100);
+  }
+
+  const parsedValues: VolgendeEuroInput | null =
+    Object.keys(errors).length === 0 ? toInput(values) : null;
+
+  return { errors, parsedValues };
 }
 
 export default function Calculator() {
@@ -257,18 +331,17 @@ function CalculatorContent({ initialValues, hasRelevantProfileValues, profilePat
   const [lastLoadedScenarioId, setLastLoadedScenarioId] = useState<string | null>(
     null,
   );
-  const validationErrors = validate(formValues);
-  const errors = Object.fromEntries(
-    Object.entries(validationErrors).filter(([field]) => {
-      const value = formValues[field as keyof FormState];
-      return typeof value === "string" ? value.trim().length > 0 : Boolean(value);
-    }),
-  ) as Partial<Record<keyof FormState, string>>;
+  const validation = validateForm(formValues);
+  const validationErrors = validation.errors;
+  const { parsedValues } = validation;
+  const errors = validationErrors;
+
+  const submittedValidation = submittedValues ? validateForm(submittedValues) : null;
 
   const submittedResult = useMemo(() => {
-    if (!submittedValues) return null;
-    return calculateVolgendeEuroPriorities(toInput(submittedValues));
-  }, [submittedValues]);
+    if (!submittedValidation?.parsedValues) return null;
+    return calculateVolgendeEuroPriorities(submittedValidation.parsedValues);
+  }, [submittedValidation]);
 
   const hasDirtyChanges = Boolean(submittedValues) && JSON.stringify(formValues) !== JSON.stringify(submittedValues);
 
@@ -382,14 +455,14 @@ function CalculatorContent({ initialValues, hasRelevantProfileValues, profilePat
 
   function onSubmit(event: React.FormEvent) {
     event.preventDefault();
-    if (Object.keys(validationErrors).length > 0) return;
+    if (!parsedValues) return;
     setSubmittedValues(formValues);
     setSubmitContextMessage(null);
     document.getElementById("tool-result-summary")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function submitAndScroll() {
-    if (Object.keys(validationErrors).length > 0) {
+    if (!parsedValues) {
       return;
     }
     setSubmittedValues(formValues);
@@ -406,7 +479,7 @@ function CalculatorContent({ initialValues, hasRelevantProfileValues, profilePat
   const scenarioTitle = result?.topRecommendation
     ? `Volgende euro — ${result.topRecommendation.label}`
     : "Volgende euro scenario";
-  const scenarioInputSnapshot = submittedValues ? toInput(submittedValues) : null;
+  const scenarioInputSnapshot = submittedValidation?.parsedValues ?? null;
   const scenarioResultSnapshot = result
     ? {
         topRecommendation: result.topRecommendation
@@ -468,7 +541,7 @@ function CalculatorContent({ initialValues, hasRelevantProfileValues, profilePat
       total={mobileFlow.total}
       canGoPrev={mobileFlow.canGoPrev}
       canGoNext={mobileFlow.canGoNext}
-      canComplete={Object.keys(validationErrors).length === 0}
+      canComplete={Boolean(parsedValues)}
       onPrev={mobileFlow.goPrev}
       onNext={mobileFlow.goNext}
       onComplete={submitAndScroll}
@@ -631,10 +704,12 @@ function CalculatorContent({ initialValues, hasRelevantProfileValues, profilePat
           <label className={mobileFlow.getFieldClassName("horizonYears")}>
             <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Beleggingshorizon (jaren)</span>
             <input inputMode="decimal" value={formValues.horizonYears} onChange={(event) => updateField("horizonYears", event.target.value)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
+            <FieldError message={errors.horizonYears} />
           </label>
           <label className={mobileFlow.getFieldClassName("expectedAnnualReturn")}>
             <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Verwacht rendement (%)</span>
             <input inputMode="decimal" value={formValues.expectedAnnualReturn} onChange={(event) => updateField("expectedAnnualReturn", event.target.value)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
+            <FieldError message={errors.expectedAnnualReturn} />
           </label>
         </>
       ) : null}
@@ -661,12 +736,14 @@ function CalculatorContent({ initialValues, hasRelevantProfileValues, profilePat
               {formValues.primaryDebtIsDuo ? "Bedrag DUO-schuld" : "Bedrag schuld"}
             </span>
             <input inputMode="decimal" value={formValues.primaryDebtAmount} onChange={(event) => updateField("primaryDebtAmount", event.target.value)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
+            <FieldError message={errors.primaryDebtAmount} />
           </label>
           <label className={mobileFlow.getFieldClassName("primaryDebtRate")}>
             <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
               {formValues.primaryDebtIsDuo ? "DUO-rente (%)" : "Rente schuld (%)"}
             </span>
             <input inputMode="decimal" value={formValues.primaryDebtRate} onChange={(event) => updateField("primaryDebtRate", event.target.value)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
+            <FieldError message={errors.primaryDebtRate} />
           </label>
 
           <label className={mobileFlow.getFieldClassName("hasOtherDebt")}>
@@ -682,10 +759,12 @@ function CalculatorContent({ initialValues, hasRelevantProfileValues, profilePat
               <label className={mobileFlow.getFieldClassName("otherDebtAmount")}>
                 <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Bedrag andere schuld</span>
                 <input inputMode="decimal" value={formValues.otherDebtAmount} onChange={(event) => updateField("otherDebtAmount", event.target.value)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
+                <FieldError message={errors.otherDebtAmount} />
               </label>
               <label className={mobileFlow.getFieldClassName("otherDebtRate")}>
                 <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Rente andere schuld (%)</span>
                 <input inputMode="decimal" value={formValues.otherDebtRate} onChange={(event) => updateField("otherDebtRate", event.target.value)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
+                <FieldError message={errors.otherDebtRate} />
               </label>
             </>
           ) : null}
@@ -703,6 +782,7 @@ function CalculatorContent({ initialValues, hasRelevantProfileValues, profilePat
         <label className={mobileFlow.getFieldClassName("mortgageRate")}>
           <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">Hypotheekrente (%)</span>
           <input inputMode="decimal" value={formValues.mortgageRate} onChange={(event) => updateField("mortgageRate", event.target.value)} className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none" />
+          <FieldError message={errors.mortgageRate} />
         </label>
       ) : null}
 
@@ -716,7 +796,7 @@ function CalculatorContent({ initialValues, hasRelevantProfileValues, profilePat
       </label>
 
       <div className="space-y-3 border-t border-[var(--hair)] pt-4">
-        <ToolActionButton type="submit" variant="submit" size="md" full>
+        <ToolActionButton type="submit" variant="submit" size="md" full disabled={!parsedValues}>
           {submittedValues && hasDirtyChanges ? "Bereken opnieuw" : "Bereken"}
         </ToolActionButton>
         <p className="text-[12px] text-[var(--muted)]">De tool rekent alleen met ingevulde gegevens.</p>
