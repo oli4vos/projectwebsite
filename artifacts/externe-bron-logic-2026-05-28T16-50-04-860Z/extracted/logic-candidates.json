@@ -1,0 +1,2560 @@
+{
+  "generatedAt": "2026-05-28T21:45:16.514Z",
+  "config": {
+    "startUrls": [
+      "https://www.externe-bron.nl/berekeningen.html"
+    ],
+    "allowedDomains": [
+      "externe-bron.nl",
+      "www.externe-bron.nl"
+    ],
+    "maxPages": 220,
+    "maxDepth": 3,
+    "maxScriptsPerPage": 10,
+    "requestTimeoutMs": 15000,
+    "userAgent": "ProjectWebsite-LogicScraper/1.0 (+local tooling; contact repo owner)",
+    "skipRobots": true,
+    "followExternalScripts": false,
+    "keywords": [
+      "bereken",
+      "calc",
+      "rente",
+      "hypotheek",
+      "studieschuld",
+      "annuiteit",
+      "lineair",
+      "aflossen",
+      "looptijd",
+      "box3",
+      "inflatie",
+      "vermogen",
+      "beleggen",
+      "fisc",
+      "belasting"
+    ],
+    "excludedScriptPatterns": [
+      "jquery",
+      "gtm",
+      "googletagmanager",
+      "google-analytics",
+      "recaptcha",
+      "wp-includes",
+      "polyfill",
+      "analytics",
+      "tracking",
+      "facebook",
+      "hotjar",
+      "cookie",
+      "consent",
+      "bootstrap"
+    ],
+    "outDir": "artifacts/externe-bron-logic-2026-05-28T16-50-04-860Z"
+  },
+  "stats": {
+    "pagesVisited": 220,
+    "scriptsFetched": 1,
+    "inlineScriptsSeen": 1275,
+    "candidatesFound": 57,
+    "robotsBlocked": 0,
+    "errors": 0
+  },
+  "pages": [
+    {
+      "url": "https://www.externe-bron.nl/berekeningen.html",
+      "depth": 0,
+      "title": "Alle rekenmodules op onze site | ExterneBron.nl",
+      "storedPath": "raw/pages/1db7d7de8d8f.html",
+      "inlineScriptCount": 3,
+      "externalScriptCount": 7,
+      "linkCount": 331
+    },
+    {
+      "url": "https://www.externe-bron.nl/",
+      "depth": 1,
+      "title": "Zelf alles berekenen op ExterneBron.nl | ExterneBron.nl",
+      "storedPath": "raw/pages/56a92df52f50.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 80
+    },
+    {
+      "url": "https://www.externe-bron.nl/belangrijke-momenten-in-jouw-leven.html",
+      "depth": 1,
+      "title": "Rekentools voor belangrijke momenten in jouw leven",
+      "storedPath": "raw/pages/1ea07693b60d.html",
+      "inlineScriptCount": 3,
+      "externalScriptCount": 7,
+      "linkCount": 39
+    },
+    {
+      "url": "https://www.externe-bron.nl/berekenen-themas-onderwerpen.html",
+      "depth": 1,
+      "title": "Berekenen - Thema's & Onderwerpen | ExterneBron.nl",
+      "storedPath": "raw/pages/e7d0b071dc35.html",
+      "inlineScriptCount": 3,
+      "externalScriptCount": 7,
+      "linkCount": 41
+    },
+    {
+      "url": "https://www.externe-bron.nl/werk-en-inkomen/index.html",
+      "depth": 1,
+      "title": "Berekenen -  Werk, Inkomen & Ontslag | ExterneBron.nl",
+      "storedPath": "raw/pages/f8a3f6e1e1d1.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 163
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/index.html",
+      "depth": 1,
+      "title": "Berekenen - Ondernemers, zzp'er & dga | ExterneBron.nl",
+      "storedPath": "raw/pages/4b76758a58c1.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 130
+    },
+    {
+      "url": "https://www.externe-bron.nl/pensioen/index.html",
+      "depth": 1,
+      "title": "Berekenen - Pensioen, pensioengat & jaarruimte",
+      "storedPath": "raw/pages/0f7cba61a6b0.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 99
+    },
+    {
+      "url": "https://www.externe-bron.nl/gezin-en-relatie/index.html",
+      "depth": 1,
+      "title": "Berekenen - Gezin, Relatie, Kinderen | ExterneBron.nl",
+      "storedPath": "raw/pages/89d62d827eb6.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 59
+    },
+    {
+      "url": "https://www.externe-bron.nl/klimaat-en-verduurzamen/index.html",
+      "depth": 1,
+      "title": "Berekenen - Klimaat & Verduurzamen | ExterneBron.nl",
+      "storedPath": "raw/pages/c41a783454bb.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 56
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek-en-wonen/index.html",
+      "depth": 1,
+      "title": "Berekenen - Hypotheek, kosten huis kopen & wonen",
+      "storedPath": "raw/pages/f0eab1ad5a41.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 157
+    },
+    {
+      "url": "https://www.externe-bron.nl/lenen-en-krediet/index.html",
+      "depth": 1,
+      "title": "Berekenen - geld lenen en financiering | ExterneBron.nl",
+      "storedPath": "raw/pages/ab8618211cf5.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 73
+    },
+    {
+      "url": "https://www.externe-bron.nl/sparen-en-beleggen/index.html",
+      "depth": 1,
+      "title": "Berekenen - Sparen & Beleggen | ExterneBron.nl",
+      "storedPath": "raw/pages/8905ce8f254b.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 102
+    },
+    {
+      "url": "https://www.externe-bron.nl/schenken-en-erven/index.html",
+      "depth": 1,
+      "title": "Berekenen - Schenken & Erven | ExterneBron.nl",
+      "storedPath": "raw/pages/762ccbddf18d.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 65
+    },
+    {
+      "url": "https://www.externe-bron.nl/kalender/index.html",
+      "depth": 1,
+      "title": "Berekenen - Kalender & Vrije tijd | ExterneBron.nl",
+      "storedPath": "raw/pages/2b71d0863bbf.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 48
+    },
+    {
+      "url": "https://www.externe-bron.nl/basis/index.html",
+      "depth": 1,
+      "title": "Berekenen - Basis berekeningen | ExterneBron.nl",
+      "storedPath": "raw/pages/56f5c6fd32c1.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 76
+    },
+    {
+      "url": "https://www.externe-bron.nl/berekeningen.html#",
+      "depth": 1,
+      "title": "Alle rekenmodules op onze site | ExterneBron.nl",
+      "storedPath": "raw/pages/781206f80a77.html",
+      "inlineScriptCount": 3,
+      "externalScriptCount": 7,
+      "linkCount": 331
+    },
+    {
+      "url": "https://www.externe-bron.nl/informatie/index.html",
+      "depth": 1,
+      "title": "Achtergrondinformatie | ExterneBron.nl",
+      "storedPath": "raw/pages/fd4641c0ed9a.html",
+      "inlineScriptCount": 3,
+      "externalScriptCount": 7,
+      "linkCount": 34
+    },
+    {
+      "url": "https://www.externe-bron.nl/wat-kost/index.html",
+      "depth": 1,
+      "title": "Wat kost ... wij hebben de kosten voor u berekend",
+      "storedPath": "raw/pages/16777f1e095e.html",
+      "inlineScriptCount": 4,
+      "externalScriptCount": 7,
+      "linkCount": 39
+    },
+    {
+      "url": "https://www.externe-bron.nl/nieuws/index.html",
+      "depth": 1,
+      "title": "Nieuws Blog | ExterneBron.nl",
+      "storedPath": "raw/pages/6cffc6df99c1.html",
+      "inlineScriptCount": 3,
+      "externalScriptCount": 7,
+      "linkCount": 57
+    },
+    {
+      "url": "https://www.externe-bron.nl/nieuwste-berekeningen.html",
+      "depth": 1,
+      "title": "De nieuwste rekentools op onze site | ExterneBron.nl",
+      "storedPath": "raw/pages/d2e2677c3aa5.html",
+      "inlineScriptCount": 3,
+      "externalScriptCount": 7,
+      "linkCount": 333
+    },
+    {
+      "url": "https://www.externe-bron.nl/oude-berekeningen.html",
+      "depth": 1,
+      "title": "Oude berekeningen | ExterneBron.nl",
+      "storedPath": "raw/pages/2011d34bcac3.html",
+      "inlineScriptCount": 3,
+      "externalScriptCount": 7,
+      "linkCount": 63
+    },
+    {
+      "url": "https://www.externe-bron.nl/partners/index.html",
+      "depth": 1,
+      "title": "Partners van ExterneBron.nl | ExterneBron.nl",
+      "storedPath": "raw/pages/29c910f32ba6.html",
+      "inlineScriptCount": 3,
+      "externalScriptCount": 7,
+      "linkCount": 30
+    },
+    {
+      "url": "https://www.externe-bron.nl/service/index.html",
+      "depth": 1,
+      "title": "Service | ExterneBron.nl",
+      "storedPath": "raw/pages/b56e26d9e8fd.html",
+      "inlineScriptCount": 3,
+      "externalScriptCount": 7,
+      "linkCount": 40
+    },
+    {
+      "url": "https://www.externe-bron.nl/zakelijk/index.html",
+      "depth": 1,
+      "title": "ExterneBron.nl - Zakelijk / B2B informatie | ExterneBron.nl",
+      "storedPath": "raw/pages/67f02509d7c8.html",
+      "inlineScriptCount": 3,
+      "externalScriptCount": 7,
+      "linkCount": 37
+    },
+    {
+      "url": "https://www.externe-bron.nl/inkomen/bruto-netto-rekentool-keuze.html",
+      "depth": 1,
+      "title": "Bruto-netto rekentool keuze - welke berekening gebruiken?",
+      "storedPath": "raw/pages/095b3da14d6c.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 35
+    },
+    {
+      "url": "https://www.externe-bron.nl/werk-en-inkomen/bruto-netto-inkomen.html",
+      "depth": 1,
+      "title": "Bruto-netto inkomen berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/d17f525c395a.html",
+      "inlineScriptCount": 10,
+      "externalScriptCount": 7,
+      "linkCount": 42
+    },
+    {
+      "url": "https://www.externe-bron.nl/werk-en-inkomen/bruto-netto-salaris.html",
+      "depth": 1,
+      "title": "Bruto-netto salaris | ExterneBron.nl",
+      "storedPath": "raw/pages/f2445a10ed91.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 42
+    },
+    {
+      "url": "https://www.externe-bron.nl/werk-en-inkomen/nettoloon.html",
+      "depth": 1,
+      "title": "Nettoloon berekenen uit bruto salaris • t/m 2026",
+      "storedPath": "raw/pages/d26ba89e06e2.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 43
+    },
+    {
+      "url": "https://www.externe-bron.nl/werk-en-inkomen/netto-loonsverhoging.html",
+      "depth": 1,
+      "title": "Netto loonsverhoging / verhoging uitkering | ExterneBron.nl",
+      "storedPath": "raw/pages/403e6f547824.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 36
+    },
+    {
+      "url": "https://www.externe-bron.nl/werk-en-inkomen/uitkering-netto.html",
+      "depth": 1,
+      "title": "Netto uitkering berekenen • t/m 2026 | ExterneBron.nl",
+      "storedPath": "raw/pages/b9dd3ad22a0c.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 41
+    },
+    {
+      "url": "https://www.externe-bron.nl/werk-en-inkomen/netto-verhoging-uitkering.html",
+      "depth": 1,
+      "title": "Netto verhoging van een uitkering | ExterneBron.nl",
+      "storedPath": "raw/pages/8f39409bf6de.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 36
+    },
+    {
+      "url": "https://www.externe-bron.nl/werk-en-inkomen/meer-gaan-werken-netto.html",
+      "depth": 1,
+      "title": "Netto extra inkomen bij meer gaan werken, inclusief toeslagen",
+      "storedPath": "raw/pages/566832707813.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 38
+    },
+    {
+      "url": "https://www.externe-bron.nl/werk-en-inkomen/meer-minder-werken-netto.html",
+      "depth": 1,
+      "title": "Netto inkomen bij meer of minder uren werken | ExterneBron.nl",
+      "storedPath": "raw/pages/26df261ae712.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 38
+    },
+    {
+      "url": "https://www.externe-bron.nl/werk-en-inkomen/brutoloon.html",
+      "depth": 1,
+      "title": "Brutoloon berekenen uit nettoloon • t/m 2026",
+      "storedPath": "raw/pages/43a584d130e5.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 42
+    },
+    {
+      "url": "https://www.externe-bron.nl/inkomen/bruto-jaarinkomen-berekenen-uit-netto.html",
+      "depth": 1,
+      "title": "Bruto jaarinkomen berekenen uit netto uitbetalingen",
+      "storedPath": "raw/pages/fb55e5afb998.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 39
+    },
+    {
+      "url": "https://www.externe-bron.nl/inkomen/gemiddeld-netto-maandinkomen-berekenen.html",
+      "depth": 1,
+      "title": "Gemiddeld netto maandinkomen inclusief vakantiegeld, etc. berekenen",
+      "storedPath": "raw/pages/fc516e179111.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 37
+    },
+    {
+      "url": "https://www.externe-bron.nl/werk-en-inkomen/bruto-netto-partneralimentatie.html",
+      "depth": 1,
+      "title": "Bruto-netto partneralimentatie | ExterneBron.nl",
+      "storedPath": "raw/pages/1c4f07203c61.html",
+      "inlineScriptCount": 10,
+      "externalScriptCount": 7,
+      "linkCount": 38
+    },
+    {
+      "url": "https://www.externe-bron.nl/werk-en-inkomen/minimumloon.html",
+      "depth": 1,
+      "title": "Minimumloon berekenen - minimum uurloon | ExterneBron.nl",
+      "storedPath": "raw/pages/7b6b3810c5b5.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 36
+    },
+    {
+      "url": "https://www.externe-bron.nl/werk-en-inkomen/bijbaan-vakantiewerk-stage-belasting-terugkrijgen.html",
+      "depth": 1,
+      "title": "Bijbaan, vakantiewerk en stage - belasting terugkrijgen",
+      "storedPath": "raw/pages/d061309e7152.html",
+      "inlineScriptCount": 9,
+      "externalScriptCount": 7,
+      "linkCount": 41
+    },
+    {
+      "url": "https://www.externe-bron.nl/werk-en-inkomen/uurloon-naar-maandsalaris.html",
+      "depth": 1,
+      "title": "Uurloon naar maandsalaris - bruto & netto | ExterneBron.nl",
+      "storedPath": "raw/pages/8521b3482ac0.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 37
+    },
+    {
+      "url": "https://www.externe-bron.nl/werk-en-inkomen/maandsalaris-naar-uurloon.html",
+      "depth": 1,
+      "title": "Maandsalaris naar uurloon - bruto & netto | ExterneBron.nl",
+      "storedPath": "raw/pages/0659b2bfe021.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 37
+    },
+    {
+      "url": "https://www.externe-bron.nl/werk-en-inkomen/uurloon-bruto-netto.html",
+      "depth": 1,
+      "title": "Uurloon bruto - netto berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/3248c94afd2a.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 37
+    },
+    {
+      "url": "https://www.externe-bron.nl/werk-en-inkomen/looncheck-horeca-cao.html",
+      "depth": 1,
+      "title": "Looncheck volgens de horeca-cao | ExterneBron.nl",
+      "storedPath": "raw/pages/2cf2144eab74.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 40
+    },
+    {
+      "url": "https://www.externe-bron.nl/werk-en-inkomen/koopkracht-verandering.html",
+      "depth": 1,
+      "title": "Koopkracht in 2026 | ExterneBron.nl",
+      "storedPath": "raw/pages/c8d831885679.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 40
+    },
+    {
+      "url": "https://www.externe-bron.nl/werk-en-inkomen/kosten-per-nederlander.html",
+      "depth": 1,
+      "title": "Wat kost dit per Nederlander? | ExterneBron.nl",
+      "storedPath": "raw/pages/421aab3f6f60.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 35
+    },
+    {
+      "url": "https://www.externe-bron.nl/inkomen/belasting-box1-verschil.html",
+      "depth": 1,
+      "title": "Belasting box 1 in 2026 t.o.v. 2025 | ExterneBron.nl",
+      "storedPath": "raw/pages/baa9148f46a6.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 37
+    },
+    {
+      "url": "https://www.externe-bron.nl/werk-en-inkomen/vakantiegeld.html",
+      "depth": 1,
+      "title": "Vakantiegeld berekenen - bruto & netto | ExterneBron.nl",
+      "storedPath": "raw/pages/0783cae2b678.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 35
+    },
+    {
+      "url": "https://www.externe-bron.nl/werk-en-inkomen/inkomstenbelasting-bij-inkomenswijziging.html",
+      "depth": 1,
+      "title": "Inkomstenbelasting bij (grote) inkomenswijziging",
+      "storedPath": "raw/pages/ea0891464c73.html",
+      "inlineScriptCount": 13,
+      "externalScriptCount": 7,
+      "linkCount": 39
+    },
+    {
+      "url": "https://www.externe-bron.nl/modules/werken/belasting-extra-inkomen.html",
+      "depth": 1,
+      "title": "Belasting extra inkomen - bereken belastingtarief bij een extra inkomen in box1",
+      "storedPath": "raw/pages/4df6ed00c6c1.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 40
+    },
+    {
+      "url": "https://www.externe-bron.nl/modules/werken/middeling-inkomen-box1.html",
+      "depth": 1,
+      "title": "Middeling inkomen box1 berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/5cd3846eb82c.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 35
+    },
+    {
+      "url": "https://www.externe-bron.nl/inkomen/box1-inkomen-belasting-uitstellen.html",
+      "depth": 1,
+      "title": "Box 1 inkomen & belasting uitstellen | ExterneBron.nl",
+      "storedPath": "raw/pages/0f8f8866e24f.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 42
+    },
+    {
+      "url": "https://www.externe-bron.nl/inkomen/bijtelling-auto-van-de-zaak.html",
+      "depth": 1,
+      "title": "Bijtelling auto van de zaak berekenen inclusief kosten",
+      "storedPath": "raw/pages/8bb744e29190.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 38
+    },
+    {
+      "url": "https://www.externe-bron.nl/inkomen/bijtelling-fiets-van-de-zaak.html",
+      "depth": 1,
+      "title": "Bijtelling fiets van de zaak berekenen inclusief kosten",
+      "storedPath": "raw/pages/b98d1a915fab.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 38
+    },
+    {
+      "url": "https://www.externe-bron.nl/modules/werken/autokosten-met-kilometer-vergoeding.html",
+      "depth": 1,
+      "title": "Autokosten met kilometer vergoeding | ExterneBron.nl",
+      "storedPath": "raw/pages/57e71b506a35.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 39
+    },
+    {
+      "url": "https://www.externe-bron.nl/werk-en-inkomen/brandstofkosten-berekenen.html",
+      "depth": 1,
+      "title": "Brandstofkosten berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/defa66ddc5a5.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 37
+    },
+    {
+      "url": "https://www.externe-bron.nl/inkomen/kilometervergoeding-bruto-netto.html",
+      "depth": 1,
+      "title": "Kilometervergoeding - bruto-netto | ExterneBron.nl",
+      "storedPath": "raw/pages/d1c27bdd39cc.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 36
+    },
+    {
+      "url": "https://www.externe-bron.nl/ontslag/dienstverband-en-opzegtermijn.html",
+      "depth": 1,
+      "title": "Duur dienstverband & opzegtermijn werkgever, werknemer",
+      "storedPath": "raw/pages/451b03b7cfb4.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 36
+    },
+    {
+      "url": "https://www.externe-bron.nl/ontslag/uitbetaling-vakantiedagen.html",
+      "depth": 1,
+      "title": "Bij ontslag uitbetaalde vakantiedagen | ExterneBron.nl",
+      "storedPath": "raw/pages/7c18dafba6f3.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 35
+    },
+    {
+      "url": "https://www.externe-bron.nl/modules/werken/wwuitkering.html",
+      "depth": 1,
+      "title": "WW-uitkering berekenen - hoogte en duur | ExterneBron.nl",
+      "storedPath": "raw/pages/52f334a0d966.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 37
+    },
+    {
+      "url": "https://www.externe-bron.nl/inkomen/bijstandsuitkering.html",
+      "depth": 1,
+      "title": "Hoogte bijstandsuitkering berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/2965a37964f2.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 37
+    },
+    {
+      "url": "https://www.externe-bron.nl/werk-en-inkomen/sociaal-minimum-inkomen-toeslagenwet.html",
+      "depth": 1,
+      "title": "Sociaal minimum inkomen volgens de Toeslagenwet",
+      "storedPath": "raw/pages/6976eb2f2745.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 37
+    },
+    {
+      "url": "https://www.externe-bron.nl/werk-en-inkomen/uwv-toeslag-toeslagenwet.html",
+      "depth": 1,
+      "title": "Toeslagenwet • UWV-toeslag berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/a52788550acd.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 38
+    },
+    {
+      "url": "https://www.externe-bron.nl/ontslag/transitievergoeding-berekenen.html",
+      "depth": 1,
+      "title": "Transitievergoeding bij ontslag berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/b6fe575e54f6.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 40
+    },
+    {
+      "url": "https://www.externe-bron.nl/ontslag/ontslagvergoeding-ambtenaar.html",
+      "depth": 1,
+      "title": "Ontslagvergoeding ambtenaar berekenen - CRvB-formule",
+      "storedPath": "raw/pages/51fb75476236.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 38
+    },
+    {
+      "url": "https://www.externe-bron.nl/ontslag/ontslag-of-transitievergoeding-bruto-netto.html",
+      "depth": 1,
+      "title": "Ontslag- of transitievergoeding bruto-netto | ExterneBron.nl",
+      "storedPath": "raw/pages/e306829ae3fb.html",
+      "inlineScriptCount": 13,
+      "externalScriptCount": 7,
+      "linkCount": 41
+    },
+    {
+      "url": "https://www.externe-bron.nl/werk-en-inkomen/stamrecht-eindkapitaal.html",
+      "depth": 1,
+      "title": "Stamrecht eindkapitaal: lijfrente of Stamrecht BV",
+      "storedPath": "raw/pages/58f628c91226.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 35
+    },
+    {
+      "url": "https://www.externe-bron.nl/werk-en-inkomen/box1-belastingdruk-berekenen.html",
+      "depth": 1,
+      "title": "Box 1 belastingdruk berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/70111a9618ca.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 35
+    },
+    {
+      "url": "https://www.externe-bron.nl/inkomen/verzamelinkomen-berekenen.html",
+      "depth": 1,
+      "title": "Verzamelinkomen berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/4b3fccc3cfce.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 37
+    },
+    {
+      "url": "https://www.externe-bron.nl/inkomen/toeslagen-berekenen.html",
+      "depth": 1,
+      "title": "Toeslagen berekenen - zie snel of er recht is op toeslagen",
+      "storedPath": "raw/pages/9e16bce85b47.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 45
+    },
+    {
+      "url": "https://www.externe-bron.nl/inkomen/zorgtoeslag-berekenen.html",
+      "depth": 1,
+      "title": "Zorgtoeslag berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/bb87dd335ad8.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 43
+    },
+    {
+      "url": "https://www.externe-bron.nl/inkomen/huurtoeslag-berekenen.html",
+      "depth": 1,
+      "title": "Huurtoeslag 2026 berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/e0e73a9027a5.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 43
+    },
+    {
+      "url": "https://www.externe-bron.nl/inkomen/kindgebonden-budget-berekenen.html",
+      "depth": 1,
+      "title": "Kindgebonden budget berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/077b301a4ca4.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 44
+    },
+    {
+      "url": "https://www.externe-bron.nl/inkomen/kinderopvangtoeslag-berekenen.html",
+      "depth": 1,
+      "title": "Kinderopvangtoeslag berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/4739ede73398.html",
+      "inlineScriptCount": 12,
+      "externalScriptCount": 7,
+      "linkCount": 47
+    },
+    {
+      "url": "https://www.externe-bron.nl/inkomen/toetsingsinkomen-berekenen.html",
+      "depth": 1,
+      "title": "Toetsingsinkomen berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/651dd56d44a6.html",
+      "inlineScriptCount": 10,
+      "externalScriptCount": 7,
+      "linkCount": 47
+    },
+    {
+      "url": "https://www.externe-bron.nl/werk-en-inkomen/algemene-heffingskorting.html",
+      "depth": 1,
+      "title": "Algemene heffingskorting berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/217cd148b1dd.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 39
+    },
+    {
+      "url": "https://www.externe-bron.nl/inkomen/algemene-heffingskorting-daling-per-box.html",
+      "depth": 1,
+      "title": "Algemene heffingskorting - daling per soort inkomen (box)",
+      "storedPath": "raw/pages/df1c9671b4c3.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 36
+    },
+    {
+      "url": "https://www.externe-bron.nl/werk-en-inkomen/arbeidskorting.html",
+      "depth": 1,
+      "title": "Arbeidskorting berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/816ae0d650d5.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 38
+    },
+    {
+      "url": "https://www.externe-bron.nl/werk-en-inkomen/inkomensafhankelijke-combinatiekorting.html",
+      "depth": 1,
+      "title": "Inkomensafhankelijke combinatiekorting berekenen",
+      "storedPath": "raw/pages/7031706af965.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 38
+    },
+    {
+      "url": "https://www.externe-bron.nl/inkomen/netto-voordeel-box-1-aftrek.html",
+      "depth": 1,
+      "title": "Netto voordeel box 1 aftrek | ExterneBron.nl",
+      "storedPath": "raw/pages/38eee9f4fc5c.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 35
+    },
+    {
+      "url": "https://www.externe-bron.nl/inkomen/tariefsaanpassing-aftrekposten.html",
+      "depth": 1,
+      "title": "Tariefsaanpassing aftrekposten box 1 berekenen",
+      "storedPath": "raw/pages/3f7a39304b3a.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 37
+    },
+    {
+      "url": "https://www.externe-bron.nl/modules/werken/feestdagen.html",
+      "depth": 1,
+      "title": "Feestdagen - wanneer vallen de feestdagen in een bepaald jaar",
+      "storedPath": "raw/pages/80e75264c25d.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 35
+    },
+    {
+      "url": "https://www.externe-bron.nl/werk-en-inkomen/sv-jaarloon-berekenen.html",
+      "depth": 1,
+      "title": "Sv-jaarloon berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/648d2cb06390.html",
+      "inlineScriptCount": 8,
+      "externalScriptCount": 7,
+      "linkCount": 37
+    },
+    {
+      "url": "https://www.externe-bron.nl/werk-en-inkomen/dagloon-uwv-berekenen.html",
+      "depth": 1,
+      "title": "Dagloon & dagloon UWV berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/5028f9f266e7.html",
+      "inlineScriptCount": 8,
+      "externalScriptCount": 7,
+      "linkCount": 37
+    },
+    {
+      "url": "https://www.externe-bron.nl/inkomen/tijdelijke-verhuur-eigen-woning.html",
+      "depth": 1,
+      "title": "Inkomen uit tijdelijke verhuur eigen woning via Airbnb, etc.",
+      "storedPath": "raw/pages/9630a3e49aa6.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 38
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/netto-inkomen-zzp-er.html",
+      "depth": 1,
+      "title": "Netto besteedbaar inkomen zzp'er berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/b886e9264de0.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 37
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/uurtarief-zzp-er.html",
+      "depth": 1,
+      "title": "Uurtarief zzp'er berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/e781da641fd0.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 37
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/declarabele-uren.html",
+      "depth": 1,
+      "title": "Declarabele uren per jaar berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/17b9c2dd3ab8.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 35
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/benodigde-declarabele-uren-zzp-er.html",
+      "depth": 1,
+      "title": "Benodigde declarabele uren zzp'er berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/cb496691c9f3.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 39
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/zzper-omzet-reserveren-inkomstenbelasting.html",
+      "depth": 1,
+      "title": "Zzp'er - omzet reserveren voor inkomstenbelasting",
+      "storedPath": "raw/pages/1bb645b03963.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 35
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/netto-inkomen-ondernemer.html",
+      "depth": 1,
+      "title": "Netto inkomen ondernemer (IB of DGA) berekenen",
+      "storedPath": "raw/pages/3522f798b4b0.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 43
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/parttime-ondernemer-extra-inkomen.html",
+      "depth": 1,
+      "title": "Parttime Ondernemer - extra inkomen berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/ecfc647210b0.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 37
+    },
+    {
+      "url": "https://www.externe-bron.nl/modules/ondernemen/marginaal-tarief-box1.html",
+      "depth": 1,
+      "title": "Marginaal tarief box1 berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/ac90b579ed4b.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 37
+    },
+    {
+      "url": "https://www.externe-bron.nl/modules/ondernemen/middelingsregeling.html",
+      "depth": 1,
+      "title": "Middelingsregeling inkomen box1 - middeling box1 belasting bij wisselend inkomen",
+      "storedPath": "raw/pages/11cff2309e8e.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 34
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/aov-premie-netto.html",
+      "depth": 1,
+      "title": "AOV-premie • netto kosten arbeids­ongeschikt­heids­verzekering",
+      "storedPath": "raw/pages/c6b01bd58f4d.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 36
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/aov-uitkering-netto.html",
+      "depth": 1,
+      "title": "AOV-uitkering • netto inkomen | ExterneBron.nl",
+      "storedPath": "raw/pages/396ccb7ce369.html",
+      "inlineScriptCount": 4,
+      "externalScriptCount": 7,
+      "linkCount": 34
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/optimaal-inkomen-belastingdruk-dga.html",
+      "depth": 1,
+      "title": "Belastingdruk & optimaal inkomen dga | ExterneBron.nl",
+      "storedPath": "raw/pages/9aec31a50d41.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 35
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/nettoloon-dga.html",
+      "depth": 1,
+      "title": "Loonstrookje dga - bruto-nettoloon berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/9a7fef0cac01.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 40
+    },
+    {
+      "url": "https://www.externe-bron.nl/modules/ondernemen/bv-of-eenmanszaak.html",
+      "depth": 1,
+      "title": "Bv of eenmanszaak - wat is voordeliger? | ExterneBron.nl",
+      "storedPath": "raw/pages/84168ae0ea1c.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 35
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/auto-van-de-zaak-of-in-prive.html",
+      "depth": 1,
+      "title": "Auto van de zaak of in privé - ondernemer | ExterneBron.nl",
+      "storedPath": "raw/pages/66515ad7f057.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 36
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/hypotheek-bank-bv-aflossen.html",
+      "depth": 1,
+      "title": "Hypotheek uit de eigen bv, van de bank of aflossen",
+      "storedPath": "raw/pages/5e8fca270e55.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 37
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/hypotheek-bv-kasrondje.html",
+      "depth": 1,
+      "title": "Hypotheek uit eigen bv - kasrondje in de toekomst",
+      "storedPath": "raw/pages/1322dfbeba87.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 35
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/winst-vermogen-bv-naar-prive.html",
+      "depth": 1,
+      "title": "Winst of vermogen uit de bv naar privé - wat houdt u netto over?",
+      "storedPath": "raw/pages/3c767ea9c43c.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 35
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/vermogen-uit-bv-naar-prive.html",
+      "depth": 1,
+      "title": "Box 2 dividend plannen - vermogen uit de bv naar privé",
+      "storedPath": "raw/pages/84e77b324a26.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 35
+    },
+    {
+      "url": "https://www.externe-bron.nl/modules/ondernemen/vermogensopbouw-in-bv-of-prive.html",
+      "depth": 1,
+      "title": "Vermogensopbouw dga in bv en privé berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/38e0d0d56f89.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 38
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/odv-oprenting-uitstelfase.html",
+      "depth": 1,
+      "title": "ODV oudedagsverplichting • oprenting in uitstelfase",
+      "storedPath": "raw/pages/96b5796ab45c.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 37
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/odv-uitkeringen-uitkeringsfase.html",
+      "depth": 1,
+      "title": "ODV oudedagsverplichting • uitkeringen in uitkeringsfase",
+      "storedPath": "raw/pages/7d36a4f4ac67.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 37
+    },
+    {
+      "url": "https://www.externe-bron.nl/modules/ondernemen/vennootschapsbelasting.html",
+      "depth": 1,
+      "title": "Vennootschapsbelasting (vpb) berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/83c8ee9b6ab4.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 34
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/box-2-belasting.html",
+      "depth": 1,
+      "title": "Box 2 belasting berekenen bij een dividenduitkering",
+      "storedPath": "raw/pages/65034e91ee6d.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 35
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/box-2-belastingdruk.html",
+      "depth": 1,
+      "title": "Box 2 belastingdruk bij verschillende dividenduitkeringen",
+      "storedPath": "raw/pages/6643052fecb3.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 36
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/box-2-marginale-belastingdruk-extra-dividend.html",
+      "depth": 1,
+      "title": "Box 2 marginale belastingdruk op extra dividend",
+      "storedPath": "raw/pages/7c0c14bc28c5.html",
+      "inlineScriptCount": 4,
+      "externalScriptCount": 7,
+      "linkCount": 37
+    },
+    {
+      "url": "https://www.externe-bron.nl/modules/ondernemen/betalingskorting-bij-vooruit-betalen.html",
+      "depth": 1,
+      "title": "Betalingskorting bij vooruit betalen in plaats van betalen in termijnen",
+      "storedPath": "raw/pages/6a2313acdb8f.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 34
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/aantal-werkdagen-berekenen.html",
+      "depth": 1,
+      "title": "Aantal werkdagen berekenen in een periode | ExterneBron.nl",
+      "storedPath": "raw/pages/ab8054e67db4.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 34
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/loonkosten-werkgever.html",
+      "depth": 1,
+      "title": "Loonkosten voor de werkgever berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/391206dd8a73.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 34
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/wkr-vrije-ruimte.html",
+      "depth": 1,
+      "title": "Vrije ruimte werkkostenregeling (WKR) berekenen",
+      "storedPath": "raw/pages/3258290e5e55.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 34
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/verkoopprijs.html",
+      "depth": 1,
+      "title": "Verkoopprijs berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/6187161268ec.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 37
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/inkoopprijs.html",
+      "depth": 1,
+      "title": "Inkoopprijs berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/2986e9a084e1.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 38
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/winstmarge-product.html",
+      "depth": 1,
+      "title": "Winstmarge berekenen | ExterneBron.nl | ExterneBron.nl",
+      "storedPath": "raw/pages/ad7fd9c77ee6.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 41
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/winstmarge-product-webwinkel.html",
+      "depth": 1,
+      "title": "Winstmarge berekenen bij verkoop via een webwinkel",
+      "storedPath": "raw/pages/54013837508e.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 34
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/winstmarge-omrekenen.html",
+      "depth": 1,
+      "title": "Winstmarge over inkoopprijs of in verkoopprijs omrekenen",
+      "storedPath": "raw/pages/891a2abd3fe5.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 35
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/winstmarge-na-korting-geven.html",
+      "depth": 1,
+      "title": "Winst en winstmarge na korting geven | ExterneBron.nl",
+      "storedPath": "raw/pages/db0302ecf456.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 37
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/gewogen-gemiddelde-kosten-kapitaal.html",
+      "depth": 1,
+      "title": "WACC - Gewogen gemiddelde kosten van kapitaal berekenen",
+      "storedPath": "raw/pages/2a8c15e68c47.html",
+      "inlineScriptCount": 8,
+      "externalScriptCount": 7,
+      "linkCount": 38
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/vrije-kasstroom.html",
+      "depth": 1,
+      "title": "Vrije kasstroom (cashflow) onderneming berekenen",
+      "storedPath": "raw/pages/89c64d6397e2.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 36
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/btw.html",
+      "depth": 1,
+      "title": "Btw berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/1d0eda58de1e.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 36
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/prijswijziging-na-btw-wijziging.html",
+      "depth": 1,
+      "title": "Prijswijziging na btw-tarief wijziging | ExterneBron.nl",
+      "storedPath": "raw/pages/191002c21f2a.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 36
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/btw-aangifte-berekenen.html",
+      "depth": 1,
+      "title": "Btw aangifte berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/96bb21aa635a.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 36
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/btw-aftrek-deels-vrijgestelde-omzet.html",
+      "depth": 1,
+      "title": "Btw-aftrek bij deels voor de btw vrijgestelde omzet",
+      "storedPath": "raw/pages/83564a5ed1d7.html",
+      "inlineScriptCount": 4,
+      "externalScriptCount": 7,
+      "linkCount": 36
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/btw-aftrek-herziening.html",
+      "depth": 1,
+      "title": "Herziening van btw-aftrek bij deels vrijgestelde omzet",
+      "storedPath": "raw/pages/b28b5f6ee696.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 36
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/mkb-winstvrijstelling-ondernemersaftrek.html",
+      "depth": 1,
+      "title": "Mkb-winstvrijstelling en ondernemersaftrek berekenen",
+      "storedPath": "raw/pages/8abb3f07eb5a.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 37
+    },
+    {
+      "url": "https://www.externe-bron.nl/ondernemen/investeringsaftrek-kia.html",
+      "depth": 1,
+      "title": "Investeringsaftrek KIA berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/c661693df94e.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 33
+    },
+    {
+      "url": "https://www.externe-bron.nl/pensioen/bruto-netto-pensioen-met-inkomen.html",
+      "depth": 1,
+      "title": "Bruto-netto pensioen + inkomen | ExterneBron.nl",
+      "storedPath": "raw/pages/2eceeb4306f1.html",
+      "inlineScriptCount": 10,
+      "externalScriptCount": 7,
+      "linkCount": 40
+    },
+    {
+      "url": "https://www.externe-bron.nl/pensioen/bruto-netto-vroegpensioen-inkomen.html",
+      "depth": 1,
+      "title": "Bruto-netto vroegpensioen (+ ander inkomen) | ExterneBron.nl",
+      "storedPath": "raw/pages/c3f6ca8c7619.html",
+      "inlineScriptCount": 10,
+      "externalScriptCount": 7,
+      "linkCount": 39
+    },
+    {
+      "url": "https://www.externe-bron.nl/pensioen/bruto-netto-eerste-pensioenjaar.html",
+      "depth": 1,
+      "title": "Bruto-netto inkomen in het eerste pensioenjaar",
+      "storedPath": "raw/pages/c52d7487b066.html",
+      "inlineScriptCount": 13,
+      "externalScriptCount": 7,
+      "linkCount": 36
+    },
+    {
+      "url": "https://www.externe-bron.nl/pensioen/rvu-regeling-netto-inkomensdaling.html",
+      "depth": 1,
+      "title": "RVU-regeling - netto inkomensdaling | ExterneBron.nl",
+      "storedPath": "raw/pages/9bd3fa6f26a0.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 33
+    },
+    {
+      "url": "https://www.externe-bron.nl/pensioen/doorwerken-na-uw-pensioen.html",
+      "depth": 1,
+      "title": "Doorwerken na uw pensioen • netto inkomen voor en na",
+      "storedPath": "raw/pages/cb1734246f7d.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 32
+    },
+    {
+      "url": "https://www.externe-bron.nl/pensioen/bruto-netto-aow-pensioen.html",
+      "depth": 1,
+      "title": "Bruto-netto AOW & pensioen | ExterneBron.nl",
+      "storedPath": "raw/pages/82ecdf0a7256.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 41
+    },
+    {
+      "url": "https://www.externe-bron.nl/pensioen/netto-aow-pensioen-lijfrente-uitkering.html",
+      "depth": 1,
+      "title": "Netto AOW-, pensioen- of lijfrente-uitkering | ExterneBron.nl",
+      "storedPath": "raw/pages/f1c81cb718d7.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 41
+    },
+    {
+      "url": "https://www.externe-bron.nl/pensioen/netto-nabestaandenpensioen.html",
+      "depth": 1,
+      "title": "Netto nabestaandenpensioen of Anw-uitkering | ExterneBron.nl",
+      "storedPath": "raw/pages/0ad0658dd5b4.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 34
+    },
+    {
+      "url": "https://www.externe-bron.nl/pensioen/hoogte-aow-uitkering.html",
+      "depth": 1,
+      "title": "Hoogte AOW-uitkering berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/ee24be07efb6.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 39
+    },
+    {
+      "url": "https://www.externe-bron.nl/pensioen/overbruggingsuitkering-aow.html",
+      "depth": 1,
+      "title": "Overbruggingsuitkering AOW berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/34886b1f8a89.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 35
+    },
+    {
+      "url": "https://www.externe-bron.nl/pensioen/aow-leeftijd.html",
+      "depth": 1,
+      "title": "AOW-leeftijd en AOW-datum berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/b41defc5f9e6.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 35
+    },
+    {
+      "url": "https://www.externe-bron.nl/pensioen/resterende-levensverwachting.html",
+      "depth": 1,
+      "title": "Resterende levensverwachting berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/b47c2961f423.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 33
+    },
+    {
+      "url": "https://www.externe-bron.nl/pensioen/levensverwachting.html",
+      "depth": 1,
+      "title": "Levensverwachting bij geboorte | ExterneBron.nl",
+      "storedPath": "raw/pages/d807c9b7c0f9.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 33
+    },
+    {
+      "url": "https://www.externe-bron.nl/pensioen/pensioen-aanvullen-jaarruimte-en-reserveringsruimte.html",
+      "depth": 1,
+      "title": "Pensioen aanvullen • jaarruimte + reserveringsruimte",
+      "storedPath": "raw/pages/e41bc645e572.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 37
+    },
+    {
+      "url": "https://www.externe-bron.nl/pensioen/jaarruimte-belastingteruggave.html",
+      "depth": 1,
+      "title": "Jaarruimte & belastingteruggave berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/18cffeaeb99c.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 38
+    },
+    {
+      "url": "https://www.externe-bron.nl/pensioen/pensioengat-reserveringsruimte.html",
+      "depth": 1,
+      "title": "Pensioengat - Reserveringsruimte berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/0d8bcfad4b12.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 37
+    },
+    {
+      "url": "https://www.externe-bron.nl/pensioen/pensioenkorting-netto-pensioen.html",
+      "depth": 1,
+      "title": "Netto pensioen na pensioenkorting | ExterneBron.nl",
+      "storedPath": "raw/pages/4cba23c5d846.html",
+      "inlineScriptCount": 13,
+      "externalScriptCount": 7,
+      "linkCount": 33
+    },
+    {
+      "url": "https://www.externe-bron.nl/pensioen/sparen-aanvullend-pensioen.html",
+      "depth": 1,
+      "title": "Sparen voor een aanvullend pensioen | ExterneBron.nl",
+      "storedPath": "raw/pages/201c0bd649ec.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 34
+    },
+    {
+      "url": "https://www.externe-bron.nl/pensioen/aanvullend-pensioen-berekenen.html",
+      "depth": 1,
+      "title": "Aanvullend pensioen berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/b886a93f1aca.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 34
+    },
+    {
+      "url": "https://www.externe-bron.nl/pensioen/pensioensparen-vs-box3-sparen.html",
+      "depth": 1,
+      "title": "Pensioensparen/beleggen of sparen/beleggen in box 3",
+      "storedPath": "raw/pages/3895b8f4b42d.html",
+      "inlineScriptCount": 4,
+      "externalScriptCount": 7,
+      "linkCount": 32
+    },
+    {
+      "url": "https://www.externe-bron.nl/pensioen/pensioenstorting-belastingaftrek.html",
+      "depth": 1,
+      "title": "Pensioenstorting - belastingaftrek & belastingteruggave",
+      "storedPath": "raw/pages/d24dfa13e564.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 35
+    },
+    {
+      "url": "https://www.externe-bron.nl/pensioen/extra-pensioenuitkering-bruto-netto.html",
+      "depth": 1,
+      "title": "Extra pensioenuitkering • bruto-netto | ExterneBron.nl",
+      "storedPath": "raw/pages/b19c3984a893.html",
+      "inlineScriptCount": 10,
+      "externalScriptCount": 7,
+      "linkCount": 35
+    },
+    {
+      "url": "https://www.externe-bron.nl/pensioen/banksparen-pensioen.html",
+      "depth": 1,
+      "title": "Banksparen voor Pensioen - Vermogensopbouw | ExterneBron.nl",
+      "storedPath": "raw/pages/de9cde6d2515.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 39
+    },
+    {
+      "url": "https://www.externe-bron.nl/pensioen/ouderenkorting.html",
+      "depth": 1,
+      "title": "Ouderenkorting berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/a6a198df19cd.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 37
+    },
+    {
+      "url": "https://www.externe-bron.nl/pensioen/pensioenuitkering-berekenen.html",
+      "depth": 1,
+      "title": "Pensioenuitkering berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/5a22f84d1b17.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 33
+    },
+    {
+      "url": "https://www.externe-bron.nl/pensioen/pensioenwaarde-berekenen-uit-pensioenuitkering.html",
+      "depth": 1,
+      "title": "Pensioenwaarde berekenen uit pensioenuitkering",
+      "storedPath": "raw/pages/d3b931b01f98.html",
+      "inlineScriptCount": 4,
+      "externalScriptCount": 7,
+      "linkCount": 33
+    },
+    {
+      "url": "https://www.externe-bron.nl/pensioen/uitkeringen-lijfrenteverzekering.html",
+      "depth": 1,
+      "title": "Uitkeringen lijfrenteverzekering - lijfrente uitkeren",
+      "storedPath": "raw/pages/2ac8071a7d4c.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 41
+    },
+    {
+      "url": "https://www.externe-bron.nl/pensioen/uitkeringen-bancaire-lijfrente.html",
+      "depth": 1,
+      "title": "Uitkeringen bancaire lijfrente - banksparen uitkeren",
+      "storedPath": "raw/pages/51c682c9fbf4.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 41
+    },
+    {
+      "url": "https://www.externe-bron.nl/kinderen/betaald-ouderschapsverlof-berekenen.html",
+      "depth": 1,
+      "title": "Betaald ouderschapsverlof - wat kost dat netto?",
+      "storedPath": "raw/pages/2240d3f261af.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 32
+    },
+    {
+      "url": "https://www.externe-bron.nl/kinderen/aanvullend-partnerverlof-berekenen.html",
+      "depth": 1,
+      "title": "Aanvullend partnerverlof berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/4f71f61892bc.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 31
+    },
+    {
+      "url": "https://www.externe-bron.nl/kinderen/kinderbijslag-berekenen.html",
+      "depth": 1,
+      "title": "Kinderbijslag berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/da1d0acaf8f1.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 31
+    },
+    {
+      "url": "https://www.externe-bron.nl/kinderen/kosten-kinderopvang.html",
+      "depth": 1,
+      "title": "Kosten kinderopvang berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/63fe16b42c92.html",
+      "inlineScriptCount": 12,
+      "externalScriptCount": 7,
+      "linkCount": 36
+    },
+    {
+      "url": "https://www.externe-bron.nl/gezin-en-relatie/kosten-trouwen-bruiloft-berekenen.html",
+      "depth": 1,
+      "title": "Trouwen en een bruiloft - kosten berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/c9709302c932.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 35
+    },
+    {
+      "url": "https://www.externe-bron.nl/gezin-en-relatie/kinderalimentatie-berekenen.html",
+      "depth": 1,
+      "title": "Kinderalimentatie berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/2e96ef9572c2.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 33
+    },
+    {
+      "url": "https://www.externe-bron.nl/gezin-en-relatie/partneralimentatie.html",
+      "depth": 1,
+      "title": "Partneralimentatie berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/be6c5eda6127.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 34
+    },
+    {
+      "url": "https://www.externe-bron.nl/gezin-en-relatie/alimentatie-indexering.html",
+      "depth": 1,
+      "title": "Indexering alimentatie 2026 | ExterneBron.nl",
+      "storedPath": "raw/pages/e88ea0c4073f.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 33
+    },
+    {
+      "url": "https://www.externe-bron.nl/gezin-en-relatie/gesubsidieerde-rechtsbijstand.html",
+      "depth": 1,
+      "title": "Gesubsidieerde rechtsbijstand - heeft u recht op een toevoeging?",
+      "storedPath": "raw/pages/d47322a5ca95.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 31
+    },
+    {
+      "url": "https://www.externe-bron.nl/gezin-en-relatie/eigen-bijdrage-wmo.html",
+      "depth": 1,
+      "title": "Wmo - Toekomstige eigen bijdrage Wmo-ondersteuning",
+      "storedPath": "raw/pages/ca3ab66d58b2.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 31
+    },
+    {
+      "url": "https://www.externe-bron.nl/gezin-en-relatie/vergoedingsrecht-binnen-huwelijk.html",
+      "depth": 1,
+      "title": "Vergoedingsrecht binnen een huwelijk | ExterneBron.nl",
+      "storedPath": "raw/pages/4114970ce147.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 31
+    },
+    {
+      "url": "https://www.externe-bron.nl/gezin-en-relatie/partner-uitkopen-woning.html",
+      "depth": 1,
+      "title": "Partner uitkopen uit eigen woning bij scheiden",
+      "storedPath": "raw/pages/48a520e2cfb4.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 41
+    },
+    {
+      "url": "https://www.externe-bron.nl/wonen/energiekosten-berekenen.html",
+      "depth": 1,
+      "title": "Energiekosten - prijswijziging, energiebelasting & besparingen doorrekenen",
+      "storedPath": "raw/pages/94d9f452b83c.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 35
+    },
+    {
+      "url": "https://www.externe-bron.nl/wonen/energiekosten-elektrisch-apparaat.html",
+      "depth": 1,
+      "title": "Elektriciteitskosten apparaat berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/eee927c3a413.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 33
+    },
+    {
+      "url": "https://www.externe-bron.nl/wonen/stijging-energiekosten-berekenen.html",
+      "depth": 1,
+      "title": "Stijging energiekosten berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/4f64956e3063.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 35
+    },
+    {
+      "url": "https://www.externe-bron.nl/wonen/energiebesparing-raam-isoleren.html",
+      "depth": 1,
+      "title": "Ramen isoleren met hr++ glas - energiebesparing",
+      "storedPath": "raw/pages/84a5d7d8acea.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 38
+    },
+    {
+      "url": "https://www.externe-bron.nl/wonen/zonnepanelen-terugverdientijd-berekenen.html",
+      "depth": 1,
+      "title": "Zonnepanelen - terugverdientijd berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/e9f0fc4bd2e3.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 34
+    },
+    {
+      "url": "https://www.externe-bron.nl/wonen/warmtepomp-besparing-terugverdientijd-berekenen.html",
+      "depth": 1,
+      "title": "Warmtepomp - besparing & terugverdientijd berekenen",
+      "storedPath": "raw/pages/f7baa4854c3b.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 37
+    },
+    {
+      "url": "https://www.externe-bron.nl/wonen/buitenunit-warmtepomp-airco-geluidsniveau-op-afstand.html",
+      "depth": 1,
+      "title": "Buitenunit warmtepomp/airco - geluidsniveau op afstand",
+      "storedPath": "raw/pages/fbe8c67066a2.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 34
+    },
+    {
+      "url": "https://www.externe-bron.nl/wonen/buitenunit-warmtepomp-airco-minimale-afstand-tot-erfgrens.html",
+      "depth": 1,
+      "title": "Buitenunit warmtepomp/airco • minimale afstand erfgrens",
+      "storedPath": "raw/pages/c1aae457d598.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 34
+    },
+    {
+      "url": "https://www.externe-bron.nl/wonen/verduurzamen-terugverdientijd-berekenen.html",
+      "depth": 1,
+      "title": "Woning verduurzamen - terugverdientijd berekenen",
+      "storedPath": "raw/pages/77ca956ebaab.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 34
+    },
+    {
+      "url": "https://www.externe-bron.nl/klimaat/maatschappelijke-kosten-co2-woonwerkverkeer.html",
+      "depth": 1,
+      "title": "Maatschappelijke kosten CO2-uitstoot woon-werkverkeer",
+      "storedPath": "raw/pages/15276a03a1e3.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 33
+    },
+    {
+      "url": "https://www.externe-bron.nl/klimaat/maatschappelijke-kosten-co2-uitstoot-vakantiereis.html",
+      "depth": 1,
+      "title": "CO2-uitstoot & maatschappelijke kosten van een vakantiereis",
+      "storedPath": "raw/pages/1ff1b1186585.html",
+      "inlineScriptCount": 7,
+      "externalScriptCount": 7,
+      "linkCount": 34
+    },
+    {
+      "url": "https://www.externe-bron.nl/klimaat/maatschappelijke-kosten-co2-uitstoot-cruise-vakantie.html",
+      "depth": 1,
+      "title": "CO2-uitstoot & maatschappelijke kosten van een cruise vakantie",
+      "storedPath": "raw/pages/32b1259789da.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 34
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek/maximale-hypotheek-berekenen.html",
+      "depth": 1,
+      "title": "Maximale hypotheek berekenen | Eerlijk en onafhankelijk",
+      "storedPath": "raw/pages/b0f47c413c74.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 46
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek/hogere-maximale-hypotheek-met-renteconstructie.html",
+      "depth": 1,
+      "title": "Hogere maximale hypotheek met slimme renteconstructie",
+      "storedPath": "raw/pages/66efdfb697c2.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 42
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek/maximale-hypotheek-ondernemer.html",
+      "depth": 1,
+      "title": "Maximale hypotheek ondernemer, zzp'er of DGA | ExterneBron.nl",
+      "storedPath": "raw/pages/c5bf77d74bc2.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 41
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek/maximale-erfpacht-hypotheek.html",
+      "depth": 1,
+      "title": "Maximale hypotheek met erfpacht berekenen, ook met NHG",
+      "storedPath": "raw/pages/341777d20aca.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 40
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek/maximale-verhuurhypotheek.html",
+      "depth": 1,
+      "title": "Maximale verhuurhypotheek - huis verhuren | ExterneBron.nl",
+      "storedPath": "raw/pages/878e497b5f0a.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 41
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek/maximale-hypotheek-uit-maandlasten.html",
+      "depth": 1,
+      "title": "Maximale hypotheek uit netto maandlasten berekenen",
+      "storedPath": "raw/pages/b2037a82f752.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 41
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek/maximale-hypotheek-na-verhuizen.html",
+      "depth": 1,
+      "title": "Maximale hypotheek na verhuizen | ExterneBron.nl",
+      "storedPath": "raw/pages/7c2e1a668a4f.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 42
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek/actuele-hypotheekrente.html",
+      "depth": 1,
+      "title": "Actuele hypotheekrente | ExterneBron.nl",
+      "storedPath": "raw/pages/8a5f41efcdee.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 39
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek-en-wonen/huis-kopen-hoeveel-eigen-geld.html",
+      "depth": 1,
+      "title": "Huis kopen - hoeveel eigen geld heeft u nodig?",
+      "storedPath": "raw/pages/87779ba28d3c.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 42
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek-en-wonen/kan-ik-dat-huis-betalen.html",
+      "depth": 1,
+      "title": "Kan ik dat huis betalen? | ExterneBron.nl",
+      "storedPath": "raw/pages/1cf9b3435dca.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 42
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek-en-wonen/maximale-huizenprijs.html",
+      "depth": 1,
+      "title": "Maximale huizenprijs | ExterneBron.nl",
+      "storedPath": "raw/pages/745dd9c14fc1.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 42
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek/huis-kopen-kosten-koper.html",
+      "depth": 1,
+      "title": "Huis kopen - kosten koper berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/d48ba23ee217.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 39
+    },
+    {
+      "url": "https://www.externe-bron.nl/modules/wonen/huren-of-kopen.html",
+      "depth": 1,
+      "title": "Huren of kopen | ExterneBron.nl",
+      "storedPath": "raw/pages/915304ed6663.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 41
+    },
+    {
+      "url": "https://www.externe-bron.nl/wonen-en-hypotheek/woning-waarde-huizenprijzen.html",
+      "depth": 1,
+      "title": "Huizenprijzen - prijsontwikkeling huizenmarkt | ExterneBron.nl",
+      "storedPath": "raw/pages/b6892891d3a9.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 41
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek/hypotheek-netto-maandlasten.html",
+      "depth": 1,
+      "title": "Hypotheek maandlasten berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/e7c1ade60a1b.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 45
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek/hypotheek-netto-maandlasten-rentewijziging.html",
+      "depth": 1,
+      "title": "Hypotheek maandlasten na hypotheekrente wijziging",
+      "storedPath": "raw/pages/78d6804967f6.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 41
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek/hypotheek-maandlasten-tijdens-bouw.html",
+      "depth": 1,
+      "title": "Hypotheek maandlasten tijdens de bouw | ExterneBron.nl",
+      "storedPath": "raw/pages/b5515b312dc1.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 38
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek/totale-kosten-hypotheek.html",
+      "depth": 1,
+      "title": "Hypotheek - totale netto kosten berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/e5caf6efd148.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 41
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek/rentevaste-periodes-vergelijken.html",
+      "depth": 1,
+      "title": "Hypotheek rentevaste periodes vergelijken | ExterneBron.nl",
+      "storedPath": "raw/pages/597e577df566.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 38
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek/kosten-hypotheekvormen.html",
+      "depth": 1,
+      "title": "Kosten verschillende hypotheekvormen | ExterneBron.nl",
+      "storedPath": "raw/pages/50da8bef2b4c.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 39
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek/risico-opslag-hypotheekrente-bij-aflossen.html",
+      "depth": 1,
+      "title": "Dalende risico opslag in hypotheekrente bij aflossen",
+      "storedPath": "raw/pages/7cf99767c47e.html",
+      "inlineScriptCount": 7,
+      "externalScriptCount": 7,
+      "linkCount": 39
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek/looptijdrente-berekenen.html",
+      "depth": 1,
+      "title": "Looptijdrente berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/2dc32b2c3e07.html",
+      "inlineScriptCount": 7,
+      "externalScriptCount": 7,
+      "linkCount": 39
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek/maandlasten-annuiteitenhypotheek.html",
+      "depth": 1,
+      "title": "Maandlasten annuïteitenhypotheek berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/03ead9e95291.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 43
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek/maandlasten-lineaire-hypotheek.html",
+      "depth": 1,
+      "title": "Maandlasten lineaire hypotheek berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/ce975eca791c.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 43
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek-en-wonen/netto-maandlasten-annuiteitenhypotheek.html",
+      "depth": 1,
+      "title": "Stijging maandlasten annuïteitenhypotheek | ExterneBron.nl",
+      "storedPath": "raw/pages/c49e89320e7c.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 40
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek/hypotheek-oversluiten.html",
+      "depth": 1,
+      "title": "Hypotheek oversluiten - nieuwe maandlasten en terugverdienen",
+      "storedPath": "raw/pages/959554b85a74.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 39
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek/hypotheek-meenemen-bij-verhuizen.html",
+      "depth": 1,
+      "title": "Hypotheek met huidige rente meenemen bij verhuizen",
+      "storedPath": "raw/pages/5815362a4bb7.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 40
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek/boeterente-berekenen.html",
+      "depth": 1,
+      "title": "Boeterente berekenen bij oversluiten hypotheek",
+      "storedPath": "raw/pages/6cdc1f941005.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 40
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek/maximale-boetevrije-hypotheekaflossing.html",
+      "depth": 1,
+      "title": "Maximale boetevrije hypotheekaflossing | ExterneBron.nl",
+      "storedPath": "raw/pages/688c107b6fe2.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 39
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek/rentemiddeling.html",
+      "depth": 1,
+      "title": "Rentemiddeling - bereken uw hypotheekrente na rentemiddeling",
+      "storedPath": "raw/pages/f4a7bafa3ad3.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 42
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek/rentemiddeling-boeterente.html",
+      "depth": 1,
+      "title": "Rentemiddeling - hoeveel boeterente zit er in verwerkt?",
+      "storedPath": "raw/pages/53b92cb077a0.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 42
+    },
+    {
+      "url": "https://www.externe-bron.nl/modules/wonen/hypotheek-aflossen-of-niet.html",
+      "depth": 1,
+      "title": "Hypotheek aflossen of niet | ExterneBron.nl",
+      "storedPath": "raw/pages/3a2dfb53d032.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 41
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek/hypotheek-aflossen-lagere-maandlasten.html",
+      "depth": 1,
+      "title": "Hypotheek extra aflossen voor lagere maandlasten",
+      "storedPath": "raw/pages/07b1d8a85d7d.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 41
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek/hypotheek-aflossen-lagere-rente.html",
+      "depth": 1,
+      "title": "Hypotheek deels aflossen voor lagere rente | ExterneBron.nl",
+      "storedPath": "raw/pages/06d690665717.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 42
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek-en-wonen/aflossingsvrije-hypotheek-aflossen.html",
+      "depth": 1,
+      "title": "Aflossingsvrije hypotheek aflossen - tussentijds aflossen",
+      "storedPath": "raw/pages/d1be8b157d98.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 40
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek-en-wonen/hypotheek-aflossen-ipv-sparen.html",
+      "depth": 1,
+      "title": "Hypotheek aflossen in plaats van sparen | ExterneBron.nl",
+      "storedPath": "raw/pages/e2c78654352e.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 43
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek/aflosboete-berekenen.html",
+      "depth": 1,
+      "title": "Hypotheek - Aflosboete Wet Hillen berekenen | ExterneBron.nl",
+      "storedPath": "raw/pages/57d9c8f73866.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 38
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek-en-wonen/hypotheek-aflossen-huis-onder-water.html",
+      "depth": 1,
+      "title": "Hypotheek aflossen als huis onder water staat | ExterneBron.nl",
+      "storedPath": "raw/pages/533615773dd3.html",
+      "inlineScriptCount": 5,
+      "externalScriptCount": 7,
+      "linkCount": 40
+    },
+    {
+      "url": "https://www.externe-bron.nl/hypotheek/restschuld-eigen-woning.html",
+      "depth": 1,
+      "title": "Restschuld eigen woning berekenen & aflossen | ExterneBron.nl",
+      "storedPath": "raw/pages/573b9e778463.html",
+      "inlineScriptCount": 6,
+      "externalScriptCount": 7,
+      "linkCount": 38
+    }
+  ],
+  "candidates": [
+    {
+      "source": "https://www.externe-bron.nl/hypotheek/hypotheek-oversluiten.html#inline-script",
+      "line": 19,
+      "score": 19,
+      "snippet": "jQuery('#tkm-itm-boetevrijPercentage' + id).show(300);\n            jQuery('#tkm-itm-vergelijkingsrente' + id).show(300);\n            if (jQuery('#hypotheekvorm' + id).val() == 'spr') {\n                jQuery('#tkm-itm-spaarkapitaal' + id).show(300);\n                jQuery('#tkm-itm-spaarpremie' + id).show(300);",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/hypotheek/hypotheek-oversluiten.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/inkomen/verzamelinkomen-berekenen.html#inline-script",
+      "line": 97,
+      "score": 17,
+      "snippet": "let jr = jQuery('#belastingjaar').val();\n    jQuery('#tkm-itm-box3vermogen')[(jr < 2021)? 'show' : 'hide'](300);\n    jQuery('#tkm-itm-box3spaargeld')[(jr >= 2021)? 'show' : 'hide'](300);\n    jQuery('#tkm-itm-box3beleggingen')[(jr >= 2021)? 'show' : 'hide'](300);\n    jQuery('#tkm-itm-box3leningen')[(jr >= 2021)? 'show' : 'hide'](300);",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/inkomen/verzamelinkomen-berekenen.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/hypotheek/totale-kosten-hypotheek.html#inline-script",
+      "line": 11,
+      "score": 17,
+      "snippet": "jQuery('#tkm-itm-hypotheeklening2')[(dln > '1')? 'show' : 'hide'](300);\n    jQuery('#tkm-itm-looptijd2')[(dln > '1')? 'show' : 'hide'](300);\n    jQuery('#tkm-itm-rendement2')[(dln > '1' && jQuery('#hypotheekvorm2').val() === 'bel')? 'show' : 'hide'](300);\n    jQuery('#tkm-itm-nieuweRente2')[(dln > '1')? 'show' : 'hide'](300);",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/hypotheek/totale-kosten-hypotheek.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/hypotheek/totale-kosten-hypotheek.html#inline-script",
+      "line": 18,
+      "score": 17,
+      "snippet": "jQuery('#tkm-itm-hypotheeklening3')[(dln > '2')? 'show' : 'hide'](300);\n    jQuery('#tkm-itm-looptijd3')[(dln > '2')? 'show' : 'hide'](300);\n    jQuery('#tkm-itm-rendement3')[(dln > '2' && jQuery('#hypotheekvorm3').val() === 'bel')? 'show' : 'hide'](300);\n    jQuery('#tkm-itm-nieuweRente3')[(dln > '2')? 'show' : 'hide'](300);\n}",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/hypotheek/totale-kosten-hypotheek.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/hypotheek/hypotheek-meenemen-bij-verhuizen.html#inline-script",
+      "line": 11,
+      "score": 17,
+      "snippet": "jQuery('#tkm-itm-hypotheeklening2')[(dln > '1')? 'show' : 'hide'](300);\n    jQuery('#tkm-itm-looptijd2')[(dln > '1')? 'show' : 'hide'](300);\n    jQuery('#tkm-itm-rendement2')[(dln > '1' && jQuery('#hypotheekvorm2').val() === 'bel')? 'show' : 'hide'](300);\n    jQuery('#tkm-itm-nieuweRente2')[(dln > '1')? 'show' : 'hide'](300);",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/hypotheek/hypotheek-meenemen-bij-verhuizen.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/hypotheek/hypotheek-meenemen-bij-verhuizen.html#inline-script",
+      "line": 18,
+      "score": 17,
+      "snippet": "jQuery('#tkm-itm-hypotheeklening3')[(dln > '2')? 'show' : 'hide'](300);\n    jQuery('#tkm-itm-looptijd3')[(dln > '2')? 'show' : 'hide'](300);\n    jQuery('#tkm-itm-rendement3')[(dln > '2' && jQuery('#hypotheekvorm3').val() === 'bel')? 'show' : 'hide'](300);\n    jQuery('#tkm-itm-nieuweRente3')[(dln > '2')? 'show' : 'hide'](300);\n}",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/hypotheek/hypotheek-meenemen-bij-verhuizen.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/inkomen/verzamelinkomen-berekenen.html#inline-script",
+      "line": 98,
+      "score": 14,
+      "snippet": "jQuery('#tkm-itm-box3vermogen')[(jr < 2021)? 'show' : 'hide'](300);\n    jQuery('#tkm-itm-box3spaargeld')[(jr >= 2021)? 'show' : 'hide'](300);\n    jQuery('#tkm-itm-box3beleggingen')[(jr >= 2021)? 'show' : 'hide'](300);\n    jQuery('#tkm-itm-box3leningen')[(jr >= 2021)? 'show' : 'hide'](300);\n}",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/inkomen/verzamelinkomen-berekenen.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/gezin-en-relatie/gesubsidieerde-rechtsbijstand.html#inline-script",
+      "line": 8,
+      "score": 13,
+      "snippet": "e = jQuery('#tkm-itm-inkomenPartner label');\n    \te.html(e.html().replace(/(20\\d\\d|%s)/, String(yr-2)));\n        e = jQuery('#tkm-itm-box3 label');\n    \te.html(e.html().replace(/(20\\d\\d|%s)/, String(yr-2)));\n    }",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/gezin-en-relatie/gesubsidieerde-rechtsbijstand.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/hypotheek/hypotheek-oversluiten.html#inline-script",
+      "line": 9,
+      "score": 13,
+      "snippet": "jQuery('#tkm-itm-rendement' + id).hide(300);\n        }\n        if (jQuery('#boeterenteBekend' + id).val() == 'y') {\n            jQuery('#tkm-itm-boeterente' + id).show(300);\n            jQuery('#tkm-itm-boetevrijPercentage' + id).hide(300);",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/hypotheek/hypotheek-oversluiten.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/inkomen/belasting-box1-verschil.html#inline-script",
+      "line": 141,
+      "score": 12,
+      "snippet": "jQuery('#tkm-itm-eigenwoning').show(300);\n        let ew = jQuery('#eigenwoning').val();\n        jQuery('#tkm-itm-hypotheekrenteaftrek')[(ew === 'y')? 'show' : 'hide'](300);\n        jQuery('#tkm-itm-wozwaarde')[(ew === 'y')? 'show' : 'hide'](300);\n    }",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/inkomen/belasting-box1-verschil.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/werk-en-inkomen/box1-belastingdruk-berekenen.html#inline-script",
+      "line": 92,
+      "score": 12,
+      "snippet": "jQuery('#tkm-itm-eigenwoning').show(300);\n        let ew = jQuery('#eigenwoning').val();\n        jQuery('#tkm-itm-hypotheekrenteaftrek')[(ew === 'y')? 'show' : 'hide'](300);\n        jQuery('#tkm-itm-wozwaarde')[(ew === 'y')? 'show' : 'hide'](300);\n    }",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/werk-en-inkomen/box1-belastingdruk-berekenen.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/inkomen/verzamelinkomen-berekenen.html#inline-script",
+      "line": 82,
+      "score": 12,
+      "snippet": "jQuery('#tkm-itm-eigenwoning').show(300);\n        let ew = jQuery('#eigenwoning').val();\n        jQuery('#tkm-itm-hypotheekrenteaftrek')[(ew === 'y')? 'show' : 'hide'](300);\n        jQuery('#tkm-itm-wozwaarde')[(ew === 'y')? 'show' : 'hide'](300);\n    }",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/inkomen/verzamelinkomen-berekenen.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/inkomen/toetsingsinkomen-berekenen.html#inline-script",
+      "line": 73,
+      "score": 12,
+      "snippet": "jQuery('#tkm-itm-eigenwoning').show(300);\n        let ew = jQuery('#eigenwoning').val();\n        jQuery('#tkm-itm-hypotheekrenteaftrek')[(ew === 'y')? 'show' : 'hide'](300);\n        jQuery('#tkm-itm-wozwaarde')[(ew === 'y')? 'show' : 'hide'](300);\n    }",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/inkomen/toetsingsinkomen-berekenen.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/werk-en-inkomen/algemene-heffingskorting.html#inline-script",
+      "line": 113,
+      "score": 12,
+      "snippet": "jQuery('#tkm-itm-eigenwoning').show(300);\n        let ew = jQuery('#eigenwoning').val();\n        jQuery('#tkm-itm-hypotheekrenteaftrek')[(ew === 'y')? 'show' : 'hide'](300);\n        jQuery('#tkm-itm-wozwaarde')[(ew === 'y')? 'show' : 'hide'](300);\n    }",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/werk-en-inkomen/algemene-heffingskorting.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/ondernemen/optimaal-inkomen-belastingdruk-dga.html#inline-script",
+      "line": 92,
+      "score": 12,
+      "snippet": "jQuery('#tkm-itm-eigenwoning').show(300);\n        let ew = jQuery('#eigenwoning').val();\n        jQuery('#tkm-itm-hypotheekrenteaftrek')[(ew === 'y')? 'show' : 'hide'](300);\n        jQuery('#tkm-itm-wozwaarde')[(ew === 'y')? 'show' : 'hide'](300);\n    }",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/ondernemen/optimaal-inkomen-belastingdruk-dga.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/pensioen/extra-pensioenuitkering-bruto-netto.html#inline-script",
+      "line": 66,
+      "score": 12,
+      "snippet": "jQuery('#tkm-itm-eigenwoning').show(300);\n        let ew = jQuery('#eigenwoning').val();\n        jQuery('#tkm-itm-hypotheekrenteaftrek')[(ew === 'y')? 'show' : 'hide'](300);\n        jQuery('#tkm-itm-wozwaarde')[(ew === 'y')? 'show' : 'hide'](300);\n    }",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/pensioen/extra-pensioenuitkering-bruto-netto.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/hypotheek/hypotheek-meenemen-bij-verhuizen.html#inline-script",
+      "line": 53,
+      "score": 12,
+      "snippet": "}\n                /*if (this.id === 'tkm-itm-rendementHd'+n) {\n                    j[(jQuery('#hypotheekvormHd'+n).val() === 'bel')? 'show' : 'hide'](300);\n                } else {\n                    if (this.id === 'tkm-itm-hypotheekleningHd'+n) {",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/hypotheek/hypotheek-meenemen-bij-verhuizen.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/hypotheek/hypotheek-netto-maandlasten.html#inline-script",
+      "line": 10,
+      "score": 11,
+      "snippet": "jQuery('#tkm-itm-hypotheeklening2').show(300);\n        jQuery('#tkm-itm-afgeslotenPeriode2').show(300);\n        jQuery('#tkm-itm-rendement2')[(jQuery('#hypotheekvorm2').val() === 'bel')? 'show' : 'hide'](300);\n        jQuery('#tkm-itm-aftrekbaar2').show(300);\n    } else {",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/hypotheek/hypotheek-netto-maandlasten.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/hypotheek/hypotheek-netto-maandlasten.html#inline-script",
+      "line": 25,
+      "score": 11,
+      "snippet": "jQuery('#tkm-itm-hypotheeklening3').show(300);\n        jQuery('#tkm-itm-afgeslotenPeriode3').show(300);\n        jQuery('#tkm-itm-rendement3')[(jQuery('#hypotheekvorm3').val() === 'bel')? 'show' : 'hide'](300);\n        jQuery('#tkm-itm-aftrekbaar3').show(300);\n    } else {",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/hypotheek/hypotheek-netto-maandlasten.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/hypotheek/hypotheek-meenemen-bij-verhuizen.html#inline-script",
+      "line": 55,
+      "score": 10,
+      "snippet": "j[(jQuery('#hypotheekvormHd'+n).val() === 'bel')? 'show' : 'hide'](300);\n                } else {\n                    if (this.id === 'tkm-itm-hypotheekleningHd'+n) {\n                        console.log(jQuery('#eersteRvpHd'+n).val(), j.find('span.lenlab'));\n                        j.find('.tkm-text,input[id$=_datum]')[(jQuery('#eersteRvpHd'+n).val() === 'n')? 'show' : 'hide'](300);",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/hypotheek/hypotheek-meenemen-bij-verhuizen.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/inkomen/verzamelinkomen-berekenen.html#inline-script",
+      "line": 99,
+      "score": 9,
+      "snippet": "jQuery('#tkm-itm-box3spaargeld')[(jr >= 2021)? 'show' : 'hide'](300);\n    jQuery('#tkm-itm-box3beleggingen')[(jr >= 2021)? 'show' : 'hide'](300);\n    jQuery('#tkm-itm-box3leningen')[(jr >= 2021)? 'show' : 'hide'](300);\n}",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/inkomen/verzamelinkomen-berekenen.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/pensioen/uitkeringen-lijfrenteverzekering.html#inline-script",
+      "line": 6,
+      "score": 9,
+      "snippet": "jQuery('#tkm-itm-leeftijd')[(d === 'l')? 'show' : 'hide'](300);\n    jQuery('#tkm-itm-geslacht')[(d === 'l')? 'show' : 'hide'](300);\n    jQuery('#tkm-itm-looptijd')[(d === 'l')? 'hide' : 'show'](300);\n}",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/pensioen/uitkeringen-lijfrenteverzekering.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/gezin-en-relatie/eigen-bijdrage-wmo.html#inline-script",
+      "line": 3,
+      "score": 9,
+      "snippet": "tkmForm = window.tkmForm || {};\ntkmForm.update = function() {\n    //let jr = parseInt(jQuery('#belastingjaar').val().substring(0, 4));\n    let as = jQuery('#huishouden').val() === 'a';\n    //jQuery('span.tk-inkomensjaar').text(jr - 2);",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/gezin-en-relatie/eigen-bijdrage-wmo.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/hypotheek/huis-kopen-kosten-koper.html#inline-script",
+      "line": 52,
+      "score": 9,
+      "snippet": "jQuery('#tkm-itm-overdrachtsbelastingJaar').show(300);\n        jQuery('#tkm-itm-overdrachtsbelastingTariefKeuze').show(300);\n        jQuery('#tkm-itm-overdrachtsbelastingAnders')[(jQuery('#overdrachtsbelastingTariefKeuze').val() === 'at')? 'show' : 'hide'](300);\n    }\n}",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/hypotheek/huis-kopen-kosten-koper.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/hypotheek/hypotheek-oversluiten.html#inline-script",
+      "line": 4,
+      "score": 9,
+      "snippet": "for (var i = 3; i--; ) {\n        id = ['', '2', '3'][i];\n        if (jQuery('#hypotheekvorm' + id).val() == 'bel') {\n            jQuery('#tkm-itm-rendement' + id).show(300);\n        } else {",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/hypotheek/hypotheek-oversluiten.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/ondernemen/winst-vermogen-bv-naar-prive.html#inline-script",
+      "line": 4,
+      "score": 8,
+      "snippet": "tkmForm.update = function() {\n    let jr = jQuery('#belastingjaar').val();\n    jQuery('#tkm-itm-fiscaalPartner')[(jr >= 2024)? 'show' : 'hide'](300);\n}",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/ondernemen/winst-vermogen-bv-naar-prive.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/ondernemen/box-2-belasting.html#inline-script",
+      "line": 4,
+      "score": 8,
+      "snippet": "tkmForm.update = function() {\n    let jr = jQuery('#belastingjaar').val();\n    jQuery('#tkm-itm-fiscaalPartner')[(jr >= 2024)? 'show' : 'hide'](300);\n}",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/ondernemen/box-2-belasting.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/pensioen/extra-pensioenuitkering-bruto-netto.html#inline-script",
+      "line": 3,
+      "score": 8,
+      "snippet": "tkmForm = window.tkmForm || {};\ntkmForm.update = function() {\n    jQuery('#tkm-itm-looptijd')[(jQuery('#extraPensioen_periode').val() === 't')? 'show' : 'hide'](300);\n    tkmForm.hideOndernemersaftrek = true;\n    jQuery('.tkm-soort-inkomen').not('[id*=PROTO]').each(function (e) {",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/pensioen/extra-pensioenuitkering-bruto-netto.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/hypotheek/hypotheek-oversluiten.html#inline-script",
+      "line": 36,
+      "score": 8,
+      "snippet": "jQuery(document).ready(function() {\n    jQuery('.btn-group[data-bind^=\"boeterenteBekend\"]').on('click', 'button', tkmUpdateForm);\n    jQuery('[id^=\"hypotheekvorm\"]').on('change', tkmUpdateForm);\n    jQuery('[id^=\"nieuweRente\"]').on('change', tkmUpdateForm);",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/hypotheek/hypotheek-oversluiten.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/hypotheek/hypotheek-oversluiten.html#inline-script",
+      "line": 38,
+      "score": 8,
+      "snippet": "jQuery('.btn-group[data-bind^=\"boeterenteBekend\"]').on('click', 'button', tkmUpdateForm);\n    jQuery('[id^=\"hypotheekvorm\"]').on('change', tkmUpdateForm);\n    jQuery('[id^=\"nieuweRente\"]').on('change', tkmUpdateForm);\n    tkmUpdateForm();\n});",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/hypotheek/hypotheek-oversluiten.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/hypotheek/hypotheek-meenemen-bij-verhuizen.html#inline-script",
+      "line": 59,
+      "score": 8,
+      "snippet": "j.find('.tkm-text,input[id$=_datum]')[(jQuery('#eersteRvpHd'+n).val() === 'n')? 'show' : 'hide'](300);\n                        j.find('span.lenlab').html((jQuery('#eersteRvpHd'+n).val() === 'y')? 'afsluiten'\n                            : 'start <br class=\"hidden tkm-fullsizeonly\" />van de huidige rentevaste periode');\n                    }\n                    j.show(300);",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/hypotheek/hypotheek-meenemen-bij-verhuizen.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/ondernemen/auto-van-de-zaak-of-in-prive.html#inline-script",
+      "line": 4,
+      "score": 7,
+      "snippet": "tkmForm.update = function() {\n    let sa = jQuery('#soortauto').val();\n    jQuery('#tkm-itm-winstbv')[(jQuery('#berekening').val() === 'dga')? 'show' : 'hide'](300);\n    if (sa === 'n') {\n        jQuery('#tkm-itm-grondslagBijtelling').hide(300);",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/ondernemen/auto-van-de-zaak-of-in-prive.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/wonen/energiekosten-berekenen.html#inline-script",
+      "line": 3,
+      "score": 7,
+      "snippet": "tkmForm = window.tkmForm || {};\ntkmForm.update = function() {\n    jQuery('#tkm-itm-belastingInPrijsIsNieuw')[(jQuery('#belastingOok').val() === 'n')? 'hide' : 'show'](300);\n    jQuery('[id^=tkm-itm-gas]')[(jQuery('#ookGasaansluiting').val() === 'n')? 'hide' : 'show'](300);\n}",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/wonen/energiekosten-berekenen.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/hypotheek/maximale-hypotheek-na-verhuizen.html#inline-script",
+      "line": 22,
+      "score": 7,
+      "snippet": "break;\n    }\n}).children('button[value='+jQuery('.btn-group[data-bind=hypotheekdelen]').next().val()+']').trigger('click');",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/hypotheek/maximale-hypotheek-na-verhuizen.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/hypotheek/hypotheek-netto-maandlasten.html#inline-script",
+      "line": 4,
+      "score": 7,
+      "snippet": "tkmForm.update = function() {\n    var dln = jQuery('#hypotheekdelen').val();\n    jQuery('#tkm-itm-rendement')[(jQuery('#hypotheekvorm').val() === 'bel')? 'show' : 'hide'](300);\n    if (dln > '1') {\n        jQuery('#tkm-itm-subTweede').show(300);",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/hypotheek/hypotheek-netto-maandlasten.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/hypotheek/totale-kosten-hypotheek.html#inline-script",
+      "line": 5,
+      "score": 7,
+      "snippet": "var dln = jQuery('#hypotheekdelen').val();\n\n    jQuery('#tkm-itm-rendement1')[(jQuery('#hypotheekvorm1').val() === 'bel')? 'show' : 'hide'](300);\n\n    jQuery('#tkm-itm-subHypotheek2')[(dln > '1')? 'show' : 'hide'](300);",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/hypotheek/totale-kosten-hypotheek.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/hypotheek/hypotheek-oversluiten.html#inline-script",
+      "line": 27,
+      "score": 7,
+      "snippet": "}\n        }\n        if (jQuery('#nieuweRente' + id).val() == 'anders') {\n            jQuery('#tkm-itm-andereRente' + id).show(300);\n        } else {",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/hypotheek/hypotheek-oversluiten.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/hypotheek/hypotheek-meenemen-bij-verhuizen.html#inline-script",
+      "line": 5,
+      "score": 7,
+      "snippet": "var dln = jQuery('#hypotheekdelen').val();\n\n    jQuery('#tkm-itm-rendement1')[(jQuery('#hypotheekvorm1').val() === 'bel')? 'show' : 'hide'](300);\n\n    jQuery('#tkm-itm-subHypotheek2')[(dln > '1')? 'show' : 'hide'](300);",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/hypotheek/hypotheek-meenemen-bij-verhuizen.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/hypotheek/hypotheek-meenemen-bij-verhuizen.html#inline-script",
+      "line": 47,
+      "score": 7,
+      "snippet": "break;\n                    case 'tkm-itm-rendementHd'+n:\n                        j[(jQuery('#hypotheekvormHd'+n).val() === 'bel')? 'show' : 'hide'](300);\n                        break;\n                    default:",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/hypotheek/hypotheek-meenemen-bij-verhuizen.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/hypotheek/hypotheek-meenemen-bij-verhuizen.html#inline-script",
+      "line": 71,
+      "score": 7,
+      "snippet": "jQuery(function() {\n    jQuery('.btn-group[data-bind=hypotheekdelenHuidig]').on('click', 'button', tkmForm.updateHypotheekdelen);\n    jQuery('.btn-group[data-bind^=eersteRvpHd]').on('click', 'button', tkmForm.updateHypotheekdelen);\n    jQuery('[id^=hypotheekvormHd]').on('change', tkmForm.updateHypotheekdelen);",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/hypotheek/hypotheek-meenemen-bij-verhuizen.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/hypotheek/hypotheek-meenemen-bij-verhuizen.html#inline-script",
+      "line": 72,
+      "score": 7,
+      "snippet": "jQuery(function() {\n    jQuery('.btn-group[data-bind=hypotheekdelenHuidig]').on('click', 'button', tkmForm.updateHypotheekdelen);\n    jQuery('.btn-group[data-bind^=eersteRvpHd]').on('click', 'button', tkmForm.updateHypotheekdelen);\n    jQuery('[id^=hypotheekvormHd]').on('change', tkmForm.updateHypotheekdelen);\n    tkmForm.updateHypotheekdelen();",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/hypotheek/hypotheek-meenemen-bij-verhuizen.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/inkomen/kilometervergoeding-bruto-netto.html#inline-script",
+      "line": 3,
+      "score": 5,
+      "snippet": "tkmForm = window.tkmForm || {};\ntkmForm.update = function() {\n    jQuery('#tkm-itm-belastingvrijAnders')[(jQuery('#belastingvrij').val()[0] === 'a')? 'show' : 'hide'](300);\n}",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/inkomen/kilometervergoeding-bruto-netto.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/werk-en-inkomen/stamrecht-eindkapitaal.html#inline-script",
+      "line": 18,
+      "score": 5,
+      "snippet": "tkmForm = window.tkmForm || {};\ntkmForm.updateBox3rendement = function() {\n    jQuery('#tkm-itm-heffingsvrij')[(jQuery('#box3').val() === 'y')? 'show' : 'hide'](300);\n}",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/werk-en-inkomen/stamrecht-eindkapitaal.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/werk-en-inkomen/stamrecht-eindkapitaal.html#inline-script",
+      "line": 22,
+      "score": 5,
+      "snippet": "jQuery(function() {\n    jQuery('.btn-group[data-bind=box3]').on('click', 'button', tkmForm.updateBox3rendement);\n    tkmForm.updateBox3rendement();\n});",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/werk-en-inkomen/stamrecht-eindkapitaal.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/ondernemen/hypotheek-bv-kasrondje.html#inline-script",
+      "line": 9,
+      "score": 5,
+      "snippet": "jQuery(function() {\n    jQuery('.btn-group[data-bind=hypotheekdelen]').on('click', 'button', tkmForm.update);\n    tkmForm.update();\n});",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/ondernemen/hypotheek-bv-kasrondje.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/ondernemen/vermogen-uit-bv-naar-prive.html#inline-script",
+      "line": 10,
+      "score": 5,
+      "snippet": "jQuery(function() {\n    jQuery('.btn-group[data-bind=fiscaalPartner]').on('click', 'button', tkmForm.update);\n    tkmForm.update();\n});",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/ondernemen/vermogen-uit-bv-naar-prive.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/modules/ondernemen/vermogensopbouw-in-bv-of-prive.html#inline-script",
+      "line": 3,
+      "score": 5,
+      "snippet": "tkmForm = window.tkmForm || {};\ntkmForm.updateBox3rendement = function() {\n    jQuery('#tkm-itm-heffingsvrij')[(jQuery('#box3').val() === 'y')? 'show' : 'hide'](300);\n}",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/modules/ondernemen/vermogensopbouw-in-bv-of-prive.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/modules/ondernemen/vermogensopbouw-in-bv-of-prive.html#inline-script",
+      "line": 7,
+      "score": 5,
+      "snippet": "jQuery(function() {\n    jQuery('.btn-group[data-bind=box3]').on('click', 'button', tkmForm.updateBox3rendement);\n    tkmForm.updateBox3rendement();\n});",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/modules/ondernemen/vermogensopbouw-in-bv-of-prive.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/hypotheek/maximale-hypotheek-na-verhuizen.html#inline-script",
+      "line": 1,
+      "score": 5,
+      "snippet": "jQuery('.btn-group[data-bind=hypotheekdelen]').on('click', 'button', null, function(e) {\n    switch(jQuery(this).val()) {\n        case '1':",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/hypotheek/maximale-hypotheek-na-verhuizen.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/hypotheek/hypotheek-netto-maandlasten.html#inline-script",
+      "line": 38,
+      "score": 5,
+      "snippet": "jQuery(function() {\n    jQuery('.btn-group[data-bind=hypotheekdelen]').on('click', 'button', tkmForm.update);\n    jQuery('[id^=\"hypotheekvorm\"]').on('change', tkmForm.update);\n    tkmForm.update();",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/hypotheek/hypotheek-netto-maandlasten.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/hypotheek/hypotheek-maandlasten-tijdens-bouw.html#inline-script",
+      "line": 3,
+      "score": 5,
+      "snippet": "tkmForm = window.tkmForm || {};\ntkmForm.tkmUpdateForm = function() {\n    jQuery('#tkm-itm-hypotheeklening2')[(jQuery('#hypotheekvorm2').val() === 'nvt')? 'hide' : 'show'](300);\n}",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/hypotheek/hypotheek-maandlasten-tijdens-bouw.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/hypotheek/totale-kosten-hypotheek.html#inline-script",
+      "line": 23,
+      "score": 5,
+      "snippet": "jQuery(function() {\n    jQuery('.btn-group[data-bind=hypotheekdelen]').on('click', 'button', tkmForm.update);\n    jQuery('[id^=\"hypotheekvorm\"]').on('change', tkmForm.update);\n    tkmForm.update();",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/hypotheek/totale-kosten-hypotheek.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/hypotheek/hypotheek-meenemen-bij-verhuizen.html#inline-script",
+      "line": 23,
+      "score": 5,
+      "snippet": "jQuery(function() {\n    jQuery('.btn-group[data-bind=hypotheekdelen]').on('click', 'button', tkmForm.update);\n    jQuery('[id^=\"hypotheekvorm\"]').on('change', tkmForm.update);\n    tkmForm.update();",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/hypotheek/hypotheek-meenemen-bij-verhuizen.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/modules/wonen/hypotheek-aflossen-of-niet.html#inline-script",
+      "line": 40,
+      "score": 5,
+      "snippet": "tkmForm = window.tkmForm || {};\ntkmForm.updateBox3rendement = function() {\n    jQuery('#tkm-itm-heffingsvrij')[(jQuery('#box3').val() === 'y')? 'show' : 'hide'](300);\n}",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/modules/wonen/hypotheek-aflossen-of-niet.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/modules/wonen/hypotheek-aflossen-of-niet.html#inline-script",
+      "line": 44,
+      "score": 5,
+      "snippet": "jQuery(function() {\n    jQuery('.btn-group[data-bind=box3]').on('click', 'button', tkmForm.updateBox3rendement);\n    tkmForm.updateBox3rendement();\n});",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/modules/wonen/hypotheek-aflossen-of-niet.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/inkomen/kinderopvangtoeslag-berekenen.html#inline-script",
+      "line": 3,
+      "score": 3,
+      "snippet": "tkmForm = window.tkmForm || {};\ntkmForm.update = function() {\n    let jr = parseInt(jQuery('#belastingjaar').val());\n    let ks = parseInt(jQuery('#kinderen').val());",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/inkomen/kinderopvangtoeslag-berekenen.html"
+    },
+    {
+      "source": "https://www.externe-bron.nl/kinderen/kosten-kinderopvang.html#inline-script",
+      "line": 3,
+      "score": 3,
+      "snippet": "tkmForm = window.tkmForm || {};\ntkmForm.update = function() {\n    let jr = parseInt(jQuery('#belastingjaar').val());\n    let ks = parseInt(jQuery('#kinderen').val());",
+      "sourceType": "inline-script",
+      "pageDepth": 1,
+      "sourcePageUrl": "https://www.externe-bron.nl/kinderen/kosten-kinderopvang.html"
+    }
+  ],
+  "warnings": [],
+  "errors": []
+}
