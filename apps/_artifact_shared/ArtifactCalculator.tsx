@@ -19,6 +19,38 @@ type DraftEntry = {
   value: string;
 };
 
+const FIELD_LABELS: Record<string, string> = {
+  principal: "Leenbedrag",
+  payment: "Termijnbedrag",
+  annualRate: "Jaarrente (%)",
+  years: "Looptijd (jaren)",
+  periods: "Aantal termijnen",
+  paymentsPerYear: "Termijnen per jaar",
+  futureValue: "Toekomstige waarde",
+  presentValue: "Contante waarde",
+  percentage: "Percentage",
+  part: "Deelwaarde",
+  total: "Totaalwaarde",
+  amounts: "Bedragenreeks",
+  rates: "Rentesreeks",
+};
+
+const OUTPUT_LABELS: Record<string, string> = {
+  payment: "Termijnbedrag",
+  principal: "Leenbedrag",
+  periods: "Aantal termijnen",
+  years: "Looptijd (jaren)",
+  annualRate: "Jaarrente (%)",
+  totalPaid: "Totaal betaald",
+  totalInterest: "Totale rente",
+  presentValue: "Contante waarde",
+  futureValue: "Toekomstige waarde",
+  discountFactor: "Disconteringsfactor",
+  finalValue: "Eindwaarde",
+  returnAmount: "Opbrengst",
+  returnPercentage: "Rendement (%)",
+};
+
 function normalizeNumberInput(value: string) {
   return value.replace(/\s+/g, "").replace(",", ".");
 }
@@ -62,8 +94,12 @@ function buildDraft(defaultInput: GenericCalculationInput): DraftEntry[] {
 }
 
 function parseArrayList(value: string) {
+  const shouldParseAsList =
+    value.includes(";") || value.includes("|") || value.includes(", ") || (value.match(/,/g)?.length ?? 0) > 1;
+  if (!shouldParseAsList) return undefined;
+
   const parts = value
-    .split(/[,;]+/g)
+    .split(/[;|]+|,\s+/g)
     .map((part) => part.trim())
     .filter((part) => part.length > 0);
 
@@ -94,11 +130,11 @@ function parseDraftValue(value: string): unknown {
     }
   }
 
-  const list = parseArrayList(trimmed);
-  if (list !== undefined) return list;
-
   const number = tryParseNumber(trimmed);
   if (number !== undefined) return number;
+
+  const list = parseArrayList(trimmed);
+  if (list !== undefined) return list;
 
   return trimmed;
 }
@@ -128,6 +164,33 @@ function formatOutputValue(value: number | string | boolean | null) {
   return value;
 }
 
+function toHumanLabel(key: string, labelMap: Record<string, string>) {
+  if (!key.trim()) return "Veld";
+  if (labelMap[key]) return labelMap[key];
+  if (labelMap[key.toLowerCase()]) return labelMap[key.toLowerCase()];
+  const withSpaces = key
+    .replace(/[_-]+/g, " ")
+    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+    .trim();
+  return withSpaces.charAt(0).toUpperCase() + withSpaces.slice(1);
+}
+
+function getEntryValueHint(value: string) {
+  const parsed = parseDraftValue(value);
+  if (Array.isArray(parsed)) return "Type: lijst (gebruik bij voorkeur `;` als scheiding, bijv. `2; 3; 4`).";
+  if (typeof parsed === "boolean") return "Type: boolean (`true` of `false`).";
+  if (typeof parsed === "number") return "Type: getal (komma of punt als decimaal).";
+  if (!value.trim()) return "Type: nog leeg.";
+  return "Type: tekst.";
+}
+
+function formatProfile(profile: string) {
+  return profile
+    .split("_")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
 export function ArtifactCalculator({
   title,
   defaultInput,
@@ -140,6 +203,13 @@ export function ArtifactCalculator({
   const hasDraftValues = useMemo(
     () => draft.some((entry) => entry.key.trim().length > 0 && entry.value.trim().length > 0),
     [draft],
+  );
+  const outputEntries = useMemo(
+    () =>
+      result
+        ? Object.entries(result.outputs).sort(([a], [b]) => a.localeCompare(b))
+        : [],
+    [result],
   );
 
   function updateDraft(id: string, patch: Partial<DraftEntry>) {
@@ -206,35 +276,56 @@ export function ArtifactCalculator({
       }
       inputs={
         <div className="space-y-3">
-          {draft.map((entry) => (
+          <p className="text-xs leading-5 text-[var(--muted)]">
+            Vul per invoer de veldnaam en waarde in. Gebruik voor lijsten bij voorkeur een
+            puntkomma (`;`) of JSON-notatie (`[1,2,3]`).
+          </p>
+          {draft.map((entry, index) => (
             <div
               key={entry.id}
               className="rounded-2xl border hair bg-[var(--paper-soft)] p-3 shadow-paper-sm"
             >
-              <div className="grid gap-2 sm:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)_auto]">
-                <input
-                  type="text"
-                  value={entry.key}
-                  onChange={(event) => updateDraft(entry.id, { key: event.target.value })}
-                  placeholder="veldnaam (bijv. principal)"
-                  className="ring-focus h-11 rounded-xl border hair bg-white px-3 text-sm text-[var(--ink)]"
-                />
-                <input
-                  type="text"
-                  value={entry.value}
-                  onChange={(event) => updateDraft(entry.id, { value: event.target.value })}
-                  placeholder="waarde (bijv. 100000 of 2,3,4)"
-                  className="ring-focus h-11 rounded-xl border hair bg-white px-3 text-sm text-[var(--ink)]"
-                />
+              <div className="mb-2 flex items-center justify-between">
+                <div className="text-[11px] uppercase tracking-[0.12em] text-[var(--muted)]">
+                  Invoer {index + 1}
+                </div>
                 <ToolActionButton
                   type="button"
                   variant="secondary"
                   onClick={() => removeField(entry.id)}
                   disabled={draft.length <= 1}
-                  className="h-11"
+                  className="h-9"
                 >
                   Verwijder
                 </ToolActionButton>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <label className="block space-y-1">
+                  <span className="text-xs font-medium text-[var(--ink)]">Veldnaam</span>
+                  <input
+                    type="text"
+                    value={entry.key}
+                    onChange={(event) => updateDraft(entry.id, { key: event.target.value })}
+                    placeholder="bijv. principal"
+                    className="ring-focus h-11 w-full rounded-xl border hair bg-white px-3 text-sm text-[var(--ink)]"
+                  />
+                </label>
+                <label className="block space-y-1">
+                  <span className="text-xs font-medium text-[var(--ink)]">Waarde</span>
+                  <input
+                    type="text"
+                    value={entry.value}
+                    onChange={(event) => updateDraft(entry.id, { value: event.target.value })}
+                    placeholder="bijv. 100000"
+                    className="ring-focus h-11 w-full rounded-xl border hair bg-white px-3 text-sm text-[var(--ink)]"
+                  />
+                </label>
+              </div>
+              <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-[var(--muted)]">
+                <span>{getEntryValueHint(entry.value)}</span>
+                {entry.key.trim() ? (
+                  <span>Label: {toHumanLabel(entry.key.trim(), FIELD_LABELS)}</span>
+                ) : null}
               </div>
             </div>
           ))}
@@ -261,18 +352,27 @@ export function ArtifactCalculator({
           </div>
           {result ? (
             <div className="mt-3 space-y-4">
-              <div
-                className={`inline-flex rounded-full px-3 py-1 text-[11px] font-medium ${
-                  result.isValid
-                    ? "bg-[oklch(90%_0.04_150)] text-[oklch(36%_0.07_152)]"
-                    : "bg-[oklch(95%_0.03_25)] text-[oklch(45%_0.12_25)]"
-                }`}
-              >
-                {result.isValid ? "Berekening geslaagd" : "Controleer invoer"}
+              <div className="grid gap-2 sm:grid-cols-3">
+                <div
+                  className={`rounded-xl px-3 py-2 text-xs font-medium ${
+                    result.isValid
+                      ? "bg-[oklch(90%_0.04_150)] text-[oklch(36%_0.07_152)]"
+                      : "bg-[oklch(95%_0.03_25)] text-[oklch(45%_0.12_25)]"
+                  }`}
+                >
+                  {result.isValid ? "Status: geslaagd" : "Status: controleer invoer"}
+                </div>
+                <div className="rounded-xl border hair bg-[var(--paper-soft)] px-3 py-2 text-xs text-[var(--ink)]">
+                  Profiel: {formatProfile(result.profile)}
+                </div>
+                <div className="rounded-xl border hair bg-[var(--paper-soft)] px-3 py-2 text-xs text-[var(--ink)]">
+                  Outputvelden: {outputEntries.length}
+                </div>
               </div>
 
               {result.errors.length > 0 ? (
                 <div className="rounded-xl border hair bg-[oklch(98%_0.01_25)] p-3 text-sm text-[oklch(42%_0.1_25)]">
+                  <p className="mb-1 text-[11px] uppercase tracking-[0.1em]">Fouten</p>
                   {result.errors.map((error) => (
                     <p key={error}>{error}</p>
                   ))}
@@ -281,6 +381,7 @@ export function ArtifactCalculator({
 
               {result.warnings.length > 0 ? (
                 <div className="rounded-xl border hair bg-[oklch(98%_0.01_95)] p-3 text-sm text-[oklch(43%_0.09_95)]">
+                  <p className="mb-1 text-[11px] uppercase tracking-[0.1em]">Waarschuwingen</p>
                   {result.warnings.map((warning) => (
                     <p key={warning}>{warning}</p>
                   ))}
@@ -288,12 +389,16 @@ export function ArtifactCalculator({
               ) : null}
 
               <div className="rounded-xl border hair bg-white p-4">
-                {Object.entries(result.outputs).length > 0 ? (
-                  Object.entries(result.outputs).map(([key, value]) => (
+                <div className="mb-2 text-[11px] uppercase tracking-[0.1em] text-[var(--muted)]">
+                  Resultaten
+                </div>
+                {outputEntries.length > 0 ? (
+                  outputEntries.map(([key, value]) => (
                     <ResultRow
                       key={key}
-                      label={key}
+                      label={toHumanLabel(key, OUTPUT_LABELS)}
                       value={formatOutputValue(value)}
+                      sub={`Technische sleutel: ${key}`}
                     />
                   ))
                 ) : (
