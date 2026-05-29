@@ -42,6 +42,448 @@ export const appRegistry = [
     "entry": "Calculator.tsx"
   },
   {
+    "slug": "artifact-geld-lenen-financiering-aflossingstermijnen-lening",
+    "title": "Aflossingstermijnen lening (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Geld lenen en financiering",
+    "tags": [
+      "artifact-import",
+      "geld-lenen-financiering",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-geld-lenen-financiering-doorlopend-krediet-vergelijken",
+    "title": "Doorlopend krediet vergelijken (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Geld lenen en financiering",
+    "tags": [
+      "artifact-import",
+      "geld-lenen-financiering",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-geld-lenen-financiering-geld-lenen-kost-geld",
+    "title": "Geld lenen kost geld (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Geld lenen en financiering",
+    "tags": [
+      "artifact-import",
+      "geld-lenen-financiering",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-geld-lenen-financiering-hoogte-lening",
+    "title": "Hoogte lening (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Geld lenen en financiering",
+    "tags": [
+      "artifact-import",
+      "geld-lenen-financiering",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-geld-lenen-financiering-kopen-op-afbetaling",
+    "title": "Kopen op afbetaling (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Geld lenen en financiering",
+    "tags": [
+      "artifact-import",
+      "geld-lenen-financiering",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-geld-lenen-financiering-leasetermijn-financial-lease",
+    "title": "Leasetermijn financial lease (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Geld lenen en financiering",
+    "tags": [
+      "artifact-import",
+      "geld-lenen-financiering",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-geld-lenen-financiering-lening-aflossen",
+    "title": "Lening aflossen (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Geld lenen en financiering",
+    "tags": [
+      "artifact-import",
+      "geld-lenen-financiering",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-geld-lenen-financiering-looptijd-aflossing-lening",
+    "title": "Looptijd aflossing lening (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Geld lenen en financiering",
+    "tags": [
+      "artifact-import",
+      "geld-lenen-financiering",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-geld-lenen-financiering-maandbedrag-voor-aflossing-lening",
+    "title": "Maandbedrag voor aflossing lening (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Geld lenen en financiering",
+    "tags": [
+      "artifact-import",
+      "geld-lenen-financiering",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-geld-lenen-financiering-maximale-lening",
+    "title": "Maximale lening (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Geld lenen en financiering",
+    "tags": [
+      "artifact-import",
+      "geld-lenen-financiering",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-geld-lenen-financiering-persoonlijke-lening-vergelijken",
+    "title": "Persoonlijke lening vergelijken (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Geld lenen en financiering",
+    "tags": [
+      "artifact-import",
+      "geld-lenen-financiering",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-geld-lenen-financiering-rente-bij-lening",
+    "title": "Rente bij lening (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Geld lenen en financiering",
+    "tags": [
+      "artifact-import",
+      "geld-lenen-financiering",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-geld-lenen-financiering-rente-in-financial-lease",
+    "title": "Rente in financial lease (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Geld lenen en financiering",
+    "tags": [
+      "artifact-import",
+      "geld-lenen-financiering",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-geld-lenen-financiering-restschuld-bij-financial-lease",
+    "title": "Restschuld bij financial lease (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Geld lenen en financiering",
+    "tags": [
+      "artifact-import",
+      "geld-lenen-financiering",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-geld-lenen-financiering-restschuld-lening",
+    "title": "Restschuld lening (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Geld lenen en financiering",
+    "tags": [
+      "artifact-import",
+      "geld-lenen-financiering",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-geld-lenen-financiering-studiefinanciering-terugbetalen",
+    "title": "Studiefinanciering terugbetalen (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Geld lenen en financiering",
+    "tags": [
+      "artifact-import",
+      "geld-lenen-financiering",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-geld-lenen-financiering-toename-schuld",
+    "title": "Toename schuld (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Geld lenen en financiering",
+    "tags": [
+      "artifact-import",
+      "geld-lenen-financiering",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
     "slug": "artifact-kalender-vrije-tijd-aantal-werkdagen",
     "title": "Aantal werkdagen (Artifacts)",
     "description": "Bereken werkdagen in een periode met optionele uitsluiting van Nederlandse feestdagen.",

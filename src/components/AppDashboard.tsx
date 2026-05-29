@@ -33,6 +33,27 @@ export function AppDashboard({ apps }: AppDashboardProps) {
     () => apps.filter(isArtifactImportedApp),
     [apps],
   );
+  const artifactGroups = useMemo(() => {
+    const groups = new Map<string, AppManifest[]>();
+
+    for (const app of artifactApps) {
+      const categoryLabel = app.category.startsWith("Artifacts · ")
+        ? app.category.replace("Artifacts · ", "")
+        : app.category;
+      const existing = groups.get(categoryLabel) ?? [];
+      existing.push(app);
+      groups.set(categoryLabel, existing);
+    }
+
+    return [...groups.entries()]
+      .map(([category, groupedApps]) => ({
+        category,
+        apps: [...groupedApps].sort((left, right) =>
+          left.title.localeCompare(right.title),
+        ),
+      }))
+      .sort((left, right) => left.category.localeCompare(right.category));
+  }, [artifactApps]);
   const primaryApps = useMemo(
     () => apps.filter((app) => !isArtifactImportedApp(app)),
     [apps],
@@ -231,9 +252,24 @@ export function AppDashboard({ apps }: AppDashboardProps) {
             Deze tools komen rechtstreeks uit ingevulde artifacts en staan bewust
             los van de reguliere toolgroepen.
           </p>
-          <div className="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {artifactApps.map((app) => (
-              <AppCard key={app.slug} app={app} />
+          <div className="mt-5 space-y-5">
+            {artifactGroups.map((group) => (
+              <section
+                key={group.category}
+                className="rounded-xl border border-[var(--hair)] bg-[var(--paper)]/45 p-4"
+              >
+                <div className="text-[11px] uppercase tracking-[0.12em] text-[var(--soft)]">
+                  Artifact-categorie
+                </div>
+                <h5 className="mt-1 font-serif text-[1.05rem] tracking-[-0.01em] text-[var(--ink)]">
+                  {group.category}
+                </h5>
+                <div className="mt-3 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                  {group.apps.map((app) => (
+                    <AppCard key={app.slug} app={app} />
+                  ))}
+                </div>
+              </section>
             ))}
           </div>
         </section>
