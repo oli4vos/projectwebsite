@@ -1,0 +1,27 @@
+{
+  "slug": "artifact-pensioen-aow-extra-pensioenuitkering",
+  "title": "Extra pensioenuitkering (Artifacts)",
+  "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+  "type": "frontend",
+  "category": "Artifacts · Pensioen en AOW",
+  "tags": [
+    "artifact-import",
+    "pensioen-aow",
+    "invulblad"
+  ],
+  "status": "draft",
+  "visibility": "public",
+  "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+  "assumptionsUsed": [
+    "tax"
+  ],
+  "calculationDomains": [
+    "pension",
+    "cashflow"
+  ],
+  "riskLevel": "medium",
+  "disclaimerType": "financialEducation",
+  "outputType": "singleResult",
+  "version": "1.0.0",
+  "entry": "Calculator.tsx"
+}

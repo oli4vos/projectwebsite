@@ -189,6 +189,202 @@ export const appComponents: Record<string, AppCalculatorComponent> = {
       </div>
     ),
   }),
+  "artifact-pensioen-aow-aanvullend-pensioen-berekenen": dynamic(() => import("../../apps/artifact-pensioen-aow-aanvullend-pensioen-berekenen/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "artifact-pensioen-aow-aow-leeftijd": dynamic(() => import("../../apps/artifact-pensioen-aow-aow-leeftijd/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "artifact-pensioen-aow-banksparen-voor-pensioen": dynamic(() => import("../../apps/artifact-pensioen-aow-banksparen-voor-pensioen/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "artifact-pensioen-aow-bruto-netto-aow-pensioen": dynamic(() => import("../../apps/artifact-pensioen-aow-bruto-netto-aow-pensioen/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "artifact-pensioen-aow-bruto-netto-eerste-pensioenjaar": dynamic(() => import("../../apps/artifact-pensioen-aow-bruto-netto-eerste-pensioenjaar/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "artifact-pensioen-aow-bruto-netto-pensioen-ander-inkomen": dynamic(() => import("../../apps/artifact-pensioen-aow-bruto-netto-pensioen-ander-inkomen/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "artifact-pensioen-aow-bruto-netto-vroegpensioen-ander-inkomen": dynamic(() => import("../../apps/artifact-pensioen-aow-bruto-netto-vroegpensioen-ander-inkomen/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "artifact-pensioen-aow-doorwerken-na-uw-pensioen": dynamic(() => import("../../apps/artifact-pensioen-aow-doorwerken-na-uw-pensioen/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "artifact-pensioen-aow-extra-pensioenuitkering": dynamic(() => import("../../apps/artifact-pensioen-aow-extra-pensioenuitkering/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "artifact-pensioen-aow-hoogte-aow-uitkering": dynamic(() => import("../../apps/artifact-pensioen-aow-hoogte-aow-uitkering/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "artifact-pensioen-aow-jaarruimte-belastingteruggave": dynamic(() => import("../../apps/artifact-pensioen-aow-jaarruimte-belastingteruggave/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "artifact-pensioen-aow-jaarruimte-reserveringsruimte": dynamic(() => import("../../apps/artifact-pensioen-aow-jaarruimte-reserveringsruimte/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "artifact-pensioen-aow-levensverwachting-bij-geboorte": dynamic(() => import("../../apps/artifact-pensioen-aow-levensverwachting-bij-geboorte/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "artifact-pensioen-aow-netto-aow-pensioen-of-lijfrente-uitkering": dynamic(() => import("../../apps/artifact-pensioen-aow-netto-aow-pensioen-of-lijfrente-uitkering/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "artifact-pensioen-aow-netto-nabestaandenpensioen-of-anw-uitkering": dynamic(() => import("../../apps/artifact-pensioen-aow-netto-nabestaandenpensioen-of-anw-uitkering/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "artifact-pensioen-aow-netto-pensioen-na-pensioenkorting": dynamic(() => import("../../apps/artifact-pensioen-aow-netto-pensioen-na-pensioenkorting/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "artifact-pensioen-aow-ouderenkorting": dynamic(() => import("../../apps/artifact-pensioen-aow-ouderenkorting/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "artifact-pensioen-aow-overbruggingsuitkering-aow": dynamic(() => import("../../apps/artifact-pensioen-aow-overbruggingsuitkering-aow/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "artifact-pensioen-aow-pensioensparen-buiten-box3": dynamic(() => import("../../apps/artifact-pensioen-aow-pensioensparen-buiten-box3/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "artifact-pensioen-aow-pensioenstorting": dynamic(() => import("../../apps/artifact-pensioen-aow-pensioenstorting/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "artifact-pensioen-aow-pensioenuitkering": dynamic(() => import("../../apps/artifact-pensioen-aow-pensioenuitkering/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "artifact-pensioen-aow-pensioenwaarde-berekenen": dynamic(() => import("../../apps/artifact-pensioen-aow-pensioenwaarde-berekenen/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "artifact-pensioen-aow-reserveringsruimte": dynamic(() => import("../../apps/artifact-pensioen-aow-reserveringsruimte/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "artifact-pensioen-aow-resterende-levensverwachting": dynamic(() => import("../../apps/artifact-pensioen-aow-resterende-levensverwachting/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "artifact-pensioen-aow-rvu-regeling-inkomensdaling": dynamic(() => import("../../apps/artifact-pensioen-aow-rvu-regeling-inkomensdaling/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "artifact-pensioen-aow-sparen-aanvullend-pensioen": dynamic(() => import("../../apps/artifact-pensioen-aow-sparen-aanvullend-pensioen/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "artifact-pensioen-aow-uitkeringen-uit-een-bancaire-lijfrente": dynamic(() => import("../../apps/artifact-pensioen-aow-uitkeringen-uit-een-bancaire-lijfrente/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "artifact-pensioen-aow-uitkeringen-uit-een-lijfrenteverzekering": dynamic(() => import("../../apps/artifact-pensioen-aow-uitkeringen-uit-een-lijfrenteverzekering/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
   "box-3-impact": dynamic(() => import("../../apps/box-3-impact/Calculator"), {
     loading: () => (
       <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">

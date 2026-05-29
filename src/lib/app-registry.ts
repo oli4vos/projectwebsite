@@ -701,6 +701,762 @@ export const appRegistry = [
     "entry": "Calculator.tsx"
   },
   {
+    "slug": "artifact-pensioen-aow-aanvullend-pensioen-berekenen",
+    "title": "Aanvullend pensioen berekenen (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Pensioen en AOW",
+    "tags": [
+      "artifact-import",
+      "pensioen-aow",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "pension",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-pensioen-aow-aow-leeftijd",
+    "title": "AOW-leeftijd (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Pensioen en AOW",
+    "tags": [
+      "artifact-import",
+      "pensioen-aow",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "pension",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-pensioen-aow-banksparen-voor-pensioen",
+    "title": "Banksparen voor Pensioen (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Pensioen en AOW",
+    "tags": [
+      "artifact-import",
+      "pensioen-aow",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "pension",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-pensioen-aow-bruto-netto-aow-pensioen",
+    "title": "Bruto-netto AOW & pensioen (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Pensioen en AOW",
+    "tags": [
+      "artifact-import",
+      "pensioen-aow",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "pension",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-pensioen-aow-bruto-netto-eerste-pensioenjaar",
+    "title": "Bruto-netto eerste pensioenjaar (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Pensioen en AOW",
+    "tags": [
+      "artifact-import",
+      "pensioen-aow",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "pension",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-pensioen-aow-bruto-netto-pensioen-ander-inkomen",
+    "title": "Bruto-netto pensioen + ander inkomen (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Pensioen en AOW",
+    "tags": [
+      "artifact-import",
+      "pensioen-aow",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "pension",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-pensioen-aow-bruto-netto-vroegpensioen-ander-inkomen",
+    "title": "Bruto-netto vroegpensioen + ander inkomen (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Pensioen en AOW",
+    "tags": [
+      "artifact-import",
+      "pensioen-aow",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "pension",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-pensioen-aow-doorwerken-na-uw-pensioen",
+    "title": "Doorwerken na uw pensioen (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Pensioen en AOW",
+    "tags": [
+      "artifact-import",
+      "pensioen-aow",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "pension",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-pensioen-aow-extra-pensioenuitkering",
+    "title": "Extra pensioenuitkering (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Pensioen en AOW",
+    "tags": [
+      "artifact-import",
+      "pensioen-aow",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "pension",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-pensioen-aow-hoogte-aow-uitkering",
+    "title": "Hoogte AOW-uitkering (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Pensioen en AOW",
+    "tags": [
+      "artifact-import",
+      "pensioen-aow",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "pension",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-pensioen-aow-jaarruimte-belastingteruggave",
+    "title": "Jaarruimte & belastingteruggave (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Pensioen en AOW",
+    "tags": [
+      "artifact-import",
+      "pensioen-aow",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "pension",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-pensioen-aow-jaarruimte-reserveringsruimte",
+    "title": "Jaarruimte + reserveringsruimte (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Pensioen en AOW",
+    "tags": [
+      "artifact-import",
+      "pensioen-aow",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "pension",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-pensioen-aow-levensverwachting-bij-geboorte",
+    "title": "Levensverwachting bij geboorte (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Pensioen en AOW",
+    "tags": [
+      "artifact-import",
+      "pensioen-aow",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "pension",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-pensioen-aow-netto-aow-pensioen-of-lijfrente-uitkering",
+    "title": "Netto AOW-, pensioen- of lijfrente-uitkering (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Pensioen en AOW",
+    "tags": [
+      "artifact-import",
+      "pensioen-aow",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "pension",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-pensioen-aow-netto-nabestaandenpensioen-of-anw-uitkering",
+    "title": "Netto nabestaandenpensioen of Anw-uitkering (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Pensioen en AOW",
+    "tags": [
+      "artifact-import",
+      "pensioen-aow",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "pension",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-pensioen-aow-netto-pensioen-na-pensioenkorting",
+    "title": "Netto pensioen na pensioenkorting (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Pensioen en AOW",
+    "tags": [
+      "artifact-import",
+      "pensioen-aow",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "pension",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-pensioen-aow-ouderenkorting",
+    "title": "Ouderenkorting (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Pensioen en AOW",
+    "tags": [
+      "artifact-import",
+      "pensioen-aow",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "pension",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-pensioen-aow-overbruggingsuitkering-aow",
+    "title": "Overbruggingsuitkering AOW (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Pensioen en AOW",
+    "tags": [
+      "artifact-import",
+      "pensioen-aow",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "pension",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-pensioen-aow-pensioensparen-buiten-box3",
+    "title": "Pensioensparen buiten box3 (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Pensioen en AOW",
+    "tags": [
+      "artifact-import",
+      "pensioen-aow",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "pension",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-pensioen-aow-pensioenstorting",
+    "title": "Pensioenstorting (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Pensioen en AOW",
+    "tags": [
+      "artifact-import",
+      "pensioen-aow",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "pension",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-pensioen-aow-pensioenuitkering",
+    "title": "Pensioenuitkering (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Pensioen en AOW",
+    "tags": [
+      "artifact-import",
+      "pensioen-aow",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "pension",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-pensioen-aow-pensioenwaarde-berekenen",
+    "title": "Pensioenwaarde berekenen (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Pensioen en AOW",
+    "tags": [
+      "artifact-import",
+      "pensioen-aow",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "pension",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-pensioen-aow-reserveringsruimte",
+    "title": "Reserveringsruimte (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Pensioen en AOW",
+    "tags": [
+      "artifact-import",
+      "pensioen-aow",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "pension",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-pensioen-aow-resterende-levensverwachting",
+    "title": "Resterende levensverwachting (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Pensioen en AOW",
+    "tags": [
+      "artifact-import",
+      "pensioen-aow",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "pension",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-pensioen-aow-rvu-regeling-inkomensdaling",
+    "title": "RVU-regeling - inkomensdaling (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Pensioen en AOW",
+    "tags": [
+      "artifact-import",
+      "pensioen-aow",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "pension",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-pensioen-aow-sparen-aanvullend-pensioen",
+    "title": "Sparen aanvullend pensioen (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Pensioen en AOW",
+    "tags": [
+      "artifact-import",
+      "pensioen-aow",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "pension",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-pensioen-aow-uitkeringen-uit-een-bancaire-lijfrente",
+    "title": "Uitkeringen uit een bancaire lijfrente (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Pensioen en AOW",
+    "tags": [
+      "artifact-import",
+      "pensioen-aow",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "pension",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "artifact-pensioen-aow-uitkeringen-uit-een-lijfrenteverzekering",
+    "title": "Uitkeringen uit een lijfrenteverzekering (Artifacts)",
+    "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
+    "type": "frontend",
+    "category": "Artifacts · Pensioen en AOW",
+    "tags": [
+      "artifact-import",
+      "pensioen-aow",
+      "invulblad"
+    ],
+    "status": "draft",
+    "visibility": "public",
+    "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "pension",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "financialEducation",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
     "slug": "box-3-impact",
     "title": "Wat kost mijn vermogen in box 3?",
     "description": "Zie hoeveel belasting je indicatief betaalt over spaargeld, beleggingen en schulden.",
