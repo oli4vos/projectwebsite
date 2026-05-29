@@ -14,36 +14,42 @@ Protocol: `START_HIER_AGENT.md`
 
 1. Annuïtair geleend bedrag — `done`
 2. Annuïteit berekenen — `done`
-3. Bedrag/getal berekenen — `ready`
-4. Breuk berekenen — `ready`
-5. Cijfer berekenen — `ready`
-6. Contante waarde — `ready`
-7. Contante waarde voor een reeks betalingen — `ready`
-8. Effectieve rente — `ready`
-9. Enkelvoudige rente — `ready`
-10. Gemiddelde cijfer — `ready`
-11. Gewogen gemiddelde rentepercentage — `ready`
-12. Lineaire lening aflossen — `ready`
-13. Looptijd annuïteit berekenen — `ready`
-14. Nominale rente — `ready`
-15. Percentage berekenen (basis) — `ready`
-16. Percentage berekenen (uit percentages) — `ready`
-17. Romeinse cijfers — `ready`
-18. Samengestelde rente — `ready`
-19. Toekomstige waarde — `ready`
-20. Waardebepaling via cashflow, DCF-methode — `ready`
+3. Bedrag/getal berekenen — `done`
+4. Breuk berekenen — `done`
+5. Cijfer berekenen — `done`
+6. Contante waarde — `done`
+7. Contante waarde voor een reeks betalingen — `done`
+8. Effectieve rente — `done`
+9. Enkelvoudige rente — `done`
+10. Gemiddelde cijfer — `done`
+11. Gewogen gemiddelde rentepercentage — `done`
+12. Lineaire lening aflossen — `done`
+13. Looptijd annuïteit berekenen — `done`
+14. Nominale rente — `done`
+15. Percentage berekenen (basis) — `done`
+16. Percentage berekenen (uit percentages) — `done`
+17. Romeinse cijfers — `done`
+18. Samengestelde rente — `done`
+19. Toekomstige waarde — `done`
+20. Waardebepaling via cashflow, DCF-methode — `done`
 
 ## Uitgevoerde implementaties in deze batch
 
-- `apps/annuitair-geleend-bedrag`
-- `apps/annuiteit-berekenen`
-- gedeelde rekenlaag: `src/lib/basis-calculations/annuity.ts`
+- Artifact-tools draaien via `apps/artifact-basis-berekeningen-*` met profielgestuurde `Calculator.tsx`.
+- Nieuwe rekenprofielen in `apps/_artifact_shared/runtime.ts`:
+  - `fraction_calculation`
+  - `required_grade`
+  - `average_grade`
+  - `roman_numerals`
+  - `dcf_valuation`
+  - `percentage_composition`
+- Bestaande foutieve profielkoppelingen in basis-categorie gecorrigeerd (o.a. annuïtair geleend bedrag).
+- Importscript bijgewerkt zodat artifact-calculators consistent worden opgebouwd met `ArtifactCalculator` + `TOOL_PROFILE`.
 
 ## Validatie (geslaagd)
 
-- `npm run generate:apps`
+- `npx vitest run apps/_artifact_shared/runtime.test.ts`
+- `npx vitest run apps/artifact-basis-berekeningen-*/logic.test.ts`
 - `npm run test`
 - `npm run lint`
 - `npm run typecheck`
-- `npm run build`
-

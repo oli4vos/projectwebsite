@@ -12,6 +12,7 @@ export default function Calculator() {
     <ArtifactCalculator
       title={TOOL_TITLE}
       defaultInput={DEFAULT_INPUT}
+      profile={TOOL_PROFILE}
       calculate={calculateRenteBijLening}
     />
   );

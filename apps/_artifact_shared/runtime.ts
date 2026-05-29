@@ -16,6 +16,12 @@ export type ToolProfile =
   | "value_from_percentage"
   | "linear_loan"
   | "indexed_amount"
+  | "fraction_calculation"
+  | "required_grade"
+  | "average_grade"
+  | "roman_numerals"
+  | "dcf_valuation"
+  | "percentage_composition"
   | "generic_contract";
 
 export type GenericCalculationInput = Record<string, unknown>;
@@ -72,6 +78,19 @@ const NAME_ALIASES = {
   amounts: ["amounts", "bedragen", "hoofdsommen", "wegingenbedrag"],
   rates: ["rates", "rentes", "percentages", "wegingenrente"],
   indexPercentages: ["indexpercentages", "indexreeks", "jaarlijkseindex"],
+  decimalValue: ["decimalvalue", "decimaal", "decimal", "waarde"],
+  numerator: ["numerator", "teller"],
+  denominator: ["denominator", "noemer"],
+  currentScores: ["currentscores", "scores", "cijfers", "behaaldecijfers"],
+  currentWeights: ["currentweights", "weights", "wegingen", "behaaldewegingen"],
+  targetScore: ["targetscore", "doelcijfer", "gewensteindcijfer", "gewenst"],
+  totalWeight: ["totalweight", "totaalweging", "total", "totaal"],
+  numberInput: ["numberinput", "arabisch", "getal", "number", "value"],
+  romanInput: ["romaninput", "romeins", "romeinscijfer", "roman", "input"],
+  cashflows: ["cashflows", "kasstromen", "cashflowreeks", "flows"],
+  terminalValue: ["terminalvalue", "eindwaarde", "restwaarde"],
+  percentage1: ["percentage1", "pct1", "eerstepercentage", "p1"],
+  percentage2: ["percentage2", "pct2", "tweedepercentage", "p2"],
 } as const;
 
 function round(value: number, digits = 2) {
@@ -136,6 +155,143 @@ function readSeries(input: GenericCalculationInput, aliases: readonly string[]):
     if (parsed.length > 0) return parsed;
   }
   return [];
+}
+
+function readString(input: GenericCalculationInput, aliases: readonly string[]): string | undefined {
+  const normalizedEntries = Object.entries(input).map(([key, value]) => [normalizeKey(key), value] as const);
+  for (const alias of aliases) {
+    const aliasKey = normalizeKey(alias);
+    const direct = normalizedEntries.find(([key]) => key === aliasKey);
+    if (!direct) continue;
+    const value = direct[1];
+    if (typeof value === "string" && value.trim().length > 0) return value.trim();
+  }
+  return undefined;
+}
+
+function gcd(a: number, b: number) {
+  let x = Math.abs(Math.trunc(a));
+  let y = Math.abs(Math.trunc(b));
+  while (y !== 0) {
+    const temp = y;
+    y = x % y;
+    x = temp;
+  }
+  return x || 1;
+}
+
+function continuedFractionApproximation(value: number, maxDenominator = 1_000_000) {
+  const sign = value < 0 ? -1 : 1;
+  let x = Math.abs(value);
+  let hPrev = 0;
+  let h = 1;
+  let kPrev = 1;
+  let k = 0;
+
+  while (true) {
+    const a = Math.floor(x);
+    const hNext = a * h + hPrev;
+    const kNext = a * k + kPrev;
+
+    if (kNext > maxDenominator || !Number.isFinite(hNext) || !Number.isFinite(kNext)) break;
+
+    hPrev = h;
+    h = hNext;
+    kPrev = k;
+    k = kNext;
+
+    const remainder = x - a;
+    if (remainder < 1e-12) break;
+    x = 1 / remainder;
+  }
+
+  if (k === 0) return { numerator: sign, denominator: 1 };
+  return { numerator: sign * h, denominator: k };
+}
+
+function toReducedFraction(value: number, maxDecimals = 10, maxDenominator = 1_000_000) {
+  if (value === 0) return { numerator: 0, denominator: 1 };
+
+  const sign = value < 0 ? -1 : 1;
+  const absValue = Math.abs(value);
+  const normalized = absValue.toFixed(maxDecimals).replace(/0+$/g, "").replace(/\.$/g, "");
+  const decimalIndex = normalized.indexOf(".");
+  const decimals = decimalIndex >= 0 ? normalized.length - decimalIndex - 1 : 0;
+  let denominator = 10 ** decimals;
+  let numerator = Math.round(absValue * denominator);
+
+  const divisor = gcd(numerator, denominator);
+  numerator /= divisor;
+  denominator /= divisor;
+
+  if (denominator > maxDenominator) {
+    const approx = continuedFractionApproximation(value, maxDenominator);
+    return {
+      numerator: approx.numerator,
+      denominator: approx.denominator,
+      approximated: true,
+    };
+  }
+
+  return { numerator: sign * numerator, denominator, approximated: false };
+}
+
+const ROMAN_TABLE = [
+  { value: 1000, symbol: "M" },
+  { value: 900, symbol: "CM" },
+  { value: 500, symbol: "D" },
+  { value: 400, symbol: "CD" },
+  { value: 100, symbol: "C" },
+  { value: 90, symbol: "XC" },
+  { value: 50, symbol: "L" },
+  { value: 40, symbol: "XL" },
+  { value: 10, symbol: "X" },
+  { value: 9, symbol: "IX" },
+  { value: 5, symbol: "V" },
+  { value: 4, symbol: "IV" },
+  { value: 1, symbol: "I" },
+];
+
+function arabicToRoman(value: number) {
+  let remainder = value;
+  let result = "";
+  for (const entry of ROMAN_TABLE) {
+    while (remainder >= entry.value) {
+      result += entry.symbol;
+      remainder -= entry.value;
+    }
+  }
+  return result;
+}
+
+function romanToArabic(roman: string) {
+  const normalized = roman.toUpperCase();
+  const validChars = /^[IVXLCDM]+$/;
+  if (!validChars.test(normalized)) return undefined;
+
+  const valueByChar: Record<string, number> = {
+    I: 1,
+    V: 5,
+    X: 10,
+    L: 50,
+    C: 100,
+    D: 500,
+    M: 1000,
+  };
+
+  let total = 0;
+  for (let i = 0; i < normalized.length; i += 1) {
+    const current = valueByChar[normalized[i]];
+    const next = valueByChar[normalized[i + 1]];
+    if (next && current < next) total -= current;
+    else total += current;
+  }
+
+  if (total < 1 || total > 3999) return undefined;
+  const canonical = arabicToRoman(total);
+  if (canonical !== normalized) return undefined;
+
+  return total;
 }
 
 function getPeriods(input: GenericCalculationInput) {
@@ -564,6 +720,238 @@ function indexedAmount(profile: ToolProfile, input: GenericCalculationInput): Ge
   };
 }
 
+function fractionCalculation(profile: ToolProfile, input: GenericCalculationInput): GenericCalculationResult {
+  const percentageInput = readNumber(input, NAME_ALIASES.percentage);
+  const decimalInput = readNumber(input, NAME_ALIASES.decimalValue) ?? readNumber(input, NAME_ALIASES.part);
+
+  if (percentageInput === undefined && decimalInput === undefined) {
+    return invalid(profile, ["Vul een geldig percentage of decimaal getal in."]);
+  }
+
+  const value = percentageInput !== undefined ? percentageInput / 100 : decimalInput;
+  if (value === undefined || !Number.isFinite(value)) {
+    return invalid(profile, ["Vul een geldig percentage of decimaal getal in."]);
+  }
+  if (Math.abs(value) > 1e12) {
+    return invalid(profile, ["De waarde is te groot om als praktische breuk weer te geven."]);
+  }
+
+  const fraction = toReducedFraction(value, 10, 1_000_000);
+  return {
+    isValid: true,
+    errors: [],
+    warnings: fraction.approximated ? ["De breuk is benaderd met een maximale noemer van 1.000.000."] : [],
+    profile,
+    outputs: {
+      fraction: `${fraction.numerator}/${fraction.denominator}`,
+      numerator: fraction.numerator,
+      denominator: fraction.denominator,
+      decimalValue: round(value, 10),
+      percentageValue: round(value * 100, 6),
+      verificationValue: round(fraction.numerator / fraction.denominator, 10),
+    },
+  };
+}
+
+function requiredGrade(profile: ToolProfile, input: GenericCalculationInput): GenericCalculationResult {
+  const targetScore = readNumber(input, NAME_ALIASES.targetScore) ?? readNumber(input, NAME_ALIASES.part);
+  const totalWeight = readNumber(input, NAME_ALIASES.totalWeight) ?? 100;
+  const scores = readSeries(input, NAME_ALIASES.currentScores);
+  const weights = readSeries(input, NAME_ALIASES.currentWeights);
+
+  if (targetScore === undefined || !Number.isFinite(targetScore) || targetScore < 1 || targetScore > 10) {
+    return invalid(profile, ["Vul een geldig gewenst eindcijfer in."]);
+  }
+  if (!Number.isFinite(totalWeight) || totalWeight <= 0) {
+    return invalid(profile, ["Vul geldige cijfers en wegingen in."]);
+  }
+  if (scores.length === 0 || weights.length === 0 || scores.length !== weights.length) {
+    return invalid(profile, ["Vul geldige cijfers en wegingen in."]);
+  }
+
+  const invalidRow = scores.some((score, index) => score < 1 || score > 10 || !Number.isFinite(score) || weights[index] <= 0 || !Number.isFinite(weights[index]));
+  if (invalidRow) return invalid(profile, ["Vul geldige cijfers en wegingen in."]);
+
+  const usedWeight = weights.reduce((sum, value) => sum + value, 0);
+  const remainingWeight = totalWeight - usedWeight;
+  if (remainingWeight <= 0) {
+    return invalid(profile, ["Er moet nog een resterende weging zijn."]);
+  }
+
+  const achievedPoints = scores.reduce((sum, score, index) => sum + score * weights[index], 0);
+  const required = ((targetScore * totalWeight) - achievedPoints) / remainingWeight;
+  const feasible = required >= 1 && required <= 10;
+
+  return {
+    isValid: true,
+    errors: [],
+    warnings: feasible ? [] : ["Het benodigde cijfer ligt buiten de mogelijke cijferschaal."],
+    profile,
+    outputs: {
+      targetScore: round(targetScore, 2),
+      totalWeight: round(totalWeight, 2),
+      usedWeight: round(usedWeight, 2),
+      remainingWeight: round(remainingWeight, 2),
+      requiredScore: round(required, 4),
+      feasible,
+      currentWeightedAverage: round(achievedPoints / usedWeight, 4),
+    },
+  };
+}
+
+function averageGrade(profile: ToolProfile, input: GenericCalculationInput): GenericCalculationResult {
+  const scores = readSeries(input, NAME_ALIASES.currentScores);
+  const weights = readSeries(input, NAME_ALIASES.currentWeights);
+
+  if (scores.length === 0) return invalid(profile, ["Vul minimaal één cijfer in."]);
+  if (scores.some((score) => !Number.isFinite(score) || score < 1 || score > 10)) {
+    return invalid(profile, ["Vul geldige cijfers in."]);
+  }
+
+  const hasWeights = weights.length > 0;
+  if (hasWeights) {
+    if (weights.length !== scores.length) return invalid(profile, ["Vul geldige positieve wegingen in."]);
+    if (weights.some((weight) => !Number.isFinite(weight) || weight <= 0)) {
+      return invalid(profile, ["Vul geldige positieve wegingen in."]);
+    }
+  }
+
+  let average: number;
+  let totalWeight: number;
+  if (hasWeights) {
+    totalWeight = weights.reduce((sum, value) => sum + value, 0);
+    if (totalWeight <= 0) return invalid(profile, ["Vul geldige positieve wegingen in."]);
+    const weightedPoints = scores.reduce((sum, score, index) => sum + score * weights[index], 0);
+    average = weightedPoints / totalWeight;
+  } else {
+    totalWeight = scores.length;
+    average = scores.reduce((sum, value) => sum + value, 0) / scores.length;
+  }
+
+  return {
+    isValid: true,
+    errors: [],
+    warnings: [],
+    profile,
+    outputs: {
+      averageScore: round(average, 4),
+      roundedToOneDecimal: round(average, 1),
+      count: scores.length,
+      weighted: hasWeights,
+      totalWeight: round(totalWeight, 4),
+    },
+  };
+}
+
+function romanNumerals(profile: ToolProfile, input: GenericCalculationInput): GenericCalculationResult {
+  const numberInput = readNumber(input, NAME_ALIASES.numberInput);
+  const romanInput = readString(input, NAME_ALIASES.romanInput);
+
+  if (numberInput !== undefined) {
+    if (!Number.isInteger(numberInput) || numberInput < 1 || numberInput > 3999) {
+      return invalid(profile, ["Vul een getal van 1 t/m 3999 of een geldig Romeins cijfer in."]);
+    }
+    return {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      profile,
+      outputs: {
+        arabicNumber: numberInput,
+        romanNumeral: arabicToRoman(numberInput),
+        direction: "arabisch-naar-romeins",
+      },
+    };
+  }
+
+  if (romanInput) {
+    const parsed = romanToArabic(romanInput);
+    if (parsed === undefined) {
+      return invalid(profile, ["Dit is geen geldige Romeinse notatie."]);
+    }
+    return {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      profile,
+      outputs: {
+        arabicNumber: parsed,
+        romanNumeral: arabicToRoman(parsed),
+        direction: "romeins-naar-arabisch",
+      },
+    };
+  }
+
+  return invalid(profile, ["Vul een getal van 1 t/m 3999 of een geldig Romeins cijfer in."]);
+}
+
+function dcfValuation(profile: ToolProfile, input: GenericCalculationInput): GenericCalculationResult {
+  const wacc = readNumber(input, NAME_ALIASES.annualRate);
+  const cashflows = readSeries(input, NAME_ALIASES.cashflows);
+  const terminalValue = readNumber(input, NAME_ALIASES.terminalValue) ?? 0;
+
+  if (wacc === undefined || !Number.isFinite(wacc)) return invalid(profile, ["Vul een geldige WACC in."]);
+  if (wacc <= -100) return invalid(profile, ["De WACC moet hoger zijn dan -100%."]);
+  if (cashflows.length === 0) return invalid(profile, ["Vul minimaal één kasstroom in."]);
+  if (cashflows.length > 100) return invalid(profile, ["De horizon is te lang voor deze berekening."]);
+  if (cashflows.some((value) => !Number.isFinite(value))) return invalid(profile, ["Vul minimaal één kasstroom in."]);
+
+  const discountRate = wacc / 100;
+  let pvCashflows = 0;
+  for (let year = 1; year <= cashflows.length; year += 1) {
+    pvCashflows += cashflows[year - 1] / (1 + discountRate) ** year;
+  }
+  const pvTerminal = terminalValue / (1 + discountRate) ** cashflows.length;
+  const totalValue = pvCashflows + pvTerminal;
+
+  return {
+    isValid: true,
+    errors: [],
+    warnings: [],
+    profile,
+    outputs: {
+      dcfValue: round(totalValue),
+      presentValueCashflows: round(pvCashflows),
+      presentValueTerminal: round(pvTerminal),
+      waccPercentage: round(wacc, 6),
+      horizonYears: cashflows.length,
+    },
+  };
+}
+
+function percentageComposition(profile: ToolProfile, input: GenericCalculationInput): GenericCalculationResult {
+  const percentage1 = readNumber(input, NAME_ALIASES.percentage1) ?? readNumber(input, NAME_ALIASES.part);
+  const percentage2 = readNumber(input, NAME_ALIASES.percentage2) ?? readNumber(input, NAME_ALIASES.total);
+
+  if (percentage1 === undefined || percentage2 === undefined) {
+    return invalid(profile, ["Vul twee geldige percentages in."]);
+  }
+  if (percentage1 < -100 || percentage2 < -100) {
+    return invalid(profile, ["Een percentage lager dan -100% is niet toegestaan."]);
+  }
+
+  const factor1 = 1 + (percentage1 / 100);
+  const factor2 = 1 + (percentage2 / 100);
+  const compositeFactor = factor1 * factor2;
+  const compositePercentage = (compositeFactor - 1) * 100;
+  const sumPercentagePoints = percentage1 + percentage2;
+
+  return {
+    isValid: true,
+    errors: [],
+    warnings: [],
+    profile,
+    outputs: {
+      percentage1: round(percentage1, 6),
+      percentage2: round(percentage2, 6),
+      compositeFactor: round(compositeFactor, 8),
+      compositePercentage: round(compositePercentage, 6),
+      sumPercentagePoints: round(sumPercentagePoints, 6),
+      compositionDifference: round(compositePercentage - sumPercentagePoints, 6),
+    },
+  };
+}
+
 function genericContract(profile: ToolProfile, input: GenericCalculationInput): GenericCalculationResult {
   const numericValues = Object.values(input).map((value) => toNumber(value)).filter((value): value is number => value !== undefined);
   if (numericValues.length === 0) {
@@ -628,6 +1016,18 @@ export function executeProfile(profile: ToolProfile, input: GenericCalculationIn
       return linearLoan(profile, input);
     case "indexed_amount":
       return indexedAmount(profile, input);
+    case "fraction_calculation":
+      return fractionCalculation(profile, input);
+    case "required_grade":
+      return requiredGrade(profile, input);
+    case "average_grade":
+      return averageGrade(profile, input);
+    case "roman_numerals":
+      return romanNumerals(profile, input);
+    case "dcf_valuation":
+      return dcfValuation(profile, input);
+    case "percentage_composition":
+      return percentageComposition(profile, input);
     case "generic_contract":
       return genericContract(profile, input);
     default:
@@ -667,6 +1067,29 @@ export function getProfileFixture(profile: ToolProfile): ProfileFixture {
       return { input: { principal: 10000, annualRate: 6, periods: 12 }, expectValid: true };
     case "indexed_amount":
       return { input: { startAmount: 1000, indexPercentages: [2, 3] }, expectValid: true };
+    case "fraction_calculation":
+      return { input: { percentage: 12.5 }, expectValid: true };
+    case "required_grade":
+      return {
+        input: {
+          targetScore: 7,
+          totalWeight: 100,
+          currentScores: [6, 8],
+          currentWeights: [40, 30],
+        },
+        expectValid: true,
+      };
+    case "average_grade":
+      return { input: { currentScores: [6, 7, 8] }, expectValid: true };
+    case "roman_numerals":
+      return { input: { numberInput: 2026 }, expectValid: true };
+    case "dcf_valuation":
+      return {
+        input: { annualRate: 10, cashflows: [100, 100, 100], terminalValue: 1000 },
+        expectValid: true,
+      };
+    case "percentage_composition":
+      return { input: { percentage1: 10, percentage2: 20 }, expectValid: true };
     case "generic_contract":
     default:
       return { input: { valueA: 100, valueB: 250 }, expectValid: true };

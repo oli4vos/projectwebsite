@@ -107,6 +107,17 @@ function rewriteSharedImports(content) {
     .replaceAll(`from "../_shared/runtime"`, `from "../_artifact_shared/runtime"`);
 }
 
+function extractLogicExports(logicSource) {
+  const functionMatch = logicSource.match(/export function\s+([A-Za-z0-9_]+)\s*\(/);
+  return {
+    calculateFunctionName: functionMatch?.[1] ?? null,
+  };
+}
+
+function buildArtifactCalculatorSource({ functionName, title }) {
+  return `"use client";\n\nimport { ArtifactCalculator } from "../_artifact_shared/ArtifactCalculator";\nimport { getProfileFixture } from "../_artifact_shared/runtime";\nimport { ${functionName}, TOOL_PROFILE } from "./logic";\n\nconst TOOL_TITLE = ${JSON.stringify(title)};\nconst DEFAULT_INPUT = getProfileFixture(TOOL_PROFILE).input;\n\nexport default function Calculator() {\n  return (\n    <ArtifactCalculator\n      title={TOOL_TITLE}\n      defaultInput={DEFAULT_INPUT}\n      profile={TOOL_PROFILE}\n      calculate={${functionName}}\n    />\n  );\n}\n`;
+}
+
 async function main() {
   const manifest = JSON.parse(await fs.readFile(STAGING_MANIFEST_PATH, "utf8"));
   await fs.mkdir(APPS_SHARED_DIR, { recursive: true });
@@ -165,9 +176,17 @@ async function main() {
       rewriteSharedImports(logicTestSource),
       "utf8",
     );
-    await copyFile(
-      path.join(sourceDir, "Calculator.tsx"),
+    const logicExports = extractLogicExports(logicSource);
+    if (!logicExports.calculateFunctionName) {
+      throw new Error(`Kon calculate-functie niet vinden voor ${entry.path}`);
+    }
+    await fs.writeFile(
       path.join(targetDir, "Calculator.tsx"),
+      buildArtifactCalculatorSource({
+        functionName: logicExports.calculateFunctionName,
+        title: entry.title,
+      }),
+      "utf8",
     );
 
     imported += 1;

@@ -17,6 +17,12 @@ const profiles: ToolProfile[] = [
   "value_from_percentage",
   "linear_loan",
   "indexed_amount",
+  "fraction_calculation",
+  "required_grade",
+  "average_grade",
+  "roman_numerals",
+  "dcf_valuation",
+  "percentage_composition",
   "generic_contract",
 ];
 

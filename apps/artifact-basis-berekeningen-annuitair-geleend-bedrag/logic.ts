@@ -7,7 +7,7 @@ import {
 export type ToolInput = GenericCalculationInput;
 export type ToolResult = GenericCalculationResult;
 
-export const TOOL_PROFILE = "generic_contract" as const;
+export const TOOL_PROFILE = "annuity_principal" as const;
 
 export function calculateAnnuitairGeleendBedrag(input: ToolInput): ToolResult {
   return executeProfile(TOOL_PROFILE, input);
