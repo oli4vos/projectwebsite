@@ -46,7 +46,7 @@ export const appRegistry = [
     "title": "Aantal werkdagen (Artifacts)",
     "description": "Bereken werkdagen in een periode met optionele uitsluiting van Nederlandse feestdagen.",
     "type": "frontend",
-    "category": "Artifacts (invulbladen)",
+    "category": "Artifacts · Kalender en vrije tijd",
     "tags": [
       "artifact-import",
       "kalender-vrije-tijd",
@@ -73,7 +73,7 @@ export const appRegistry = [
     "title": "Begin- of einddatum (Artifacts)",
     "description": "Bereken een begin- of einddatum op basis van een bekende datum en periodecomponenten.",
     "type": "frontend",
-    "category": "Artifacts (invulbladen)",
+    "category": "Artifacts · Kalender en vrije tijd",
     "tags": [
       "artifact-import",
       "kalender-vrije-tijd",
@@ -100,7 +100,7 @@ export const appRegistry = [
     "title": "Dag van de week (Artifacts)",
     "description": "Bepaal op welke weekdag een datum valt, inclusief ISO-weeknummer en dagnummer in het jaar.",
     "type": "frontend",
-    "category": "Artifacts (invulbladen)",
+    "category": "Artifacts · Kalender en vrije tijd",
     "tags": [
       "artifact-import",
       "kalender-vrije-tijd",
@@ -127,7 +127,7 @@ export const appRegistry = [
     "title": "Eerstvolgende of vorige weekdag (Artifacts)",
     "description": "Bereken de eerstvolgende of vorige weekdag vanaf een opgegeven datum.",
     "type": "frontend",
-    "category": "Artifacts (invulbladen)",
+    "category": "Artifacts · Kalender en vrije tijd",
     "tags": [
       "artifact-import",
       "kalender-vrije-tijd",
@@ -154,7 +154,7 @@ export const appRegistry = [
     "title": "Feestdagen (Artifacts)",
     "description": "Toon Nederlandse feestdagen voor een gekozen jaar, inclusief vaste en beweeglijke dagen.",
     "type": "frontend",
-    "category": "Artifacts (invulbladen)",
+    "category": "Artifacts · Kalender en vrije tijd",
     "tags": [
       "artifact-import",
       "kalender-vrije-tijd",
@@ -181,7 +181,7 @@ export const appRegistry = [
     "title": "Periode duur (Artifacts)",
     "description": "Bereken de duur tussen twee datums in dagen, weken en kalendercomponenten.",
     "type": "frontend",
-    "category": "Artifacts (invulbladen)",
+    "category": "Artifacts · Kalender en vrije tijd",
     "tags": [
       "artifact-import",
       "kalender-vrije-tijd",
@@ -208,7 +208,7 @@ export const appRegistry = [
     "title": "Schoolvakanties (Artifacts)",
     "description": "Toon schoolvakantieperiodes per schooljaar en regio op basis van een interne dataset.",
     "type": "frontend",
-    "category": "Artifacts (invulbladen)",
+    "category": "Artifacts · Kalender en vrije tijd",
     "tags": [
       "artifact-import",
       "kalender-vrije-tijd",
@@ -235,7 +235,7 @@ export const appRegistry = [
     "title": "Wisselkoers valuta (Artifacts)",
     "description": "Reken bedragen om tussen valuta met optionele koersopslag en vaste kosten.",
     "type": "frontend",
-    "category": "Artifacts (invulbladen)",
+    "category": "Artifacts · Kalender en vrije tijd",
     "tags": [
       "artifact-import",
       "kalender-vrije-tijd",

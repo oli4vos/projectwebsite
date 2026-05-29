@@ -3,7 +3,7 @@
   "title": "Maandbedrag voor aflossing lening (Artifacts)",
   "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
   "type": "frontend",
-  "category": "Artifacts (invulbladen)",
+  "category": "Artifacts · Geld lenen en financiering",
   "tags": [
     "artifact-import",
     "geld-lenen-financiering",

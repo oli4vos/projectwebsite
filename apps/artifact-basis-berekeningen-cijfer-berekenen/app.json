@@ -3,7 +3,7 @@
   "title": "Cijfer berekenen (Artifacts)",
   "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
   "type": "frontend",
-  "category": "Artifacts (invulbladen)",
+  "category": "Artifacts · Basis berekeningen",
   "tags": [
     "artifact-import",
     "basis-berekeningen",

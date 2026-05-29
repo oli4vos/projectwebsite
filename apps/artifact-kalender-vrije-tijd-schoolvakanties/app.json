@@ -3,7 +3,7 @@
   "title": "Schoolvakanties (Artifacts)",
   "description": "Toon schoolvakantieperiodes per schooljaar en regio op basis van een interne dataset.",
   "type": "frontend",
-  "category": "Artifacts (invulbladen)",
+  "category": "Artifacts · Kalender en vrije tijd",
   "tags": [
     "artifact-import",
     "kalender-vrije-tijd",

@@ -49,6 +49,31 @@ function mapCalculationDomains(categorySlug) {
   }
 }
 
+function fallbackCategoryTitle(categorySlug) {
+  return categorySlug
+    .split("-")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function mapArtifactCategoryLabel(categorySlug) {
+  const labels = {
+    "basis-berekeningen": "Artifacts · Basis berekeningen",
+    "geld-lenen-financiering": "Artifacts · Geld lenen en financiering",
+    "gezin-relatie": "Artifacts · Gezin en relatie",
+    "hypotheek-wonen": "Artifacts · Hypotheek en wonen",
+    "kalender-vrije-tijd": "Artifacts · Kalender en vrije tijd",
+    "ondernemen-zzp-dga": "Artifacts · Ondernemen, zzp en dga",
+    "overig": "Artifacts · Overig",
+    "pensioen-aow": "Artifacts · Pensioen en AOW",
+    "schenken-erven": "Artifacts · Schenken en erven",
+    "sparen-beleggen": "Artifacts · Sparen en beleggen",
+    "werk-inkomen-ontslag": "Artifacts · Werk, inkomen en ontslag",
+  };
+
+  return labels[categorySlug] ?? `Artifacts · ${fallbackCategoryTitle(categorySlug)}`;
+}
+
 function buildAppJson({ targetSlug, title, categorySlug }) {
   return {
     slug: targetSlug,
@@ -56,7 +81,7 @@ function buildAppJson({ targetSlug, title, categorySlug }) {
     description:
       "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
     type: "frontend",
-    category: "Artifacts (invulbladen)",
+    category: mapArtifactCategoryLabel(categorySlug),
     tags: ["artifact-import", categorySlug, "invulblad"],
     status: "draft",
     visibility: "public",
