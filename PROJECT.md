@@ -95,6 +95,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 
 - `/` via `src/app/page.tsx`
 - `/apps/[slug]` via `src/app/apps/[slug]/page.tsx`
+- `/kennisbank` via `src/app/kennisbank/page.tsx`
 - `/variabelen` via `src/app/variabelen/page.tsx`
 - `not-found` via `src/app/not-found.tsx`
 
@@ -105,6 +106,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/components/SiteHeader.tsx`: topnavigatie en CTA's
 - `src/components/SiteFooter.tsx`: footerlinks
 - `src/components/AppDashboard.tsx`: bibliotheek-first homepageflow met doelgroep-/geldroutes, categoriekaarten en tools per onderwerp
+- `src/app/kennisbank/page.tsx`: aparte kennisbankpagina met besliskaders los van tooluitkomsten
 - `src/components/AppCard.tsx`: vertaalt manifest naar card-props
 - `src/components/ToolCard.tsx`: daadwerkelijke kaart-UI
 - `src/components/AppRenderer.tsx`: pakt lazy toolcomponent op basis van slug
@@ -162,6 +164,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/hooks/useUserPreferences.ts`: sync-hook voor lokale kennisniveauvoorkeur
 - `src/lib/financial-constants/`: centrale jaarlijkse aannames/variabelen + helpers
 - `src/lib/chart-utils.ts`: centrale format/tick helpers voor grafieken (hele jaren + eurolabels)
+- `src/lib/knowledge-base.ts`: centrale kennisbankcontent (horizonbanden, checklists, keuzecontexten, toolkoppelingen)
 - `src/lib/number-input.ts`: centrale parser voor numerieke invoer; komma wordt als decimaalpunt behandeld
 - `src/lib/copy-glossary.ts`: centrale woordenlijst voor gebruikerstaal bij financiële termen en enumlabels
 - `src/components/GlossaryText.tsx`: maakt bekende financiële begrippen klikbaar met korte hover/focus-uitleg
@@ -185,7 +188,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `docs/database/README.md` + `docs/database/supabase-schema.sql`: voorbereid databaseplan en schema voor side-by-side remote variant
 - `src/lib/runtime-monitoring.ts` + `src/components/RuntimeMonitoringBootstrap.tsx`: privacy-first frontend runtime monitoring (error/unhandledrejection), met release-tag en optionele webhook via `NEXT_PUBLIC_MONITORING_WEBHOOK_URL`
 - `src/lib/feature-flags.ts`: centrale flags voor tijdelijk uit/aan zetten van productfunctionaliteit (o.a. profiel en kennisniveau)
-- `FUNCTIONALITY_STATUS.md`: centrale statuslijst met actief/uitgeschakeld/toekomstig + heractivatiestappen
+- `FUNCTIONALITY_STATUS.md`: **SSOT** voor functionele status (actief/uit/hidden/voorbereid) inclusief append-only mutatielog
 
 ### Profielopslag (voorbereid op databasevariant)
 
@@ -389,6 +392,8 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - wat aan staat;
   - wat bewust uit staat;
   - hoe het weer geactiveerd wordt.
+  - welke commit de laatste functionele statuswijziging heeft gedaan (mutatielog).
+- Bij elke functionele wijziging is het updaten van `FUNCTIONALITY_STATUS.md` verplicht.
   - profielkoppeling altijd via `profile-tool-mapping` + `profile-prefill` en met regressietests;
   - tool-specifieke `logic.ts` alleen testen op gedrag dat niet al in centrale lagen zit.
 - `npm run check` draait lokaal dezelfde sequentie als CI inclusief registry-verificatie.

@@ -33,6 +33,9 @@ export default async function HomePage() {
                   Vul profiel in
                 </BtnLink>
               ) : null}
+              <BtnLink href="/kennisbank" kind="outline" size="md">
+                Lees kennisbank
+              </BtnLink>
               <BtnLink href="/variabelen" kind="ghost" size="md">
                 Bekijk aannames
               </BtnLink>

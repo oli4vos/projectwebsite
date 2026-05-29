@@ -5,4 +5,36 @@
 - wettelijk maandbedrag vanuit duo meenemen, dit berekenen dmv een annuiteit. Vervolgens een optie geven om te berekenen of je beter extra snel kunt aflossen of beleggen. Voor studieschuld is het niet zo relevant want aflossen moet je toch, daarnaast ook daadwerkelijke maandbedrag berekenen obv inkomen etc. deze logica is belangrijk want dit moet je minimaal aflossen en zit geen keuze in de keuze zit hem wel in het extra aflossen of niet.
 - qua design moet alles veel meer flex, als het scherm verkleind wordt of via een mobiel wordt aangeroepen moet de juiste info zichtbaar blijven
 - grafieken moeten makkelijker te lezen zijn met een overzichtelijke maar adaptieve x en Y as, x altijd tijd in jaren afhaneklijk van de lengte kan dit per jaar maar bv ook per vijf jaar in de as staan, y as altijd in euros, maar afhaneklijk van de grens van de grafiek in stappen van honderden of (tien) duizenden.
-- 
+- gelaagdheid in de tools: invulveld, daarna beknopte samenvatting van wat iemand echt wilt weten, daaronder de mogelijkheid om een uitgebreide toelichting uit te vouwen
+- ook meenemen hoeveel je met je inkomen aan hypohteek zou kunnen krijgen
+- snelle vuistregel nog verwijderen
+- een makkelijk leesbaar betand waar ik de variable per jaar kan doorvoeren en dat dit doorwerkt voor de hele website
+- op mobiel per veld op enter moeten drukken of een knop of automatisch door als het is ingevuld en daarna pas het volgende blok laten verschijnen en de volgende laten verdwijnen. hierdoor blijft het scherm altijd clean.
+- bij box 3 de keuze meegegeven of er onder werkelijk rendement of forfatair rendement gevallen wordt, default waarde is werkelijk, alleen aan te passen naar werkelijk wanneer dit expliciet wordt aangevinkt
+- voor mobiel wil ik dat het hoofdmenu bovenin als er naar beneden gescrold word alleen nog het logo zichtbaar is samen met rekentools en mijn profiel en als er weer naar boven gescrolt wordt en we bijna bovenaan zijn het hele menu weer zichtbaar wordt.
+- profielpagina invullen resulteert in een error, zorg dat deze eruit wordt gehaal en het profiel in de browser wordt opgeslagen
+- in de DUO tool meenemen dat het wettelijke minimale bedrag altijd afgelost moet worden, zoek uit hoe dit werkt maar het is iets met 4% van loon boven minimumloon, alles daarboven is een keuze en daarvoor zou gekozen kunnen worden om dit te gaan beleggen
+- in studieschuld aflossen of beleggen moet ook alles van het leenstelsel etc meegenomen worden en dus ook hoe het werkt met het wettelijke minimum maar niet met het waar banken mee rekenen maar puur wat je moet en alles daarboven is dus vrijwillig
+- maandbedrag dat je af zou moeten lossen per maand om DUO helemaal af te lossen is het bedrag waar hypotheekverstrekkers rekening mee houden, deze is dus relevant hiervoor en zou niet door iemand zelf ingevuld kunnen worden. 
+- werk nu ook een box 3 tool uit, met goede uitleg en specificatie
+- uiteindelijk een goed overzicht per doelgroep, bv (oud)studenten, mensen richting pensioen (AOV), ZZP of loondienst (Aov etc, geen vakantiedagen vakantiegeld), beleggen algemeen (box 3 meenemen, vermogensgroei) mogelijk zit dit ook al in fire maar wil niet mensen af laten haken omdat ze afknappen op het label fire
+- overal waar box 3 relevant is moet de algemene logica laag van box 3 aangeroepen worden
+- clean pdf en excel export kunnen maken met een vermogensplanning
+- bij het veld waar iemand zijn jaarruimte invult eronder plaatsen, weet ik niet help mij berekenen, en dan een knop die je leidt naar de berekenhulp van de jaarruimte.
+- duo kan uit meerdere schuld delen bestaan creer een box onder het invullen van de duo schuld, heb je meerdere duo schulden in delen, als het ja is nog een keer duo schuld in laten vollen, daarna was dit het laatste schuld deel, als het nee is weer een nieuw veld op laten poppen met rente etc. herhaal dit totdat het de laatse was
+- bij wat doe ik met mijn volgende euro werkt de berekening nog niet goed als zaken nog opengelaten zijn. ik wil onderaan een knop met bereken, als deze wordt ingedrukt gaat de tool alleen aan de slag met die gegevens en geeft dus ook alleen de relevante output voor deze persoon
+- overal waar veel getallen in gebruikt worden wil ik ook een export met een mooi pdf rapport en excel kunnen generen. de excel moet duidelijk gestructureerd zijn maar ook een grafische weergave bevatten, daarnaast mag de gebruiker in het excel niet met invoerwaarden spelen zodat het niet opnieuw de berekening kan maken, hiervoor moet altijd terug naar de site gegaan worden.
+- belastinlogica doorvoeren bij uurtarief bepaling voor een ZZP-er. daarnaast goed controleren in de logica of het ingevulde aantal werkweken goed overgenomen wordt in de berekening. hanteer altijd een jaar van 52 weken en vraag dus niet uit hoeveel vakantie werken, maar vraag aantal werkweken (dit is 52- vakantie weken per jaar)
+- uiteindelijk ook een API aanbieden zodat mensen de rekentools in hun eigen website kunnen gebruiken als uithangbord.
+- uiteindelijk moeten alle logica lagen herbruikt worden en aangeroepen worden uit de algemene laag, denk bijvoorbeeld aan een jaarrente terugrekenen naar een maandrente.
+
+
+
+buiten doelgroep:
+- impact private lease op hypotheek
+
+
+Niet aan codex vragen maar gericht uitzoeken:
+- logic test nagaan en kijken of dit logisch is.
+- vrij beleggen tov jaarruimte gaat nog niet goed, je moet hier rekenen met het netto bedrag tov het bruto bedrag in de pensioenpot
+

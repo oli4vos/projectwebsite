@@ -10,6 +10,7 @@ import { toolGroups } from "@/lib/tool-groups";
 
 const navItems = [
   { href: "/#apps", label: "Overzicht" },
+  { href: "/kennisbank", label: "Kennisbank" },
   ...(ENABLE_PROFILE ? [{ href: "/#persoonlijk", label: "Persoonlijk" as const }] : []),
   { href: "/#aannames", label: "Aannames" },
 ] as const;
@@ -27,6 +28,7 @@ export function SiteHeader() {
   const pathname = usePathname();
   const onHome = pathname === "/";
   const onToolPage = pathname.startsWith("/apps/");
+  const onKnowledgePage = pathname === "/kennisbank";
   const [isMobileCompact, setIsMobileCompact] = useState(false);
   const lastScrollY = useRef(0);
 
@@ -97,6 +99,9 @@ export function SiteHeader() {
                 Mijn profiel
               </BtnLink>
             ) : null}
+            <BtnLink href="/kennisbank" kind={onKnowledgePage ? "outline" : "ghost"} size="sm">
+              Kennisbank
+            </BtnLink>
             <BtnLink href="/variabelen" kind={pathname === "/variabelen" ? "outline" : "ghost"} size="sm">
               Variabelen
             </BtnLink>
@@ -134,6 +139,14 @@ export function SiteHeader() {
                 className="min-w-0 flex-1 justify-center"
               >
                 Rekentools
+              </BtnLink>
+              <BtnLink
+                href="/kennisbank"
+                kind={onKnowledgePage ? "outline" : "ghost"}
+                size="sm"
+                className="min-w-0 flex-1 justify-center"
+              >
+                Kennisbank
               </BtnLink>
               {ENABLE_PROFILE ? (
                 <BtnLink
@@ -181,6 +194,14 @@ export function SiteHeader() {
                   Mijn profiel
                 </BtnLink>
               ) : null}
+              <BtnLink
+                href="/kennisbank"
+                kind={onKnowledgePage ? "outline" : "ghost"}
+                size="sm"
+                className="w-full justify-center"
+              >
+                Kennisbank
+              </BtnLink>
               <BtnLink
                 href="/variabelen"
                 kind={pathname === "/variabelen" ? "outline" : "ghost"}

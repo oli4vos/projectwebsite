@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Logo } from "@/components/ui";
+import { ENABLE_PROFILE } from "@/lib/feature-flags";
 
 export function SiteFooter() {
   return (
@@ -16,11 +17,19 @@ export function SiteFooter() {
           >
             Overzicht
           </Link>
+          {ENABLE_PROFILE ? (
+            <Link
+              href="/#persoonlijk"
+              className="rounded-full px-2 py-1 transition hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
+            >
+              Persoonlijk
+            </Link>
+          ) : null}
           <Link
-            href="/#persoonlijk"
+            href="/kennisbank"
             className="rounded-full px-2 py-1 transition hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
           >
-            Persoonlijk
+            Kennisbank
           </Link>
           <Link
             href="/#aannames"
