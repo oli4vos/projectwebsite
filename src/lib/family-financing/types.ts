@@ -53,7 +53,55 @@ export type FamilyLoanInput = {
   termYears: number;
   repaymentType: FamilyLoanRepaymentType;
   startDate?: string;
+  /**
+   * Optionele doelbetaling per maand voor latere scenario's; de huidige engine gebruikt dit niet als harde contractwaarde.
+   */
   monthlyPaymentOverride?: EuroAmount;
+};
+
+/**
+ * Eén maandregel in de familielening-aflossingstabel.
+ */
+export type FamilyLoanScheduleRow = {
+  period: number;
+  openingBalance: EuroAmount;
+  payment: EuroAmount;
+  interestPayment: EuroAmount;
+  principalPayment: EuroAmount;
+  closingBalance: EuroAmount;
+  borrowerCashOutflow: EuroAmount;
+  lenderCashInflow: EuroAmount;
+};
+
+/**
+ * Samenvatting van totale kasstromen voor één partij.
+ */
+export type FamilyLoanCashflowSummary = {
+  totalPayments: EuroAmount;
+  totalInterest: EuroAmount;
+  totalPrincipal: EuroAmount;
+  endingDebt: EuroAmount;
+};
+
+/**
+ * Volledig resultaat van de familieleningengine, inclusief aflossingstabel.
+ */
+export type FamilyLoanResult = {
+  input: FamilyLoanInput;
+  principalUsed: EuroAmount;
+  annualRateUsed: AnnualPercent;
+  termYearsUsed: number;
+  repaymentType: FamilyLoanRepaymentType;
+  monthlyPayment: EuroAmount;
+  periods: number;
+  schedule: FamilyLoanScheduleRow[];
+  totalPayments: EuroAmount;
+  totalInterest: EuroAmount;
+  totalPrincipal: EuroAmount;
+  remainingDebt: EuroAmount;
+  borrowerCashflow: FamilyLoanCashflowSummary;
+  lenderCashflow: FamilyLoanCashflowSummary;
+  warnings: string[];
 };
 
 export type OneTimeGiftInput = {

@@ -4,8 +4,11 @@ export type {
   AssumptionStatus,
   BankMortgageInput,
   DebtBySource,
+  FamilyLoanCashflowSummary,
   FamilyLoanInput,
   FamilyLoanRepaymentType,
+  FamilyLoanResult,
+  FamilyLoanScheduleRow,
   FinancingScenario,
   FinancingScenarioResult,
   FinancingScenarioType,
@@ -22,3 +25,4 @@ export type {
   DuoContextInput,
   EuroAmount,
 } from "@/lib/family-financing/types";
+export { calculateFamilyLoan } from "@/lib/family-financing/family-loan";
