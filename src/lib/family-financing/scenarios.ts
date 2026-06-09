@@ -204,6 +204,7 @@ export function calculateFinancingScenario(
   const recurringGiftMonthlyEquivalent = monthlyEquivalentFromGifts(
     giftCashflows.filter((gift) => gift.kind === "recurring"),
   );
+  const extraDuoRepaymentUsed = roundMoney(sanitizeMoney(input.extraDuoRepayment));
   const purchaseNeed = roundMoney(
     sanitizeMoney(input.purchasePrice) + sanitizeMoney(input.acquisitionCosts),
   );
@@ -220,7 +221,13 @@ export function calculateFinancingScenario(
     ? determineRelevantDuoPayment(input.duo)
     : undefined;
   const duoExtraRepaymentGift =
-    scenario.type === "gift-for-duo-repayment" ? oneTimeGiftTotal : 0;
+    extraDuoRepaymentUsed > 0
+      ? extraDuoRepaymentUsed
+      : scenario.type === "gift-for-duo-repayment"
+        ? oneTimeGiftTotal
+        : 0;
+  const liquidFundsExtraDuoRepayment =
+    extraDuoRepaymentUsed > 0 ? extraDuoRepaymentUsed : 0;
   const duoAdjusted = input.duo
     ? calculateDuoMonthlyPaymentAfterExtraRepayment({
         remainingDebt: sanitizeMoney(input.duo.remainingDebt),
@@ -241,7 +248,9 @@ export function calculateFinancingScenario(
 
   const oneTimeGiftsCountedAsOwnFunds =
     scenario.type === "gift-for-duo-repayment" ? 0 : oneTimeGiftTotal;
-  const liquidFundsAvailable = roundMoney(ownFundsInput + oneTimeGiftsCountedAsOwnFunds);
+  const liquidFundsAvailable = roundMoney(
+    ownFundsInput + oneTimeGiftsCountedAsOwnFunds - liquidFundsExtraDuoRepayment,
+  );
   const purchaseFundingBeforeOwnFunds = roundMoney(bankMortgageUsed + familyLoanUsed);
   const requiredOwnFundsAfterLoans = roundMoney(
     Math.max(purchaseNeed - purchaseFundingBeforeOwnFunds, 0),
@@ -314,6 +323,12 @@ export function calculateFinancingScenario(
   if (scenario.type === "gift-for-duo-repayment" && duoExtraRepaymentGift > 0) {
     warnings.push(
       "De schenking wordt in dit scenario alleen als extra DUO-aflossing gebruikt en niet nogmaals als eigen inbreng.",
+    );
+  }
+
+  if (extraDuoRepaymentUsed > 0) {
+    warnings.push(
+      "Extra DUO-aflossing wordt apart gemodelleerd als eigen uitgave en verlaagt de buffer, maar telt niet mee als aankoopfinanciering.",
     );
   }
 

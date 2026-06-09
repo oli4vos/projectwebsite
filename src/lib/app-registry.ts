@@ -1493,6 +1493,54 @@ export const appRegistry = [
     "entry": "Calculator.tsx"
   },
   {
+    "slug": "familiehulp-eerste-woning",
+    "title": "Familiehulp eerste woning",
+    "description": "Combineer bancaire hypotheek, DUO, schenking, eigen geld en familielening voor een eerste woning.",
+    "type": "frontend",
+    "category": "Familiefinanciering",
+    "tags": [
+      "familielening",
+      "schenking",
+      "studieschuld",
+      "hypotheek",
+      "starter"
+    ],
+    "status": "beta",
+    "visibility": "public",
+    "requiredProfileFields": [
+      "income.grossAnnualIncome",
+      "income.partnerGrossAnnualIncome",
+      "studentDebt.remainingDebt",
+      "studentDebt.currentMonthlyPayment",
+      "studentDebt.statutoryMonthlyPayment",
+      "studentDebt.repaymentRule",
+      "studentDebt.duoSituation",
+      "studentDebt.duoInterestRate",
+      "studentDebt.remainingTermYears",
+      "housing.targetHomePrice",
+      "housing.ownFunds",
+      "housing.mortgageRate",
+      "housing.mortgageTermYears",
+      "savingInvesting.targetEmergencyFund"
+    ],
+    "reasonHint": "Handig als je een eerste woning wilt financieren met hypotheek, DUO, familiehulp en eigen geld.",
+    "assumptionsUsed": [
+      "duo",
+      "mortgage"
+    ],
+    "calculationDomains": [
+      "studentDebt",
+      "mortgage",
+      "housing",
+      "cashflow"
+    ],
+    "riskLevel": "high",
+    "disclaimerType": "financialEducation",
+    "outputType": "scenarioComparison",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
     "slug": "fire-na-belasting",
     "title": "Wanneer kan ik stoppen of minder werken?",
     "description": "Bereken je pad naar financiële vrijheid met inleg, rendement, uitgaven en box 3-effect.",

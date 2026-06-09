@@ -158,6 +158,7 @@ export type PurchaseFinancingInput = {
   acquisitionCosts?: EuroAmount;
   ownFunds?: EuroAmount;
   minimumBuffer?: EuroAmount;
+  extraDuoRepayment?: EuroAmount;
   bankMortgage?: BankMortgageInput;
   familyLoan?: FamilyLoanInput;
   gifts?: GiftInput[];
