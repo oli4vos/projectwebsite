@@ -112,13 +112,15 @@ export function AppDashboard({ apps }: AppDashboardProps) {
 
       <section id="apps" className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
         <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
-          Kies een onderwerp
+          Alle tools
         </div>
         <h2 className="mt-2 font-serif text-[clamp(1.35rem,1.1rem+1vw,1.9rem)] tracking-[-0.02em] text-[var(--ink)]">
-          Rekentools per onderwerp
+          Kies een onderwerp
         </h2>
         <p className="mt-3 max-w-[62ch] text-[14px] leading-[1.65] text-[var(--ink-2)]">
-          Eerst invullen, daarna resultaat. Verdieping staat standaard dicht en open je alleen als je meer uitleg wilt.
+          Eerst invullen, daarna resultaat. Start met een doelgroep of blader direct door de
+          reguliere DUO-, woon-, pensioen- en reken-tools. Verdieping staat standaard dicht en
+          open je alleen als je meer uitleg wilt.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           {audienceRoutes.map((preset) => (

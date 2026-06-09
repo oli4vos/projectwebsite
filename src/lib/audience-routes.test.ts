@@ -65,19 +65,31 @@ describe("audience routes", () => {
     expect(getAudienceRouteAnchorId("starter-studieschuld")).toBe(
       "groep-studieschuld",
     );
+    expect(getAudienceRouteAnchorId("koopstarter-familiehulp")).toBe("groep-studieschuld");
   });
 
   it("returns route apps in configured order", () => {
     const apps = [
+      app("familiehulp-eerste-woning", "Familiehulp"),
       app("hypotheek-impact-studieschuld", "Hypotheek"),
       app("volgende-euro", "Volgende euro"),
       app("studieschuld-vs-beleggen", "Studieschuld"),
+      app("schulden-volgorde", "Schulden volgorde"),
     ];
 
     expect(getAudienceRouteApps("starter-studieschuld", apps).map((item) => item.slug)).toEqual([
+      "schulden-volgorde",
       "volgende-euro",
       "studieschuld-vs-beleggen",
       "hypotheek-impact-studieschuld",
+    ]);
+
+    expect(getAudienceRouteApps("koopstarter-familiehulp", apps).map((item) => item.slug)).toEqual([
+      "familiehulp-eerste-woning",
+      "hypotheek-impact-studieschuld",
+      "studieschuld-vs-beleggen",
+      "schulden-volgorde",
+      "volgende-euro",
     ]);
   });
 

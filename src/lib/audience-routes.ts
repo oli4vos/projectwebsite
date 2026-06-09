@@ -4,6 +4,7 @@ import { toAnchorId } from "@/lib/anchor-ids";
 export type AudienceRouteId =
   | "all"
   | "starter-studieschuld"
+  | "koopstarter-familiehulp"
   | "woningzoeker"
   | "zzp"
   | "schulden"
@@ -46,6 +47,24 @@ export const audienceRoutes: AudienceRoute[] = [
       "volgende-euro",
       "studieschuld-vs-beleggen",
       "hypotheek-impact-studieschuld",
+    ],
+  },
+  {
+    id: "koopstarter-familiehulp",
+    label: "Koopstarter + familiehulp",
+    summary:
+      "Vergelijk eigen geld, DUO, familielening en schenkingen in één route voor je eerste woning.",
+    userQuestion:
+      "Hoe combineer ik mijn studieschuld, eigen geld en familiehulp zonder dubbel te tellen?",
+    researchSignal:
+      "Koopstarters willen scenario-inzicht met duidelijke scheiding tussen contractuele lasten, schenkingen en buffer.",
+    groups: ["Studieschuld", "Wonen", "Persoonlijke financiën"],
+    primaryToolSlugs: [
+      "familiehulp-eerste-woning",
+      "hypotheek-impact-studieschuld",
+      "studieschuld-vs-beleggen",
+      "schulden-volgorde",
+      "volgende-euro",
     ],
   },
   {
