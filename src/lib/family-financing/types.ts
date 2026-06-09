@@ -123,6 +123,24 @@ export type RecurringGiftInput = {
 
 export type GiftInput = OneTimeGiftInput | RecurringGiftInput;
 
+export type GiftCashflowRow = {
+  period: number;
+  amount: EuroAmount;
+  scheduledAt?: string;
+  guaranteed: boolean;
+};
+
+export type GiftCashflowResult = {
+  input: GiftInput;
+  kind: GiftInput["kind"];
+  periods: number;
+  schedule: GiftCashflowRow[];
+  totalAmount: EuroAmount;
+  monthlyEquivalent: EuroAmount;
+  guaranteed: boolean;
+  warnings: string[];
+};
+
 /**
  * Bankinge hypotheek in pure contractvorm, zonder berekening.
  */
@@ -217,6 +235,7 @@ export type FinancingScenarioResult = {
   netHouseholdCashflow?: EuroAmount;
   parentCashflow?: ParentCashflowSummary;
   debtsBySource?: DebtBySource;
+  giftCashflows?: GiftCashflowResult[];
   warnings: string[];
   assumptions: AssumptionMetadata[];
   stressTests?: StressTestResult[];

@@ -9,6 +9,8 @@ export type {
   FamilyLoanRepaymentType,
   FamilyLoanResult,
   FamilyLoanScheduleRow,
+  GiftCashflowResult,
+  GiftCashflowRow,
   FinancingScenario,
   FinancingScenarioResult,
   FinancingScenarioType,
@@ -26,3 +28,5 @@ export type {
   EuroAmount,
 } from "@/lib/family-financing/types";
 export { calculateFamilyLoan } from "@/lib/family-financing/family-loan";
+export { calculateGiftCashflows } from "@/lib/family-financing/gifts";
+export { calculateFinancingScenario } from "@/lib/family-financing/scenarios";
