@@ -1,10 +1,16 @@
 import { describe, expect, it } from "vitest";
 import {
+  calculateAnnuityPayment,
   calculateExtraRepaymentScenario,
   calculateHypotheekImpact,
+  calculatePresentValueFromMonthlyPayment,
   getBruteringFactor,
   type HypotheekImpactInput,
 } from "./logic";
+import {
+  calculateAnnuityPayment as calculateSharedAnnuityPayment,
+  calculatePresentValueFromMonthlyPayment as calculateSharedPresentValue,
+} from "@/lib/mortgage";
 
 const baseInput: HypotheekImpactInput = {
   situation: "repaying",
@@ -62,5 +68,22 @@ describe("hypotheek-impact-studieschuld logic", () => {
     expect(result.mortgageImpact.principalImpact).toBeGreaterThanOrEqual(0);
     expect(Number.isFinite(result.mortgageImpact.principalImpact)).toBe(true);
     expect(result.remainingStudentDebt).toBe(0);
+  });
+
+  it("keeps public mortgage helper facades aligned with the shared mortgage layer", () => {
+    expect(calculateAnnuityPayment(300000, 4.1, 30)).toBe(
+      calculateSharedAnnuityPayment({
+        principal: 300000,
+        annualRate: 4.1,
+        years: 30,
+      }),
+    );
+    expect(calculatePresentValueFromMonthlyPayment(1200, 4.1, 30)).toBe(
+      calculateSharedPresentValue({
+        monthlyPayment: 1200,
+        annualRate: 4.1,
+        years: 30,
+      }),
+    );
   });
 });

@@ -18,6 +18,10 @@ import {
   type DuoPaymentSource as CentralDuoPaymentSource,
   type RepaymentRule as CentralRepaymentRule,
 } from "@/lib/duo";
+import {
+  calculateAnnuityPayment as calculateMortgageAnnuityPayment,
+  calculatePresentValueFromMonthlyPayment as calculateMortgagePresentValueFromMonthlyPayment,
+} from "@/lib/mortgage";
 
 const DEFAULT_YEAR = getDefaultFinancialYear();
 const FINANCIAL_CONSTANTS = getFinancialConstants(DEFAULT_YEAR);
@@ -237,27 +241,7 @@ export function calculateAnnuityPayment(
   annualRate: number,
   years: number,
 ): number {
-  const safePrincipal = sanitizeMoney(principal);
-  const safeAnnualRate = sanitizePercent(annualRate);
-  const safeYears = sanitizeYears(years, 0);
-  const months = Math.max(Math.round(safeYears * 12), 0);
-
-  if (safePrincipal === 0 || months === 0) {
-    return 0;
-  }
-
-  if (safeAnnualRate === 0) {
-    return roundMoney(safePrincipal / months);
-  }
-
-  const monthlyRate = safeAnnualRate / 100 / 12;
-  const denominator = 1 - (1 + monthlyRate) ** -months;
-
-  if (denominator <= 0) {
-    return 0;
-  }
-
-  return roundMoney((safePrincipal * monthlyRate) / denominator);
+  return calculateMortgageAnnuityPayment({ principal, annualRate, years });
 }
 
 export function calculatePresentValueFromMonthlyPayment(
@@ -265,24 +249,11 @@ export function calculatePresentValueFromMonthlyPayment(
   annualRate: number,
   years: number,
 ): number {
-  const safeMonthlyPayment = sanitizeMoney(monthlyPayment);
-  const safeAnnualRate = sanitizePercent(annualRate);
-  const safeYears = sanitizeYears(years, 0);
-  const months = Math.max(Math.round(safeYears * 12), 0);
-
-  if (safeMonthlyPayment === 0 || months === 0) {
-    return 0;
-  }
-
-  if (safeAnnualRate === 0) {
-    return roundMoney(safeMonthlyPayment * months);
-  }
-
-  const monthlyRate = safeAnnualRate / 100 / 12;
-
-  return roundMoney(
-    safeMonthlyPayment * (1 - (1 + monthlyRate) ** -months) / monthlyRate,
-  );
+  return calculateMortgagePresentValueFromMonthlyPayment({
+    monthlyPayment,
+    annualRate,
+    years,
+  });
 }
 
 export function getBruteringFactor(mortgageRate: number): {
