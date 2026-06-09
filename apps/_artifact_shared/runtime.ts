@@ -1875,6 +1875,686 @@ function genericContract(profile: ToolProfile, input: GenericCalculationInput): 
     return invalid(profile, ["Vul minimaal één numerieke invoer in."]);
   }
 
+  const geboorteJaar = readNumber(input, ["geboorteJaar", "birthYear", "geboortejaar"]);
+  if (geboorteJaar !== undefined && (geboorteJaar < 1900 || geboorteJaar > 2100)) {
+    return invalid(profile, ["Vul een realistisch geboortejaar in (tussen 1900 en 2100)."]);
+  }
+  if (geboorteJaar !== undefined && geboorteJaar >= 1900 && geboorteJaar <= 2100) {
+    const currentYear = new Date().getFullYear();
+    const leeftijdNu = Math.max(0, currentYear - Math.round(geboorteJaar));
+    const aowLeeftijdJaren = 67;
+    const jarenTotAow = Math.max(0, aowLeeftijdJaren - leeftijdNu);
+    return {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      profile,
+      outputs: {
+        modelUsed: "aow_leeftijd_indicatie",
+        modelExplanation:
+          "Indicatieve berekening op basis van geboortejaar en een AOW-richtleeftijd van 67 jaar.",
+        geboorteJaar: Math.round(geboorteJaar),
+        leeftijdNu,
+        aowLeeftijdJaren,
+        jarenTotAow,
+        verwachteAowJaar: currentYear + jarenTotAow,
+      },
+    };
+  }
+
+  const pensioengrondslag = readNumber(input, ["pensioengrondslag", "grondslag", "pensioenGrondslag"]);
+  const aFactor = readNumber(input, ["aFactor", "afactor", "a-factor"]);
+  if (pensioengrondslag !== undefined || aFactor !== undefined) {
+    if (
+      pensioengrondslag === undefined ||
+      pensioengrondslag < 0 ||
+      aFactor === undefined ||
+      aFactor < 0
+    ) {
+      return invalid(profile, [
+        "Vul een geldige pensioengrondslag en A-factor in voor de jaarruimteberekening.",
+      ]);
+    }
+    const reserveringsruimteInput =
+      readNumber(input, ["reserveringsruimte", "reserveringsRuimte"]) ?? 0;
+    const voorgenomenStorting =
+      readNumber(input, ["voorgenomenStorting", "storting", "inleg"]) ?? 0;
+    const jaarruimteIndicatie = Math.max(0, (pensioengrondslag * 0.133) - (aFactor * 6.27));
+    const totaleFiscaleRuimte = jaarruimteIndicatie + Math.max(0, reserveringsruimteInput);
+    const fiscaleRuimteResterend = totaleFiscaleRuimte - voorgenomenStorting;
+    const warnings: string[] = [];
+    if (fiscaleRuimteResterend < 0) {
+      warnings.push("De voorgenomen storting ligt boven de indicatieve fiscale ruimte.");
+    }
+    return {
+      isValid: true,
+      errors: [],
+      warnings,
+      profile,
+      outputs: {
+        modelUsed: "pensioen_jaarruimte_indicatie",
+        modelExplanation:
+          "Indicatieve jaarruimte op basis van pensioengrondslag, A-factor en reserveringsruimte.",
+        pensioengrondslag: round(pensioengrondslag),
+        aFactor: round(aFactor, 2),
+        jaarruimteIndicatie: round(jaarruimteIndicatie),
+        reserveringsruimte: round(Math.max(0, reserveringsruimteInput)),
+        totaleFiscaleRuimte: round(totaleFiscaleRuimte),
+        voorgenomenStorting: round(voorgenomenStorting),
+        fiscaleRuimteResterend: round(fiscaleRuimteResterend),
+      },
+    };
+  }
+
+  const huidigeLeeftijd = readNumber(input, ["huidigeLeeftijd", "leeftijdNu"]);
+  const verwachteEindleeftijd = readNumber(input, ["verwachteEindleeftijd", "eindleeftijd"]);
+  if (huidigeLeeftijd !== undefined || verwachteEindleeftijd !== undefined) {
+    if (
+      huidigeLeeftijd === undefined ||
+      verwachteEindleeftijd === undefined ||
+      huidigeLeeftijd < 0 ||
+      verwachteEindleeftijd <= huidigeLeeftijd
+    ) {
+      return invalid(profile, ["Vul een geldige huidige leeftijd en hogere eindleeftijd in."]);
+    }
+    const jaarlijkseZorgkosten =
+      readNumber(input, ["jaarlijkseZorgkosten", "zorgkostenPerJaar"]) ?? 0;
+    const resterendeLevensjaren = verwachteEindleeftijd - huidigeLeeftijd;
+    const totaleZorgkostenTotEindleeftijd = resterendeLevensjaren * jaarlijkseZorgkosten;
+    return {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      profile,
+      outputs: {
+        modelUsed: "levensverwachting_indicatie",
+        modelExplanation:
+          "Indicatieve resterende levensverwachting met optionele cumulatieve zorgkosten.",
+        huidigeLeeftijd: round(huidigeLeeftijd, 1),
+        verwachteEindleeftijd: round(verwachteEindleeftijd, 1),
+        resterendeLevensjaren: round(resterendeLevensjaren, 1),
+        totaleZorgkostenTotEindleeftijd: round(totaleZorgkostenTotEindleeftijd),
+        gemiddeldeZorgkostenPerLevensjaar: round(jaarlijkseZorgkosten),
+      },
+    };
+  }
+
+  const huidigeAlimentatiePerMaand = readNumber(input, [
+    "huidigeAlimentatiePerMaand",
+    "huidigeAlimentatie",
+    "alimentatiePerMaand",
+  ]);
+  const indexPercentage = readNumber(input, ["indexPercentage", "indexeringPercentage"]);
+  if (huidigeAlimentatiePerMaand !== undefined || indexPercentage !== undefined) {
+    if (
+      huidigeAlimentatiePerMaand === undefined ||
+      huidigeAlimentatiePerMaand < 0 ||
+      indexPercentage === undefined ||
+      indexPercentage < -100
+    ) {
+      return invalid(profile, ["Vul een geldige alimentatie en indexeringspercentage in."]);
+    }
+    const aantalMaanden = Math.max(1, Math.round(readNumber(input, ["aantalMaanden", "maanden"]) ?? 12));
+    const geindexeerdeAlimentatiePerMaand =
+      huidigeAlimentatiePerMaand * (1 + indexPercentage / 100);
+    const maandelijkseStijging = geindexeerdeAlimentatiePerMaand - huidigeAlimentatiePerMaand;
+    const jaarlijksVerschil = maandelijkseStijging * aantalMaanden;
+    return {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      profile,
+      outputs: {
+        modelUsed: "alimentatie_indexering_indicatie",
+        modelExplanation:
+          "Indicatieve indexering van alimentatie met maand- en jaarverschil.",
+        huidigeAlimentatiePerMaand: round(huidigeAlimentatiePerMaand),
+        geindexeerdeAlimentatiePerMaand: round(geindexeerdeAlimentatiePerMaand),
+        maandelijkseStijging: round(maandelijkseStijging),
+        jaarlijksVerschil: round(jaarlijksVerschil),
+        indexPercentage: round(indexPercentage, 2),
+      },
+    };
+  }
+
+  const brutoPensioenPerMaand = readNumber(input, [
+    "brutoPensioenPerMaand",
+    "brutoPensioen",
+    "brutoMaand",
+  ]);
+  const aowPerMaand = readNumber(input, ["aowPerMaand", "aowMaand"]);
+  if (brutoPensioenPerMaand !== undefined || aowPerMaand !== undefined) {
+    const pensioen = brutoPensioenPerMaand ?? 0;
+    const aow = aowPerMaand ?? 0;
+    const aanvullend = readNumber(input, [
+      "aanvullendInkomenPerMaand",
+      "aanvullendInkomen",
+      "extraInkomen",
+    ]) ?? 0;
+    const belastingPercentage = readNumber(input, ["belastingPercentage", "belasting"]) ?? 28;
+    const totaalBrutoPerMaand = pensioen + aow + aanvullend;
+    const totaalNettoPerMaand = totaalBrutoPerMaand * (1 - belastingPercentage / 100);
+    return {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      profile,
+      outputs: {
+        modelUsed: "pensioen_inkomen_indicatie",
+        modelExplanation:
+          "Indicatieve pensioenberekening met bruto maandinkomen en een vast belastingpercentage.",
+        totaalBrutoPerMaand: round(totaalBrutoPerMaand),
+        totaalNettoPerMaand: round(totaalNettoPerMaand),
+        totaalBrutoPerJaar: round(totaalBrutoPerMaand * 12),
+        totaalNettoPerJaar: round(totaalNettoPerMaand * 12),
+        belastingPercentage: round(belastingPercentage, 2),
+      },
+    };
+  }
+
+  const koopprijs = readNumber(input, ["koopprijs", "aankoopprijs"]);
+  const tariefPercentage = readNumber(input, ["tariefPercentage", "overdrachtsbelastingPercentage", "tarief"]);
+  const notariskosten = readNumber(input, ["notariskosten"]) ?? 0;
+  const advieskosten = readNumber(input, ["advieskosten"]) ?? 0;
+  const taxatiekosten = readNumber(input, ["taxatiekosten"]) ?? 0;
+  if (koopprijs !== undefined && tariefPercentage !== undefined) {
+    if (koopprijs <= 0 || tariefPercentage < 0 || tariefPercentage > 100) {
+      return invalid(profile, ["Vul een geldige koopprijs en belastingtarief in."]);
+    }
+    const overdrachtsbelasting = koopprijs * (tariefPercentage / 100);
+    const totaleKostenKoper = overdrachtsbelasting + Math.max(0, notariskosten) + Math.max(0, advieskosten) + Math.max(0, taxatiekosten);
+    const warnings: string[] = [];
+    if (notariskosten === 0 && advieskosten === 0 && taxatiekosten === 0) {
+      warnings.push("Overige kosten zijn op 0 gezet; vul ze in voor een realistischer beeld.");
+    }
+    return {
+      isValid: true,
+      errors: [],
+      warnings,
+      profile,
+      outputs: {
+        modelUsed: "kosten_koper_indicatie",
+        modelExplanation:
+          "Indicatieve kosten koper met overdrachtsbelasting en optionele bijkomende aankoopkosten.",
+        koopprijs: round(koopprijs),
+        tariefPercentage: round(tariefPercentage, 2),
+        overdrachtsbelasting: round(overdrachtsbelasting),
+        notariskosten: round(Math.max(0, notariskosten)),
+        advieskosten: round(Math.max(0, advieskosten)),
+        taxatiekosten: round(Math.max(0, taxatiekosten)),
+        totaleKostenKoper: round(totaleKostenKoper),
+        totaleAankoopLast: round(koopprijs + totaleKostenKoper),
+      },
+    };
+  }
+
+  const woningWaardeOverdracht = readNumber(input, ["woningWaarde", "wozWaarde"]);
+  if (woningWaardeOverdracht !== undefined && tariefPercentage !== undefined) {
+    if (woningWaardeOverdracht <= 0 || tariefPercentage < 0 || tariefPercentage > 100) {
+      return invalid(profile, ["Vul een geldige woningwaarde en tarief in."]);
+    }
+    const overdrachtsbelasting = woningWaardeOverdracht * (tariefPercentage / 100);
+    return {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      profile,
+      outputs: {
+        modelUsed: "overdrachtsbelasting_indicatie",
+        modelExplanation:
+          "Indicatieve berekening van overdrachtsbelasting op basis van woningwaarde en tarief.",
+        woningWaarde: round(woningWaardeOverdracht),
+        tariefPercentage: round(tariefPercentage, 2),
+        overdrachtsbelasting: round(overdrachtsbelasting),
+        totaleAankoopLast: round(woningWaardeOverdracht + overdrachtsbelasting),
+      },
+    };
+  }
+
+  const forfaitPercentage = readNumber(input, ["forfaitPercentage", "eigenwoningforfaitPercentage"]);
+  if (woningWaardeOverdracht !== undefined && forfaitPercentage !== undefined) {
+    if (woningWaardeOverdracht <= 0 || forfaitPercentage < 0 || forfaitPercentage > 100) {
+      return invalid(profile, ["Vul een geldige woningwaarde en forfaitpercentage in."]);
+    }
+    const eigenwoningforfait = woningWaardeOverdracht * (forfaitPercentage / 100);
+    return {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      profile,
+      outputs: {
+        modelUsed: "eigenwoningforfait_indicatie",
+        modelExplanation:
+          "Indicatieve berekening van het eigenwoningforfait op basis van WOZ-waarde en forfaitpercentage.",
+        woningWaarde: round(woningWaardeOverdracht),
+        forfaitPercentage: round(forfaitPercentage, 4),
+        eigenwoningforfaitPerJaar: round(eigenwoningforfait),
+        eigenwoningforfaitPerMaand: round(eigenwoningforfait / 12),
+      },
+    };
+  }
+
+  const jaarlijkseStijgingPercentage = readNumber(input, [
+    "jaarlijkseStijgingPercentage",
+    "stijgingPercentage",
+    "prijsstijgingPercentage",
+  ]);
+  if (
+    woningWaardeOverdracht !== undefined &&
+    jaarlijkseStijgingPercentage !== undefined &&
+    readNumber(input, ["looptijdJaren", "jaren", "years"]) !== undefined
+  ) {
+    const jaren = readNumber(input, ["looptijdJaren", "jaren", "years"]) ?? 0;
+    if (woningWaardeOverdracht <= 0 || jaren <= 0 || jaarlijkseStijgingPercentage <= -100) {
+      return invalid(profile, ["Vul een geldige woningwaarde, stijging en looptijd in."]);
+    }
+    const factor = (1 + jaarlijkseStijgingPercentage / 100) ** jaren;
+    const toekomstigeWoningWaarde = woningWaardeOverdracht * factor;
+    return {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      profile,
+      outputs: {
+        modelUsed: "woningwaarde_groei_indicatie",
+        modelExplanation:
+          "Indicatieve prijsontwikkeling van een woning op basis van jaarlijkse procentuele groei.",
+        huidigeWoningWaarde: round(woningWaardeOverdracht),
+        jaarlijkseStijgingPercentage: round(jaarlijkseStijgingPercentage, 3),
+        vergelijkingJaren: round(jaren, 1),
+        toekomstigeWoningWaarde: round(toekomstigeWoningWaarde),
+        waardestijgingInEuro: round(toekomstigeWoningWaarde - woningWaardeOverdracht),
+      },
+    };
+  }
+
+  const brutoJaarInkomen = readNumber(input, ["brutoJaarInkomen", "jaarInkomen", "inkomen"]);
+  if (brutoJaarInkomen !== undefined) {
+    if (brutoJaarInkomen < 0) {
+      return invalid(profile, ["Vul een geldig bruto jaarinkomen in."]);
+    }
+    const partnerInkomen = readNumber(input, ["partnerJaarInkomen", "partnerInkomen"]) ?? 0;
+    const inkomensFactor = readNumber(input, ["inkomensFactor", "factor"]) ?? 4.5;
+    const toetsInkomen = brutoJaarInkomen + Math.max(0, partnerInkomen);
+    const maximaleHypotheek = toetsInkomen * inkomensFactor;
+    return {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      profile,
+      outputs: {
+        modelUsed: "maximale_hypotheek_indicatie",
+        modelExplanation:
+          "Indicatieve maximale hypotheek op basis van (gezamenlijk) inkomen en een inkomensfactor.",
+        toetsInkomen: round(toetsInkomen),
+        inkomensFactor: round(inkomensFactor, 2),
+        maximaleHypotheekIndicatie: round(maximaleHypotheek),
+      },
+    };
+  }
+
+  const oudeRentePercentage = readNumber(input, [
+    "oudeRentePercentage",
+    "oudeRente",
+    "huidigeRentePercentage",
+  ]);
+  const nieuweRentePercentage = readNumber(input, [
+    "nieuweRentePercentage",
+    "nieuweRente",
+    "renteNieuw",
+  ]);
+  const resterendeHypotheek = readNumber(input, [
+    "resterendeHypotheek",
+    "hypotheekBedrag",
+    "restschuld",
+    "lening",
+  ]);
+  const resterendeLooptijdJaren = readNumber(input, [
+    "resterendeLooptijdJaren",
+    "looptijdJaren",
+    "years",
+  ]);
+  if (
+    oudeRentePercentage !== undefined &&
+    nieuweRentePercentage !== undefined &&
+    resterendeHypotheek !== undefined &&
+    resterendeLooptijdJaren !== undefined
+  ) {
+    if (
+      resterendeHypotheek <= 0 ||
+      resterendeLooptijdJaren <= 0 ||
+      oudeRentePercentage < 0 ||
+      nieuweRentePercentage < 0 ||
+      oudeRentePercentage > 100 ||
+      nieuweRentePercentage > 100
+    ) {
+      return invalid(profile, [
+        "Vul een geldige resterende hypotheek, looptijd en oude/nieuwe rente in.",
+      ]);
+    }
+    const maanden = Math.max(1, Math.round(resterendeLooptijdJaren * 12));
+    const oudeMaandlast = annuityPaymentAmount(
+      resterendeHypotheek,
+      monthlyRateFromAnnual(oudeRentePercentage),
+      maanden,
+    );
+    const nieuweMaandlast = annuityPaymentAmount(
+      resterendeHypotheek,
+      monthlyRateFromAnnual(nieuweRentePercentage),
+      maanden,
+    );
+    const oversluitKosten = Math.max(
+      0,
+      readNumber(input, ["oversluitKosten", "boeterente", "advieskosten"]) ?? 0,
+    );
+    const maandelijkseBesparing = oudeMaandlast - nieuweMaandlast;
+    const terugverdientijdMaanden =
+      maandelijkseBesparing > 0 && oversluitKosten > 0
+        ? oversluitKosten / maandelijkseBesparing
+        : 0;
+    return {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      profile,
+      outputs: {
+        modelUsed: "hypotheek_rentevergelijking_indicatie",
+        modelExplanation:
+          "Indicatieve vergelijking van oude en nieuwe rente op maandlast en terugverdientijd.",
+        oudeMaandlast: round(oudeMaandlast),
+        nieuweMaandlast: round(nieuweMaandlast),
+        maandelijkseBesparing: round(maandelijkseBesparing),
+        oversluitKosten: round(oversluitKosten),
+        terugverdientijdMaanden:
+          maandelijkseBesparing > 0
+            ? round(terugverdientijdMaanden, 1)
+            : null,
+      },
+    };
+  }
+
+  const huidigeHypotheek = readNumber(input, [
+    "huidigeHypotheek",
+    "hypotheekBedrag",
+    "resterendeHypotheek",
+  ]);
+  const extraAflossing = readNumber(input, ["extraAflossing", "aflossingExtra"]);
+  const aflossingsRente = readNumber(input, ["rentePercentage", "jaarrente", "annualRate"]);
+  const aflossingsLooptijdJaren = readNumber(input, ["looptijdJaren", "years"]);
+  if (
+    huidigeHypotheek !== undefined &&
+    extraAflossing !== undefined &&
+    aflossingsRente !== undefined &&
+    aflossingsLooptijdJaren !== undefined
+  ) {
+    if (
+      huidigeHypotheek <= 0 ||
+      extraAflossing < 0 ||
+      extraAflossing >= huidigeHypotheek ||
+      aflossingsRente < 0 ||
+      aflossingsRente > 100 ||
+      aflossingsLooptijdJaren <= 0
+    ) {
+      return invalid(profile, ["Vul geldige waarden in voor hypotheek, aflossing, rente en looptijd."]);
+    }
+    const maanden = Math.max(1, Math.round(aflossingsLooptijdJaren * 12));
+    const maandRente = monthlyRateFromAnnual(aflossingsRente);
+    const maandlastVoor = annuityPaymentAmount(huidigeHypotheek, maandRente, maanden);
+    const maandlastNa = annuityPaymentAmount(
+      huidigeHypotheek - extraAflossing,
+      maandRente,
+      maanden,
+    );
+    const totaleRenteVoor = maandlastVoor * maanden - huidigeHypotheek;
+    const totaleRenteNa = maandlastNa * maanden - (huidigeHypotheek - extraAflossing);
+    return {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      profile,
+      outputs: {
+        modelUsed: "hypotheek_aflossen_indicatie",
+        modelExplanation:
+          "Indicatieve vergelijking van maandlast en totale rente vóór en na een extra aflossing.",
+        maandlastVoor: round(maandlastVoor),
+        maandlastNa: round(maandlastNa),
+        maandlastBesparing: round(maandlastVoor - maandlastNa),
+        totaleRenteVoor: round(totaleRenteVoor),
+        totaleRenteNa: round(totaleRenteNa),
+        renteBesparing: round(totaleRenteVoor - totaleRenteNa),
+      },
+    };
+  }
+
+  const hypotheekBedrag = readNumber(input, ["hypotheekBedrag", "hypotheek", "lening", "principal"]);
+  const rentePercentage = readNumber(input, ["rentePercentage", "jaarrente", "annualRate"]);
+  const looptijdJaren = readNumber(input, ["looptijdJaren", "looptijd", "years"]);
+  if (
+    hypotheekBedrag !== undefined &&
+    rentePercentage !== undefined &&
+    looptijdJaren !== undefined &&
+    hypotheekBedrag > 0 &&
+    rentePercentage >= 0 &&
+    looptijdJaren > 0
+  ) {
+    const looptijdMaanden = Math.max(1, Math.round(looptijdJaren * 12));
+    const maandRente = monthlyRateFromAnnual(rentePercentage);
+    const brutoMaandlast = annuityPaymentAmount(hypotheekBedrag, maandRente, looptijdMaanden);
+    const totaalBetaald = brutoMaandlast * looptijdMaanden;
+    const woningWaarde = readNumber(input, ["woningWaarde", "wozWaarde"]);
+    const ltv =
+      woningWaarde && woningWaarde > 0
+        ? (hypotheekBedrag / woningWaarde) * 100
+        : undefined;
+    return {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      profile,
+      outputs: {
+        modelUsed: "hypotheek_lasten_indicatie",
+        modelExplanation:
+          "Indicatieve annuïtaire berekening met leenbedrag, rente en looptijd.",
+        brutoMaandlast: round(brutoMaandlast),
+        totaalBetaald: round(totaalBetaald),
+        totaleRente: round(totaalBetaald - hypotheekBedrag),
+        looptijdMaanden,
+        ltvPercentage: ltv !== undefined ? round(ltv, 2) : null,
+      },
+    };
+  }
+
+  const huurPerMaand = readNumber(input, ["huurPerMaand", "huur", "maandhuur"]);
+  const koopWaarde = readNumber(input, ["woningWaarde", "koopprijs"]);
+  if (huurPerMaand !== undefined && koopWaarde !== undefined && huurPerMaand > 0 && koopWaarde > 0) {
+    const jaren = readNumber(input, ["looptijdJaren", "vergelijkingJaren", "years"]) ?? 10;
+    const eigenGeld = readNumber(input, ["eigenGeld", "aanbetaling"]) ?? 0;
+    const hypotheek = Math.max(0, koopWaarde - eigenGeld);
+    const rente = readNumber(input, ["rentePercentage", "jaarrente"]) ?? 4;
+    const maanden = Math.max(1, Math.round(jaren * 12));
+    const maandlastKoop = annuityPaymentAmount(hypotheek, monthlyRateFromAnnual(rente), maanden);
+    const totaleHuur = huurPerMaand * maanden;
+    const totaleKooplasten = maandlastKoop * maanden + eigenGeld;
+    return {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      profile,
+      outputs: {
+        modelUsed: "huren_kopen_indicatie",
+        modelExplanation:
+          "Indicatieve vergelijking van totale huurlasten versus kooplasten over dezelfde periode.",
+        totaleHuurLasten: round(totaleHuur),
+        totaleKoopLasten: round(totaleKooplasten),
+        maandlastKoop: round(maandlastKoop),
+        verschilKoopMinHuur: round(totaleKooplasten - totaleHuur),
+        vergelijkingJaren: round(jaren, 1),
+      },
+    };
+  }
+
+  const leenbedrag = readNumber(input, ["leenbedrag", "lening", "schuld", "principal"]);
+  const leenRente = readNumber(input, ["rentePercentage", "jaarrente", "annualRate"]);
+  const looptijdMaanden = readNumber(input, ["looptijdMaanden", "periods", "maanden"]);
+  if (
+    leenbedrag !== undefined &&
+    leenRente !== undefined &&
+    looptijdMaanden !== undefined &&
+    leenbedrag > 0 &&
+    leenRente >= 0 &&
+    looptijdMaanden > 0
+  ) {
+    const termijnen = Math.max(1, Math.round(looptijdMaanden));
+    const maandRente = monthlyRateFromAnnual(leenRente);
+    const maandbedrag = annuityPaymentAmount(leenbedrag, maandRente, termijnen);
+    const totaal = maandbedrag * termijnen;
+    return {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      profile,
+      outputs: {
+        modelUsed: "lening_kosten_indicatie",
+        modelExplanation:
+          "Indicatieve annuïtaire leningberekening met maandlast en totale kosten.",
+        maandbedrag: round(maandbedrag),
+        totaleKosten: round(totaal),
+        totaleRente: round(totaal - leenbedrag),
+        looptijdMaanden: termijnen,
+      },
+    };
+  }
+
+  const startVermogen = readNumber(input, ["startVermogen", "startBedrag", "presentValue"]);
+  const maandelijkseInleg = readNumber(input, ["maandelijkseInleg", "periodiekeInleg", "payment"]) ?? 0;
+  const rendement = readNumber(input, ["verwachtRendementProcent", "rendementProcent", "percentage", "annualRate"]);
+  const horizonJaren = readNumber(input, ["looptijdJaren", "jaren", "years"]);
+  if (
+    startVermogen !== undefined &&
+    rendement !== undefined &&
+    horizonJaren !== undefined &&
+    startVermogen >= 0 &&
+    horizonJaren > 0
+  ) {
+    const maanden = Math.max(1, Math.round(horizonJaren * 12));
+    const maandRente = rendement / 100 / 12;
+    const eindStart = startVermogen * (1 + maandRente) ** maanden;
+    const eindInleg =
+      maandRente === 0
+        ? maandelijkseInleg * maanden
+        : maandelijkseInleg * (((1 + maandRente) ** maanden - 1) / maandRente);
+    const eindvermogen = eindStart + eindInleg;
+    const totaleInleg = startVermogen + maandelijkseInleg * maanden;
+    return {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      profile,
+      outputs: {
+        modelUsed: "vermogensgroei_indicatie",
+        modelExplanation:
+          "Indicatieve vermogensgroei met samengesteld rendement en periodieke inleg.",
+        eindVermogen: round(eindvermogen),
+        totaleInleg: round(totaleInleg),
+        rendementInEuro: round(eindvermogen - totaleInleg),
+        horizonJaren: round(horizonJaren, 1),
+      },
+    };
+  }
+
+  const schenkingBedrag = readNumber(input, ["schenkingBedrag", "bedrag", "giftAmount"]);
+  const vrijstelling = readNumber(input, ["vrijstelling", "vrijgesteldBedrag"]) ?? 0;
+  if (schenkingBedrag !== undefined && schenkingBedrag >= 0) {
+    const tarief = readNumber(input, ["tariefProcent", "belastingPercentage", "tarief"]) ?? 10;
+    const belastbareGrondslag = Math.max(0, schenkingBedrag - vrijstelling);
+    const belasting = belastbareGrondslag * (tarief / 100);
+    return {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      profile,
+      outputs: {
+        modelUsed: "schenken_erven_indicatie",
+        modelExplanation:
+          "Indicatieve fiscale berekening op basis van vrijstelling en vast tarief.",
+        belastbareGrondslag: round(belastbareGrondslag),
+        verschuldigdeBelasting: round(belasting),
+        nettoNaBelasting: round(schenkingBedrag - belasting),
+      },
+    };
+  }
+
+  const brutoMaandloon = readNumber(input, ["brutoMaandloon", "brutoMaand", "salaris"]);
+  if (brutoMaandloon !== undefined && brutoMaandloon > 0) {
+    const belastingPercentage = readNumber(input, ["belastingPercentage", "belasting"]) ?? 30;
+    const vakantiegeldPercentage = readNumber(input, ["vakantiegeldPercentage", "vakantiegeld"]) ?? 8;
+    const nettoMaandloon = brutoMaandloon * (1 - belastingPercentage / 100);
+    const vakantiegeldBruto = brutoMaandloon * (vakantiegeldPercentage / 100);
+    return {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      profile,
+      outputs: {
+        modelUsed: "inkomen_indicatie",
+        modelExplanation:
+          "Indicatieve omzetting van bruto naar netto met een vast belastingpercentage.",
+        brutoMaandloon: round(brutoMaandloon),
+        nettoMaandloon: round(nettoMaandloon),
+        vakantiegeldBrutoPerJaar: round(vakantiegeldBruto * 12),
+        nettoJaarloonIndicatie: round(nettoMaandloon * 12),
+      },
+    };
+  }
+
+  const jaaromzet = readNumber(input, ["jaaromzet", "omzet"]);
+  if (jaaromzet !== undefined && jaaromzet >= 0) {
+    const zakelijkeKosten = readNumber(input, ["zakelijkeKosten", "kosten"]) ?? 0;
+    const winst = jaaromzet - zakelijkeKosten;
+    const belastingReserve = winst > 0 ? winst * 0.37 : 0;
+    return {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      profile,
+      outputs: {
+        modelUsed: "ondernemers_resultaat_indicatie",
+        modelExplanation:
+          "Indicatieve ondernemersberekening met omzet, kosten en belastingreservering.",
+        jaaromzet: round(jaaromzet),
+        zakelijkeKosten: round(zakelijkeKosten),
+        winstVoorBelasting: round(winst),
+        geadviseerdeBelastingReserve: round(belastingReserve),
+        nettoResultaatIndicatie: round(winst - belastingReserve),
+      },
+    };
+  }
+
+  const nettoInkomenOuder1 = readNumber(input, ["nettoInkomenOuder1"]);
+  const nettoInkomenOuder2 = readNumber(input, ["nettoInkomenOuder2"]);
+  if (nettoInkomenOuder1 !== undefined || nettoInkomenOuder2 !== undefined) {
+    const inkomen1 = nettoInkomenOuder1 ?? 0;
+    const inkomen2 = nettoInkomenOuder2 ?? 0;
+    const kinderen = Math.max(0, Math.round(readNumber(input, ["aantalKinderen", "kinderen"]) ?? 0));
+    const kostenPerKind = readNumber(input, ["kostenPerKindPerMaand", "kostenPerKind"]) ?? 0;
+    const totaleKindkosten = kinderen * kostenPerKind;
+    return {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      profile,
+      outputs: {
+        modelUsed: "gezin_budget_indicatie",
+        modelExplanation:
+          "Indicatieve gezinsberekening met netto inkomsten en maandelijkse kindkosten.",
+        totaalNettoInkomenPerMaand: round(inkomen1 + inkomen2),
+        totaleKindkostenPerMaand: round(totaleKindkosten),
+        beschikbaarNaKindkosten: round(inkomen1 + inkomen2 - totaleKindkosten),
+        aantalKinderen: kinderen,
+      },
+    };
+  }
+
   const min = Math.min(...numericValues);
   const max = Math.max(...numericValues);
   const sum = numericValues.reduce((total, value) => total + value, 0);
@@ -1888,6 +2568,9 @@ function genericContract(profile: ToolProfile, input: GenericCalculationInput): 
     ],
     profile,
     outputs: {
+      modelUsed: "fallback_statistiek",
+      modelExplanation:
+        "Fallback-model: de tool berekent basisstatistiek over de numerieke invoerwaarden.",
       inputCount: numericValues.length,
       min: round(min),
       max: round(max),
@@ -1988,18 +2671,164 @@ export function executeProfile(profile: ToolProfile, input: GenericCalculationIn
 
 function getGenericFixtureForTool(toolSlug?: string): ProfileFixture {
   if (toolSlug?.startsWith("artifact-pensioen-aow-")) {
+    if (toolSlug.includes("aow-leeftijd")) {
+      return {
+        input: {
+          geboorteJaar: 1988,
+          geboorteMaand: 6,
+          gewenstePensioenLeeftijd: 67,
+        },
+        expectValid: true,
+      };
+    }
+    if (toolSlug.includes("jaarruimte") || toolSlug.includes("reserveringsruimte")) {
+      return {
+        input: {
+          pensioengrondslag: 52000,
+          aFactor: 1200,
+          reserveringsruimte: 4500,
+          voorgenomenStorting: 3000,
+        },
+        expectValid: true,
+      };
+    }
+    if (toolSlug.includes("levensverwachting")) {
+      return {
+        input: {
+          huidigeLeeftijd: 45,
+          verwachteEindleeftijd: 87,
+          jaarlijkseZorgkosten: 3500,
+        },
+        expectValid: true,
+      };
+    }
+    if (toolSlug.includes("netto") || toolSlug.includes("bruto-netto")) {
+      return {
+        input: {
+          brutoPensioenPerMaand: 2400,
+          aowPerMaand: 1345,
+          aanvullendInkomenPerMaand: 250,
+          belastingPercentage: 28,
+        },
+        expectValid: true,
+      };
+    }
+    if (toolSlug.includes("pensioenstorting") || toolSlug.includes("pensioensparen")) {
+      return {
+        input: {
+          pensioengrondslag: 52000,
+          aFactor: 1200,
+          reserveringsruimte: 3000,
+          voorgenomenStorting: 2500,
+        },
+        expectValid: true,
+      };
+    }
     return {
       input: {
         brutoPensioenPerMaand: 2400,
         aowPerMaand: 1345,
         aanvullendInkomenPerMaand: 250,
-        leeftijdJaren: 67,
+        belastingPercentage: 28,
       },
       expectValid: true,
     };
   }
 
   if (toolSlug?.startsWith("artifact-hypotheek-wonen-")) {
+    if (toolSlug.includes("kosten-koper")) {
+      return {
+        input: {
+          koopprijs: 475000,
+          tariefPercentage: 2,
+          notariskosten: 1800,
+          advieskosten: 2500,
+          taxatiekosten: 750,
+        },
+        expectValid: true,
+      };
+    }
+    if (toolSlug.includes("huren-of-kopen")) {
+      return {
+        input: {
+          huurPerMaand: 1450,
+          woningWaarde: 475000,
+          eigenGeld: 60000,
+          rentePercentage: 4.1,
+          looptijdJaren: 30,
+        },
+        expectValid: true,
+      };
+    }
+    if (toolSlug.includes("overdrachtsbelasting")) {
+      return {
+        input: {
+          woningWaarde: 475000,
+          tariefPercentage: 2,
+        },
+        expectValid: true,
+      };
+    }
+    if (toolSlug.includes("eigenwoningforfait")) {
+      return {
+        input: {
+          woningWaarde: 475000,
+          forfaitPercentage: 0.35,
+        },
+        expectValid: true,
+      };
+    }
+    if (toolSlug.includes("prijsontwikkeling")) {
+      return {
+        input: {
+          woningWaarde: 475000,
+          jaarlijkseStijgingPercentage: 3.2,
+          looptijdJaren: 10,
+        },
+        expectValid: true,
+      };
+    }
+    if (
+      toolSlug.includes("oversluiten") ||
+      toolSlug.includes("rentemiddeling") ||
+      toolSlug.includes("rentewijziging")
+    ) {
+      return {
+        input: {
+          resterendeHypotheek: 300000,
+          oudeRentePercentage: 4.8,
+          nieuweRentePercentage: 3.9,
+          resterendeLooptijdJaren: 22,
+          oversluitKosten: 7800,
+        },
+        expectValid: true,
+      };
+    }
+    if (
+      toolSlug.includes("aflossen") ||
+      toolSlug.includes("aflossingsvrije") ||
+      toolSlug.includes("restschuld")
+    ) {
+      return {
+        input: {
+          huidigeHypotheek: 320000,
+          extraAflossing: 25000,
+          rentePercentage: 4.1,
+          looptijdJaren: 24,
+        },
+        expectValid: true,
+      };
+    }
+    if (toolSlug.includes("maximale-hypotheek")) {
+      return {
+        input: {
+          brutoJaarInkomen: 78000,
+          partnerJaarInkomen: 32000,
+          inkomensFactor: 4.4,
+        },
+        expectValid: true,
+      };
+    }
     return {
       input: {
         woningWaarde: 475000,
@@ -2012,6 +2841,16 @@ function getGenericFixtureForTool(toolSlug?: string): ProfileFixture {
   }
 
   if (toolSlug?.startsWith("artifact-gezin-relatie-")) {
+    if (toolSlug.includes("indexering-alimentatie")) {
+      return {
+        input: {
+          huidigeAlimentatiePerMaand: 525,
+          indexPercentage: 6.2,
+          aantalMaanden: 12,
+        },
+        expectValid: true,
+      };
+    }
     return {
       input: {
         nettoInkomenOuder1: 3200,
@@ -2075,7 +2914,7 @@ function getGenericFixtureForTool(toolSlug?: string): ProfileFixture {
     return {
       input: {
         brutoMaandloon: 4200,
-        nettoMaandloon: 2950,
+        belastingPercentage: 30,
         arbeidsurenPerWeek: 40,
         vakantiegeldPercentage: 8,
       },

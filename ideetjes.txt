@@ -27,7 +27,7 @@
 - belastinlogica doorvoeren bij uurtarief bepaling voor een ZZP-er. daarnaast goed controleren in de logica of het ingevulde aantal werkweken goed overgenomen wordt in de berekening. hanteer altijd een jaar van 52 weken en vraag dus niet uit hoeveel vakantie werken, maar vraag aantal werkweken (dit is 52- vakantie weken per jaar)
 - uiteindelijk ook een API aanbieden zodat mensen de rekentools in hun eigen website kunnen gebruiken als uithangbord.
 - uiteindelijk moeten alle logica lagen herbruikt worden en aangeroepen worden uit de algemene laag, denk bijvoorbeeld aan een jaarrente terugrekenen naar een maandrente.
-
+- in MD opnemen dat alles wat zichtbaar is voor gebruikers ten alle tijden in het nederlands moet zijn
 
 
 buiten doelgroep:

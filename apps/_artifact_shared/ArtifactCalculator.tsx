@@ -26,6 +26,7 @@ type DraftEntry = {
   id: string;
   key: string;
   value: string;
+  locked?: boolean;
 };
 
 type FieldType =
@@ -84,6 +85,74 @@ const FIELD_LABELS: Record<string, string> = {
   annualRatePercentage: "Jaarrente (%)",
   monthlyRatePercentage: "Maandrente (%)",
   finalDebt: "Eindschuld",
+  geboorteJaar: "Geboortejaar",
+  geboorteMaand: "Geboortemaand",
+  gewenstePensioenLeeftijd: "Gewenste pensioenleeftijd",
+  brutoPensioenPerMaand: "Bruto pensioen per maand",
+  aowPerMaand: "AOW per maand",
+  aanvullendInkomenPerMaand: "Aanvullend inkomen per maand",
+  belastingPercentage: "Belasting (%)",
+  pensioengrondslag: "Pensioengrondslag",
+  aFactor: "A-factor",
+  reserveringsruimte: "Reserveringsruimte",
+  voorgenomenStorting: "Voorgenomen storting",
+  huidigeLeeftijd: "Huidige leeftijd",
+  verwachteEindleeftijd: "Verwachte eindleeftijd",
+  jaarlijkseZorgkosten: "Jaarlijkse zorgkosten",
+  woningWaarde: "Woningwaarde",
+  hypotheekBedrag: "Hypotheekbedrag",
+  rentePercentage: "Rentepercentage (%)",
+  looptijdJaren: "Looptijd (jaren)",
+  huurPerMaand: "Huur per maand",
+  eigenGeld: "Eigen geld",
+  tariefPercentage: "Tarief (%)",
+  koopprijs: "Koopprijs",
+  notariskosten: "Notariskosten",
+  advieskosten: "Advieskosten",
+  taxatiekosten: "Taxatiekosten",
+  forfaitPercentage: "Forfait (%)",
+  jaarlijkseStijgingPercentage: "Jaarlijkse stijging (%)",
+  brutoJaarInkomen: "Bruto jaarinkomen",
+  partnerJaarInkomen: "Partner jaarinkomen",
+  inkomensFactor: "Inkomensfactor",
+  oudeRentePercentage: "Oude rente (%)",
+  nieuweRentePercentage: "Nieuwe rente (%)",
+  resterendeHypotheek: "Resterende hypotheek",
+  resterendeLooptijdJaren: "Resterende looptijd (jaren)",
+  oversluitKosten: "Oversluitkosten",
+  huidigeHypotheek: "Huidige hypotheek",
+  extraAflossing: "Extra aflossing",
+  huidigeAlimentatiePerMaand: "Huidige alimentatie per maand",
+  indexPercentage: "Indexering (%)",
+  aantalMaanden: "Aantal maanden",
+  nettoInkomenOuder1: "Netto inkomen ouder 1",
+  nettoInkomenOuder2: "Netto inkomen ouder 2",
+  aantalKinderen: "Aantal kinderen",
+  kostenPerKindPerMaand: "Kosten per kind per maand",
+  jaaromzet: "Jaaromzet",
+  zakelijkeKosten: "Zakelijke kosten",
+};
+
+const FIELD_HINTS: Record<string, string> = {
+  geboorteJaar: "Bijv. 1988",
+  geboorteMaand: "1 = januari, 12 = december",
+  gewenstePensioenLeeftijd: "Meestal tussen 60 en 70",
+  rentePercentage: "In procenten per jaar, bijv. 4,2",
+  belastingPercentage: "In procenten, bijv. 30",
+  looptijdJaren: "Bijv. 30",
+  pensioengrondslag: "Jaargrondslag in euro",
+  aFactor: "Pensioenaangroei van vorig jaar",
+  reserveringsruimte: "Overgebleven fiscale ruimte uit vorige jaren",
+  voorgenomenStorting: "Wat je wilt inleggen",
+  koopprijs: "Koopsom van de woning",
+  tariefPercentage: "Tarief in procenten, bijv. 2",
+  huidigeAlimentatiePerMaand: "Huidig maandbedrag",
+  indexPercentage: "Jaarlijkse indexering in procenten",
+  forfaitPercentage: "Forfait in procenten, bijv. 0,35",
+  jaarlijkseStijgingPercentage: "Jaarlijkse prijsstijging in procenten",
+  inkomensFactor: "Meestal tussen 3,5 en 5,0",
+  oudeRentePercentage: "Huidige rente in procenten",
+  nieuweRentePercentage: "Nieuwe rente in procenten",
 };
 
 const OUTPUT_LABELS: Record<string, string> = {
@@ -154,6 +223,168 @@ const OUTPUT_LABELS: Record<string, string> = {
   finalDebt: "Eindschuld",
   debtIncrease: "Schuldtoename",
   remainingDebtAfterTerm: "Resterende schuld na termijn",
+  modelUsed: "Model",
+  jaarruimteIndicatie: "Jaarruimte (indicatie)",
+  totaleFiscaleRuimte: "Totale fiscale ruimte",
+  fiscaleRuimteResterend: "Resterende fiscale ruimte",
+  resterendeLevensjaren: "Resterende levensjaren",
+  totaleZorgkostenTotEindleeftijd: "Totale zorgkosten tot eindleeftijd",
+  gemiddeldeZorgkostenPerLevensjaar: "Gemiddelde zorgkosten per levensjaar",
+  geindexeerdeAlimentatiePerMaand: "Geïndexeerde alimentatie per maand",
+  maandelijkseStijging: "Maandelijkse stijging",
+  jaarlijksVerschil: "Verschil op jaarbasis",
+  overdrachtsbelasting: "Overdrachtsbelasting",
+  totaleKostenKoper: "Totale kosten koper",
+  totaleAankoopLast: "Totale aankooplast",
+  eigenwoningforfaitPerJaar: "Eigenwoningforfait per jaar",
+  eigenwoningforfaitPerMaand: "Eigenwoningforfait per maand",
+  huidigeWoningWaarde: "Huidige woningwaarde",
+  toekomstigeWoningWaarde: "Toekomstige woningwaarde",
+  waardestijgingInEuro: "Waardestijging in euro",
+  toetsInkomen: "Toetsinkomen",
+  maximaleHypotheekIndicatie: "Maximale hypotheek (indicatie)",
+  oudeMaandlast: "Oude maandlast",
+  nieuweMaandlast: "Nieuwe maandlast",
+  maandelijkseBesparing: "Maandelijkse besparing",
+  terugverdientijdMaanden: "Terugverdientijd (maanden)",
+  maandlastVoor: "Maandlast vóór aflossing",
+  maandlastNa: "Maandlast na aflossing",
+  maandlastBesparing: "Besparing per maand",
+  totaleRenteVoor: "Totale rente vóór aflossing",
+  totaleRenteNa: "Totale rente na aflossing",
+  renteBesparing: "Rentebesparing",
+};
+
+const DYNAMIC_MODEL_OUTPUT_ORDER: Record<string, string[]> = {
+  aow_leeftijd_indicatie: [
+    "geboorteJaar",
+    "leeftijdNu",
+    "aowLeeftijdJaren",
+    "jarenTotAow",
+    "verwachteAowJaar",
+  ],
+  pensioen_inkomen_indicatie: [
+    "totaalBrutoPerMaand",
+    "totaalNettoPerMaand",
+    "totaalBrutoPerJaar",
+    "totaalNettoPerJaar",
+    "belastingPercentage",
+  ],
+  pensioen_jaarruimte_indicatie: [
+    "pensioengrondslag",
+    "aFactor",
+    "jaarruimteIndicatie",
+    "reserveringsruimte",
+    "totaleFiscaleRuimte",
+    "voorgenomenStorting",
+    "fiscaleRuimteResterend",
+  ],
+  levensverwachting_indicatie: [
+    "huidigeLeeftijd",
+    "verwachteEindleeftijd",
+    "resterendeLevensjaren",
+    "totaleZorgkostenTotEindleeftijd",
+    "gemiddeldeZorgkostenPerLevensjaar",
+  ],
+  hypotheek_lasten_indicatie: [
+    "brutoMaandlast",
+    "totaalBetaald",
+    "totaleRente",
+    "looptijdMaanden",
+    "ltvPercentage",
+  ],
+  huren_kopen_indicatie: [
+    "totaleHuurLasten",
+    "totaleKoopLasten",
+    "maandlastKoop",
+    "verschilKoopMinHuur",
+    "vergelijkingJaren",
+  ],
+  overdrachtsbelasting_indicatie: [
+    "woningWaarde",
+    "tariefPercentage",
+    "overdrachtsbelasting",
+    "totaleAankoopLast",
+  ],
+  kosten_koper_indicatie: [
+    "koopprijs",
+    "overdrachtsbelasting",
+    "notariskosten",
+    "advieskosten",
+    "taxatiekosten",
+    "totaleKostenKoper",
+  ],
+  alimentatie_indexering_indicatie: [
+    "huidigeAlimentatiePerMaand",
+    "geindexeerdeAlimentatiePerMaand",
+    "maandelijkseStijging",
+    "jaarlijksVerschil",
+    "indexPercentage",
+  ],
+  lening_kosten_indicatie: [
+    "maandbedrag",
+    "totaleKosten",
+    "totaleRente",
+    "looptijdMaanden",
+  ],
+  vermogensgroei_indicatie: [
+    "eindVermogen",
+    "totaleInleg",
+    "rendementInEuro",
+    "horizonJaren",
+  ],
+  schenken_erven_indicatie: [
+    "belastbareGrondslag",
+    "verschuldigdeBelasting",
+    "nettoNaBelasting",
+  ],
+  inkomen_indicatie: [
+    "brutoMaandloon",
+    "nettoMaandloon",
+    "vakantiegeldBrutoPerJaar",
+    "nettoJaarloonIndicatie",
+  ],
+  ondernemers_resultaat_indicatie: [
+    "jaaromzet",
+    "zakelijkeKosten",
+    "winstVoorBelasting",
+    "geadviseerdeBelastingReserve",
+    "nettoResultaatIndicatie",
+  ],
+  gezin_budget_indicatie: [
+    "totaalNettoInkomenPerMaand",
+    "totaleKindkostenPerMaand",
+    "beschikbaarNaKindkosten",
+    "aantalKinderen",
+  ],
+  woningwaarde_groei_indicatie: [
+    "huidigeWoningWaarde",
+    "jaarlijkseStijgingPercentage",
+    "vergelijkingJaren",
+    "toekomstigeWoningWaarde",
+    "waardestijgingInEuro",
+  ],
+  maximale_hypotheek_indicatie: [
+    "toetsInkomen",
+    "inkomensFactor",
+    "maximaleHypotheekIndicatie",
+  ],
+  hypotheek_rentevergelijking_indicatie: [
+    "oudeMaandlast",
+    "nieuweMaandlast",
+    "maandelijkseBesparing",
+    "oversluitKosten",
+    "terugverdientijdMaanden",
+  ],
+  hypotheek_aflossen_indicatie: [
+    "maandlastVoor",
+    "maandlastNa",
+    "maandlastBesparing",
+    "totaleRenteVoor",
+    "totaleRenteNa",
+    "renteBesparing",
+  ],
+  fallback_statistiek: ["inputCount", "min", "max", "sum", "average"],
 };
 
 const STRICT_PROFILE_CONFIGS: Partial<Record<ToolProfile, StrictProfileConfig>> = {
@@ -658,10 +889,11 @@ function buildDraft(defaultInput: GenericCalculationInput): DraftEntry[] {
     id: `field-${index}-${key}`,
     key,
     value: stringifyValue(value),
+    locked: true,
   }));
 
   if (entries.length > 0) return entries;
-  return [{ id: "field-0", key: "valueA", value: "100" }];
+  return [{ id: "field-0", key: "valueA", value: "100", locked: false }];
 }
 
 function parseDraftValue(value: string): unknown {
@@ -730,10 +962,22 @@ export function ArtifactCalculator({
   );
 
   const dynamicOutputEntries = useMemo(
-    () =>
-      dynamicResult
-        ? Object.entries(dynamicResult.outputs).sort(([a], [b]) => a.localeCompare(b))
-        : [],
+    () => {
+      if (!dynamicResult) return [];
+      const raw = Object.entries(dynamicResult.outputs).filter(
+        ([key]) => key !== "modelExplanation",
+      );
+      const model =
+        typeof dynamicResult.outputs.modelUsed === "string"
+          ? dynamicResult.outputs.modelUsed
+          : undefined;
+      const preferredOrder = model ? DYNAMIC_MODEL_OUTPUT_ORDER[model] : undefined;
+      if (!preferredOrder || preferredOrder.length === 0) {
+        return raw.sort(([a], [b]) => a.localeCompare(b));
+      }
+      const order = new Map(preferredOrder.map((key, index) => [key, index]));
+      return raw.sort(([a], [b]) => (order.get(a) ?? 999) - (order.get(b) ?? 999));
+    },
     [dynamicResult],
   );
 
@@ -861,6 +1105,7 @@ export function ArtifactCalculator({
         id: `field-${current.length}-${Date.now()}`,
         key: "",
         value: "",
+        locked: false,
       },
     ]);
   }
@@ -1011,6 +1256,14 @@ export function ArtifactCalculator({
               subtitle="Volledige output en technische context."
             >
               <div className="space-y-3">
+                <div className="rounded-xl border hair bg-white p-4 text-sm text-[var(--ink)]">
+                  <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--soft)]">
+                    Toelichting berekening
+                  </div>
+                  <p className="mt-2 leading-[1.65] text-[var(--ink-2)]">
+                    {strictConfig.description}
+                  </p>
+                </div>
                 <div className="rounded-xl border hair bg-white p-4">
                   {strictOutputEntries.map(([key, value]) => (
                     <ResultRow
@@ -1083,15 +1336,15 @@ export function ArtifactCalculator({
             Voorbeeld invullen
           </ToolActionButton>
           <ToolActionButton type="button" variant="secondary" onClick={addDynamicField}>
-            Veld toevoegen
+            Extra veld toevoegen
           </ToolActionButton>
         </div>
       }
       inputs={
         <div className="space-y-3">
           <p className="text-xs leading-5 text-[var(--muted)]">
-            Vul per invoer de veldnaam en waarde in. Gebruik voor lijsten bij voorkeur een
-            puntkomma (`;`) of JSON-notatie (`[1,2,3]`).
+            Vul de voorgestelde velden in. Alleen als iets ontbreekt voeg je een extra veld toe.
+            Gebruik voor lijsten bij voorkeur een puntkomma (`;`) of JSON-notatie (`[1,2,3]`).
           </p>
           {dynamicDraft.map((entry, index) => (
             <div
@@ -1102,29 +1355,40 @@ export function ArtifactCalculator({
                 <div className="text-[11px] uppercase tracking-[0.12em] text-[var(--muted)]">
                   Invoer {index + 1}
                 </div>
-                <ToolActionButton
-                  type="button"
-                  variant="secondary"
-                  onClick={() => removeDynamicField(entry.id)}
-                  disabled={dynamicDraft.length <= 1}
-                  className="h-9"
-                >
-                  Verwijder
-                </ToolActionButton>
+                {!entry.locked ? (
+                  <ToolActionButton
+                    type="button"
+                    variant="secondary"
+                    onClick={() => removeDynamicField(entry.id)}
+                    disabled={dynamicDraft.length <= 1}
+                    className="h-9"
+                  >
+                    Verwijder
+                  </ToolActionButton>
+                ) : null}
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
-                <label className="block space-y-1">
-                  <span className="text-xs font-medium text-[var(--ink)]">Veldnaam</span>
-                  <input
-                    type="text"
-                    value={entry.key}
-                    onChange={(event) =>
-                      updateDynamicDraft(entry.id, { key: event.target.value })
-                    }
-                    placeholder="bijv. principal"
-                    className="ring-focus h-11 w-full rounded-xl border hair bg-white px-3 text-sm text-[var(--ink)]"
-                  />
-                </label>
+                {entry.locked ? (
+                  <div className="block space-y-1">
+                    <span className="text-xs font-medium text-[var(--ink)]">Invoerveld</span>
+                    <div className="h-11 w-full rounded-xl border hair bg-white px-3 text-sm leading-[44px] text-[var(--ink)]">
+                      {toHumanLabel(entry.key.trim(), FIELD_LABELS)}
+                    </div>
+                  </div>
+                ) : (
+                  <label className="block space-y-1">
+                    <span className="text-xs font-medium text-[var(--ink)]">Veldnaam</span>
+                    <input
+                      type="text"
+                      value={entry.key}
+                      onChange={(event) =>
+                        updateDynamicDraft(entry.id, { key: event.target.value })
+                      }
+                      placeholder="bijv. principal"
+                      className="ring-focus h-11 w-full rounded-xl border hair bg-white px-3 text-sm text-[var(--ink)]"
+                    />
+                  </label>
+                )}
                 <label className="block space-y-1">
                   <span className="text-xs font-medium text-[var(--ink)]">Waarde</span>
                   <input
@@ -1141,6 +1405,11 @@ export function ArtifactCalculator({
               <div className="mt-2 text-[11px] text-[var(--muted)]">
                 Label: {entry.key.trim() ? toHumanLabel(entry.key.trim(), FIELD_LABELS) : "n.v.t."}
               </div>
+              {entry.key.trim() && FIELD_HINTS[entry.key.trim()] ? (
+                <div className="mt-1 text-[11px] text-[var(--muted)]">
+                  Hint: {FIELD_HINTS[entry.key.trim()]}
+                </div>
+              ) : null}
             </div>
           ))}
         </div>
@@ -1223,6 +1492,18 @@ export function ArtifactCalculator({
       details={
         <DisclosureSection title="Technische details" subtitle="Artifact input/output">
           <div className="space-y-3">
+            {dynamicResult ? (
+              <div className="rounded-xl border hair bg-white p-4 text-sm text-[var(--ink)]">
+                <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--soft)]">
+                  Toelichting berekening
+                </div>
+                <p className="mt-2 leading-[1.65] text-[var(--ink-2)]">
+                  {typeof dynamicResult.outputs.modelExplanation === "string"
+                    ? dynamicResult.outputs.modelExplanation
+                    : "De tool gebruikt een generiek artifact-model. Controleer velden en context voordat je conclusies trekt."}
+                </p>
+              </div>
+            ) : null}
             <div>
               <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--soft)]">
                 Laatste input

@@ -58,4 +58,107 @@ describe("staging runtime profiles", () => {
     expect(result.isValid).toBe(false);
     expect(result.errors.length).toBeGreaterThan(0);
   });
+
+  it("builds pensioen/aow fixture with logical fields by slug", () => {
+    const fixture = getProfileFixture(
+      "generic_contract",
+      "artifact-pensioen-aow-aow-leeftijd",
+    );
+    expect(fixture.input).toMatchObject({ geboorteJaar: expect.any(Number) });
+    const result = executeProfile("generic_contract", fixture.input);
+    expect(result.isValid).toBe(true);
+    expect(result.outputs.modelUsed).toBe("aow_leeftijd_indicatie");
+  });
+
+  it("builds hypotheek fixture with logical fields by slug", () => {
+    const fixture = getProfileFixture(
+      "generic_contract",
+      "artifact-hypotheek-wonen-huren-of-kopen",
+    );
+    expect(fixture.input).toMatchObject({ huurPerMaand: expect.any(Number) });
+    const result = executeProfile("generic_contract", fixture.input);
+    expect(result.isValid).toBe(true);
+    expect(result.outputs.modelUsed).toBe("huren_kopen_indicatie");
+  });
+
+  it("builds pensioen jaarruimte fixture with dedicated model", () => {
+    const fixture = getProfileFixture(
+      "generic_contract",
+      "artifact-pensioen-aow-jaarruimte-belastingteruggave",
+    );
+    const result = executeProfile("generic_contract", fixture.input);
+    expect(result.isValid).toBe(true);
+    expect(result.outputs.modelUsed).toBe("pensioen_jaarruimte_indicatie");
+    expect(typeof result.outputs.modelExplanation).toBe("string");
+  });
+
+  it("builds gezin indexering fixture with dedicated model", () => {
+    const fixture = getProfileFixture(
+      "generic_contract",
+      "artifact-gezin-relatie-indexering-alimentatie",
+    );
+    const result = executeProfile("generic_contract", fixture.input);
+    expect(result.isValid).toBe(true);
+    expect(result.outputs.modelUsed).toBe("alimentatie_indexering_indicatie");
+  });
+
+  it("builds hypotheek overdrachtsbelasting fixture with dedicated model", () => {
+    const fixture = getProfileFixture(
+      "generic_contract",
+      "artifact-hypotheek-wonen-overdrachtsbelasting",
+    );
+    const result = executeProfile("generic_contract", fixture.input);
+    expect(result.isValid).toBe(true);
+    expect(result.outputs.modelUsed).toBe("overdrachtsbelasting_indicatie");
+  });
+
+  it("builds hypotheek kosten koper fixture with dedicated model", () => {
+    const fixture = getProfileFixture(
+      "generic_contract",
+      "artifact-hypotheek-wonen-kosten-koper",
+    );
+    const result = executeProfile("generic_contract", fixture.input);
+    expect(result.isValid).toBe(true);
+    expect(result.outputs.modelUsed).toBe("kosten_koper_indicatie");
+  });
+
+  it("builds hypotheek rentevergelijking fixture with dedicated model", () => {
+    const fixture = getProfileFixture(
+      "generic_contract",
+      "artifact-hypotheek-wonen-hypotheek-oversluiten",
+    );
+    const result = executeProfile("generic_contract", fixture.input);
+    expect(result.isValid).toBe(true);
+    expect(result.outputs.modelUsed).toBe("hypotheek_rentevergelijking_indicatie");
+  });
+
+  it("builds hypotheek aflossen fixture with dedicated model", () => {
+    const fixture = getProfileFixture(
+      "generic_contract",
+      "artifact-hypotheek-wonen-hypotheek-extra-aflossen",
+    );
+    const result = executeProfile("generic_contract", fixture.input);
+    expect(result.isValid).toBe(true);
+    expect(result.outputs.modelUsed).toBe("hypotheek_aflossen_indicatie");
+  });
+
+  it("builds hypotheek maximale hypotheek fixture with dedicated model", () => {
+    const fixture = getProfileFixture(
+      "generic_contract",
+      "artifact-hypotheek-wonen-maximale-hypotheek",
+    );
+    const result = executeProfile("generic_contract", fixture.input);
+    expect(result.isValid).toBe(true);
+    expect(result.outputs.modelUsed).toBe("maximale_hypotheek_indicatie");
+  });
+
+  it("builds woning prijsontwikkeling fixture with dedicated model", () => {
+    const fixture = getProfileFixture(
+      "generic_contract",
+      "artifact-hypotheek-wonen-prijsontwikkeling-huizenprijzen",
+    );
+    const result = executeProfile("generic_contract", fixture.input);
+    expect(result.isValid).toBe(true);
+    expect(result.outputs.modelUsed).toBe("woningwaarde_groei_indicatie");
+  });
 });
