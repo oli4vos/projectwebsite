@@ -6,10 +6,10 @@ import type { AppManifest } from "@/lib/app-types";
 export const appRegistry = [
   {
     "slug": "familiehulp-eerste-woning",
-    "title": "Familiehulp eerste woning",
-    "description": "Combineer bancaire hypotheek, DUO, schenking, eigen geld en familielening voor een eerste woning.",
+    "title": "Lenen of schenken voor eerste woning",
+    "description": "Vergelijk studieschuld, bankhypotheek, eigen geld, familielening en schenkingen voor een eerste woning.",
     "type": "frontend",
-    "category": "Familiefinanciering",
+    "category": "Studieschuld & wonen",
     "tags": [
       "familielening",
       "schenking",
@@ -35,7 +35,7 @@ export const appRegistry = [
       "housing.mortgageTermYears",
       "savingInvesting.targetEmergencyFund"
     ],
-    "reasonHint": "Handig als je een eerste woning wilt financieren met hypotheek, DUO, familiehulp en eigen geld.",
+    "reasonHint": "Handig als je door studieschuld wilt zien hoe bankhypotheek, eigen geld, familielening en schenking samen uitpakken.",
     "assumptionsUsed": [
       "duo",
       "mortgage"

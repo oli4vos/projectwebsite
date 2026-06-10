@@ -256,15 +256,15 @@ function CalculatorContent({
       intro={
         <div>
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
-            Rekentool
+            Studieschuld, wonen en familiehulp
           </div>
           <h1 className="mt-2 font-serif text-[clamp(2rem,1.6rem+1.5vw,2.9rem)] leading-[1.05] tracking-[-0.03em] text-[var(--ink)]">
-            Familiehulp bij een eerste woning
+            Lenen of schenken naast je studieschuld
           </h1>
           <p className="mt-3 text-[14px] leading-[1.75] text-[var(--ink-2)]">
-            Combineer woningprijs, eigen geld, DUO, schenking en familielening in
-            één scenario. Schenkingen worden apart zichtbaar gehouden en tellen
-            niet automatisch mee als contractuele schuld.
+            Deze tool is de plek waar je de leen/schenk-vraag terugvindt. Combineer
+            woningprijs, eigen geld, DUO, een familielening en schenkingen in één
+            scenario, zonder contractuele lasten en hulp van familie door elkaar te halen.
           </p>
           <p className="mt-3 text-[13px] leading-[1.65] text-[var(--muted)]">
             Toekomstige periodieke schenkingen zijn onzeker. Deze tool laat daarom
@@ -372,7 +372,7 @@ function CalculatorContent({
             </div>
           </DisclosureSection>
 
-          <DisclosureSection title="DUO" subtitle="Studieschuld, maandlast en extra aflossing.">
+          <DisclosureSection title="DUO en extra aflossen" subtitle="Studieschuld, maandlast en effect van extra aflossen.">
             <div className="grid gap-4 md:grid-cols-2">
               <SelectField
                 id="duoSituation"
@@ -469,7 +469,10 @@ function CalculatorContent({
             </div>
           </DisclosureSection>
 
-          <DisclosureSection title="Hulp van familie" subtitle="Familielening en schenking blijven apart zichtbaar.">
+          <DisclosureSection
+            title="Lenen of schenken via familie"
+            subtitle="Familielening, eenmalige schenking en periodieke schenking blijven apart zichtbaar."
+          >
             <div className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <TextField

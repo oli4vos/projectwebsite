@@ -36,12 +36,12 @@ export const audienceRoutes: AudienceRoute[] = [
   },
   {
     id: "starter-studieschuld",
-    label: "Starter met studieschuld",
+    label: "Studieschuldroute",
     summary:
-      "Begin bij DUO, buffer en wonen: wat betekent je schuld voor maandruimte, hypotheek en extra aflossen?",
-    userQuestion: "Kan ik beter aflossen, sparen voor een huis of beleggen?",
+      "Begin bij wat DUO blokkeert: maandruimte, buffer, extra aflossen, wonen en investeren in je toekomst.",
+    userQuestion: "Wat belemmert mijn studieschuld en welke keuze pak ik eerst aan?",
     researchSignal:
-      "Jongvolwassenen en oud-studenten zoeken vooral grip op studieschuld, wonen en de eerste grote geldkeuzes.",
+      "Jongvolwassenen en oud-studenten zoeken vooral grip op studieschuld voordat zij grote keuzes maken over wonen, buffer en vermogen.",
     groups: ["Studieschuld", "Wonen", "Persoonlijke financiën"],
     primaryToolSlugs: [
       "schulden-volgorde",
@@ -52,13 +52,13 @@ export const audienceRoutes: AudienceRoute[] = [
   },
   {
     id: "koopstarter-familiehulp",
-    label: "Koopstarter + familiehulp",
+    label: "Wonen + lenen/schenken",
     summary:
-      "Vergelijk eigen geld, DUO, familielening en schenkingen in één route voor je eerste woning.",
+      "Vergelijk eigen geld, DUO, bankhypotheek, familielening en schenkingen in één woningroute.",
     userQuestion:
-      "Hoe combineer ik mijn studieschuld, eigen geld en familiehulp zonder dubbel te tellen?",
+      "Waar vind ik lenen of schenken via familie en wat doet dat met mijn woningroute?",
     researchSignal:
-      "Koopstarters willen scenario-inzicht met duidelijke scheiding tussen contractuele lasten, schenkingen en buffer.",
+      "Koopstarters willen familiehulp kunnen bekijken zonder contractuele lasten, schenkingen en buffer op één hoop te gooien.",
     groups: ["Studieschuld", "Wonen", "Persoonlijke financiën"],
     primaryToolSlugs: [
       "familiehulp-eerste-woning",

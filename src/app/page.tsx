@@ -14,34 +14,35 @@ export default async function HomePage() {
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)]">
             <div className="max-w-4xl pt-2">
               <div className="text-[11px] uppercase tracking-[0.16em] text-[var(--muted)]">
-                Koopstarters met familiehulp
+                Studieschuld als startpunt
               </div>
               <h1
                 className="text-fluid-h1 mt-4 font-serif tracking-[-0.03em] text-[var(--ink)]"
                 style={{ textWrap: "balance" }}
               >
-                Je eerste huis financieren met studieschuld en hulp van familie
+                Wat je studieschuld doet met je volgende grote keuzes
               </h1>
               <p className="text-fluid-lead mt-5 max-w-[64ch] leading-[1.7] text-[var(--ink-2)]">
-                Vergelijk eigen geld, DUO, een familielening en schenkingen in één overzicht.
+                Zie hoe DUO doorwerkt in maandruimte, extra aflossen, wonen,
+                eigen geld en hulp van familie.
               </p>
               <div className="mt-7 flex flex-wrap items-center gap-3">
                 <BtnLink href="/apps/familiehulp-eerste-woning" kind="primary" size="md">
-                  Bereken mijn financieringsroute
+                  Start mijn studieschuldroute
                 </BtnLink>
                 <BtnLink href="#apps" kind="outline" size="md">
-                  Bekijk alle tools
+                  Bekijk de lagen
                 </BtnLink>
               </div>
               <div className="mt-5 flex flex-wrap gap-2 text-[12.5px] leading-[1.6] text-[var(--muted)]">
                 <span className="rounded-full border border-[var(--hair)] bg-white px-3 py-1.5">
-                  Onafhankelijk scenario-inzicht
+                  DUO remt maandruimte
                 </span>
                 <span className="rounded-full border border-[var(--hair)] bg-white px-3 py-1.5">
-                  Toekomstige schenkingen zijn onzeker
+                  Extra aflossen is een keuze
                 </span>
                 <span className="rounded-full border border-[var(--hair)] bg-white px-3 py-1.5">
-                  Gegevens blijven lokaal
+                  Lenen en schenken apart zichtbaar
                 </span>
               </div>
               <div className="mt-6 flex flex-wrap items-center gap-3">
@@ -61,32 +62,32 @@ export default async function HomePage() {
 
             <aside className="rounded-[1.75rem] border hair bg-white p-6 shadow-paper">
               <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
-                Gericht op één route
+                Gelaagde route
               </div>
               <h2 className="mt-2 font-serif text-[clamp(1.35rem,1.1rem+0.9vw,1.8rem)] tracking-[-0.02em] text-[var(--ink)]">
-                Eerst inzicht, daarna keuze
+                Niet alleen een huisvraag
               </h2>
               <p className="mt-3 text-[14px] leading-[1.7] text-[var(--ink-2)]">
-                Deze ingang combineert studieschuld, eigen geld, familiehulp en de bancaire
-                hypotheek. De reguliere DUO-tools blijven daarnaast gewoon beschikbaar.
+                Een woning is één onderwerp binnen een bredere route: je studieschuld,
+                buffer, extra aflossen, sparen, beleggen en eventueel hulp van familie.
               </p>
               <div className="mt-5 space-y-3">
                 <div className="rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3">
-                  <div className="text-[12px] font-medium text-[var(--ink)]">Scenario-inzicht</div>
+                  <div className="text-[12px] font-medium text-[var(--ink)]">1. DUO-druk</div>
                   <p className="mt-1 text-[12.5px] leading-[1.6] text-[var(--muted)]">
-                    Vergelijk routes zonder dat bedragen automatisch door elkaar lopen.
+                    Breng maandlast, regeling en hypotheekimpact eerst helder in beeld.
                   </p>
                 </div>
                 <div className="rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3">
-                  <div className="text-[12px] font-medium text-[var(--ink)]">Schenkingen blijven onzeker</div>
+                  <div className="text-[12px] font-medium text-[var(--ink)]">2. Extra aflossen</div>
                   <p className="mt-1 text-[12.5px] leading-[1.6] text-[var(--muted)]">
-                    Een toekomstige schenking is geen gegarandeerd inkomen of vaste lastverlaging.
+                    Vergelijk aflossen met buffer, sparen, beleggen en woonruimte.
                   </p>
                 </div>
                 <div className="rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3">
-                  <div className="text-[12px] font-medium text-[var(--ink)]">Lokaal bewaard</div>
+                  <div className="text-[12px] font-medium text-[var(--ink)]">3. Wonen en familiehulp</div>
                   <p className="mt-1 text-[12.5px] leading-[1.6] text-[var(--muted)]">
-                    Invoer blijft volgens de bestaande opslagwerking in je eigen browser.
+                    Bekijk bankhypotheek, eigen geld, familielening en schenking los van elkaar.
                   </p>
                 </div>
               </div>
