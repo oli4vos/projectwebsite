@@ -5,11 +5,11 @@ import { useMemo, useState } from "react";
 import type { AppManifest } from "@/lib/app-types";
 import { toAnchorId } from "@/lib/anchor-ids";
 import {
-  audienceRoutes,
   filterGroupsForAudience,
   getAudienceRoute,
   getAudienceRouteAnchorId,
   getAudienceRouteApps,
+  visibleAudienceRoutes,
 } from "@/lib/audience-routes";
 import { ENABLE_PROFILE } from "@/lib/feature-flags";
 import { toolGroups } from "@/lib/tool-groups";
@@ -123,7 +123,7 @@ export function AppDashboard({ apps }: AppDashboardProps) {
           open je alleen als je meer uitleg wilt.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
-          {audienceRoutes.map((preset) => (
+          {visibleAudienceRoutes.map((preset) => (
             <button
               key={preset.id}
               type="button"

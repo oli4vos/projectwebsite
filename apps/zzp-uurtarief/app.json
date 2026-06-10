@@ -6,7 +6,7 @@
   "category": "Werk",
   "tags": ["ZZP", "uurtarief", "AOV", "pensioen", "inkomen"],
   "status": "beta",
-  "visibility": "public",
+  "visibility": "hidden",
   "requiredProfileFields": [
     "income.employmentType",
     "income.grossAnnualIncome",

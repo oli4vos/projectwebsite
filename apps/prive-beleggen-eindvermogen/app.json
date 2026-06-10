@@ -6,7 +6,7 @@
   "category": "Beleggen",
   "tags": ["beleggen", "eindvermogen", "box 3", "vermogen", "privé"],
   "status": "beta",
-  "visibility": "public",
+  "visibility": "hidden",
   "requiredProfileFields": [
     "savingInvesting.currentSavings",
     "savingInvesting.monthlyFreeCashflow",

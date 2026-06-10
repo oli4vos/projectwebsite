@@ -11,16 +11,18 @@ describe("generated app registry", () => {
   });
 
   it("contains expected public tools", () => {
+    expect(appRegistry).toHaveLength(5);
+    expect(appRegistryBySlug["familiehulp-eerste-woning"]).toBeDefined();
     expect(appRegistryBySlug["hypotheek-impact-studieschuld"]).toBeDefined();
     expect(appRegistryBySlug["studieschuld-vs-beleggen"]).toBeDefined();
-    expect(appRegistryBySlug["jaarruimte-vs-vrij-beleggen"]).toBeDefined();
-    expect(appRegistryBySlug["box-3-impact"]).toBeDefined();
     expect(appRegistryBySlug["volgende-euro"]).toBeDefined();
-    expect(appRegistryBySlug["hypotheek-aflossen-vs-beleggen"]).toBeDefined();
-    expect(appRegistryBySlug["zzp-uurtarief"]).toBeDefined();
-    expect(appRegistryBySlug["koop-vs-huur"]).toBeDefined();
     expect(appRegistryBySlug["schulden-volgorde"]).toBeDefined();
-    expect(appRegistryBySlug["kind-wordt-18-impact"]).toBeDefined();
+    expect(appRegistryBySlug["jaarruimte-vs-vrij-beleggen"]).toBeUndefined();
+    expect(appRegistryBySlug["box-3-impact"]).toBeUndefined();
+    expect(appRegistryBySlug["hypotheek-aflossen-vs-beleggen"]).toBeUndefined();
+    expect(appRegistryBySlug["zzp-uurtarief"]).toBeUndefined();
+    expect(appRegistryBySlug["koop-vs-huur"]).toBeUndefined();
+    expect(appRegistryBySlug["kind-wordt-18-impact"]).toBeUndefined();
   });
 
   it("keeps manifest metadata consistent for disclaimer and output type", () => {
@@ -76,7 +78,6 @@ describe("generated app registry", () => {
     const box3Apps = (appRegistry as AppManifest[]).filter((app) =>
       (app.assumptionsUsed ?? []).includes("box3"),
     );
-    expect(box3Apps.length).toBeGreaterThan(0);
 
     for (const app of box3Apps) {
       expect((app.calculationDomains ?? []).length).toBeGreaterThan(0);

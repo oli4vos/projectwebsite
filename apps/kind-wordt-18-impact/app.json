@@ -6,7 +6,7 @@
   "category": "Persoonlijke financiën",
   "tags": ["gezin", "kind 18", "toeslagen", "zorgverzekering", "studiekosten"],
   "status": "beta",
-  "visibility": "public",
+  "visibility": "hidden",
   "reasonHint": "Handig als je wilt zien wat er in je maandruimte verandert rond de 18e verjaardag van je kind.",
   "assumptionsUsed": ["tax"],
   "calculationDomains": ["cashflow", "tax"],

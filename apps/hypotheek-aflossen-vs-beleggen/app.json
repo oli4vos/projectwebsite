@@ -6,7 +6,7 @@
   "category": "Hypotheek",
   "tags": ["hypotheek", "aflossen", "beleggen", "box 3", "renteaftrek"],
   "status": "beta",
-  "visibility": "public",
+  "visibility": "hidden",
   "requiredProfileFields": [
     "income.grossAnnualIncome",
     "housing.mortgageRate",

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { BtnLink, Logo } from "@/components/ui";
 import { toAnchorId } from "@/lib/anchor-ids";
+import { appRegistryBySlug } from "@/lib/app-registry";
 import { ENABLE_PROFILE } from "@/lib/feature-flags";
 import { toolGroups } from "@/lib/tool-groups";
 
@@ -15,10 +16,12 @@ const navItems = [
   { href: "/#aannames", label: "Aannames" },
 ] as const;
 
-const headerCategories = toolGroups.map((group) => ({
-  label: group.title,
-  href: `/#${toAnchorId(group.title, "groep")}`,
-}));
+const headerCategories = toolGroups
+  .filter((group) => group.slugs.some((slug) => appRegistryBySlug[slug]))
+  .map((group) => ({
+    label: group.title,
+    href: `/#${toAnchorId(group.title, "groep")}`,
+  }));
 
 function navClassName() {
   return "inline-flex min-h-11 items-center rounded-full px-3 py-2 text-[var(--muted)] transition hover:bg-white/70 hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2";

@@ -6,7 +6,7 @@
   "category": "Belasting",
   "tags": ["jaarruimte", "pensioen", "box 3", "beleggen", "FIRE"],
   "status": "beta",
-  "visibility": "public",
+  "visibility": "hidden",
   "requiredProfileFields": [
     "income.grossAnnualIncome",
     "savingInvesting.currentSavings",

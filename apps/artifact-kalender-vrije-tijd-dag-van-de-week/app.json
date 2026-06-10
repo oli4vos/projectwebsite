@@ -11,7 +11,7 @@
     "invulblad"
   ],
   "status": "draft",
-  "visibility": "public",
+  "visibility": "hidden",
   "reasonHint": "Geïmporteerd vanuit ingevulde artifacts; bedoeld voor gecontroleerde uitrol in aparte sectie.",
   "assumptionsUsed": [
     "charts"

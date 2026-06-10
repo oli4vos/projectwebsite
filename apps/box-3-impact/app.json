@@ -6,7 +6,7 @@
   "category": "Belasting",
   "tags": ["box 3", "belasting", "sparen", "beleggen", "vermogen"],
   "status": "beta",
-  "visibility": "public",
+  "visibility": "hidden",
   "requiredProfileFields": [
     "savingInvesting.currentSavings",
     "tax.hasFiscalPartner",

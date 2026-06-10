@@ -6,7 +6,7 @@
   "category": "Beleggen",
   "tags": ["FIRE", "beleggen", "box 3", "financiële vrijheid", "vermogen"],
   "status": "beta",
-  "visibility": "public",
+  "visibility": "hidden",
   "requiredProfileFields": [
     "savingInvesting.currentSavings",
     "savingInvesting.monthlyFreeCashflow",

@@ -19,6 +19,7 @@ export type AudienceRoute = {
   researchSignal: string;
   groups: string[];
   primaryToolSlugs: string[];
+  enabled?: boolean;
   futureOpportunity?: string;
 };
 
@@ -70,6 +71,7 @@ export const audienceRoutes: AudienceRoute[] = [
   {
     id: "woningzoeker",
     label: "Woningzoeker",
+    enabled: false,
     summary:
       "Focus op betaalbare maandlasten, eigen geld, renteaftrek en de impact van studieschuld of vaste lasten.",
     userQuestion: "Wat kan ik dragen als ik wil kopen of mijn hypotheek wil vergelijken?",
@@ -86,6 +88,7 @@ export const audienceRoutes: AudienceRoute[] = [
   {
     id: "zzp",
     label: "ZZP / wisselend inkomen",
+    enabled: false,
     summary:
       "Begin bij uurtarief, belastingpot, buffer en pensioenruimte voordat je privé-uitgaven verhoogt.",
     userQuestion: "Wat kan ik veilig privé uitgeven als mijn inkomen wisselt?",
@@ -97,6 +100,7 @@ export const audienceRoutes: AudienceRoute[] = [
   {
     id: "schulden",
     label: "Schulden aanpakken",
+    enabled: false,
     summary:
       "Breng dure schulden, DUO en hypotheekafwegingen in volgorde zonder lege velden als advies te behandelen.",
     userQuestion: "Welke schuld of keuze moet eerst aandacht krijgen?",
@@ -113,6 +117,7 @@ export const audienceRoutes: AudienceRoute[] = [
   {
     id: "gezin-kind-18",
     label: "Gezin / kind wordt 18",
+    enabled: false,
     summary:
       "Kijk naar maandruimte, toeslaggevoelige keuzes en reserveringen wanneer gezinsinkomen of kosten veranderen.",
     userQuestion: "Wat verandert er in mijn maandruimte als gezinssituatie of inkomsten wijzigen?",
@@ -129,6 +134,7 @@ export const audienceRoutes: AudienceRoute[] = [
   {
     id: "pensioen-fire",
     label: "Pensioen / FIRE",
+    enabled: false,
     summary:
       "Vergelijk vrij beleggen, jaarruimte, box 3 en financiële vrijheid met focus op netto uitkomsten.",
     userQuestion: "Hoe bouw ik vermogen op zonder flexibiliteit en belastingeffecten te vergeten?",
@@ -142,6 +148,10 @@ export const audienceRoutes: AudienceRoute[] = [
     ],
   },
 ];
+
+export const visibleAudienceRoutes = audienceRoutes.filter(
+  (route) => route.enabled !== false,
+);
 
 const fallbackRoute = audienceRoutes[0];
 

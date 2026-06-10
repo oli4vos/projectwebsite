@@ -6,6 +6,7 @@ import {
   getAudienceRoute,
   getAudienceRouteAnchorId,
   getAudienceRouteApps,
+  visibleAudienceRoutes,
 } from "@/lib/audience-routes";
 import { appRegistryBySlug } from "@/lib/app-registry";
 
@@ -44,6 +45,14 @@ describe("audience routes", () => {
   it("falls back to all for unknown routes", () => {
     expect(getAudienceRoute("unknown").id).toBe("all");
     expect(getAudienceRoute(undefined).id).toBe("all");
+  });
+
+  it("exposes only currently active audience routes", () => {
+    expect(visibleAudienceRoutes.map((route) => route.id)).toEqual([
+      "all",
+      "starter-studieschuld",
+      "koopstarter-familiehulp",
+    ]);
   });
 
   it("filters tool groups by route", () => {
@@ -94,7 +103,7 @@ describe("audience routes", () => {
   });
 
   it("only points primary routes to public registry apps", () => {
-    for (const route of audienceRoutes) {
+    for (const route of visibleAudienceRoutes) {
       for (const slug of route.primaryToolSlugs) {
         expect(appRegistryBySlug[slug], `${route.id} -> ${slug}`).toBeDefined();
       }

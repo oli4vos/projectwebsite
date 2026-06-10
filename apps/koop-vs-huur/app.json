@@ -6,7 +6,7 @@
   "category": "Hypotheek",
   "tags": ["wonen", "huur", "koop", "hypotheek", "rente-stresstest"],
   "status": "beta",
-  "visibility": "public",
+  "visibility": "hidden",
   "reasonHint": "Handig als je kopen en huren wilt vergelijken op maandlast, eigen geld en renterisico.",
   "assumptionsUsed": ["mortgage"],
   "calculationDomains": ["housing", "mortgage", "cashflow"],

@@ -6,7 +6,7 @@
   "category": "Hypotheek",
   "tags": ["hypotheek", "annuiteit", "lineair", "maandlasten"],
   "status": "active",
-  "visibility": "public",
+  "visibility": "hidden",
   "requiredProfileFields": [
     "income.grossAnnualIncome",
     "income.partnerGrossAnnualIncome",

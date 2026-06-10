@@ -133,7 +133,7 @@ describe("profile recommendations", () => {
     };
     const slugs = getRecommendedAppSlugsForProfile(profile, { availableSlugs });
     expect(slugs).toContain("hypotheek-impact-studieschuld");
-    expect(slugs).toContain("hypotheek-aflossen-vs-beleggen");
+    expect(slugs).not.toContain("hypotheek-aflossen-vs-beleggen");
   });
 
   it("adds housing specific reason text", () => {
@@ -142,7 +142,7 @@ describe("profile recommendations", () => {
       { availableSlugs },
     );
     const housingRecommendation = recommendations.find(
-      (item) => item.slug === "hypotheek-aflossen-vs-beleggen",
+      (item) => item.slug === "hypotheek-impact-studieschuld",
     );
 
     expect(housingRecommendation?.reason).toContain("hypotheek");
@@ -155,8 +155,9 @@ describe("profile recommendations", () => {
       },
     };
     const slugs = getRecommendedAppSlugsForProfile(profile, { availableSlugs });
-    expect(slugs).toContain("box-3-impact");
-    expect(slugs).toContain("fire-na-belasting");
+    expect(slugs).toEqual(["volgende-euro"]);
+    expect(slugs).not.toContain("box-3-impact");
+    expect(slugs).not.toContain("fire-na-belasting");
   });
 
   it("adds investing specific reason text", () => {
@@ -168,7 +169,8 @@ describe("profile recommendations", () => {
       (item) => item.slug === "box-3-impact",
     );
 
-    expect(box3Recommendation?.reason).toContain("box 3");
+    expect(box3Recommendation).toBeUndefined();
+    expect(recommendations[0]?.reason).toContain("brede starttool");
   });
 
   it("recommends zzp tool for self-employed profile", () => {
@@ -178,7 +180,8 @@ describe("profile recommendations", () => {
       },
     };
     const slugs = getRecommendedAppSlugsForProfile(profile, { availableSlugs });
-    expect(slugs).toContain("zzp-uurtarief");
+    expect(slugs).toEqual(["volgende-euro"]);
+    expect(slugs).not.toContain("zzp-uurtarief");
   });
 
   it("adds zzp specific reason text", () => {
@@ -190,7 +193,8 @@ describe("profile recommendations", () => {
       (item) => item.slug === "zzp-uurtarief",
     );
 
-    expect(zzpRecommendation?.reason).toContain("ZZP");
+    expect(zzpRecommendation).toBeUndefined();
+    expect(recommendations[0]?.reason).toContain("brede starttool");
   });
 
   it("returns max 3 unique slugs", () => {
