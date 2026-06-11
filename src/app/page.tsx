@@ -20,18 +20,18 @@ export default async function HomePage() {
                 className="text-fluid-h1 mt-4 font-serif tracking-[-0.03em] text-[var(--ink)]"
                 style={{ textWrap: "balance" }}
               >
-                Wat je studieschuld doet met je volgende grote keuzes
+                Begin bij je studieschuld. Ga daarna pas dieper.
               </h1>
               <p className="text-fluid-lead mt-5 max-w-[64ch] leading-[1.7] text-[var(--ink-2)]">
-                Zie hoe DUO doorwerkt in maandruimte, extra aflossen, wonen,
-                eigen geld en hulp van familie.
+                Eerst zie je wat DUO per maand doet. Daarna vergelijk je extra
+                aflossen, sparen, wonen en hulp van familie.
               </p>
               <div className="mt-7 flex flex-wrap items-center gap-3">
-                <BtnLink href="/apps/familiehulp-eerste-woning" kind="primary" size="md">
-                  Start mijn studieschuldroute
+                <BtnLink href="#apps" kind="primary" size="md">
+                  Begin bij stap 1
                 </BtnLink>
-                <BtnLink href="#apps" kind="outline" size="md">
-                  Bekijk de lagen
+                <BtnLink href="/apps/familiehulp-eerste-woning" kind="outline" size="md">
+                  Lenen of schenken voor huis
                 </BtnLink>
               </div>
               <div className="mt-5 flex flex-wrap gap-2 text-[12.5px] leading-[1.6] text-[var(--muted)]">
@@ -65,29 +65,29 @@ export default async function HomePage() {
                 Gelaagde route
               </div>
               <h2 className="mt-2 font-serif text-[clamp(1.35rem,1.1rem+0.9vw,1.8rem)] tracking-[-0.02em] text-[var(--ink)]">
-                Niet alleen een huisvraag
+                Eerst simpel, daarna meer detail
               </h2>
               <p className="mt-3 text-[14px] leading-[1.7] text-[var(--ink-2)]">
-                Een woning is één onderwerp binnen een bredere route: je studieschuld,
-                buffer, extra aflossen, sparen, beleggen en eventueel hulp van familie.
+                Je hoeft niet alles tegelijk te begrijpen. De site begint bij één
+                vraag en opent daarna pas de volgende laag.
               </p>
               <div className="mt-5 space-y-3">
                 <div className="rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3">
-                  <div className="text-[12px] font-medium text-[var(--ink)]">1. DUO-druk</div>
+                  <div className="text-[12px] font-medium text-[var(--ink)]">1. Wat kost DUO?</div>
                   <p className="mt-1 text-[12.5px] leading-[1.6] text-[var(--muted)]">
-                    Breng maandlast, regeling en hypotheekimpact eerst helder in beeld.
+                    Begrijp je maandlast en wat de schuld voor je ruimte betekent.
                   </p>
                 </div>
                 <div className="rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3">
-                  <div className="text-[12px] font-medium text-[var(--ink)]">2. Extra aflossen</div>
+                  <div className="text-[12px] font-medium text-[var(--ink)]">2. Wat doe ik met extra geld?</div>
                   <p className="mt-1 text-[12.5px] leading-[1.6] text-[var(--muted)]">
-                    Vergelijk aflossen met buffer, sparen, beleggen en woonruimte.
+                    Vergelijk aflossen met buffer houden, sparen of beleggen.
                   </p>
                 </div>
                 <div className="rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3">
-                  <div className="text-[12px] font-medium text-[var(--ink)]">3. Wonen en familiehulp</div>
+                  <div className="text-[12px] font-medium text-[var(--ink)]">3. Wat betekent dit voor wonen?</div>
                   <p className="mt-1 text-[12.5px] leading-[1.6] text-[var(--muted)]">
-                    Bekijk bankhypotheek, eigen geld, familielening en schenking los van elkaar.
+                    Bekijk hypotheek, eigen geld, familielening en schenking pas daarna.
                   </p>
                 </div>
               </div>

@@ -26,23 +26,23 @@ export type AudienceRoute = {
 export const audienceRoutes: AudienceRoute[] = [
   {
     id: "all",
-    label: "Alles",
-    summary: "Toon alle onderwerpen en kies daarna een tool die past bij je vraag.",
-    userQuestion: "Ik wil zelf door de hele toolbibliotheek bladeren.",
+    label: "Alle tools",
+    summary: "Toon alle zichtbare tools wanneer je zelf wilt kiezen.",
+    userQuestion: "Ik wil zelf alle tools zien.",
     researchSignal:
-      "Breed startpunt: de site blijft primair een rustige bibliotheek per onderwerp.",
+      "Alle tools blijven beschikbaar, maar de standaardroute begint bewust eenvoudiger.",
     groups: [],
     primaryToolSlugs: [],
   },
   {
     id: "starter-studieschuld",
-    label: "Studieschuldroute",
+    label: "Start bij DUO",
     summary:
-      "Begin bij wat DUO blokkeert: maandruimte, buffer, extra aflossen, wonen en investeren in je toekomst.",
-    userQuestion: "Wat belemmert mijn studieschuld en welke keuze pak ik eerst aan?",
+      "Begin bij maandlast, buffer, extra aflossen en wat je studieschuld blokkeert.",
+    userQuestion: "Wat doet mijn studieschuld met mijn ruimte per maand?",
     researchSignal:
-      "Jongvolwassenen en oud-studenten zoeken vooral grip op studieschuld voordat zij grote keuzes maken over wonen, buffer en vermogen.",
-    groups: ["Studieschuld", "Wonen", "Persoonlijke financiën"],
+      "Eerst grip op DUO, daarna pas wonen, vermogen en familiehulp.",
+    groups: ["Studieschuld", "Wonen", "Extra geld"],
     primaryToolSlugs: [
       "schulden-volgorde",
       "volgende-euro",
@@ -52,14 +52,14 @@ export const audienceRoutes: AudienceRoute[] = [
   },
   {
     id: "koopstarter-familiehulp",
-    label: "Wonen + lenen/schenken",
+    label: "Daarna wonen",
     summary:
-      "Vergelijk eigen geld, DUO, bankhypotheek, familielening en schenkingen in één woningroute.",
+      "Vergelijk woningprijs, eigen geld, DUO, bankhypotheek, familielening en schenking.",
     userQuestion:
-      "Waar vind ik lenen of schenken via familie en wat doet dat met mijn woningroute?",
+      "Kan ik kopen met studieschuld, eigen geld en hulp van familie?",
     researchSignal:
-      "Koopstarters willen familiehulp kunnen bekijken zonder contractuele lasten, schenkingen en buffer op één hoop te gooien.",
-    groups: ["Studieschuld", "Wonen", "Persoonlijke financiën"],
+      "Wonen is een verdiepingslaag: familielening, schenking en contractuele lasten blijven apart.",
+    groups: ["Studieschuld", "Wonen", "Extra geld"],
     primaryToolSlugs: [
       "familiehulp-eerste-woning",
       "hypotheek-impact-studieschuld",
@@ -94,7 +94,7 @@ export const audienceRoutes: AudienceRoute[] = [
     userQuestion: "Wat kan ik veilig privé uitgeven als mijn inkomen wisselt?",
     researchSignal:
       "Huishoudens met wisselend inkomen ervaren vaker onzekerheid; tools moeten daarom reserveringen en buffer expliciet maken.",
-    groups: ["Werk & ZZP", "Belasting", "Persoonlijke financiën", "Sparen & beleggen"],
+    groups: ["Werk & ZZP", "Belasting", "Extra geld", "Sparen & beleggen"],
     primaryToolSlugs: ["zzp-uurtarief", "volgende-euro", "jaarruimte-vs-vrij-beleggen"],
   },
   {
@@ -106,7 +106,7 @@ export const audienceRoutes: AudienceRoute[] = [
     userQuestion: "Welke schuld of keuze moet eerst aandacht krijgen?",
     researchSignal:
       "Kredieten, achteraf betalen en betalingsachterstanden vragen om een concrete volgorde in plaats van losse percentages.",
-    groups: ["Persoonlijke financiën", "Studieschuld", "Wonen"],
+    groups: ["Extra geld", "Studieschuld", "Wonen"],
     primaryToolSlugs: [
       "schulden-volgorde",
       "volgende-euro",
@@ -123,7 +123,7 @@ export const audienceRoutes: AudienceRoute[] = [
     userQuestion: "Wat verandert er in mijn maandruimte als gezinssituatie of inkomsten wijzigen?",
     researchSignal:
       "Overgangsmomenten zoals een kind dat 18 wordt, werkuren en toeslagen veroorzaken juist behoefte aan eenvoudige scenario's.",
-    groups: ["Persoonlijke financiën", "Werk & ZZP", "Belasting"],
+    groups: ["Extra geld", "Werk & ZZP", "Belasting"],
     primaryToolSlugs: [
       "kind-wordt-18-impact",
       "volgende-euro",

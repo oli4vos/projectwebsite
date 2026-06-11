@@ -28,7 +28,7 @@ function isArtifactImportedApp(app: AppManifest) {
 }
 
 export function AppDashboard({ apps }: AppDashboardProps) {
-  const [activeAudience, setActiveAudience] = useState<string>("all");
+  const [activeAudience, setActiveAudience] = useState<string>("starter-studieschuld");
   const artifactApps = useMemo(
     () => apps.filter(isArtifactImportedApp),
     [apps],
@@ -112,16 +112,36 @@ export function AppDashboard({ apps }: AppDashboardProps) {
 
       <section id="apps" className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
         <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
-          Route vanaf studieschuld
+          Stap voor stap
         </div>
         <h2 className="mt-2 font-serif text-[clamp(1.35rem,1.1rem+1vw,1.9rem)] tracking-[-0.02em] text-[var(--ink)]">
-          Kies de laag die nu blokkeert
+          Begin klein. Open pas meer als je eraan toe bent.
         </h2>
         <p className="mt-3 max-w-[62ch] text-[14px] leading-[1.65] text-[var(--ink-2)]">
-          Begin bij DUO en ga daarna naar extra aflossen, buffer, wonen of familiehulp.
-          De reguliere tools blijven apart bruikbaar, maar de route helpt voorkomen dat
-          maandlasten, schenkingen en eigen geld door elkaar lopen.
+          Je hoeft niet meteen alle cijfers te weten. Kies eerst je situatie, vul
+          alleen de velden in die nodig zijn en klap de uitleg open wanneer je meer
+          wilt begrijpen.
         </p>
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          <div className="rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] p-4">
+            <div className="text-[12px] font-medium text-[var(--ink)]">1. Begrijp DUO</div>
+            <p className="mt-1 text-[12.5px] leading-[1.55] text-[var(--muted)]">
+              Wat betaal je, wat blijft over en wat blokkeert dat?
+            </p>
+          </div>
+          <div className="rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] p-4">
+            <div className="text-[12px] font-medium text-[var(--ink)]">2. Kies met extra geld</div>
+            <p className="mt-1 text-[12.5px] leading-[1.55] text-[var(--muted)]">
+              Aflossen, buffer, sparen of beleggen naast elkaar.
+            </p>
+          </div>
+          <div className="rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] p-4">
+            <div className="text-[12px] font-medium text-[var(--ink)]">3. Ga naar wonen</div>
+            <p className="mt-1 text-[12.5px] leading-[1.55] text-[var(--muted)]">
+              Pas daarna hypotheek, familiehulp en schenking.
+            </p>
+          </div>
+        </div>
         <div className="mt-4 flex flex-wrap gap-2">
           {visibleAudienceRoutes.map((preset) => (
             <button
@@ -140,7 +160,7 @@ export function AppDashboard({ apps }: AppDashboardProps) {
         </div>
         <div className="mt-4 rounded-xl border hair bg-[var(--paper)] p-4">
           <div className="text-[11px] uppercase tracking-[0.12em] text-[var(--soft)]">
-            Routehulp
+            Jouw volgende vraag
           </div>
           <p className="mt-2 text-[14px] font-medium leading-[1.55] text-[var(--ink)]">
             {activeAudiencePreset.userQuestion}

@@ -9,13 +9,13 @@ export type ToolGroup = {
 
 export const toolGroups: ToolGroup[] = [
   {
-    title: "Persoonlijke financiën",
-    description: "Voor je eerste prioriteit als je extra geld overhoudt.",
+    title: "Extra geld",
+    description: "Wat doe je als er geld overblijft: aflossen, buffer houden of iets anders?",
     slugs: ["volgende-euro", "schulden-volgorde", "kind-wordt-18-impact"],
   },
   {
     title: "Studieschuld",
-    description: "Vergelijk verplicht aflossen, extra aflossen en alternatieven.",
+    description: "Begin hier: je maandlast, extra aflossen en wat DUO voor je keuzes betekent.",
     slugs: [
       "studieschuld-vs-beleggen",
       "schulden-volgorde",
@@ -24,7 +24,7 @@ export const toolGroups: ToolGroup[] = [
   },
   {
     title: "Wonen",
-    description: "Inzicht in hypotheekkeuzes, maandlasten en extra aflossen.",
+    description: "Verdieping voor kopen: hypotheekruimte, eigen geld en hulp van familie.",
     slugs: [
       "hypotheek-impact-studieschuld",
       "hypotheek-aflossen-vs-beleggen",
@@ -66,7 +66,8 @@ const categoryToGroupTitle: Record<string, string> = {
   Beleggen: "Sparen & beleggen",
   Belasting: "Belasting",
   Werk: "Werk & ZZP",
-  "Persoonlijke financiën": "Persoonlijke financiën",
+  "Persoonlijke financiën": "Extra geld",
+  "Studieschuld & wonen": "Wonen",
 };
 
 const preferredSlugsByCategory: Record<string, string[]> = {
@@ -89,10 +90,15 @@ const preferredSlugsByCategory: Record<string, string[]> = {
     "schulden-volgorde",
     "kind-wordt-18-impact",
   ],
+  "Studieschuld & wonen": [
+    "familiehulp-eerste-woning",
+    "hypotheek-impact-studieschuld",
+    "studieschuld-vs-beleggen",
+  ],
 };
 
 export function getGroupAnchorForCategory(category: string) {
-  const groupTitle = categoryToGroupTitle[category] ?? "Persoonlijke financiën";
+  const groupTitle = categoryToGroupTitle[category] ?? "Extra geld";
   return toAnchorId(groupTitle, "groep");
 }
 
