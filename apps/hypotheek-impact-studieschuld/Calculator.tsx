@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { DisclosureSection } from "@/components/DisclosureSection";
 import { MobileFieldFlowControls } from "@/components/MobileFieldFlowControls";
 import { ResultRow } from "@/components/ResultRow";
@@ -165,6 +166,16 @@ function formatMonthsAndYears(months: number) {
   const roundedMonths = Math.round(months);
   const years = roundedMonths / 12;
   return `${roundedMonths} maanden (${formatDecimal(years, 1)} jaar)`;
+}
+
+function AmountBreakdown({ items }: { items: ReactNode[] }) {
+  return (
+    <ul className="space-y-1.5">
+      {items.map((item, index) => (
+        <li key={index}>{item}</li>
+      ))}
+    </ul>
+  );
 }
 
 function parseOptionalNumber(value: string) {
@@ -448,6 +459,7 @@ function CalculatorContent({
     hasDirtyChanges,
     submitContextMessage,
     setValues,
+    reset,
   } = useSubmittedCalculation<FormState>(initialValues);
   const validation = validateForm(formValues);
   const errors = Object.fromEntries(
@@ -552,6 +564,10 @@ function CalculatorContent({
     setValues(exampleValues, "Voorbeeldwaarden geladen. Klik op Bereken om de uitkomst te zien.");
   }
 
+  function clearAllInputs() {
+    reset("Alle invoervelden zijn gewist. Vul opnieuw in of laad voorbeeldwaarden.");
+  }
+
   function goToResult() {
     document.getElementById("tool-result-summary")?.scrollIntoView({
       behavior: "smooth",
@@ -606,6 +622,9 @@ function CalculatorContent({
             <ToolActionButton type="button" onClick={applyProfileValues} variant="secondary" size="sm">
               Start met profielwaarden
             </ToolActionButton>
+            <ToolActionButton type="button" onClick={clearAllInputs} variant="secondary" size="sm">
+              Wis invoer
+            </ToolActionButton>
           </div>
         ) : null}
         {!hasRelevantProfileValues ? (
@@ -613,6 +632,9 @@ function CalculatorContent({
             <span>Start leeg en vul snel een voorbeeldscenario in.</span>
             <ToolActionButton type="button" onClick={applyExampleValues} variant="secondary" size="sm">
               Start met voorbeeldwaarden
+            </ToolActionButton>
+            <ToolActionButton type="button" onClick={clearAllInputs} variant="secondary" size="sm">
+              Wis invoer
             </ToolActionButton>
           </div>
         ) : null}
@@ -1068,14 +1090,17 @@ function CalculatorContent({
           {result ? (
             <>
               <div className="mt-4 font-serif text-[30px] leading-[1.03] tracking-[-0.03em] sm:text-[36px]">
-                Voor jouw situatie rekent deze tool met ongeveer{" "}
-                {formatCurrency(result.mortgageImpact.netDuoMonthlyPayment)} netto
-                DUO-last per maand.
+                Voor jouw situatie is het verplichte DUO-bedrag ongeveer{" "}
+                {formatCurrency(result.duoMandatoryPayment.requiredMonthlyPayment)} per maand.
               </div>
               <p className="mt-3 max-w-[58ch] text-[14px] leading-[1.7] text-white/78">
+                Voor brutering rekenen geldverstrekkers met de annuïtaire
+                DUO-maandlast die nodig is om de schuld op nul te zetten:
+                {` `}
+                {formatCurrency(result.mortgageImpact.bruteringBaseMonthlyPayment)}.
                 Na brutering telt dat indicatief als ongeveer{" "}
                 {formatCurrency(result.mortgageImpact.grossDuoMonthlyImpact)} bruto
-                maandlast. Dat kan je hypotheekruimte indicatief met ongeveer{" "}
+                maandlast en kan dat je hypotheekruimte indicatief met ongeveer{" "}
                 {formatCurrency(result.mortgageImpact.principalImpact)} drukken.
               </p>
               <p className="mt-3 max-w-[58ch] text-[13px] leading-[1.65] text-white/72">
@@ -1140,21 +1165,84 @@ function CalculatorContent({
                 value={formatCurrency(result.duoPayment.primaryNetMonthlyPayment)}
                 sub="Bedrag waar deze tool primair mee rekent"
                 accent
+                breakdownLabel="Hoe komt dit bedrag eruit?"
+                breakdown={
+                  <AmountBreakdown
+                    items={[
+                      <span key="1">
+                        Bron: {paymentSourceLabels[result.duoPayment.source]}.
+                      </span>,
+                      <span key="2">
+                        De DUO-situatie bepaalt of we je actuele maandbedrag, een
+                        wettelijk bedrag of een veilige schatting gebruiken.
+                      </span>,
+                      <span key="3">{result.duoPayment.explanation}</span>,
+                    ]}
+                  />
+                }
               />
               <ResultRow
                 label="Optimistisch scenario"
                 value={formatCurrency(result.duoPayment.optimisticNetMonthlyPayment)}
                 sub="Als een geldverstrekker coulanter naar je actuele betaling kijkt"
+                breakdownLabel="Optimistische berekening"
+                breakdown={
+                  <AmountBreakdown
+                    items={[
+                      <span key="1">
+                        Uitgangspunt: {formatCurrency(result.duoPayment.optimisticNetMonthlyPayment)} per maand.
+                      </span>,
+                      <span key="2">
+                        Dit is het scenario waarin een geldverstrekker je huidige of laagste
+                        geldige betaling volgt.
+                      </span>,
+                    ]}
+                  />
+                }
               />
               <ResultRow
                 label="Voorzichtig scenario"
                 value={formatCurrency(result.duoPayment.conservativeNetMonthlyPayment)}
                 sub="Als een geldverstrekker met het wettelijke of geschatte bedrag rekent"
+                breakdownLabel="Voorzichtige berekening"
+                breakdown={
+                  <AmountBreakdown
+                    items={[
+                      <span key="1">
+                        Uitgangspunt: {formatCurrency(result.duoPayment.conservativeNetMonthlyPayment)} per maand.
+                      </span>,
+                      <span key="2">
+                        Dit is het hogere bedrag dat een geldverstrekker kan aanhouden
+                        als veilige DUO-last.
+                      </span>,
+                    ]}
+                  />
+                }
               />
               <ResultRow
                 label="Geschat wettelijk maandbedrag"
                 value={formatCurrency(result.duoPayment.estimatedStatutoryPayment)}
                 sub={`Gebaseerd op schuld, rente en looptijd onder ${ruleLabels[formValues.repaymentRule]}`}
+                breakdownLabel="Wettelijke annuïteit"
+                breakdown={
+                  <AmountBreakdown
+                    items={[
+                      <span key="1">
+                        Resterende schuld:{" "}
+                        {formatCurrency(parsedValues?.remainingStudentDebt ?? 0)}.
+                      </span>,
+                      <span key="2">
+                        DUO-rente: {formatDecimal(parsedValues?.duoInterestRate ?? 0)}%.
+                      </span>,
+                      <span key="3">
+                        Looptijd: {formatMonthsAndYears((parsedValues?.remainingTermYears ?? 0) * 12)}.
+                      </span>,
+                      <span key="4">
+                        Dit is de annuïteit die naar nul aflost over de resterende looptijd.
+                      </span>,
+                    ]}
+                  />
+                }
               />
             </div>
           ) : null}
@@ -1182,16 +1270,60 @@ function CalculatorContent({
                 label="Inkomen gebruikt voor draagkracht"
                 value={formatCurrency(result.duoMandatoryPayment.annualIncomeUsed)}
                 sub="Bruto jaarinkomen gebruiker + partner (indien ingevuld)"
+                breakdownLabel="Hoe is dit berekend?"
+                breakdown={
+                  <AmountBreakdown
+                    items={[
+                      <span key="1">
+                        Gebruiker: {formatCurrency(parsedValues?.grossIncomeUser ?? 0)}.
+                      </span>,
+                      <span key="2">
+                        Partner: {formatCurrency(parsedValues?.grossIncomePartner ?? 0)}.
+                      </span>,
+                      <span key="3">
+                        Samen vormt dat de inkomensbasis voor de DUO-draagkracht.
+                      </span>,
+                    ]}
+                  />
+                }
               />
               <ResultRow
                 label="Vrijstelling (draagkrachtvrije voet)"
                 value={formatCurrency(result.duoMandatoryPayment.allowanceUsed)}
                 sub="Indicatieve vrijstelling volgens gekozen regeling"
+                breakdownLabel="Vrijstellingsstap"
+                breakdown={
+                  <AmountBreakdown
+                    items={[
+                      <span key="1">
+                        De regeling {ruleLabels[formValues.repaymentRule]} bepaalt welke
+                        vrijstelling geldt.
+                      </span>,
+                      <span key="2">
+                        Die vrijstelling trekken we af van het bruto jaarinkomen.
+                      </span>,
+                    ]}
+                  />
+                }
               />
               <ResultRow
                 label="Inkomen boven vrijstelling"
                 value={formatCurrency(result.duoMandatoryPayment.amountAboveAllowance)}
                 sub="Hierover wordt het DUO-percentage toegepast"
+                breakdownLabel="Belaste inkomensstap"
+                breakdown={
+                  <AmountBreakdown
+                    items={[
+                      <span key="1">
+                        {formatCurrency(result.duoMandatoryPayment.annualIncomeUsed)} minus{" "}
+                        {formatCurrency(result.duoMandatoryPayment.allowanceUsed)}.
+                      </span>,
+                      <span key="2">
+                        Uitkomst: {formatCurrency(result.duoMandatoryPayment.amountAboveAllowance)}.
+                      </span>,
+                    ]}
+                  />
+                }
               />
               <ResultRow
                 label="DUO-percentage"
@@ -1201,27 +1333,95 @@ function CalculatorContent({
                     : `${formatDecimal(result.duoMandatoryPayment.percentageUsed)}%`
                 }
                 sub="SF35 rekent indicatief met 4%, SF15/SF15-lllk met 12%"
+                breakdownLabel="Percentagekeuze"
+                breakdown={
+                  <AmountBreakdown
+                    items={[
+                      <span key="1">
+                        Regeling {ruleLabels[formValues.repaymentRule]} bepaalt het percentage.
+                      </span>,
+                      <span key="2">
+                        We gebruiken dit percentage op het inkomen boven de vrijstelling.
+                      </span>,
+                    ]}
+                  />
+                }
               />
               <ResultRow
                 label="Draagkrachtbedrag per maand"
                 value={formatCurrency(result.duoMandatoryPayment.incomeBasedMonthlyPayment)}
                 sub="Indicatief bedrag vanuit inkomen"
+                breakdownLabel="Draagkrachtformule"
+                breakdown={
+                  <AmountBreakdown
+                    items={[
+                      <span key="1">
+                        {formatCurrency(result.duoMandatoryPayment.amountAboveAllowance)} ×{" "}
+                        {formatDecimal(result.duoMandatoryPayment.percentageUsed ?? 0)}% / 12.
+                      </span>,
+                      <span key="2">
+                        Uitkomst: {formatCurrency(result.duoMandatoryPayment.incomeBasedMonthlyPayment)} per maand.
+                      </span>,
+                    ]}
+                  />
+                }
               />
               <ResultRow
                 label="Wettelijk maandbedrag"
                 value={formatCurrency(result.duoMandatoryPayment.statutoryMonthlyPayment)}
                 sub="Indicatie uit annuïtaire DUO-berekening"
+                breakdownLabel="Annuïteit tot nul"
+                breakdown={
+                  <AmountBreakdown
+                    items={[
+                      <span key="1">
+                        Dit bedrag wordt berekend uit de resterende studieschuld, de DUO-rente en de resterende looptijd.
+                      </span>,
+                      <span key="2">
+                        Het is het bedrag dat de schuld aan het einde van de looptijd op nul brengt.
+                      </span>,
+                    ]}
+                  />
+                }
               />
               <ResultRow
                 label="Verplicht bedrag per maand"
                 value={formatCurrency(result.duoMandatoryPayment.requiredMonthlyPayment)}
                 sub="Laagste van draagkracht en wettelijk maandbedrag"
                 accent
+                breakdownLabel="Welke van de twee telt?"
+                breakdown={
+                  <AmountBreakdown
+                    items={[
+                      <span key="1">
+                        We nemen de laagste van {formatCurrency(result.duoMandatoryPayment.incomeBasedMonthlyPayment)} en{" "}
+                        {formatCurrency(result.duoMandatoryPayment.statutoryMonthlyPayment)}.
+                      </span>,
+                      <span key="2">
+                        Dat is het bedrag dat je in deze situatie daadwerkelijk moet betalen.
+                      </span>,
+                    ]}
+                  />
+                }
               />
               <ResultRow
                 label="Keuzeruimte boven verplicht bedrag"
                 value={formatCurrency(result.duoMandatoryPayment.remainingChoiceBudgetMonthly)}
                 sub="Bedrag dat in dit scenario boven verplicht aflossen uitkomt"
+                breakdownLabel="Vrije extra aflossing"
+                breakdown={
+                  <AmountBreakdown
+                    items={[
+                      <span key="1">
+                        {formatCurrency(result.duoPayment.primaryNetMonthlyPayment)} minus{" "}
+                        {formatCurrency(result.duoMandatoryPayment.requiredMonthlyPayment)}.
+                      </span>,
+                      <span key="2">
+                        Dit deel kun je eventueel ook anders inzetten, bijvoorbeeld als buffer.
+                      </span>,
+                    ]}
+                  />
+                }
               />
             </div>
           ) : null}
@@ -1251,9 +1451,40 @@ function CalculatorContent({
           {result ? (
             <div className="mt-5">
               <ResultRow
-                label="Netto DUO-last"
-                value={formatCurrency(result.mortgageImpact.netDuoMonthlyPayment)}
-                sub="Bedrag dat uit je DUO-situatie naar voren komt"
+                label="Verplicht DUO-bedrag"
+                value={formatCurrency(result.duoMandatoryPayment.requiredMonthlyPayment)}
+                sub="Bedrag dat je in deze situatie daadwerkelijk moet betalen"
+                breakdownLabel="Basisbedrag"
+                breakdown={
+                  <AmountBreakdown
+                    items={[
+                      <span key="1">
+                        Dit bedrag komt uit de draagkrachttoets en het wettelijke maandbedrag.
+                      </span>,
+                      <span key="2">
+                        Het blijft apart van het bedrag dat geldverstrekkers voor brutering gebruiken.
+                      </span>,
+                    ]}
+                  />
+                }
+              />
+              <ResultRow
+                label="Bruteringsbasis"
+                value={formatCurrency(result.mortgageImpact.bruteringBaseMonthlyPayment)}
+                sub="Annuïtaire DUO-last die naar nul aflost"
+                breakdownLabel="Waarom dit bedrag?"
+                breakdown={
+                  <AmountBreakdown
+                    items={[
+                      <span key="1">
+                        Geldverstrekkers rekenen voor brutering met de DUO-annuïteit tot nul.
+                      </span>,
+                      <span key="2">
+                        Dat bedrag is hier {formatCurrency(result.mortgageImpact.bruteringBaseMonthlyPayment)}.
+                      </span>,
+                    ]}
+                  />
+                }
               />
               <ResultRow
                 label="Gebruikte bruteringsfactor"
@@ -1265,6 +1496,20 @@ function CalculatorContent({
                 value={formatCurrency(result.mortgageImpact.grossDuoMonthlyImpact)}
                 sub="De netto DUO-last omgerekend naar bruto vergelijkbare hypotheeklast"
                 accent
+                breakdownLabel="Brutering"
+                breakdown={
+                  <AmountBreakdown
+                    items={[
+                      <span key="1">
+                        {formatCurrency(result.mortgageImpact.bruteringBaseMonthlyPayment)} ×{" "}
+                        {formatDecimal(result.mortgageImpact.bruteringFactor)}.
+                      </span>,
+                      <span key="2">
+                        Uitkomst: {formatCurrency(result.mortgageImpact.grossDuoMonthlyImpact)} bruto per maand.
+                      </span>
+                    ]}
+                  />
+                }
               />
             </div>
           ) : null}
@@ -1282,11 +1527,36 @@ function CalculatorContent({
                 value={formatCurrency(result.mortgageImpact.principalImpact)}
                 sub={`Gebaseerd op ${formatDecimal(parsedValues?.mortgageRate ?? 0)}% hypotheekrente en ${parsedValues?.mortgageTermYears ?? 0} jaar`}
                 accent
+                breakdownLabel="Contante waarde"
+                breakdown={
+                  <AmountBreakdown
+                    items={[
+                      <span key="1">
+                        We zetten de bruto maandlast om naar leenruimte met de contantewaardeformule.
+                      </span>,
+                      <span key="2">
+                        Daarbij gebruiken we {formatCurrency(result.mortgageImpact.grossDuoMonthlyImpact)} per maand,{" "}
+                        {formatDecimal(parsedValues?.mortgageRate ?? 0)}% rente en {parsedValues?.mortgageTermYears ?? 0} jaar.
+                      </span>,
+                    ]}
+                  />
+                }
               />
               <ResultRow
                 label="Totaal bruto jaarinkomen"
                 value={formatCurrency(result.grossIncomeTotal)}
                 sub="Alleen context, geen officiële maximale hypotheekberekening"
+                breakdownLabel="Inkomenssom"
+                breakdown={
+                  <AmountBreakdown
+                    items={[
+                      <span key="1">
+                        {formatCurrency(parsedValues?.grossIncomeUser ?? 0)} +{" "}
+                        {formatCurrency(parsedValues?.grossIncomePartner ?? 0)}.
+                      </span>
+                    ]}
+                  />
+                }
               />
               <ResultRow
                 label="Indicatieve maximale hypotheek op basis van inkomen"
@@ -1298,6 +1568,19 @@ function CalculatorContent({
                 )}% van bruto inkomen als maandlastruimte (${formatCurrency(
                   result.incomeCapacity.monthlyBudgetFromIncome,
                 )} p/m)`}
+                breakdownLabel="Inkomensruimte"
+                breakdown={
+                  <AmountBreakdown
+                    items={[
+                      <span key="1">
+                        Jaarinkomen × inkomensratio = maandbudget.
+                      </span>,
+                      <span key="2">
+                        Dat maandbudget wordt met de hypotheekrente en looptijd omgerekend naar leenruimte.
+                      </span>,
+                    ]}
+                  />
+                }
               />
               <ResultRow
                 label="Indicatief met studieschuldimpact"
@@ -1307,12 +1590,36 @@ function CalculatorContent({
                 )}
                 sub="Zelfde inkomensruimte minus de gebruteerde DUO-maandlast"
                 accent
+                breakdownLabel="Inkomen minus studieschuld"
+                breakdown={
+                  <AmountBreakdown
+                    items={[
+                      <span key="1">
+                        We trekken de bruto DUO-maandlast af van de maandruimte uit inkomen.
+                      </span>,
+                      <span key="2">
+                        Resterende maandruimte wordt weer omgezet naar indicatieve hypotheekruimte.
+                      </span>,
+                    ]}
+                  />
+                }
               />
               {result.debtToIncomeRatio !== undefined ? (
                 <ResultRow
                   label="Studieschuld als % van jaarinkomen"
                   value={formatPercent(result.debtToIncomeRatio)}
                   sub="Geeft gevoel bij de grootte van je schuld ten opzichte van je inkomen"
+                  breakdownLabel="Verhouding"
+                  breakdown={
+                    <AmountBreakdown
+                      items={[
+                        <span key="1">
+                          {formatCurrency(result.remainingStudentDebt)} gedeeld door{" "}
+                          {formatCurrency(result.grossIncomeTotal)}.
+                        </span>
+                      ]}
+                    />
+                  }
                 />
               ) : result.remainingStudentDebt > 0 ? (
                 <ResultRow
@@ -1327,6 +1634,19 @@ function CalculatorContent({
                     label="Benodigde hypotheek zonder studieschuld"
                     value={formatCurrency(result.housingTarget.neededMortgage)}
                     sub={`Woningprijs ${formatCurrency(result.housingTarget.desiredHomePrice)} minus eigen geld ${formatCurrency(result.housingTarget.ownMoney)}`}
+                    breakdownLabel="Benodigde lening"
+                    breakdown={
+                      <AmountBreakdown
+                        items={[
+                          <span key="1">
+                            Woningprijs minus eigen geld en eventuele aankoopkosten.
+                          </span>,
+                          <span key="2">
+                            Dit is de hypotheek die je zonder studieschuld nodig zou hebben.
+                          </span>,
+                        ]}
+                      />
+                    }
                   />
                   <ResultRow
                     label="Indicatieve behoefte mét studieschuldimpact"
@@ -1335,6 +1655,16 @@ function CalculatorContent({
                     )}
                     sub="Benodigde hypotheek plus de berekende hypotheekimpact van je studieschuld"
                     accent
+                    breakdownLabel="Woningdoel met studieschuld"
+                    breakdown={
+                      <AmountBreakdown
+                        items={[
+                          <span key="1">
+                            Benodigde hypotheek zonder studieschuld plus de indicatieve invloed van de studieschuld.
+                          </span>,
+                        ]}
+                      />
+                    }
                   />
                   {result.housingTarget.maxMortgageWithStudentDebtIndicative !==
                   undefined ? (
@@ -1345,6 +1675,16 @@ function CalculatorContent({
                           result.housingTarget.maxMortgageWithoutStudentDebt ?? 0,
                         )}
                         sub="Zoals jij of je adviseur die al indicatief had"
+                        breakdownLabel="Referentiewaarde"
+                        breakdown={
+                          <AmountBreakdown
+                            items={[
+                              <span key="1">
+                                Dit is de uitgangswaarde die je zonder studieschuld zou gebruiken.
+                              </span>,
+                            ]}
+                          />
+                        }
                       />
                       <ResultRow
                         label="Max hypotheek met studieschuld indicatief"
@@ -1352,6 +1692,17 @@ function CalculatorContent({
                           result.housingTarget.maxMortgageWithStudentDebtIndicative,
                         )}
                         sub="Je eerdere indicatie minus de berekende studieschuldimpact"
+                        breakdownLabel="Minus studieschuldimpact"
+                        breakdown={
+                          <AmountBreakdown
+                            items={[
+                              <span key="1">
+                                {formatCurrency(result.housingTarget.maxMortgageWithoutStudentDebt ?? 0)} minus{" "}
+                                {formatCurrency(result.mortgageImpact.principalImpact)}.
+                              </span>
+                            ]}
+                          />
+                        }
                       />
                       <ResultRow
                         label="Ruimtegat voor woningdoel"
@@ -1360,6 +1711,16 @@ function CalculatorContent({
                         )}
                         sub="Voorzichtige indicatie van wat je mogelijk tekortkomt voor dit doel"
                         accent
+                        breakdownLabel="Tekort"
+                        breakdown={
+                          <AmountBreakdown
+                            items={[
+                              <span key="1">
+                                Het verschil tussen je woningdoel en de indicatieve maximale hypotheek met studieschuld.
+                              </span>,
+                            ]}
+                          />
+                        }
                       />
                     </>
                   ) : null}
@@ -1381,42 +1742,94 @@ function CalculatorContent({
           {result ? (
             result.extraRepaymentScenario.extraRepaymentUsed > 0 ? (
               <div className="mt-5">
-                <ResultRow
-                  label="Je lost extra af"
-                  value={formatCurrency(result.extraRepaymentScenario.extraRepaymentUsed)}
-                  sub="Bedrag dat in dit scenario echt is meegenomen"
-                />
-                <ResultRow
-                  label="Geschatte daling DUO-maandlast"
-                  value={formatCurrency(
-                    result.extraRepaymentScenario.monthlyPaymentReduction,
-                  )}
-                  sub={`Van ${formatCurrency(result.extraRepaymentScenario.oldEstimatedMonthlyPayment)} naar ${formatCurrency(result.extraRepaymentScenario.newEstimatedMonthlyPayment)} per maand`}
-                />
-                <ResultRow
-                  label="Gebruteerde maandlastdaling"
-                  value={formatCurrency(
-                    result.extraRepaymentScenario.grossMonthlyImpactReduction,
-                  )}
-                  sub="De maandlastdaling na toepassing van dezelfde bruteringsfactor"
-                />
-                <ResultRow
-                  label="Indicatieve extra hypotheekruimte"
-                  value={formatCurrency(
-                    result.extraRepaymentScenario.extraMortgageRoomIndicative,
-                  )}
-                  sub="Wat die lagere DUO-last in dit scenario extra kan opleveren"
-                  accent
-                />
-                <ResultRow
-                  label="Effect per €1 extra aflossen"
-                  value={
-                    result.extraRepaymentScenario.ratio !== null
-                      ? `${formatDecimal(result.extraRepaymentScenario.ratio)}x`
-                      : "n.v.t."
-                  }
-                  sub="Hoeveel extra hypotheekruimte elke extra afgeloste euro hier grofweg oplevert"
-                />
+              <ResultRow
+                label="Je lost extra af"
+                value={formatCurrency(result.extraRepaymentScenario.extraRepaymentUsed)}
+                sub="Bedrag dat in dit scenario echt is meegenomen"
+                breakdownLabel="Extra aflossing"
+                breakdown={
+                  <AmountBreakdown
+                    items={[
+                      <span key="1">
+                        Invoer extra aflossen, begrensd door de resterende studieschuld.
+                      </span>
+                    ]}
+                  />
+                }
+              />
+              <ResultRow
+                label="Geschatte daling DUO-maandlast"
+                value={formatCurrency(
+                  result.extraRepaymentScenario.monthlyPaymentReduction,
+                )}
+                sub={`Van ${formatCurrency(result.extraRepaymentScenario.oldEstimatedMonthlyPayment)} naar ${formatCurrency(result.extraRepaymentScenario.newEstimatedMonthlyPayment)} per maand`}
+                breakdownLabel="Maandlastverschil"
+                breakdown={
+                  <AmountBreakdown
+                    items={[
+                      <span key="1">
+                        Oud bedrag minus nieuw bedrag na extra aflossen.
+                      </span>
+                    ]}
+                  />
+                }
+              />
+              <ResultRow
+                label="Gebruteerde maandlastdaling"
+                value={formatCurrency(
+                  result.extraRepaymentScenario.grossMonthlyImpactReduction,
+                )}
+                sub="De maandlastdaling na toepassing van dezelfde bruteringsfactor"
+                breakdownLabel="Brutering van het verschil"
+                breakdown={
+                  <AmountBreakdown
+                    items={[
+                      <span key="1">
+                        {formatCurrency(result.extraRepaymentScenario.monthlyPaymentReduction)} ×{" "}
+                        {formatDecimal(result.mortgageImpact.bruteringFactor)}.
+                      </span>
+                    ]}
+                  />
+                }
+              />
+              <ResultRow
+                label="Indicatieve extra hypotheekruimte"
+                value={formatCurrency(
+                  result.extraRepaymentScenario.extraMortgageRoomIndicative,
+                )}
+                sub="Wat die lagere DUO-last in dit scenario extra kan opleveren"
+                accent
+                breakdownLabel="Contante waarde van het voordeel"
+                breakdown={
+                  <AmountBreakdown
+                    items={[
+                      <span key="1">
+                        De gebruteerde maandlastdaling wordt contant gemaakt over de hypotheeklooptijd.
+                      </span>
+                    ]}
+                  />
+                }
+              />
+              <ResultRow
+                label="Effect per €1 extra aflossen"
+                value={
+                  result.extraRepaymentScenario.ratio !== null
+                    ? `${formatDecimal(result.extraRepaymentScenario.ratio)}x`
+                    : "n.v.t."
+                }
+                sub="Hoeveel extra hypotheekruimte elke extra afgeloste euro hier grofweg oplevert"
+                breakdownLabel="Terugverdienratio"
+                breakdown={
+                  <AmountBreakdown
+                    items={[
+                      <span key="1">
+                        {formatCurrency(result.extraRepaymentScenario.extraMortgageRoomIndicative)} gedeeld door{" "}
+                        {formatCurrency(result.extraRepaymentScenario.extraRepaymentUsed)}.
+                      </span>
+                    ]}
+                  />
+                }
+              />
                 <ResultRow
                   label="Oorspronkelijke indicatieve aflosdatum"
                   value={

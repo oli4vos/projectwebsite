@@ -445,6 +445,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - Bij “Deze pagina kon niet goed laden”: eerst hard refresh (`Cmd+Shift+R`) of sitegegevens wissen voor `oli4vos.github.io`.
 - UX-standaard voor rekentools:
   - bovenaan start-CTA's met voorbeeldwaarden en profielroute
+  - elke tool met invoervelden biedt standaard ook een centrale `Wis invoer`-actie via de gedeelde submit-hook
   - eerst invulvelden
   - dan een beknopte samenvatting met kernuitkomst in gewone taal
   - daarna uitklapbare verdieping, standaard dicht, met uitleg, aannames en praktische aandachtspunten
@@ -474,6 +475,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - gebruik profieldefaults uitsluitend via `profile-tool-mapping` + `profile-prefill`;
   - volg het mobiele shell-patroon (`CalculatorShell`) en houd aannames vindbaar via disclosure;
   - gebruik bij voorkeur de slot-opbouw van `CalculatorShell` voor invullen → berekenen → resultaat.
+  - neem waar passend ook de gedeelde reset-actie op, zodat gebruikers invoer in één klik kunnen wissen zonder de tool te verlaten.
   - publieke tools moeten minimaal compleet zijn in manifest en bestanden:
     `title`, `description`, `category`, `tags`, `reasonHint`, `assumptionsUsed`,
     `calculationDomains`, `riskLevel`, `disclaimerType`, `outputType` +

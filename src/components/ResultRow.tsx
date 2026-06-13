@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { GlossaryText } from "@/components/GlossaryText";
 
 interface ResultRowProps {
@@ -6,9 +7,21 @@ interface ResultRowProps {
   sub?: string;
   accent?: boolean;
   strong?: boolean;
+  breakdown?: ReactNode;
+  breakdownLabel?: string;
+  defaultBreakdownOpen?: boolean;
 }
 
-export function ResultRow({ label, value, sub, accent, strong }: ResultRowProps) {
+export function ResultRow({
+  label,
+  value,
+  sub,
+  accent,
+  strong,
+  breakdown,
+  breakdownLabel = "Toon berekening",
+  defaultBreakdownOpen = false,
+}: ResultRowProps) {
   return (
     <div
       className={`hair-b py-3 last:border-b-0 ${
@@ -38,6 +51,19 @@ export function ResultRow({ label, value, sub, accent, strong }: ResultRowProps)
           ) : null}
         </div>
       </div>
+      {breakdown ? (
+        <details
+          className="mt-2 rounded-lg border border-[var(--hair)] bg-[var(--paper-soft)]/55 px-3 py-2"
+          open={defaultBreakdownOpen}
+        >
+          <summary className="cursor-pointer list-none text-[12px] font-medium text-[var(--soft)] marker:content-none">
+            {breakdownLabel}
+          </summary>
+          <div className="mt-2 space-y-1.5 text-[12px] leading-[1.6] text-[var(--muted)]">
+            {breakdown}
+          </div>
+        </details>
+      ) : null}
     </div>
   );
 }

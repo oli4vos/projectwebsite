@@ -56,6 +56,7 @@ export type RelevantDuoPaymentResult = {
   primaryNetMonthlyPayment: number;
   optimisticNetMonthlyPayment: number;
   conservativeNetMonthlyPayment: number;
+  statutoryMonthlyPayment: number;
   estimatedStatutoryPayment: number;
   source: PaymentSource;
   explanation: string;
@@ -64,6 +65,8 @@ export type RelevantDuoPaymentResult = {
 
 export type MortgageImpactResult = {
   netDuoMonthlyPayment: number;
+  legalMonthlyPayment: number;
+  bruteringBaseMonthlyPayment: number;
   bruteringFactor: number;
   bruteringLabel: string;
   grossDuoMonthlyImpact: number;
@@ -295,6 +298,7 @@ export function determineRelevantDuoPayment(
     primaryNetMonthlyPayment: result.primaryMonthlyPayment,
     optimisticNetMonthlyPayment: result.optimisticMonthlyPayment,
     conservativeNetMonthlyPayment: result.conservativeMonthlyPayment,
+    statutoryMonthlyPayment: result.statutoryMonthlyPayment,
     estimatedStatutoryPayment: result.estimatedStatutoryMonthlyPayment,
     source: result.source,
     explanation: result.explanation,
@@ -321,7 +325,11 @@ export function calculateMortgageImpact(
   const mortgageTermYears = sanitizeYears(input.mortgageTermYears, 30);
   const brutering = getBruteringFactor(mortgageRate);
   const netDuoMonthlyPayment = roundMoney(duoPayment.primaryNetMonthlyPayment);
-  const grossDuoMonthlyImpact = roundMoney(netDuoMonthlyPayment * brutering.factor);
+  const legalMonthlyPayment = roundMoney(netDuoMonthlyPayment);
+  const bruteringBaseMonthlyPayment = roundMoney(duoPayment.statutoryMonthlyPayment);
+  const grossDuoMonthlyImpact = roundMoney(
+    bruteringBaseMonthlyPayment * brutering.factor,
+  );
   const principalImpact = calculatePresentValueFromMonthlyPayment(
     grossDuoMonthlyImpact,
     mortgageRate,
@@ -340,6 +348,8 @@ export function calculateMortgageImpact(
 
   return {
     netDuoMonthlyPayment,
+    legalMonthlyPayment,
+    bruteringBaseMonthlyPayment,
     bruteringFactor: brutering.factor,
     bruteringLabel: brutering.label,
     grossDuoMonthlyImpact,
@@ -347,7 +357,8 @@ export function calculateMortgageImpact(
     optimisticPrincipalImpact,
     conservativePrincipalImpact,
     assumptions: [
-      "We gebruiken een indicatieve bruteringsstaffel om een netto DUO-last om te rekenen naar een bruto vergelijkbare maandlast.",
+      "We gebruiken een indicatieve bruteringsstaffel om de annuïtaire DUO-maandlast naar een bruto vergelijkbare maandlast om te rekenen.",
+      "Voor de brutering nemen we het annuïtaire DUO-bedrag dat nodig is om de studieschuld aan het einde van de looptijd op nul te brengen.",
       `Voor de hypotheekimpact rekenen we met ${mortgageRate.toFixed(2).replace(".", ",")}% hypotheekrente en ${mortgageTermYears} jaar looptijd.`,
       "De hoofdsom-impact volgt uit de contante waarde van die gebruteerde maandlast als annuïteit.",
       "Een hogere bruteringsfactor verhoogt altijd de maandlast-impact. Bij hogere hypotheekrente kan de hoofdsom-impact toch lager lijken, omdat dezelfde maandlast dan minder leenhoofdsom vertegenwoordigt.",

@@ -55,6 +55,41 @@ describe("hypotheek-impact-studieschuld logic", () => {
     expect(getBruteringFactor(4.2).factor).toBe(1.25);
   });
 
+  it("uses the annuity-to-zero amount for lender brutering", () => {
+    const result = calculateHypotheekImpact({
+      ...baseInput,
+      actualMonthlyPayment: 145,
+      statutoryMonthlyPayment: 230,
+      remainingStudentDebt: 28500,
+      duoInterestRate: 2.4,
+      remainingTermYears: 30,
+      mortgageRate: 4.1,
+      mortgageTermYears: 30,
+    });
+
+    const bruteringFactor = getBruteringFactor(4.1).factor;
+
+    expect(result.mortgageImpact.legalMonthlyPayment).toBe(145);
+    expect(result.mortgageImpact.bruteringBaseMonthlyPayment).toBe(230);
+    expect(result.mortgageImpact.grossDuoMonthlyImpact).toBeCloseTo(
+      230 * bruteringFactor,
+      2,
+    );
+    expect(result.mortgageImpact.principalImpact).toBeCloseTo(
+      calculateSharedPresentValue({
+        monthlyPayment: result.mortgageImpact.grossDuoMonthlyImpact,
+        annualRate: 4.1,
+        years: 30,
+      }),
+      2,
+    );
+    expect(result.mortgageImpact.grossDuoMonthlyImpact).not.toBeCloseTo(
+      145 * bruteringFactor,
+      2,
+    );
+    expect(result.mortgageImpact.principalImpact).toBeGreaterThan(0);
+  });
+
   it("supports negative/invalid inputs defensively", () => {
     const result = calculateHypotheekImpact({
       ...baseInput,
