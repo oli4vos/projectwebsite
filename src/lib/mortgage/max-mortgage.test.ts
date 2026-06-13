@@ -61,6 +61,51 @@ describe("calculateIndicativeMaxMortgage", () => {
     expect(result.maxHomeBudget).toBeGreaterThan(0);
   });
 
+  it("does not add the energy-label income allowance to the property-value limit", () => {
+    const result = calculateIndicativeMaxMortgage({
+      grossAnnualHouseholdIncome: 80_000,
+      annualMortgageRate: 4.5,
+      mortgageTermYears: 30,
+      property: {
+        propertyValue: 350_000,
+        marketValue: 350_000,
+        purchasePrice: 350_000,
+        ltvPercentage: 100,
+        energyLabel: "A",
+        energySavingMeasuresAmount: 0,
+      },
+    });
+
+    expect(result.breakdown.energyLabelAllowance).toBe(10_000);
+    expect(result.breakdown.energySavingAllowance).toBe(0);
+    expect(result.breakdown.baseMaxMortgageByLtv).toBe(350_000);
+    expect(result.maxMortgageByIncome).toBe(
+      result.breakdown.baseMaxMortgageByIncome + 10_000,
+    );
+    expect(result.maxMortgageByCollateral).toBe(350_000);
+  });
+
+  it("only adds actual eligible energy-saving measures to the LTV limit", () => {
+    const result = calculateIndicativeMaxMortgage({
+      grossAnnualHouseholdIncome: 120_000,
+      annualMortgageRate: 4.5,
+      mortgageTermYears: 30,
+      property: {
+        propertyValue: 350_000,
+        marketValue: 350_000,
+        purchasePrice: 350_000,
+        ltvPercentage: 100,
+        energyLabel: "A",
+        energySavingMeasuresAmount: 18_000,
+      },
+    });
+
+    expect(result.breakdown.energyLabelAllowance).toBe(10_000);
+    expect(result.breakdown.energySavingAllowance).toBe(10_000);
+    expect(result.breakdown.baseMaxMortgageByLtv).toBe(350_000);
+    expect(result.maxMortgageByCollateral).toBe(360_000);
+  });
+
   it("keeps the expected collateral and budget split visible in the debug output", () => {
     const result = calculateIndicativeMaxMortgage({
       grossAnnualHouseholdIncome: 95_000,

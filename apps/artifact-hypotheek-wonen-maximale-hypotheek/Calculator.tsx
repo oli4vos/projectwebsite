@@ -514,6 +514,9 @@ export default function Calculator() {
                     <div>Toetsinkomen: {formatCurrency(result.breakdown.householdIncome)}</div>
                     <div>Woonlastfactor: {formatPercent(result.breakdown.annualHousingCostRatio)}%</div>
                     <div>Maandbudget na schulden: {formatCurrency(result.breakdown.monthlyHousingBudgetAfterLiabilities)}</div>
+                    <div>Basis hypotheekruimte uit inkomen: {formatCurrency(result.breakdown.baseMaxMortgageByIncome)}</div>
+                    <div>Toegepaste extra leenruimte op inkomen door energielabel: {formatCurrency(result.breakdown.energyLabelAllowance)}</div>
+                    <div>Toegepaste extra leenruimte op inkomen voor energiebesparende maatregelen: {formatCurrency(result.breakdown.energySavingAllowance)}</div>
                   </>
                 }
                 breakdownLabel="Toon inkomensberekening"
@@ -529,7 +532,10 @@ export default function Calculator() {
                     <>
                       <div>Woningwaarde: {formatCurrency(result.breakdown.propertyValue || result.breakdown.marketValue)}</div>
                       <div>LTV: {formatPercent(result.breakdown.ltvPercentage)}%</div>
-                      <div>Energieruimte: {formatCurrency(result.breakdown.energySavingAllowance)}</div>
+                      <div>Basislimiet op woningwaarde: {formatCurrency(result.breakdown.baseMaxMortgageByLtv)}</div>
+                      <div>Toegepaste extra LTV-ruimte voor energiebesparende maatregelen: {formatCurrency(result.breakdown.energySavingAllowance)}</div>
+                      <div>Totaal maximale hypotheek op woningwaarde: {formatCurrency(result.breakdown.maxMortgageByLtv)}</div>
+                      <div>Extra leenruimte door energielabel: {formatCurrency(result.breakdown.energyLabelAllowance)}. Dit bedrag verhoogt alleen de inkomensgrens en is niet opgenomen in deze woningwaardelimiet.</div>
                     </>
                   )
                 }

@@ -26,7 +26,7 @@ const DEFAULT_BUYER_COST_RATE = 0.04;
 const DEFAULT_ENERGY_SAVING_ALLOWANCE_CAP_RATIO = 0.06;
 const DEFAULT_CREDIT_LIMIT_FACTOR = 0.01;
 
-const ENERGY_LABEL_ALLOWANCES: Readonly<Record<string, number>> = {
+const ENERGY_LABEL_PURCHASE_ALLOWANCES: Readonly<Record<string, number>> = {
   G: 0,
   F: 0,
   E: 0,
@@ -39,6 +39,22 @@ const ENERGY_LABEL_ALLOWANCES: Readonly<Record<string, number>> = {
   "A+++": 25_000,
   "A++++": 30_000,
   APLUSGUARANTEE: 40_000,
+  unknown: 0,
+};
+
+const ENERGY_SAVING_MEASURE_ALLOWANCES: Readonly<Record<string, number>> = {
+  G: 20_000,
+  F: 20_000,
+  E: 20_000,
+  D: 15_000,
+  C: 15_000,
+  B: 10_000,
+  A: 10_000,
+  "A+": 10_000,
+  "A++": 10_000,
+  "A+++": 0,
+  "A++++": 0,
+  APLUSGUARANTEE: 0,
   unknown: 0,
 };
 
@@ -112,7 +128,7 @@ function normalizeEnergyLabel(value?: MortgageMaxMortgagePropertyInput["energyLa
     return "APLUSGUARANTEE";
   }
 
-  return normalized in ENERGY_LABEL_ALLOWANCES ? normalized : "unknown";
+  return normalized in ENERGY_LABEL_PURCHASE_ALLOWANCES ? normalized : "unknown";
 }
 
 function resolveHouseholdIncome(input: MortgageMaxMortgageInput) {
@@ -247,7 +263,7 @@ function calculateLiabilityMonthlyImpact(
 
 function calculateEnergyLabelAllowance(property: MortgageMaxMortgagePropertyInput | undefined) {
   const normalized = normalizeEnergyLabel(property?.energyLabel);
-  return ENERGY_LABEL_ALLOWANCES[normalized] ?? 0;
+  return ENERGY_LABEL_PURCHASE_ALLOWANCES[normalized] ?? 0;
 }
 
 function calculateEnergySavingAllowance(
@@ -255,32 +271,31 @@ function calculateEnergySavingAllowance(
   marketValue: number,
 ) {
   const energySavingMeasuresAmount = sanitizeMoney(property?.energySavingMeasuresAmount ?? 0);
+  const normalized = normalizeEnergyLabel(property?.energyLabel);
+  const labelMaximum = ENERGY_SAVING_MEASURE_ALLOWANCES[normalized] ?? 0;
 
-  if (energySavingMeasuresAmount <= 0 || marketValue <= 0) {
+  if (energySavingMeasuresAmount <= 0 || marketValue <= 0 || labelMaximum <= 0) {
     return 0;
   }
 
   return roundMoney(
     Math.min(
       energySavingMeasuresAmount,
+      labelMaximum,
       marketValue * DEFAULT_ENERGY_SAVING_ALLOWANCE_CAP_RATIO,
     ),
   );
 }
 
 function calculateLtvLimit(
-  propertyValue: number,
-  ltvPercentage: number,
-  energyLabelAllowance: number,
+  baseMaxMortgageByLtv: number,
   energySavingAllowance: number,
 ) {
-  if (propertyValue <= 0) {
+  if (baseMaxMortgageByLtv <= 0) {
     return undefined;
   }
 
-  return roundMoney(
-    propertyValue * (sanitizePercent(ltvPercentage) / 100) + energyLabelAllowance + energySavingAllowance,
-  );
+  return roundMoney(baseMaxMortgageByLtv + energySavingAllowance);
 }
 
 function calculateNhgLimit(
@@ -457,7 +472,9 @@ export function calculateIndicativeMaxMortgage(
     annualRate: mortgageRateResolution.testRateUsed,
     years: mortgageTermYears,
   });
-  const maxMortgageByIncome = roundMoney(monthlyHousingBudgetAfterLiabilities * annuityFactor);
+  const baseMaxMortgageByIncome = roundMoney(
+    monthlyHousingBudgetAfterLiabilities * annuityFactor,
+  );
 
   const property = input.property;
   const propertyValue = sanitizeMoney(
@@ -468,10 +485,14 @@ export function calculateIndicativeMaxMortgage(
   const ltvPercentage = sanitizePercent(property?.ltvPercentage ?? 100);
   const energyLabelAllowance = calculateEnergyLabelAllowance(property);
   const energySavingAllowance = calculateEnergySavingAllowance(property, marketValue);
+  const maxMortgageByIncome = roundMoney(
+    baseMaxMortgageByIncome + energyLabelAllowance + energySavingAllowance,
+  );
+  const baseMaxMortgageByLtv = roundMoney(
+    propertyValue * (ltvPercentage / 100),
+  );
   const maxMortgageByCollateral = calculateLtvLimit(
-    propertyValue,
-    ltvPercentage,
-    energyLabelAllowance,
+    baseMaxMortgageByLtv,
     energySavingAllowance,
   );
   const maxMortgageByNhg = calculateNhgLimit(input, purchasePrice, energySavingAllowance);
@@ -579,10 +600,13 @@ export function calculateIndicativeMaxMortgage(
     monthlyLiabilityImpact,
     studentLoanMonthlyImpact,
     monthlyHousingBudgetAfterLiabilities,
+    baseMaxMortgageByIncome,
+    energyLabelAllowance,
     propertyValue,
     purchasePrice,
     marketValue,
     ltvPercentage,
+    baseMaxMortgageByLtv,
     maxMortgageByIncome,
     maxMortgageByLtv: maxMortgageByCollateral ?? 0,
     maxMortgageByNhg,

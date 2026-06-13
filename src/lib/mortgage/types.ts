@@ -152,10 +152,13 @@ export type MortgageMaxMortgageBreakdown = {
   monthlyLiabilityImpact: number;
   studentLoanMonthlyImpact: number;
   monthlyHousingBudgetAfterLiabilities: number;
+  baseMaxMortgageByIncome: number;
+  energyLabelAllowance: number;
   propertyValue: number;
   purchasePrice: number;
   marketValue: number;
   ltvPercentage: number;
+  baseMaxMortgageByLtv: number;
   maxMortgageByIncome: number;
   maxMortgageByLtv: number;
   maxMortgageByNhg?: number;

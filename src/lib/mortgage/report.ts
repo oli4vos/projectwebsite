@@ -346,13 +346,16 @@ function buildTimeline(
       step: 7,
       title: "Maandbudget annuïtair omrekenen naar hoofdsom",
       explanation:
-        "Het resterende maandbudget wordt met de toetsrente en looptijd omgerekend naar de maximale lening die annuïtair kan worden gedragen.",
+        "Het resterende maandbudget wordt met de toetsrente en looptijd omgerekend naar de basislening. Daarna worden alleen de toegestane bedragen voor energielabel en verduurzaming aan de inkomensruimte toegevoegd.",
       formula:
-        "hoofdsom = maandbudget x (1 - (1 + maandrente)^-aantalMaanden) / maandrente",
+        "inkomenslimiet = annuïtaire basislening + energielabelruimte + verduurzamingsruimte",
       lines: [
         { label: "Toetsrente", value: formatPercent(result.debug.interestRate) },
         { label: "Looptijd", value: formatMonths(result.debug.durationMonths) },
         { label: "Annuïteitsfactor", value: formatNumber(result.debug.annuityFactor) },
+        { label: "Basis hypotheekruimte uit inkomen", value: formatCurrency(result.breakdown.baseMaxMortgageByIncome, 2) },
+        { label: "Toegepaste extra leenruimte op inkomen door energielabel", value: formatCurrency(result.breakdown.energyLabelAllowance, 2) },
+        { label: "Toegepaste extra leenruimte op inkomen voor energiebesparende maatregelen", value: formatCurrency(result.breakdown.energySavingAllowance, 2) },
       ],
       outcome: {
         label: "Maximale hypotheek op inkomen",
@@ -364,12 +367,14 @@ function buildTimeline(
       step: 8,
       title: "Woningwaarde en LTV toetsen",
       explanation:
-        "De inkomensruimte wordt afzonderlijk vergeleken met de toegestane financiering op basis van woningwaarde en de in de engine toegepaste energieruimte.",
-      formula: "woningwaardelimiet = woningwaarde x LTV-percentage + toegepaste energieruimte",
+        "De woningwaardelimiet bestaat uit de basislimiet op woningwaarde plus uitsluitend de daadwerkelijk toegepaste extra LTV-ruimte voor energiebesparende maatregelen. De energielabelruimte verhoogt alleen de inkomensgrens.",
+      formula: "woningwaardelimiet = woningwaarde x LTV-percentage + gefinancierde energiebesparende voorzieningen",
       lines: [
         { label: "Woningwaarde", value: formatCurrency(result.breakdown.propertyValue, 2) },
         { label: "LTV-percentage", value: formatPercent(result.breakdown.ltvPercentage) },
-        { label: "Toegepaste energieruimte", value: formatCurrency(result.breakdown.energySavingAllowance, 2) },
+        { label: "Basislimiet op woningwaarde", value: formatCurrency(result.breakdown.baseMaxMortgageByLtv, 2) },
+        { label: "Toegepaste extra LTV-ruimte voor energiebesparende maatregelen", value: formatCurrency(result.breakdown.energySavingAllowance, 2) },
+        { label: "Extra leenruimte door energielabel", value: `${formatCurrency(result.breakdown.energyLabelAllowance, 2)}; alleen toegepast op de inkomensgrens` },
       ],
       outcome: {
         label: "Maximale hypotheek op woningwaarde",
@@ -554,6 +559,9 @@ export function buildMortgagePdfReport(
         { label: "Totale verplichtingen", value: formatCurrency(result.breakdown.monthlyLiabilityImpact, 2) },
         { label: "Maandbudget na verplichtingen", value: formatCurrency(result.breakdown.monthlyHousingBudgetAfterLiabilities, 2) },
         { label: "Annuïteitsfactor", value: formatNumber(result.debug.annuityFactor) },
+        { label: "Basis hypotheekruimte uit inkomen", value: formatCurrency(result.breakdown.baseMaxMortgageByIncome, 2) },
+        { label: "Toegepaste extra leenruimte op inkomen door energielabel", value: formatCurrency(result.breakdown.energyLabelAllowance, 2) },
+        { label: "Toegepaste extra leenruimte op inkomen voor energiebesparende maatregelen", value: formatCurrency(result.breakdown.energySavingAllowance, 2) },
       ],
     },
     {
@@ -561,9 +569,11 @@ export function buildMortgagePdfReport(
       lines: [
         { label: "Woningwaarde voor toetsing", value: formatCurrency(result.breakdown.propertyValue, 2) },
         { label: "LTV-percentage", value: formatPercent(result.breakdown.ltvPercentage) },
+        { label: "Basislimiet op woningwaarde", value: formatCurrency(result.breakdown.baseMaxMortgageByLtv, 2) },
+        { label: "Toegepaste extra LTV-ruimte voor energiebesparende maatregelen", value: formatCurrency(result.breakdown.energySavingAllowance, 2) },
         { label: "Maximale hypotheek op woningwaarde", value: result.maxMortgageByCollateral === null ? "n.v.t." : formatCurrency(result.maxMortgageByCollateral, 2) },
         { label: "NHG-limiet", value: result.breakdown.maxMortgageByNhg === undefined ? "n.v.t." : formatCurrency(result.breakdown.maxMortgageByNhg, 2) },
-        { label: "Energieruimte in engine", value: formatCurrency(result.breakdown.energySavingAllowance, 2) },
+        { label: "Extra leenruimte door energielabel", value: `${formatCurrency(result.breakdown.energyLabelAllowance, 2)}; niet opgenomen in de woningwaardelimiet` },
         { label: "Kosten koper", value: formatCurrency(result.breakdown.buyerCostsEstimate, 2) },
         { label: "Verbouwing / renovatie", value: formatCurrency(renovationAmount, 2) },
         { label: "Benodigde eigen middelen", value: formatCurrency(result.breakdown.requiredOwnFunds, 2) },

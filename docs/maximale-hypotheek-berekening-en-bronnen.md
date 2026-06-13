@@ -172,13 +172,33 @@ De uitkomst is de maximale hypotheek op inkomen.
 
 ### Stap 8: woningwaarde en LTV
 
-De tool berekent afzonderlijk een onderpandgrens:
+De tool berekent afzonderlijk een onderpandgrens. Extra leenruimte op basis van
+het bestaande energielabel hoort bij de inkomensgrens en wordt niet op de
+woningwaarde gestapeld:
 
 ```text
 woningwaardelimiet =
   woningwaarde x LTV-percentage
-  + energieruimte die de huidige engine toepast
+  + werkelijk gefinancierde energiebesparende voorzieningen
 ```
+
+Zonder energiebesparende voorzieningen blijft 100% LTV bij een woningwaarde van
+EUR 350.000 dus EUR 350.000. Alleen het bedrag dat aantoonbaar voor toegestane
+energiebesparende voorzieningen wordt geleend kan de onderpandgrens verhogen,
+met een absolute bovengrens van 106% van de woningwaarde.
+
+De UI en het PDF-rapport benoemen deze bedragen daarom afzonderlijk:
+
+- `Toegepaste extra leenruimte op inkomen door energielabel`: verhoogt alleen
+  de inkomenslimiet.
+- `Toegepaste extra leenruimte op inkomen voor energiebesparende maatregelen`:
+  verhoogt de inkomenslimiet voor het werkelijk opgegeven en toegestane bedrag.
+- `Toegepaste extra LTV-ruimte voor energiebesparende maatregelen`: hetzelfde
+  toegestane maatregelenbedrag dat boven de basislimiet op woningwaarde mag
+  worden gefinancierd.
+
+Een generieke regel zoals `energieruimte` wordt bewust vermeden, omdat daaruit
+niet blijkt op welke wettelijke limiet het bedrag is toegepast.
 
 Zonder woningwaarde kan de tool alleen de inkomensruimte tonen. Een volledige
 vergelijking met de onderpandgrens is dan niet mogelijk.

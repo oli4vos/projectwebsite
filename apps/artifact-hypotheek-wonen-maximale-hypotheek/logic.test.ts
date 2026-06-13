@@ -37,4 +37,15 @@ describe("maximale hypotheek app logic", () => {
     expect(result.breakdown.marketValue).toBe(350000);
     expect(result.warnings.some((warning) => warning.code === "INDICATIVE_ONLY")).toBe(true);
   });
+
+  it("keeps a label-A home at 100% of market value when no energy measures are financed", () => {
+    const result = calculateMortgageScenario(exampleValues);
+
+    expect(result.breakdown.propertyValue).toBe(350000);
+    expect(result.breakdown.ltvPercentage).toBe(100);
+    expect(result.breakdown.energyLabelAllowance).toBe(10000);
+    expect(result.breakdown.energySavingAllowance).toBe(0);
+    expect(result.breakdown.baseMaxMortgageByLtv).toBe(350000);
+    expect(result.maxMortgageByCollateral).toBe(350000);
+  });
 });

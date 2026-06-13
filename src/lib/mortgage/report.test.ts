@@ -49,6 +49,18 @@ describe("mortgage PDF report", () => {
     expect(report.sections.some((section) => section.title === "Inkomens- en verplichtingentabel")).toBe(true);
     expect(report.sections.some((section) => section.title === "Woningwaarde, NHG en eigen middelen")).toBe(true);
 
+    const ltvStep = report.timeline.find((step) => step.title === "Woningwaarde en LTV toetsen");
+    expect(ltvStep?.lines.some(
+      (line) =>
+        line.label === "Toegepaste extra LTV-ruimte voor energiebesparende maatregelen" &&
+        line.value.includes("0,00"),
+    )).toBe(true);
+    expect(ltvStep?.lines.some(
+      (line) =>
+        line.label === "Extra leenruimte door energielabel" &&
+        line.value.includes("alleen toegepast op de inkomensgrens"),
+    )).toBe(true);
+
     const studentLoanLine = report.sections
       .find((section) => section.title === "Inkomens- en verplichtingentabel")
       ?.lines?.find((line) => line.label === "Studieschuldimpact");
