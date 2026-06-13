@@ -1094,9 +1094,19 @@ function CalculatorContent({
                 {formatCurrency(result.mortgageImpact.bruteringBaseMonthlyPayment)}.
                 Na brutering telt dat indicatief als ongeveer{" "}
                 {formatCurrency(result.mortgageImpact.grossDuoMonthlyImpact)} bruto
-                maandlast en kan dat je hypotheekruimte indicatief met ongeveer{" "}
-                {formatCurrency(result.mortgageImpact.principalImpact)} drukken.
+                maandlast.
               </p>
+              <ul className="mt-4 space-y-2 rounded-2xl border border-white/12 bg-white/6 px-4 py-3 text-[13px] leading-[1.65] text-white/76">
+                <li>
+                  Verplicht DUO-bedrag: {formatCurrency(result.duoMandatoryPayment.requiredMonthlyPayment)} per maand.
+                </li>
+                <li>
+                  Bruto DUO-maandlast voor hypotheek: {formatCurrency(result.mortgageImpact.grossDuoMonthlyImpact)} per maand.
+                </li>
+                <li>
+                  Impact op leencapaciteit: {formatCurrency(result.mortgageImpact.principalImpact)} minder leencapaciteit.
+                </li>
+              </ul>
               <p className="mt-3 max-w-[58ch] text-[13px] leading-[1.65] text-white/72">
                 Indicatief verplicht DUO-bedrag op basis van inkomen en wettelijk
                 maandbedrag: {formatCurrency(result.duoMandatoryPayment.requiredMonthlyPayment)} p/m.
