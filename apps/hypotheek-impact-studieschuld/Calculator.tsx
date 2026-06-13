@@ -540,12 +540,6 @@ function CalculatorContent({
       mortgageTermYears: errors.mortgageTermYears,
     }[mobileFlow.activeFieldId],
   );
-  const hasMixedPaymentOutcome = Boolean(
-    result &&
-      result.mortgageImpact.optimisticPrincipalImpact !==
-        result.mortgageImpact.conservativePrincipalImpact,
-  );
-
   function updateField<K extends keyof FormState>(field: K, value: FormState[K]) {
     setFormValues((current) => ({
       ...current,
@@ -1125,14 +1119,6 @@ function CalculatorContent({
                   Een tijdelijke betaalpauze maakt de hypotheekimpact niet automatisch nul.
                 </p>
               ) : null}
-              {hasMixedPaymentOutcome ? (
-                <p className="mt-3 text-[13px] leading-[1.65] text-white/72">
-                  In een optimistischer lezing kom je uit op ongeveer{" "}
-                  {formatCurrency(result.mortgageImpact.optimisticPrincipalImpact)} impact,
-                  in een voorzichtigere lezing op ongeveer{" "}
-                  {formatCurrency(result.mortgageImpact.conservativePrincipalImpact)}.
-                </p>
-              ) : null}
             </>
           ) : (
             <p className="mt-4 text-[14px] leading-[1.7] text-white/75">
@@ -1177,44 +1163,6 @@ function CalculatorContent({
                         wettelijk bedrag of een veilige schatting gebruiken.
                       </span>,
                       <span key="3">{result.duoPayment.explanation}</span>,
-                    ]}
-                  />
-                }
-              />
-              <ResultRow
-                label="Optimistisch scenario"
-                value={formatCurrency(result.duoPayment.optimisticNetMonthlyPayment)}
-                sub="Als een geldverstrekker coulanter naar je actuele betaling kijkt"
-                breakdownLabel="Optimistische berekening"
-                breakdown={
-                  <AmountBreakdown
-                    items={[
-                      <span key="1">
-                        Uitgangspunt: {formatCurrency(result.duoPayment.optimisticNetMonthlyPayment)} per maand.
-                      </span>,
-                      <span key="2">
-                        Dit is het scenario waarin een geldverstrekker je huidige of laagste
-                        geldige betaling volgt.
-                      </span>,
-                    ]}
-                  />
-                }
-              />
-              <ResultRow
-                label="Voorzichtig scenario"
-                value={formatCurrency(result.duoPayment.conservativeNetMonthlyPayment)}
-                sub="Als een geldverstrekker met het wettelijke of geschatte bedrag rekent"
-                breakdownLabel="Voorzichtige berekening"
-                breakdown={
-                  <AmountBreakdown
-                    items={[
-                      <span key="1">
-                        Uitgangspunt: {formatCurrency(result.duoPayment.conservativeNetMonthlyPayment)} per maand.
-                      </span>,
-                      <span key="2">
-                        Dit is het hogere bedrag dat een geldverstrekker kan aanhouden
-                        als veilige DUO-last.
-                      </span>,
                     ]}
                   />
                 }

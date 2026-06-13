@@ -335,16 +335,6 @@ export function calculateMortgageImpact(
     mortgageRate,
     mortgageTermYears,
   );
-  const optimisticPrincipalImpact = calculatePresentValueFromMonthlyPayment(
-    roundMoney(duoPayment.optimisticNetMonthlyPayment * brutering.factor),
-    mortgageRate,
-    mortgageTermYears,
-  );
-  const conservativePrincipalImpact = calculatePresentValueFromMonthlyPayment(
-    roundMoney(duoPayment.conservativeNetMonthlyPayment * brutering.factor),
-    mortgageRate,
-    mortgageTermYears,
-  );
 
   return {
     netDuoMonthlyPayment,
@@ -354,8 +344,8 @@ export function calculateMortgageImpact(
     bruteringLabel: brutering.label,
     grossDuoMonthlyImpact,
     principalImpact,
-    optimisticPrincipalImpact,
-    conservativePrincipalImpact,
+    optimisticPrincipalImpact: principalImpact,
+    conservativePrincipalImpact: principalImpact,
     assumptions: [
       "We gebruiken een indicatieve bruteringsstaffel om de annuïtaire DUO-maandlast naar een bruto vergelijkbare maandlast om te rekenen.",
       "Voor de brutering nemen we het annuïtaire DUO-bedrag dat nodig is om de studieschuld aan het einde van de looptijd op nul te brengen.",
