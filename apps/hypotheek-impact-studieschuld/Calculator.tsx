@@ -1459,6 +1459,24 @@ function CalculatorContent({
                   />
                 }
               />
+              <ResultRow
+                label="Impact op leencapaciteit"
+                value={formatCurrency(result.mortgageImpact.principalImpact)}
+                sub="Hoeveel de DUO-schuld je maximale hypotheek indicatief verlaagt"
+                breakdownLabel="Contante waarde"
+                breakdown={
+                  <AmountBreakdown
+                    items={[
+                      <span key="1">
+                        We zetten de bruto DUO-maandlast om naar leenruimte met dezelfde contantewaardeformule als in de hypotheeklaag.
+                      </span>,
+                      <span key="2">
+                        Uitkomst: {formatCurrency(result.mortgageImpact.principalImpact)} minder leencapaciteit.
+                      </span>,
+                    ]}
+                  />
+                }
+              />
             </div>
           ) : null}
           <InfoList items={result?.mortgageImpact.assumptions ?? []} />

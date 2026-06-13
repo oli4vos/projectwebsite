@@ -2,6 +2,7 @@ import type {
   MortgageMaxMortgageInput,
   MortgageMaxMortgageResult,
 } from "@/lib/mortgage/types";
+import { calculatePresentValueFromMonthlyPayment } from "@/lib/mortgage/present-value";
 
 export type MortgageReportLine = {
   label: string;
@@ -498,6 +499,14 @@ export function buildMortgagePdfReport(
       input.property?.marketValue ??
       input.property?.purchasePrice,
   );
+  const studentLoanImpactOnLeencapaciteit =
+    result.breakdown.studentLoanMonthlyImpact > 0
+      ? calculatePresentValueFromMonthlyPayment({
+          monthlyPayment: result.breakdown.studentLoanMonthlyImpact,
+          annualRate: result.debug.interestRate,
+          years: result.debug.durationMonths / 12,
+        })
+      : 0;
 
   const summaryLines: MortgageReportLine[] = [
     { label: "Maximale hypotheek op inkomen", value: formatCurrency(result.maxMortgageByIncome, 2) },
@@ -519,6 +528,14 @@ export function buildMortgagePdfReport(
       note: result.fundingGap > 0 ? "Er is indicatief extra eigen geld nodig." : "Geen tekort zichtbaar.",
     },
     { label: "Bruto maandlast", value: formatCurrency(result.monthlyPaymentGross, 2) },
+    {
+      label: "Impact op leencapaciteit",
+      value: formatCurrency(studentLoanImpactOnLeencapaciteit, 2),
+      note:
+        result.breakdown.studentLoanMonthlyImpact > 0
+          ? "Contante waarde van de bruto DUO-maandlast; dit verlaagt de leencapaciteit indicatief."
+          : "Geen DUO-impact zichtbaar op de leencapaciteit.",
+    },
     {
       label: "Limiterend",
       value: limitingFactorLabel(result),

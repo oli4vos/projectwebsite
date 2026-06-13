@@ -46,6 +46,7 @@ describe("mortgage PDF report", () => {
     expect(report.sources.some((source) => source.key === "student-loan")).toBe(true);
     expect(report.sections[0].title).toBe("Resultatentabel");
     expect(report.summaryLines.some((line) => line.label === "Einduitkomst")).toBe(true);
+    expect(report.summaryLines.some((line) => line.label === "Impact op leencapaciteit")).toBe(true);
     expect(report.sections.some((section) => section.title === "Inkomens- en verplichtingentabel")).toBe(true);
     expect(report.sections.some((section) => section.title === "Woningwaarde, NHG en eigen middelen")).toBe(true);
 
