@@ -26,6 +26,15 @@ type PdfDocument = {
   setFillColor: (r: number, g?: number, b?: number) => PdfDocument;
   setLineWidth: (width: number) => PdfDocument;
   rect: (x: number, y: number, width: number, height: number, style?: "S" | "F" | "FD") => PdfDocument;
+  roundedRect: (
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    rx: number,
+    ry?: number,
+    style?: "S" | "F" | "FD",
+  ) => PdfDocument;
   line: (x1: number, y1: number, x2: number, y2: number) => PdfDocument;
   text: (
     text: string | string[],
@@ -42,9 +51,63 @@ type PdfDocument = {
 };
 
 const PAGE_MARGIN = 40;
+const HEADER_HEIGHT = 104;
 const LINE_HEIGHT = 15;
 const SECTION_GAP = 16;
 const VALUE_COLUMN_RATIO = 0.42;
+
+const PDF_COLORS = {
+  paper: [246, 246, 244] as const,
+  card: [255, 255, 255] as const,
+  ink: [23, 23, 23] as const,
+  ink2: [51, 51, 49] as const,
+  muted: [104, 104, 100] as const,
+  soft: [155, 155, 150] as const,
+  hair: [222, 222, 217] as const,
+  hair2: [207, 207, 200] as const,
+  deep: [22, 22, 22] as const,
+  accent: [72, 105, 155] as const,
+  accentSoft: [230, 236, 244] as const,
+  pos: [54, 102, 76] as const,
+  posSoft: [235, 245, 239] as const,
+  warn: [138, 100, 32] as const,
+  warnSoft: [249, 243, 226] as const,
+};
+
+function setTextColor(doc: PdfDocument, color: readonly [number, number, number]) {
+  doc.setTextColor(color[0], color[1], color[2]);
+}
+
+function setDrawColor(doc: PdfDocument, color: readonly [number, number, number]) {
+  doc.setDrawColor(color[0], color[1], color[2]);
+}
+
+function setFillColor(doc: PdfDocument, color: readonly [number, number, number]) {
+  doc.setFillColor(color[0], color[1], color[2]);
+}
+
+function drawPageBackground(doc: PdfDocument) {
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+
+  setFillColor(doc, PDF_COLORS.paper);
+  doc.rect(0, 0, pageWidth, pageHeight, "F");
+}
+
+function drawRoundedPanel(
+  doc: PdfDocument,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  fill: readonly [number, number, number],
+  border: readonly [number, number, number] = PDF_COLORS.hair,
+  radius = 12,
+) {
+  setFillColor(doc, fill);
+  setDrawColor(doc, border);
+  doc.roundedRect(x, y, width, height, radius, radius, "FD");
+}
 
 function formatPageLabel(pageNumber: number, totalPages: number) {
   return `Pagina ${pageNumber} van ${totalPages}`;
@@ -54,59 +117,81 @@ function drawHeader(doc: PdfDocument, reportTitle: string, subtitle: string, gen
   const pageWidth = doc.internal.pageSize.getWidth();
   const contentWidth = pageWidth - PAGE_MARGIN * 2;
 
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(18);
-  doc.setTextColor(20, 27, 39);
-  doc.text(reportTitle, PAGE_MARGIN, PAGE_MARGIN + 2, { maxWidth: contentWidth });
+  drawPageBackground(doc);
+  drawRoundedPanel(doc, PAGE_MARGIN, PAGE_MARGIN, contentWidth, HEADER_HEIGHT, PDF_COLORS.card);
 
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
-  doc.setTextColor(92, 104, 120);
-  doc.text(subtitle, PAGE_MARGIN, PAGE_MARGIN + 20, { maxWidth: contentWidth });
-  doc.text(`Gegenereerd op ${generatedAt} • normjaar ${normYear}`, PAGE_MARGIN, PAGE_MARGIN + 34, {
-    maxWidth: contentWidth,
+  setFillColor(doc, PDF_COLORS.accentSoft);
+  doc.roundedRect(PAGE_MARGIN + 16, PAGE_MARGIN + 16, 108, 22, 11, 11, "F");
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8.5);
+  setTextColor(doc, PDF_COLORS.accent);
+  doc.text("HYPOTHEEKRAPPORT", PAGE_MARGIN + 70, PAGE_MARGIN + 30, { align: "center" });
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(21);
+  setTextColor(doc, PDF_COLORS.ink);
+  doc.text(reportTitle, PAGE_MARGIN + 18, PAGE_MARGIN + 54, {
+    maxWidth: contentWidth - 170,
   });
 
-  doc.setDrawColor(216, 223, 230);
-  doc.setLineWidth(1);
-  doc.line(PAGE_MARGIN, PAGE_MARGIN + 44, pageWidth - PAGE_MARGIN, PAGE_MARGIN + 44);
-}
-
-function renderWrappedText(
-  doc: PdfDocument,
-  text: string,
-  x: number,
-  y: number,
-  width: number,
-  fontSize: number,
-  color: [number, number, number],
-) {
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(fontSize);
-  doc.setTextColor(color[0], color[1], color[2]);
-  const lines = doc.splitTextToSize(text, width);
-  doc.text(lines, x, y, { maxWidth: width });
-  return lines.length;
+  doc.setFontSize(9.5);
+  setTextColor(doc, PDF_COLORS.ink2);
+  doc.text(subtitle, PAGE_MARGIN + 18, PAGE_MARGIN + 73, {
+    maxWidth: contentWidth - 170,
+  });
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8.5);
+  setTextColor(doc, PDF_COLORS.muted);
+  doc.text(`Gegenereerd op ${generatedAt}`, PAGE_MARGIN + 18, PAGE_MARGIN + 92, {
+    maxWidth: contentWidth - 170,
+  });
+
+  setFillColor(doc, PDF_COLORS.paper);
+  setDrawColor(doc, PDF_COLORS.hair);
+  doc.roundedRect(pageWidth - PAGE_MARGIN - 110, PAGE_MARGIN + 16, 92, 22, 11, 11, "FD");
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8.5);
+  setTextColor(doc, PDF_COLORS.ink);
+  doc.text(`Normjaar ${normYear}`, pageWidth - PAGE_MARGIN - 64, PAGE_MARGIN + 30, {
+    align: "center",
+  });
+
+  setDrawColor(doc, PDF_COLORS.hair);
+  doc.setLineWidth(1);
+  doc.line(
+    PAGE_MARGIN + 18,
+    PAGE_MARGIN + HEADER_HEIGHT - 18,
+    pageWidth - PAGE_MARGIN - 18,
+    PAGE_MARGIN + HEADER_HEIGHT - 18,
+  );
 }
 
 function renderSectionTitle(doc: PdfDocument, title: string, subtitle: string | undefined, y: number) {
   const pageWidth = doc.internal.pageSize.getWidth();
   const contentWidth = pageWidth - PAGE_MARGIN * 2;
+  const subtitleWidth = contentWidth - 48;
+  const subtitleLines = subtitle ? doc.splitTextToSize(subtitle, subtitleWidth) : [];
+  const boxHeight = 52 + (subtitleLines.length > 0 ? subtitleLines.length * 11 + 6 : 0);
 
-  doc.setFillColor(20, 27, 39);
-  doc.rect(PAGE_MARGIN, y - 2, 4, 22, "F");
+  drawRoundedPanel(doc, PAGE_MARGIN, y, contentWidth, boxHeight, PDF_COLORS.card);
+  setFillColor(doc, PDF_COLORS.accent);
+  doc.rect(PAGE_MARGIN + 14, y + 14, 4, 24, "F");
+
   doc.setFont("helvetica", "bold");
   doc.setFontSize(13);
-  doc.setTextColor(20, 27, 39);
-  doc.text(title, PAGE_MARGIN + 12, y + 10, { maxWidth: contentWidth - 12 });
+  setTextColor(doc, PDF_COLORS.ink);
+  doc.text(title, PAGE_MARGIN + 28, y + 28, { maxWidth: contentWidth - 44 });
 
-  let currentY = y + 24;
-  if (subtitle) {
-    const linesUsed = renderWrappedText(doc, subtitle, PAGE_MARGIN + 12, currentY, contentWidth - 12, 9, [92, 104, 120]);
-    currentY += linesUsed * 11 + 2;
+  if (subtitleLines.length > 0) {
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    setTextColor(doc, PDF_COLORS.muted);
+    doc.text(subtitleLines, PAGE_MARGIN + 28, y + 43, { maxWidth: contentWidth - 44 });
   }
 
-  return currentY + 4;
+  return y + boxHeight + 10;
 }
 
 function renderLineItem(doc: PdfDocument, label: string, value: string, note: string | undefined, y: number) {
@@ -120,24 +205,22 @@ function renderLineItem(doc: PdfDocument, label: string, value: string, note: st
   const noteHeight = note ? doc.splitTextToSize(note, contentWidth).length * 11 + 4 : 0;
   const totalHeight = baseHeight + noteHeight + 4;
 
-  doc.setDrawColor(229, 231, 235);
-  doc.setFillColor(255, 255, 255);
-  doc.rect(PAGE_MARGIN, y, contentWidth, totalHeight, "FD");
+  drawRoundedPanel(doc, PAGE_MARGIN, y, contentWidth, totalHeight, PDF_COLORS.card);
 
   doc.setFont("helvetica", "bold");
   doc.setFontSize(10);
-  doc.setTextColor(20, 27, 39);
+  setTextColor(doc, PDF_COLORS.ink);
   doc.text(labelLines, PAGE_MARGIN + 8, y + 14, { maxWidth: labelWidth - 8 });
 
-  doc.setFont("helvetica", "normal");
+  doc.setFont("courier", "normal");
   doc.setFontSize(10);
-  doc.setTextColor(31, 41, 55);
+  setTextColor(doc, PDF_COLORS.ink2);
   doc.text(valueLines, PAGE_MARGIN + 8 + labelWidth + 12, y + 14, { maxWidth: valueWidth });
 
   if (note) {
     const noteLines = doc.splitTextToSize(note, contentWidth - 16);
     doc.setFontSize(8.5);
-    doc.setTextColor(100, 116, 139);
+    setTextColor(doc, PDF_COLORS.muted);
     doc.text(noteLines, PAGE_MARGIN + 8, y + totalHeight - 8, { maxWidth: contentWidth - 16 });
   }
 
@@ -150,7 +233,7 @@ function renderParagraph(doc: PdfDocument, text: string, y: number) {
   const lines = doc.splitTextToSize(text, contentWidth);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
-  doc.setTextColor(31, 41, 55);
+  setTextColor(doc, PDF_COLORS.ink2);
   doc.text(lines, PAGE_MARGIN, y + 12, { maxWidth: contentWidth });
   return lines.length * 12 + 2;
 }
@@ -189,39 +272,39 @@ function renderTimelineStep(
   const textWidth = contentWidth - 52;
   const totalHeight = timelineStepHeight(doc, step);
 
-  doc.setDrawColor(209, 215, 224);
-  doc.setFillColor(249, 250, 251);
-  doc.rect(PAGE_MARGIN, y, contentWidth, totalHeight, "FD");
+  drawRoundedPanel(doc, PAGE_MARGIN, y, contentWidth, totalHeight, PDF_COLORS.card);
 
-  doc.setFillColor(20, 27, 39);
-  doc.rect(PAGE_MARGIN + 12, y + 12, 28, 28, "F");
+  setFillColor(doc, PDF_COLORS.accent);
+  doc.rect(PAGE_MARGIN + 12, y + 12, 4, totalHeight - 24, "F");
+
+  setFillColor(doc, PDF_COLORS.deep);
+  doc.roundedRect(PAGE_MARGIN + 18, y + 12, 30, 24, 12, 12, "F");
   doc.setFont("helvetica", "bold");
   doc.setFontSize(12);
-  doc.setTextColor(255, 255, 255);
-  doc.text(String(step.step), PAGE_MARGIN + 26, y + 30, { align: "center" });
+  setTextColor(doc, [255, 255, 255]);
+  doc.text(String(step.step), PAGE_MARGIN + 33, y + 29, { align: "center" });
 
   let currentY = y + 18;
   doc.setFont("helvetica", "bold");
   doc.setFontSize(12);
-  doc.setTextColor(20, 27, 39);
+  setTextColor(doc, PDF_COLORS.ink);
   doc.text(step.title, textX, currentY, { maxWidth: textWidth });
   currentY += 18;
 
   const explanationLines = doc.splitTextToSize(step.explanation, textWidth);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
-  doc.setTextColor(71, 85, 105);
+  setTextColor(doc, PDF_COLORS.ink2);
   doc.text(explanationLines, textX, currentY, { maxWidth: textWidth });
   currentY += explanationLines.length * 11 + 8;
 
   if (step.formula) {
     const formulaLines = doc.splitTextToSize(step.formula, textWidth - 16);
     const formulaHeight = formulaLines.length * 11 + 12;
-    doc.setFillColor(237, 242, 247);
-    doc.rect(textX, currentY - 4, textWidth, formulaHeight, "F");
+    drawRoundedPanel(doc, textX, currentY - 4, textWidth, formulaHeight, PDF_COLORS.paper, PDF_COLORS.hair, 10);
     doc.setFont("courier", "normal");
     doc.setFontSize(8.5);
-    doc.setTextColor(31, 41, 55);
+    setTextColor(doc, PDF_COLORS.ink2);
     doc.text(formulaLines, textX + 8, currentY + 7, {
       maxWidth: textWidth - 16,
     });
@@ -233,7 +316,7 @@ function renderTimelineStep(
     const valueLines = doc.splitTextToSize(value, textWidth);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8.5);
-    doc.setTextColor(51, 65, 85);
+    setTextColor(doc, PDF_COLORS.ink2);
     doc.text(valueLines, textX, currentY, { maxWidth: textWidth });
     currentY += valueLines.length * 10 + 5;
   }
@@ -241,11 +324,10 @@ function renderTimelineStep(
   const outcome = `${step.outcome.label}: ${step.outcome.value}`;
   const outcomeLines = doc.splitTextToSize(outcome, textWidth - 16);
   const outcomeHeight = outcomeLines.length * 11 + 12;
-  doc.setFillColor(229, 245, 237);
-  doc.rect(textX, currentY - 4, textWidth, outcomeHeight, "F");
+  drawRoundedPanel(doc, textX, currentY - 4, textWidth, outcomeHeight, PDF_COLORS.posSoft, [201, 226, 209], 10);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(9);
-  doc.setTextColor(23, 92, 65);
+  setTextColor(doc, PDF_COLORS.pos);
   doc.text(outcomeLines, textX + 8, currentY + 7, {
     maxWidth: textWidth - 16,
   });
@@ -254,7 +336,7 @@ function renderTimelineStep(
   if (step.sourceKeys.length > 0) {
     doc.setFont("helvetica", "italic");
     doc.setFontSize(7.5);
-    doc.setTextColor(100, 116, 139);
+    setTextColor(doc, PDF_COLORS.muted);
     doc.text(`Bronnen: ${step.sourceKeys.join(", ")}`, textX, currentY + 5, {
       maxWidth: textWidth,
     });
@@ -267,7 +349,7 @@ function renderMortgagePdfDocument(doc: PdfDocument, report: MortgagePdfReport) 
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
 
-  let y = PAGE_MARGIN + 56;
+  let y = PAGE_MARGIN + HEADER_HEIGHT + 18;
 
   const drawPageHeader = () => {
     drawHeader(doc, report.title, report.subtitle, report.generatedAt, report.normYear);
@@ -279,7 +361,10 @@ function renderMortgagePdfDocument(doc: PdfDocument, report: MortgagePdfReport) 
       doc.setPage(page);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(8.5);
-      doc.setTextColor(100, 116, 139);
+      setTextColor(doc, PDF_COLORS.muted);
+      setDrawColor(doc, PDF_COLORS.hair);
+      doc.line(PAGE_MARGIN, pageHeight - 32, pageWidth - PAGE_MARGIN, pageHeight - 32);
+      doc.text("Maximale hypotheek", PAGE_MARGIN, pageHeight - 18);
       doc.text(formatPageLabel(page, totalPages), pageWidth - PAGE_MARGIN, pageHeight - 22, {
         align: "right",
       });
@@ -292,12 +377,12 @@ function renderMortgagePdfDocument(doc: PdfDocument, report: MortgagePdfReport) 
     }
     doc.addPage();
     drawPageHeader();
-    y = PAGE_MARGIN + 56;
+    y = PAGE_MARGIN + HEADER_HEIGHT + 18;
   };
 
   drawPageHeader();
 
-  ensureSpace(80);
+  ensureSpace(110);
   y = renderSectionTitle(
     doc,
     "Berekeningsvolgorde",
@@ -312,7 +397,7 @@ function renderMortgagePdfDocument(doc: PdfDocument, report: MortgagePdfReport) 
   });
 
   report.sections.forEach((section) => {
-    ensureSpace(60);
+    ensureSpace(90);
     y += SECTION_GAP;
     y = renderSectionTitle(doc, section.title, section.subtitle, y);
 
@@ -332,7 +417,7 @@ function renderMortgagePdfDocument(doc: PdfDocument, report: MortgagePdfReport) 
   });
 
   if (report.warnings.length > 0) {
-    ensureSpace(60);
+    ensureSpace(90);
     y += SECTION_GAP;
     y = renderSectionTitle(doc, "Waarschuwingen", "Meldingen die bij deze uitkomst horen.", y);
     report.warnings.forEach((warning) => {
@@ -343,7 +428,7 @@ function renderMortgagePdfDocument(doc: PdfDocument, report: MortgagePdfReport) 
   }
 
   if (report.assumptions.length > 0) {
-    ensureSpace(60);
+    ensureSpace(90);
     y += SECTION_GAP;
     y = renderSectionTitle(doc, "Aannames", "De centrale hypotheeklaag levert deze aannames mee.", y);
     report.assumptions.forEach((assumption) => {
@@ -354,7 +439,7 @@ function renderMortgagePdfDocument(doc: PdfDocument, report: MortgagePdfReport) 
   }
 
   if (report.sources.length > 0) {
-    ensureSpace(60);
+    ensureSpace(90);
     y += SECTION_GAP;
     y = renderSectionTitle(
       doc,

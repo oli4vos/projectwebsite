@@ -582,9 +582,9 @@ export function buildMortgagePdfReport(
   ];
 
   return {
-    title: "Maximale hypotheek - volledig berekeningsrapport",
+    title: "Maximale hypotheek",
     subtitle:
-      "Eerst de volledige rekenvolgorde, daarna de uitkomsten, controlewaarden, aannames en bronnen.",
+      "Volledige rekenvolgorde, uitkomsten, controlewaarden, aannames en bronnen.",
     generatedAt: generatedAtLabel,
     normYear: result.normYear,
     timeline: buildTimeline(input, result),
