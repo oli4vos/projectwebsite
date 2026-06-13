@@ -5,6 +5,37 @@ import type { AppManifest } from "@/lib/app-types";
 
 export const appRegistry = [
   {
+    "slug": "artifact-hypotheek-wonen-maximale-hypotheek",
+    "title": "Maximale hypotheek",
+    "description": "Indicatieve tool voor maximale leencapaciteit op basis van inkomen, woningwaarde, schulden en NHG.",
+    "type": "frontend",
+    "category": "Hypotheek",
+    "tags": [
+      "hypotheek",
+      "woningwaarde",
+      "inkomen",
+      "NHG",
+      "studieschuld"
+    ],
+    "status": "active",
+    "visibility": "public",
+    "reasonHint": "Indicatieve tool voor starters en doorstromers die hun maximale hypotheek willen inschatten.",
+    "assumptionsUsed": [
+      "mortgage"
+    ],
+    "calculationDomains": [
+      "mortgage",
+      "housing",
+      "studentDebt",
+      "cashflow"
+    ],
+    "riskLevel": "high",
+    "disclaimerType": "mortgageIndicative",
+    "outputType": "mixed",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
     "slug": "familiehulp-eerste-woning",
     "title": "Lenen of schenken voor eerste woning",
     "description": "Vergelijk studieschuld, bankhypotheek, eigen geld, familielening en schenkingen voor een eerste woning.",

@@ -26,6 +26,7 @@ export const toolGroups: ToolGroup[] = [
     title: "Wonen",
     description: "Verdieping voor kopen: hypotheekruimte, eigen geld en hulp van familie.",
     slugs: [
+      "artifact-hypotheek-wonen-maximale-hypotheek",
       "hypotheek-impact-studieschuld",
       "hypotheek-aflossen-vs-beleggen",
       "annuitair-lineair",
@@ -77,6 +78,7 @@ const preferredSlugsByCategory: Record<string, string[]> = {
     "hypotheek-impact-studieschuld",
   ],
   Hypotheek: [
+    "artifact-hypotheek-wonen-maximale-hypotheek",
     "koop-vs-huur",
     "hypotheek-aflossen-vs-beleggen",
     "annuitair-lineair",

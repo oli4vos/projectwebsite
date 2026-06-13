@@ -26,6 +26,7 @@ const routeSteps = [
     body: "Pas als stap 1 en 2 helder zijn: hypotheek, eigen geld, familielening en schenking.",
     links: [
       { href: "/apps/familiehulp-eerste-woning", label: "Lenen of schenken" },
+      { href: "/apps/artifact-hypotheek-wonen-maximale-hypotheek", label: "Maximale hypotheek" },
     ],
   },
 ];
