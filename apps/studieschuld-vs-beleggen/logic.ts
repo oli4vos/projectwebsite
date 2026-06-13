@@ -7,6 +7,7 @@ import {
   sanitizeDuoPercent,
   type RepaymentRule,
 } from "@/lib/duo";
+import { calculateWeightedAverageRate } from "@/lib/basis-calculations";
 import {
   getDefaultFinancialYear,
   getFinancialConstants,
@@ -15,6 +16,11 @@ import { calculateBox3Tax } from "@/lib/tax";
 import type { Box3Method } from "@/lib/tax";
 
 const DEFAULT_FINANCIAL_YEAR = getDefaultFinancialYear();
+
+export type DebtPartInput = {
+  amount?: number;
+  annualDebtRate?: number;
+};
 
 export type CalculatorInput = {
   repaymentRule: RepaymentRule;
@@ -107,6 +113,47 @@ export type CalculatorResult = {
   warnings: string[];
   box3Scenario?: Box3ScenarioResult;
 };
+
+export function summarizeDebtParts(
+  parts: DebtPartInput[],
+  fallback?: {
+    remainingDebt?: number;
+    annualDebtRate?: number;
+  },
+) {
+  const normalizedRows = parts
+    .map((part) => ({
+      amount: part.amount ?? 0,
+      ratePercent: part.annualDebtRate ?? 0,
+    }))
+    .filter(
+      (row) =>
+        Number.isFinite(row.amount) &&
+        Number.isFinite(row.ratePercent) &&
+        row.amount > 0,
+    );
+
+  if (!normalizedRows.length) {
+    return {
+      remainingDebt: fallback?.remainingDebt ?? 0,
+      annualDebtRate: fallback?.annualDebtRate,
+    };
+  }
+
+  try {
+    const weightedRatePercent = calculateWeightedAverageRate(normalizedRows).weightedRatePercent;
+    const remainingDebt = normalizedRows.reduce((sum, row) => sum + row.amount, 0);
+    return {
+      remainingDebt,
+      annualDebtRate: weightedRatePercent,
+    };
+  } catch {
+    return {
+      remainingDebt: normalizedRows.reduce((sum, row) => sum + row.amount, 0),
+      annualDebtRate: fallback?.annualDebtRate,
+    };
+  }
+}
 
 function roundMoney(value: number) {
   return Math.round(sanitizeDuoMoney(value) * 100) / 100;

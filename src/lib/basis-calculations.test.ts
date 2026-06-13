@@ -145,6 +145,12 @@ describe("basis calculations", () => {
     expect(result.totalAmount).toBe(4000);
   });
 
+  it("rejects weighted average rates without positive amounts", () => {
+    expect(() =>
+      calculateWeightedAverageRate([{ amount: 0, ratePercent: 5 }]),
+    ).toThrow("De som van de bedragen moet groter zijn dan 0.");
+  });
+
   it("converts roman numerals in both directions", () => {
     expect(toRoman(1984)).toBe("MCMLXXXIV");
     expect(fromRoman("MMXXVI")).toBe(2026);

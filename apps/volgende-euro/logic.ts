@@ -68,6 +68,20 @@ export type VolgendeEuroInput = {
   ownFunds?: number;
 };
 
+export type CombinedNonDuoDebtInput = {
+  hasPrimaryNonDuoDebt: boolean;
+  primaryDebtAmount?: number;
+  primaryDebtRate?: number;
+  hasOtherDebt: boolean;
+  otherDebtAmount?: number;
+  otherDebtRate?: number;
+};
+
+export type CombinedNonDuoDebtResult = {
+  amount?: number;
+  rate?: number;
+};
+
 export type PriorityOption = {
   key: PriorityOptionKey;
   label: string;
@@ -182,6 +196,28 @@ function getLegacyRiskNote(key: PriorityOptionKey) {
   if (key === "freeInvesting") return "Meer groeipotentieel, maar ook marktrisico.";
   if (key === "pensionJaarruimte") return "Fiscaal voordeel kan sterk zijn, flexibiliteit is lager.";
   return "Gebruik dit als routehulp en reken daarna verder door.";
+}
+
+export function combineNonDuoDebt(
+  input: CombinedNonDuoDebtInput,
+): CombinedNonDuoDebtResult {
+  const primaryAmount = input.hasPrimaryNonDuoDebt
+    ? sanitizeMoney(input.primaryDebtAmount)
+    : 0;
+  const otherAmount = input.hasOtherDebt ? sanitizeMoney(input.otherDebtAmount) : 0;
+  const amount = primaryAmount + otherAmount;
+  const rate = input.hasPrimaryNonDuoDebt
+    ? input.hasOtherDebt
+      ? Math.max(input.primaryDebtRate ?? 0, input.otherDebtRate ?? 0)
+      : input.primaryDebtRate
+    : input.hasOtherDebt
+      ? input.otherDebtRate
+      : undefined;
+
+  return {
+    amount,
+    rate,
+  };
 }
 
 export function calculateVolgendeEuroPriorities(input: VolgendeEuroInput): VolgendeEuroResult {

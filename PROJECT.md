@@ -91,6 +91,29 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - functioneel uitgezet;
   - technisch in code behouden voor snelle heractivatie.
 
+## Centrale berekeningslaag
+
+- Alle berekeningslogica moet zo dicht mogelijk bij de centrale domeinlaag staan en mag niet in `Calculator.tsx`, routes of andere presentatiecode worden gedupliceerd.
+- `Calculator.tsx` mag alleen:
+  - invoer renderen;
+  - formuliervalidatie op veldniveau doen;
+  - waarden parsen;
+  - centrale berekeningsfuncties aanroepen;
+  - resultaten en toelichting renderen.
+- Gedeelde rekenregels horen eerst in bestaande centrale lagen te landen:
+  - `src/lib/duo/` voor studieschuld- en DUO-regels;
+  - `src/lib/mortgage/` voor hypotheek- en leenwiskunde;
+  - `src/lib/basis-calculations.ts` voor generieke financiële wiskunde;
+  - `src/lib/financial-constants/` voor tabellen, normen en jaarkoppelingen;
+  - `src/lib/tax/`, `src/lib/pension/` en `src/lib/planning/` voor domeinspecifieke varianten.
+- Tool-specifieke `apps/<slug>/logic.ts`-bestanden mogen orchestration doen, maar geen formulekopieën bevatten die al centraal beschikbaar zijn.
+- Bij nieuwe berekeningen geldt:
+  - eerst bestaande helpers zoeken;
+  - daarna centrale laag uitbreiden;
+  - pas dan een dunne app-façade toevoegen;
+  - nooit dezelfde formule op meerdere plaatsen onderhouden.
+- Jaarafhankelijke constants, tabellen en percentages moeten centraal en testbaar beheerd worden, niet verspreid over UI of routecode.
+
 ## Huidige routes
 
 - `/` via `src/app/page.tsx`

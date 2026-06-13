@@ -23,6 +23,7 @@ import {
 import { getStudentDebtVsInvestingDefaultsFromProfile } from "@/lib/profile-tool-mapping";
 import {
   calculateStudyDebtVsInvesting,
+  summarizeDebtParts,
   type CalculatorInput,
 } from "./logic";
 
@@ -266,28 +267,10 @@ function validateForm(values: FormState) {
   const parsedValues: CalculatorInput | null =
     Object.keys(errors).length === 0
       ? {
-          remainingDebt:
-            effectiveDebtParts.length > 0
-              ? effectiveDebtParts.reduce((sum, part) => sum + (part.amount ?? 0), 0)
-              : remainingDebt,
-          annualDebtRate:
-            effectiveDebtParts.length > 0
-              ? (() => {
-                  const weightedDenominator = effectiveDebtParts.reduce(
-                    (sum, part) => sum + (part.amount ?? 0),
-                    0,
-                  );
-                  if (weightedDenominator <= 0) {
-                    return annualDebtRate;
-                  }
-                  const weightedNumerator = effectiveDebtParts.reduce(
-                    (sum, part) =>
-                      sum + (part.amount ?? 0) * (part.annualDebtRate ?? 0),
-                    0,
-                  );
-                  return weightedNumerator / weightedDenominator;
-                })()
-              : annualDebtRate,
+          ...summarizeDebtParts(effectiveDebtParts, {
+            remainingDebt,
+            annualDebtRate,
+          }),
           repaymentRule: values.repaymentRule,
           remainingTermYears,
           grossAnnualIncome,

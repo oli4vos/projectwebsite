@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   calculateVolgendeEuroPriorities,
+  combineNonDuoDebt,
   type PriorityOptionKey,
   type PriorityPlanStep,
 } from "./logic";
@@ -32,6 +33,34 @@ function expectFiniteNonNegative(value: number | undefined) {
 }
 
 describe("calculateVolgendeEuroPriorities", () => {
+  it("combines non-DUO debt centrally", () => {
+    const result = combineNonDuoDebt({
+      hasPrimaryNonDuoDebt: true,
+      primaryDebtAmount: 2500,
+      primaryDebtRate: 7,
+      hasOtherDebt: true,
+      otherDebtAmount: 1500,
+      otherDebtRate: 9,
+    });
+
+    expect(result.amount).toBe(4000);
+    expect(result.rate).toBe(9);
+  });
+
+  it("returns the single non-DUO debt when only one exists", () => {
+    const result = combineNonDuoDebt({
+      hasPrimaryNonDuoDebt: false,
+      primaryDebtAmount: 2500,
+      primaryDebtRate: 7,
+      hasOtherDebt: true,
+      otherDebtAmount: 1500,
+      otherDebtRate: 9,
+    });
+
+    expect(result.amount).toBe(1500);
+    expect(result.rate).toBe(9);
+  });
+
   describe("priorityPlan", () => {
     it("returns no top recommendation for empty input", () => {
       const result = calculateVolgendeEuroPriorities({});

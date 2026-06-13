@@ -19,7 +19,11 @@ import { createProfilePrefillState, mergeProfilePatchIntoValues } from "@/lib/pr
 import { getVolgendeEuroDefaultsFromProfile } from "@/lib/profile-tool-mapping";
 import { getSavedCalculation } from "@/lib/storage/saved-calculations/saved-calculation-store";
 import { getSavedCalculationIdFromSearchParams } from "@/lib/storage/saved-calculations/saved-calculation-links";
-import { calculateVolgendeEuroPriorities, type VolgendeEuroInput } from "./logic";
+import {
+  calculateVolgendeEuroPriorities,
+  combineNonDuoDebt,
+  type VolgendeEuroInput,
+} from "./logic";
 
 type FormState = {
   extraAmount: string;
@@ -106,14 +110,14 @@ function toInput(values: FormState): VolgendeEuroInput {
   const otherDebtRate = parseOptionalNumber(values.otherDebtRate);
   const hasPrimaryNonDuoDebt = values.hasDebt && !values.primaryDebtIsDuo;
   const hasAnyNonDuoDebt = hasPrimaryNonDuoDebt || values.hasOtherDebt;
-  const combinedNonDuoDebtAmount = (hasPrimaryNonDuoDebt ? primaryDebtAmount ?? 0 : 0) + (values.hasOtherDebt ? otherDebtAmount ?? 0 : 0);
-  const combinedNonDuoDebtRate = hasPrimaryNonDuoDebt
-    ? values.hasOtherDebt
-      ? Math.max(primaryDebtRate ?? 0, otherDebtRate ?? 0)
-      : primaryDebtRate
-    : values.hasOtherDebt
-      ? otherDebtRate
-      : undefined;
+  const combinedNonDuoDebt = combineNonDuoDebt({
+    hasPrimaryNonDuoDebt,
+    primaryDebtAmount,
+    primaryDebtRate,
+    hasOtherDebt: values.hasOtherDebt,
+    otherDebtAmount,
+    otherDebtRate,
+  });
 
   return {
     year: getDefaultFinancialYear(),
@@ -121,8 +125,8 @@ function toInput(values: FormState): VolgendeEuroInput {
     currentBuffer: parseOptionalNumber(values.currentBuffer),
     targetBuffer: parseOptionalNumber(values.targetBuffer),
     hasExpensiveDebt: hasAnyNonDuoDebt,
-    expensiveDebtRate: hasAnyNonDuoDebt ? combinedNonDuoDebtRate : undefined,
-    expensiveDebtAmount: hasAnyNonDuoDebt ? combinedNonDuoDebtAmount : undefined,
+    expensiveDebtRate: hasAnyNonDuoDebt ? combinedNonDuoDebt.rate : undefined,
+    expensiveDebtAmount: hasAnyNonDuoDebt ? combinedNonDuoDebt.amount : undefined,
     studentDebtAmount:
       values.hasDebt && values.primaryDebtIsDuo
         ? primaryDebtAmount

@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { calculateStudyDebtVsInvesting } from "./logic";
+import {
+  calculateStudyDebtVsInvesting,
+  summarizeDebtParts,
+} from "./logic";
 
 const baseInput = {
   repaymentRule: "SF35" as const,
@@ -13,6 +16,26 @@ const baseInput = {
 };
 
 describe("calculateStudyDebtVsInvesting", () => {
+  it("summarizes debt parts in the central logic layer", () => {
+    const result = summarizeDebtParts([
+      { amount: 1000, annualDebtRate: 2 },
+      { amount: 3000, annualDebtRate: 4 },
+    ]);
+
+    expect(result.remainingDebt).toBe(4000);
+    expect(result.annualDebtRate).toBeCloseTo(3.5, 3);
+  });
+
+  it("falls back safely when debt parts carry no positive amount", () => {
+    const result = summarizeDebtParts([{ amount: 0, annualDebtRate: 5 }], {
+      remainingDebt: 12345,
+      annualDebtRate: 2.33,
+    });
+
+    expect(result.remainingDebt).toBe(12345);
+    expect(result.annualDebtRate).toBe(2.33);
+  });
+
   it("computes statutory and required DUO monthly payments", () => {
     const result = calculateStudyDebtVsInvesting(baseInput);
 
