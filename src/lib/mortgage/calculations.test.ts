@@ -70,6 +70,28 @@ describe("mortgage calculations", () => {
     ).toBe(248345.21);
   });
 
+  it("shows the expected term effect seen in online mortgage calculators", () => {
+    const longTermPayment = calculateAnnuityPayment({
+      principal: 300000,
+      annualRate: 4.1,
+      years: 30,
+    });
+    const shortTermPayment = calculateAnnuityPayment({
+      principal: 300000,
+      annualRate: 4.1,
+      years: 15,
+    });
+
+    expect(shortTermPayment).toBeGreaterThan(longTermPayment);
+    expect(
+      calculatePresentValueFromMonthlyPayment({
+        monthlyPayment: longTermPayment,
+        annualRate: 4.1,
+        years: 15,
+      }),
+    ).toBeLessThan(300000);
+  });
+
   it("matches the mortgage-impact student-debt example values", () => {
     expect(
       calculateAnnuityPayment({ principal: 28000, annualRate: 2.33, years: 30 }),

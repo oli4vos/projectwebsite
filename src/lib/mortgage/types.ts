@@ -51,6 +51,12 @@ export type MortgageMaxMortgageLimitingFactor =
   | "own-funds"
   | "none";
 
+export type MortgageMaxMortgageDetailedLimitingFactor =
+  | "income"
+  | "collateral"
+  | "both"
+  | "unknown";
+
 export type MortgageMaxMortgageWarningSeverity =
   | "info"
   | "warning"
@@ -80,8 +86,10 @@ export type MortgageMaxMortgageStudentLoanInput = {
 };
 
 export type MortgageMaxMortgagePropertyInput = {
+  propertyValue?: number;
   purchasePrice?: number;
   marketValue?: number;
+  ltvPercentage?: number;
   energyLabel?:
     | "G"
     | "F"
@@ -109,9 +117,13 @@ export type MortgageMaxMortgageInput = {
   mortgageTermYears?: number;
   householdType?: MortgageMaxMortgageHouseholdType;
   repaymentType?: MortgageMaxMortgageRepaymentType;
+  monthlyFinancialObligations?: number;
   monthlyDebtPayments?: number;
   liabilities?: MortgageMaxMortgageLiabilityInput[];
   studentLoan?: MortgageMaxMortgageStudentLoanInput;
+  studentDebtMonthlyPayment?: number;
+  studentDebtNormativeMonthlyPayment?: number;
+  studentDebtRegime?: "SF15" | "SF35" | "unknown";
   property?: MortgageMaxMortgagePropertyInput;
   ownFunds?: number;
   buyerCostRate?: number;
@@ -133,8 +145,10 @@ export type MortgageMaxMortgageBreakdown = {
   monthlyLiabilityImpact: number;
   studentLoanMonthlyImpact: number;
   monthlyHousingBudgetAfterLiabilities: number;
+  propertyValue: number;
   purchasePrice: number;
   marketValue: number;
+  ltvPercentage: number;
   maxMortgageByIncome: number;
   maxMortgageByLtv: number;
   maxMortgageByNhg?: number;
@@ -144,8 +158,31 @@ export type MortgageMaxMortgageBreakdown = {
   requiredOwnFunds: number;
 };
 
+export type MortgageMaxMortgageDebug = {
+  toetsinkomen: number;
+  primaryIncome: number;
+  partnerIncome: number;
+  financingLoadPercentage: number;
+  maxAnnualHousingCost: number;
+  maxMonthlyHousingCost: number;
+  monthlyObligations: number;
+  availableMortgageMonthlyCost: number;
+  annuityFactor: number;
+  interestRate: number;
+  durationMonths: number;
+  collateralValue: number | null;
+  ownFunds: number;
+  ltvPercentage: number | null;
+};
+
 export type MortgageMaxMortgageResult = {
   normYear: number;
+  maxMortgageByIncome: number;
+  maxMortgageByCollateral: number | null;
+  finalMaxMortgage: number;
+  maxHomeBudget: number | null;
+  limitingFactorDetailed: MortgageMaxMortgageDetailedLimitingFactor;
+  debug: MortgageMaxMortgageDebug;
   maxMortgageFinal: number;
   monthlyPaymentGross: number;
   monthlyHousingBudget: number;

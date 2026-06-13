@@ -5,10 +5,11 @@ import {
   getStudentDebtGrossUpFactor,
 } from "@/lib/financial-constants";
 import { calculateAnnuityPayment } from "@/lib/mortgage/annuity";
-import { calculatePresentValueFromMonthlyPayment } from "@/lib/mortgage/present-value";
 import type {
   MortgageMaxMortgageBreakdown,
+  MortgageMaxMortgageDebug,
   MortgageMaxMortgageInput,
+  MortgageMaxMortgageDetailedLimitingFactor,
   MortgageMaxMortgageLimitingFactor,
   MortgageMaxMortgagePropertyInput,
   MortgageMaxMortgageResult,
@@ -67,6 +68,26 @@ function roundMoney(value: number) {
 
 function roundMonthlyMoney(value: number) {
   return Math.round(sanitizeMoney(value) * 100) / 100;
+}
+
+function calculateAnnuityFactor(input: {
+  annualRate: number;
+  years: number;
+}) {
+  const safeAnnualRate = sanitizePercent(input.annualRate);
+  const safeYears = sanitizeYears(input.years, 0);
+  const months = Math.max(Math.round(safeYears * 12), 0);
+
+  if (months === 0) {
+    return 0;
+  }
+
+  if (safeAnnualRate === 0) {
+    return months;
+  }
+
+  const monthlyRate = safeAnnualRate / 100 / 12;
+  return (1 - (1 + monthlyRate) ** -months) / monthlyRate;
 }
 
 function pushWarning(
@@ -134,26 +155,45 @@ function resolveMortgageRate(
 
 function calculateStudentLoanMonthlyImpact(
   studentLoan: MortgageMaxMortgageStudentLoanInput | undefined,
+  studentDebtMonthlyPayment: number,
+  studentDebtNormativeMonthlyPayment: number,
+  studentDebtRegime: MortgageMaxMortgageInput["studentDebtRegime"],
   mortgageRate: number,
   warnings: MortgageMaxMortgageWarning[],
 ) {
-  if (!studentLoan?.hasStudentLoan) {
-    return 0;
+  if (studentLoan?.hasStudentLoan) {
+    const status = studentLoan.status ?? "repaying";
+    const actualMonthlyPayment = sanitizeMoney(studentLoan.actualMonthlyPayment ?? 0);
+    const statutoryMonthlyPayment = sanitizeMoney(studentLoan.statutoryMonthlyPayment ?? 0);
+    const baseMonthlyPayment =
+      status === "repaying" ? actualMonthlyPayment : statutoryMonthlyPayment;
+
+    if (baseMonthlyPayment <= 0) {
+      pushWarning(
+        warnings,
+        "MISSING_STUDENT_LOAN_PAYMENT",
+        "blocking",
+        "Vul het wettelijke of actuele DUO-maandbedrag in.",
+      );
+      return 0;
+    }
+
+    return roundMonthlyMoney(baseMonthlyPayment * getStudentDebtGrossUpFactor(mortgageRate).factor);
   }
 
-  const status = studentLoan.status ?? "repaying";
-  const actualMonthlyPayment = sanitizeMoney(studentLoan.actualMonthlyPayment ?? 0);
-  const statutoryMonthlyPayment = sanitizeMoney(studentLoan.statutoryMonthlyPayment ?? 0);
-  const baseMonthlyPayment =
-    status === "repaying" ? actualMonthlyPayment : statutoryMonthlyPayment;
+  const monthlyPayment = sanitizeMoney(studentDebtMonthlyPayment);
+  const normativeMonthlyPayment = sanitizeMoney(studentDebtNormativeMonthlyPayment);
+  const prefersNormative =
+    studentDebtRegime === "SF15" || studentDebtRegime === "SF35";
+  const baseMonthlyPayment = prefersNormative
+    ? normativeMonthlyPayment > 0
+      ? normativeMonthlyPayment
+      : monthlyPayment
+    : monthlyPayment > 0
+      ? monthlyPayment
+      : normativeMonthlyPayment;
 
   if (baseMonthlyPayment <= 0) {
-    pushWarning(
-      warnings,
-      "MISSING_STUDENT_LOAN_PAYMENT",
-      "blocking",
-      "Vul het wettelijke of actuele DUO-maandbedrag in.",
-    );
     return 0;
   }
 
@@ -164,7 +204,9 @@ function calculateLiabilityMonthlyImpact(
   input: MortgageMaxMortgageInput,
   warnings: MortgageMaxMortgageWarning[],
 ) {
-  const monthlyDebtPayments = sanitizeMoney(input.monthlyDebtPayments ?? 0);
+  const monthlyFinancialObligations = sanitizeMoney(
+    input.monthlyFinancialObligations ?? input.monthlyDebtPayments ?? 0,
+  );
   const liabilitiesImpact = (input.liabilities ?? []).reduce((total, liability) => {
     if (liability.type === "ground_lease") {
       return total + roundMonthlyMoney(sanitizeMoney(liability.annualCanon ?? 0) / 12);
@@ -198,7 +240,7 @@ function calculateLiabilityMonthlyImpact(
     return total;
   }, 0);
 
-  return roundMonthlyMoney(monthlyDebtPayments + liabilitiesImpact);
+  return roundMonthlyMoney(monthlyFinancialObligations + liabilitiesImpact);
 }
 
 function calculateEnergyLabelAllowance(property: MortgageMaxMortgagePropertyInput | undefined) {
@@ -225,15 +267,18 @@ function calculateEnergySavingAllowance(
 }
 
 function calculateLtvLimit(
-  marketValue: number,
+  propertyValue: number,
+  ltvPercentage: number,
   energyLabelAllowance: number,
   energySavingAllowance: number,
 ) {
-  if (marketValue <= 0) {
+  if (propertyValue <= 0) {
     return undefined;
   }
 
-  return roundMoney(marketValue + energyLabelAllowance + energySavingAllowance);
+  return roundMoney(
+    propertyValue * (sanitizePercent(ltvPercentage) / 100) + energyLabelAllowance + energySavingAllowance,
+  );
 }
 
 function calculateNhgLimit(
@@ -280,6 +325,34 @@ function calculateLimitingFactor(input: {
   return candidates.reduce((current, candidate) =>
     candidate[1] < current[1] ? candidate : current,
   )[0];
+}
+
+function calculateDetailedLimitingFactor(input: {
+  maxMortgageByIncome: number;
+  maxMortgageByCollateral?: number | null;
+}) {
+  if (!Number.isFinite(input.maxMortgageByIncome) || input.maxMortgageByIncome <= 0) {
+    return "unknown" as MortgageMaxMortgageDetailedLimitingFactor;
+  }
+
+  if (input.maxMortgageByCollateral === undefined || input.maxMortgageByCollateral === null) {
+    return "income" as MortgageMaxMortgageDetailedLimitingFactor;
+  }
+
+  if (!Number.isFinite(input.maxMortgageByCollateral) || input.maxMortgageByCollateral <= 0) {
+    return "unknown" as MortgageMaxMortgageDetailedLimitingFactor;
+  }
+
+  const income = roundMoney(input.maxMortgageByIncome);
+  const collateral = roundMoney(input.maxMortgageByCollateral);
+
+  if (income === collateral) {
+    return "both" as MortgageMaxMortgageDetailedLimitingFactor;
+  }
+
+  return income < collateral
+    ? ("income" as MortgageMaxMortgageDetailedLimitingFactor)
+    : ("collateral" as MortgageMaxMortgageDetailedLimitingFactor);
 }
 
 export function calculateIndicativeMaxMortgage(
@@ -329,11 +402,13 @@ export function calculateIndicativeMaxMortgage(
     pushWarning(warnings, "MISSING_TERM", "blocking", "Vul een looptijd in jaren in.");
   }
 
-  const monthlyHousingBudgetBeforeLiabilities = roundMonthlyMoney(
-    (householdIncome * annualHousingCostRatio) / 100 / 12,
-  );
+  const maxAnnualHousingCost = roundMoney((householdIncome * annualHousingCostRatio) / 100);
+  const monthlyHousingBudgetBeforeLiabilities = roundMonthlyMoney(maxAnnualHousingCost / 12);
   const studentLoanMonthlyImpact = calculateStudentLoanMonthlyImpact(
     input.studentLoan,
+    input.studentDebtMonthlyPayment ?? 0,
+    input.studentDebtNormativeMonthlyPayment ?? 0,
+    input.studentDebtRegime ?? "unknown",
     annualMortgageRateUsed,
     warnings,
   );
@@ -343,29 +418,32 @@ export function calculateIndicativeMaxMortgage(
   const monthlyHousingBudgetAfterLiabilities = roundMonthlyMoney(
     Math.max(monthlyHousingBudgetBeforeLiabilities - monthlyLiabilityImpact, 0),
   );
-  const maxMortgageByIncome = roundMoney(
-    calculatePresentValueFromMonthlyPayment({
-      monthlyPayment: monthlyHousingBudgetAfterLiabilities,
-      annualRate: annualMortgageRateUsed,
-      years: mortgageTermYears,
-    }),
-  );
+  const annuityFactor = calculateAnnuityFactor({
+    annualRate: annualMortgageRateUsed,
+    years: mortgageTermYears,
+  });
+  const maxMortgageByIncome = roundMoney(monthlyHousingBudgetAfterLiabilities * annuityFactor);
 
   const property = input.property;
-  const marketValue = sanitizeMoney(property?.marketValue ?? property?.purchasePrice ?? 0);
-  const purchasePrice = sanitizeMoney(property?.purchasePrice ?? marketValue);
+  const propertyValue = sanitizeMoney(
+    property?.propertyValue ?? property?.marketValue ?? property?.purchasePrice ?? 0,
+  );
+  const marketValue = sanitizeMoney(property?.marketValue ?? propertyValue);
+  const purchasePrice = sanitizeMoney(property?.purchasePrice ?? propertyValue);
+  const ltvPercentage = sanitizePercent(property?.ltvPercentage ?? 100);
   const energyLabelAllowance = calculateEnergyLabelAllowance(property);
   const energySavingAllowance = calculateEnergySavingAllowance(property, marketValue);
-  const maxMortgageByLtv = calculateLtvLimit(
-    marketValue,
+  const maxMortgageByCollateral = calculateLtvLimit(
+    propertyValue,
+    ltvPercentage,
     energyLabelAllowance,
     energySavingAllowance,
   );
   const maxMortgageByNhg = calculateNhgLimit(input, purchasePrice, energySavingAllowance);
 
   const limits = [maxMortgageByIncome];
-  if (maxMortgageByLtv !== undefined) {
-    limits.push(maxMortgageByLtv);
+  if (maxMortgageByCollateral !== undefined) {
+    limits.push(maxMortgageByCollateral);
   }
   if (maxMortgageByNhg !== undefined) {
     limits.push(maxMortgageByNhg);
@@ -385,7 +463,7 @@ export function calculateIndicativeMaxMortgage(
     pushWarning(warnings, "INCOME_LIMITING", "info", "Je inkomen begrenst je hypotheek.");
   }
 
-  if (maxMortgageByLtv !== undefined && maxMortgageFinal === maxMortgageByLtv) {
+  if (maxMortgageByCollateral !== undefined && maxMortgageFinal === maxMortgageByCollateral) {
     pushWarning(warnings, "LTV_LIMITING", "info", "De woningwaarde begrenst je hypotheek.");
   }
 
@@ -404,8 +482,13 @@ export function calculateIndicativeMaxMortgage(
 
   const limitingFactor = calculateLimitingFactor({
     maxMortgageByIncome,
-    maxMortgageByLtv,
+    maxMortgageByLtv: maxMortgageByCollateral ?? undefined,
     maxMortgageByNhg,
+  });
+
+  const limitingFactorDetailed = calculateDetailedLimitingFactor({
+    maxMortgageByIncome,
+    maxMortgageByCollateral,
   });
 
   const monthlyPaymentGross = roundMonthlyMoney(
@@ -417,6 +500,28 @@ export function calculateIndicativeMaxMortgage(
         })
       : 0,
   );
+
+  const maxHomeBudget =
+    propertyValue > 0 || purchasePrice > 0
+      ? roundMoney(Math.max(maxMortgageFinal + ownFunds - buyerCostsEstimate - renovationAmount, 0))
+      : null;
+
+  const debug: MortgageMaxMortgageDebug = {
+    toetsinkomen: roundMoney(householdIncome),
+    primaryIncome: roundMoney(input.grossAnnualHouseholdIncome),
+    partnerIncome: roundMoney(partnerIncome),
+    financingLoadPercentage: annualHousingCostRatio,
+    maxAnnualHousingCost,
+    maxMonthlyHousingCost: monthlyHousingBudgetBeforeLiabilities,
+    monthlyObligations: monthlyLiabilityImpact,
+    availableMortgageMonthlyCost: monthlyHousingBudgetAfterLiabilities,
+    annuityFactor,
+    interestRate: annualMortgageRateUsed,
+    durationMonths: mortgageTermMonths,
+    collateralValue: maxMortgageByCollateral ?? null,
+    ownFunds,
+    ltvPercentage: maxMortgageByCollateral !== undefined ? ltvPercentage : null,
+  };
 
   const breakdown: MortgageMaxMortgageBreakdown = {
     householdIncome: roundMoney(householdIncome),
@@ -430,10 +535,12 @@ export function calculateIndicativeMaxMortgage(
     monthlyLiabilityImpact,
     studentLoanMonthlyImpact,
     monthlyHousingBudgetAfterLiabilities,
+    propertyValue,
     purchasePrice,
     marketValue,
+    ltvPercentage,
     maxMortgageByIncome,
-    maxMortgageByLtv: maxMortgageByLtv ?? 0,
+    maxMortgageByLtv: maxMortgageByCollateral ?? 0,
     maxMortgageByNhg,
     buyerCostsEstimate,
     energySavingAllowance,
@@ -450,6 +557,12 @@ export function calculateIndicativeMaxMortgage(
 
   return {
     normYear,
+    maxMortgageByIncome,
+    maxMortgageByCollateral: maxMortgageByCollateral ?? null,
+    finalMaxMortgage: maxMortgageFinal,
+    maxHomeBudget,
+    limitingFactorDetailed,
+    debug,
     maxMortgageFinal,
     monthlyPaymentGross,
     monthlyHousingBudget: monthlyHousingBudgetAfterLiabilities,

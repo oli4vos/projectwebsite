@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { DisclosureSection } from "@/components/DisclosureSection";
 import { FieldError } from "@/components/forms/FieldError";
 import { MobileFieldFlowControls } from "@/components/MobileFieldFlowControls";
@@ -16,6 +17,7 @@ import {
   validateMortgageForm,
   type MortgageFormState,
 } from "./logic";
+import { downloadMortgagePdfReport } from "./report";
 
 function formatCurrency(value: number, maximumFractionDigits = 0) {
   return new Intl.NumberFormat("nl-NL", {
@@ -31,6 +33,16 @@ function formatPercent(value: number) {
     maximumFractionDigits: 1,
   }).format(value);
 }
+
+const limitingFactorLabels: Record<string, string> = {
+  income: "inkomen",
+  ltv: "woningwaarde",
+  nhg: "NHG",
+  "own-funds": "eigen middelen",
+  none: "geen limiet",
+  both: "inkomen en woningwaarde",
+  unknown: "onbekend",
+};
 
 function Field({
   label,
@@ -111,6 +123,7 @@ function SelectField({
 }
 
 export default function Calculator() {
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
   const { formValues, setFormValues, submittedValues, submit, hasDirtyChanges, reset } =
     useSubmittedCalculation<MortgageFormState>(defaultValues);
   const formValidation = validateMortgageForm(formValues);
@@ -148,6 +161,19 @@ export default function Calculator() {
     submit();
   }
 
+  async function handleDownloadPdf() {
+    if (!submittedValidation?.parsed || !result) {
+      return;
+    }
+
+    setIsDownloadingPdf(true);
+    try {
+      await downloadMortgagePdfReport(submittedValidation.parsed, result);
+    } finally {
+      setIsDownloadingPdf(false);
+    }
+  }
+
   return (
     <CalculatorShell
       intro={
@@ -181,6 +207,14 @@ export default function Calculator() {
             onClick={() => reset("Invoer gewist.")}
           >
             Wis invoer
+          </ToolActionButton>
+          <ToolActionButton
+            type="button"
+            variant="secondary"
+            onClick={() => void handleDownloadPdf()}
+            disabled={!result || isDownloadingPdf}
+          >
+            {isDownloadingPdf ? "PDF wordt gemaakt..." : "PDF-rapport downloaden"}
           </ToolActionButton>
         </div>
       }
@@ -420,13 +454,22 @@ export default function Calculator() {
             <>
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
                 <ResultCard
-                  label="Indicatieve maximale hypotheek"
-                  value={formatCurrency(result.maxMortgageFinal)}
+                  label="Maximale hypotheek op inkomen"
+                  value={formatCurrency(result.maxMortgageByIncome)}
                   tone="pos"
                 />
                 <ResultCard
-                  label="Bruto maandlast"
-                  value={formatCurrency(result.monthlyPaymentGross)}
+                  label="Maximale hypotheek op woningwaarde"
+                  value={result.maxMortgageByCollateral === null ? "n.v.t." : formatCurrency(result.maxMortgageByCollateral)}
+                />
+                <ResultCard
+                  label="Einduitkomst"
+                  value={formatCurrency(result.finalMaxMortgage)}
+                  tone="pos"
+                />
+                <ResultCard
+                  label="Maximaal koopbudget"
+                  value={result.maxHomeBudget === null ? "n.v.t." : formatCurrency(result.maxHomeBudget)}
                 />
                 <ResultCard
                   label="Benodigde eigen middelen"
@@ -438,9 +481,21 @@ export default function Calculator() {
                   value={formatCurrency(result.fundingGap)}
                   tone={result.fundingGap > 0 ? "neg" : "pos"}
                 />
+                <ResultCard
+                  label="Bruto maandlast"
+                  value={formatCurrency(result.monthlyPaymentGross)}
+                />
               </div>
               <p className="mt-4 text-[13px] leading-6 text-white/75">
-                Limiterend: <span className="font-medium text-white">{result.limitingFactor}</span>.{" "}
+                Limiterend:{" "}
+                <span className="font-medium text-white">
+                  {limitingFactorLabels[result.limitingFactor] ?? result.limitingFactor}
+                </span>
+                {" / "}
+                <span className="font-medium text-white">
+                  {limitingFactorLabels[result.limitingFactorDetailed] ?? result.limitingFactorDetailed}
+                </span>
+                .{" "}
                 Betrouwbaarheid: <span className="font-medium text-white">{result.confidence}</span>.
               </p>
             </>
@@ -466,12 +521,17 @@ export default function Calculator() {
               />
               <ResultRow
                 label="Maximale hypotheek op woningwaarde"
-                value={formatCurrency(result.breakdown.maxMortgageByLtv)}
+                value={result.maxMortgageByCollateral === null ? "n.v.t." : formatCurrency(result.maxMortgageByCollateral)}
                 breakdown={
-                  <>
-                    <div>Woningwaarde: {formatCurrency(result.breakdown.marketValue)}</div>
-                    <div>Energieruimte: {formatCurrency(result.breakdown.energySavingAllowance)}</div>
-                  </>
+                  result.maxMortgageByCollateral === null ? (
+                    <div>Geen woningwaarde opgegeven, dus geen aparte collateral-cap.</div>
+                  ) : (
+                    <>
+                      <div>Woningwaarde: {formatCurrency(result.breakdown.propertyValue || result.breakdown.marketValue)}</div>
+                      <div>LTV: {formatPercent(result.breakdown.ltvPercentage)}%</div>
+                      <div>Energieruimte: {formatCurrency(result.breakdown.energySavingAllowance)}</div>
+                    </>
+                  )
                 }
                 breakdownLabel="Toon LTV-berekening"
               />
