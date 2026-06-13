@@ -7,7 +7,6 @@ import { ResultCard } from "@/components/ResultCard";
 import { ResultRow } from "@/components/ResultRow";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
-import { Pill } from "@/components/ui";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { createProfilePrefillState, mergeProfilePatchIntoValues } from "@/lib/profile-prefill";
 import { buildProfilePatchFromProfile, calculateFamilyHomeScenario, exampleValues, validateFamilyHomeForm, type FamilyHomeFormState } from "./logic";
@@ -38,7 +37,7 @@ function TextField({
   return (
     <label className="block space-y-1.5">
       <div className="flex items-baseline justify-between gap-3">
-        <span className="text-[12px] uppercase tracking-[0.06em] text-[var(--muted)]">
+        <span className="text-[12px] font-medium text-[var(--muted)]">
           {label}
         </span>
         {hint ? <span className="text-[11px] text-[var(--soft)]">{hint}</span> : null}
@@ -73,7 +72,7 @@ function SelectField({ id, label, value, onChange, error, hint, options }: Selec
   return (
     <label className="block space-y-1.5">
       <div className="flex items-baseline justify-between gap-3">
-        <span className="text-[12px] uppercase tracking-[0.06em] text-[var(--muted)]">
+        <span className="text-[12px] font-medium text-[var(--muted)]">
           {label}
         </span>
         {hint ? <span className="text-[11px] text-[var(--soft)]">{hint}</span> : null}
@@ -157,6 +156,18 @@ function comparisonNote(resultValue: number | undefined, baseValue: number | und
     return "Geen verschil met het hoofdscenario";
   }
   return `Verschil t.o.v. hoofdscenario: ${formatSignedCurrency(delta)}`;
+}
+
+function formatConclusion(value: number) {
+  if (value > 0) {
+    return `Je komt ${formatCurrency(value)} tekort`;
+  }
+
+  if (value < 0) {
+    return `Je financiering is rond met ${formatCurrency(Math.abs(value))} ruimte`;
+  }
+
+  return "Je financiering sluit precies";
 }
 
 export default function Calculator() {
@@ -250,53 +261,35 @@ function CalculatorContent({
   const recurringGiftWarnings = result?.primaryScenario.warnings.filter((warning) =>
     warning.toLowerCase().includes("schenk"),
   );
+  const conclusionTone = financingGap > 0 ? "neg" : "pos";
+  const conclusionNote =
+    financingGap > 0
+      ? "Hypotheek, eigen geld en hulp van familie dekken de aankoop met deze invoer niet helemaal."
+      : "De gekozen bronnen dekken de aankoop met deze invoer.";
 
   return (
     <CalculatorShell
       intro={
         <div>
-          <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
-            Studieschuld, wonen en familiehulp
+          <div className="text-[13px] font-medium text-[var(--muted)]">
+            Verdieping: wonen
           </div>
           <h1 className="mt-2 font-serif text-[clamp(2rem,1.6rem+1.5vw,2.9rem)] leading-[1.05] tracking-[-0.03em] text-[var(--ink)]">
             Lenen of schenken naast je studieschuld
           </h1>
           <p className="mt-3 text-[14px] leading-[1.75] text-[var(--ink-2)]">
-            Deze tool is de plek waar je de leen/schenk-vraag terugvindt. Combineer
-            woningprijs, eigen geld, DUO, een familielening en schenkingen in één
-            scenario, zonder contractuele lasten en hulp van familie door elkaar te halen.
+            Combineer woningprijs, eigen geld, DUO, een familielening en schenkingen
+            in één scenario. Contractuele lasten en hulp van familie blijven apart.
           </p>
           <p className="mt-3 text-[13px] leading-[1.65] text-[var(--muted)]">
             Toekomstige periodieke schenkingen zijn onzeker. Deze tool laat daarom
             ook een scenario zonder periodieke schenking zien.
           </p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <Pill tone="accent">Starter</Pill>
-            <Pill tone="default">DUO</Pill>
-            <Pill tone="default">Familielening</Pill>
-            <Pill tone="default">Schenking</Pill>
-          </div>
-          <div className="mt-5 rounded-2xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[13px] leading-[1.7] text-[var(--muted)]">
+          <div className="mt-5 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[13px] leading-[1.7] text-[var(--muted)]">
             Geen persoonlijk advies. Deze berekening is educatief en indicatief.
             Actuele acceptatie-eisen, fiscale regels en notariële voorwaarden kunnen
             afwijken.
           </div>
-          {hasRelevantProfileValues ? (
-            <div className="mt-4 flex flex-wrap gap-3">
-              <ToolActionButton type="button" variant="secondary" onClick={applyExampleValues}>
-                Voorbeeldwaarden
-              </ToolActionButton>
-              <ToolActionButton type="button" variant="secondary" onClick={applyProfileValues}>
-                Profielwaarden
-              </ToolActionButton>
-            </div>
-          ) : (
-            <div className="mt-4 flex flex-wrap gap-3">
-              <ToolActionButton type="button" variant="secondary" onClick={applyExampleValues}>
-                Voorbeeldwaarden
-              </ToolActionButton>
-            </div>
-          )}
           {submitContextMessage ? (
             <p className="mt-3 text-[12.5px] text-[var(--muted)]">{submitContextMessage}</p>
           ) : null}
@@ -620,123 +613,110 @@ function CalculatorContent({
       result={
         <section
           id="tool-result-summary"
-          className="space-y-5 rounded-[1.5rem] border hair bg-white p-6 shadow-paper"
+          className="space-y-5 rounded-xl border hair bg-white p-5 shadow-paper"
         >
           <div>
-            <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
-              Resultaat
-            </div>
+            <div className="text-[13px] font-medium text-[var(--muted)]">Resultaat</div>
             <h2 className="mt-2 font-serif text-[clamp(1.5rem,1.25rem+0.8vw,2rem)] tracking-[-0.02em] text-[var(--ink)]">
-              Uitkomst van het basisscenario
+              Eerst de conclusie
             </h2>
             <p className="mt-2 text-[13px] leading-[1.7] text-[var(--muted)]">
-              Contractuele lasten en ontvangen schenkingen worden apart getoond.
-              Het scenario zonder periodieke schenking staat ernaast ter vergelijking.
+              De vaste verplichtingen staan los van wat je netto kwijt bent na een schenking.
             </p>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <ResultCard
-              label="Totale financiering"
-              value={formatCurrency(totalFinancing)}
-              note="Wat de gekozen bronnen samen dragen."
-            />
-            <ResultCard
-              label="Tekort / overschot"
-              value={formatSignedCurrency(financingGap)}
-              note="Positief is een tekort, negatief is overschot."
-            />
-            <ResultCard
-              label="Eigen geld gebruikt"
-              value={formatCurrency(ownFundsUsed)}
-              note="Inclusief eenmalige schenking als die aan de aankoop bijdraagt."
-            />
-            <ResultCard
-              label="Resterende buffer"
-              value={formatCurrency(remainingBuffer)}
-              note="Na aankoop en eventuele extra DUO-aflossing."
-            />
+          <ResultCard
+            label="Conclusie"
+            value={formatConclusion(financingGap)}
+            note={conclusionNote}
+            tone={conclusionTone}
+          />
+
+          <div className="grid gap-4 xl:grid-cols-2">
+            <article className="rounded-xl border hair bg-[var(--paper-soft)] p-4">
+              <h3 className="font-serif text-[1.2rem] tracking-[-0.02em] text-[var(--ink)]">
+                Vaste maandlasten (contracten)
+              </h3>
+              <p className="mt-1 text-[13px] leading-6 text-[var(--muted)]">
+                Dit moet je elke maand betalen, ook als een schenking stopt.
+              </p>
+              <div className="mt-3">
+                <ResultRow label="Bancaire maandlast" value={formatCurrency(mortgageMonthlyPayment)} />
+                <ResultRow label="DUO-maandlast" value={formatCurrency(duoMonthlyPayment)} />
+                <ResultRow label="Familielening-maandlast" value={formatCurrency(familyLoanMonthlyPayment)} />
+                <ResultRow
+                  label="Totaal vaste maandlasten"
+                  value={formatCurrency(totalContractualMonthlyPayment)}
+                  strong
+                />
+                {familyLoanResult ? (
+                  <>
+                    <ResultRow
+                      label="Totale rente familielening"
+                      value={formatCurrency(familyLoanResult.totalInterest)}
+                    />
+                    <ResultRow
+                      label="Resterende vordering familielening"
+                      value={formatCurrency(familyLoanResult.remainingDebt)}
+                    />
+                  </>
+                ) : null}
+              </div>
+            </article>
+
+            <article className="rounded-xl border hair bg-white p-4">
+              <h3 className="font-serif text-[1.2rem] tracking-[-0.02em] text-[var(--ink)]">
+                Wat je netto kwijt bent
+              </h3>
+              <p className="mt-1 text-[13px] leading-6 text-[var(--muted)]">
+                Een schenking verlaagt niet je verplichtingen, maar kan wel je netto kasstroom veranderen.
+              </p>
+              <div className="mt-3">
+                <ResultRow label="Totale financiering" value={formatCurrency(totalFinancing)} />
+                <ResultRow label="Eigen geld gebruikt" value={formatCurrency(ownFundsUsed)} />
+                <ResultRow label="Resterende buffer" value={formatCurrency(remainingBuffer)} />
+                <ResultRow
+                  label="Netto kasuitstroom na schenking"
+                  value={formatCurrency(netHouseholdCashflow)}
+                  strong
+                />
+                <ResultRow
+                  label="DUO-schuld na extra aflossing"
+                  value={formatCurrency(duoDebtAfterExtraRepayment ?? 0)}
+                  sub="Alleen extra DUO-aflossing verlaagt deze schuld; de schenking zelf niet automatisch."
+                />
+              </div>
+            </article>
           </div>
 
-          <div className="rounded-[1.25rem] border border-[var(--hair)] bg-[var(--paper-soft)] p-4">
-            <div className="mb-3 flex flex-wrap items-center gap-2">
-              <Pill tone="dark">Basisscenario</Pill>
-              {recurringGiftResult ? <Pill tone="accent">Periodieke schenking actief</Pill> : null}
-              {financingGap > 0 ? <Pill tone="neg">Tekort</Pill> : <Pill tone="pos">Gedekt</Pill>}
-            </div>
-            <div className="grid gap-1">
-              <ResultRow label="Bancaire maandlast" value={formatCurrency(mortgageMonthlyPayment)} />
-              <ResultRow label="DUO-maandlast" value={formatCurrency(duoMonthlyPayment)} />
-              <ResultRow label="Familielening-maandlast" value={formatCurrency(familyLoanMonthlyPayment)} />
+          <div className="rounded-xl border border-transparent bg-[var(--warn-soft)] p-5">
+            <h3 className="font-serif text-[1.2rem] tracking-[-0.02em] text-[var(--ink)]">
+              Toekomstige schenkingen zijn niet zeker
+            </h3>
+            <p className="mt-2 text-[13px] leading-6 text-[var(--muted)]">
+              Daarom rekenen we ook uit hoe je ervoor staat als de periodieke schenking
+              stopt of nooit komt.
+            </p>
+            <div className="mt-3">
               <ResultRow
-                label="Totale contractuele maandlast"
-                value={formatCurrency(totalContractualMonthlyPayment)}
-              />
-              <ResultRow
-                label="Netto kasuitstroom na schenking"
-                value={formatCurrency(netHouseholdCashflow)}
-              />
-              <ResultRow
-                label="DUO-schuld na extra aflossing"
-                value={formatCurrency(duoDebtAfterExtraRepayment ?? 0)}
-                sub="Alleen de extra DUO-aflossing verlaagt deze schuld; de schenking zelf niet automatisch."
-              />
-              {familyLoanResult ? (
-                <>
-                  <ResultRow
-                    label="Totale rente familielening"
-                    value={formatCurrency(familyLoanResult.totalInterest)}
-                  />
-                  <ResultRow
-                    label="Resterende vordering familielening"
-                    value={formatCurrency(familyLoanResult.remainingDebt)}
-                  />
-                </>
-              ) : null}
-            </div>
-          </div>
-
-          <div className="grid gap-3 sm:grid-cols-2">
-            <ResultCard
-              label="Scenario zonder periodieke schenking"
-              value={formatSignedCurrency(noRecurringGiftResult?.financingGap)}
-              note="Vergelijkingsscenario zonder toekomstige periodieke schenking."
-            />
-            <ResultCard
-              label="Netto kasuitstroom zonder periodieke schenking"
-              value={formatCurrency(
-                noRecurringGiftResult?.contractualMonthlyPayments?.netCashOutflowAfterReceipts ?? 0,
-              )}
-              note={comparisonNote(
-                noRecurringGiftResult?.contractualMonthlyPayments?.netCashOutflowAfterReceipts,
-                result?.primaryScenario.contractualMonthlyPayments?.netCashOutflowAfterReceipts,
-              )}
-            />
-          </div>
-
-          <DisclosureSection
-            title="Stresstest en aannames"
-            subtitle="Waarom de berekening voorzichtig blijft over toekomstige schenkingen."
-            defaultOpen
-          >
-            <div className="space-y-3">
-              <ResultRow
-                label="Toekomstige periodieke schenking"
-                value={formValues.recurringGiftEnabled ? "Onzeker en apart gemodelleerd" : "Niet gebruikt"}
-                sub="Niet automatisch behandeld als gegarandeerd inkomen of structurele leenruimte."
+                label="Periodieke schenking"
+                value={recurringGiftResult ? "Meegenomen als onzeker scenario" : "Niet gebruikt"}
+                sub="Niet behandeld als gegarandeerd inkomen of vaste lastverlaging."
               />
               <ResultRow
                 label="Scenario zonder periodieke schenking"
                 value={noRecurringGiftResult ? formatSignedCurrency(noRecurringGiftResult.financingGap) : "n.v.t."}
+                strong
               />
               <ResultRow
-                label="Stresstest gift stopt"
-                value={
-                  result?.primaryScenario.stressTests?.find((test) => test.type === "giftStops")
-                    ? "Aanwezig"
-                    : "Niet van toepassing"
-                }
-                sub="Het stress-resultaat laat zien wat er gebeurt als de periodieke schenking wegvalt."
+                label="Netto kasuitstroom zonder periodieke schenking"
+                value={formatCurrency(
+                  noRecurringGiftResult?.contractualMonthlyPayments?.netCashOutflowAfterReceipts ?? 0,
+                )}
+                sub={comparisonNote(
+                  noRecurringGiftResult?.contractualMonthlyPayments?.netCashOutflowAfterReceipts,
+                  result?.primaryScenario.contractualMonthlyPayments?.netCashOutflowAfterReceipts,
+                )}
               />
               {result?.primaryScenario.stressTests?.map((test) => (
                 <ResultRow
@@ -746,15 +726,15 @@ function CalculatorContent({
                   sub={`Effect ${formatCurrency(test.financialEffect)} · Buffer na stress ${formatCurrency(test.bufferAfterStress ?? 0)}`}
                 />
               ))}
-              {recurringGiftWarnings?.length ? (
-                <div className="rounded-xl border border-[var(--hair)] bg-white px-4 py-3 text-[13px] leading-6 text-[var(--muted)]">
-                  {recurringGiftWarnings.map((warning) => (
-                    <p key={warning}>{warning}</p>
-                  ))}
-                </div>
-              ) : null}
             </div>
-          </DisclosureSection>
+            {recurringGiftWarnings?.length ? (
+              <div className="mt-3 rounded-lg border border-[var(--hair)] bg-white/65 px-4 py-3 text-[13px] leading-6 text-[var(--muted)]">
+                {recurringGiftWarnings.map((warning) => (
+                  <p key={warning}>{warning}</p>
+                ))}
+              </div>
+            ) : null}
+          </div>
 
           <DisclosureSection title="Hoe je dit leest" subtitle="Korte uitleg bij de belangrijkste uitkomsten.">
             <div className="space-y-3 text-[13px] leading-6 text-[var(--muted)]">
@@ -813,7 +793,7 @@ function CalculatorContent({
         </DisclosureSection>
       }
       disclaimer={
-        <div className="rounded-[1.5rem] border border-[var(--hair)] bg-white p-5 text-[13px] leading-6 text-[var(--muted)] shadow-paper">
+        <div className="rounded-xl border border-[var(--hair)] bg-white p-5 text-[13px] leading-6 text-[var(--muted)] shadow-paper">
           Deze tool is een educatieve scenariovergelijking. Toekomstige periodieke
           schenkingen zijn onzeker en worden hier expliciet als stressvariant
           getoond. Fiscale, juridische en acceptatie-afspraken kunnen per jaar en

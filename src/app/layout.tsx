@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Source_Serif_4 } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import { RuntimeMonitoringBootstrap } from "@/components/RuntimeMonitoringBootstrap";
 import "./globals.css";
 
@@ -11,11 +11,6 @@ const geist = Geist({
 const geistMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-mono-ui",
-});
-
-const sourceSerif = Source_Serif_4({
-  subsets: ["latin"],
-  variable: "--font-display",
 });
 
 export const metadata: Metadata = {
@@ -31,7 +26,7 @@ type RootLayoutProps = {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="nl">
-      <body className={`${geist.variable} ${geistMono.variable} ${sourceSerif.variable}`}>
+      <body className={`${geist.variable} ${geistMono.variable}`}>
         <RuntimeMonitoringBootstrap />
         <a
           href="#main-content"

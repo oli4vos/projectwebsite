@@ -15,13 +15,12 @@ export function Logo({
   return (
     <div className="flex items-center gap-2.5" style={{ color }}>
       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <circle cx="12" cy="12" r="10" stroke={color} strokeWidth="1.4" />
-        <path d="M12 4V20M4 12H20" stroke={color} strokeWidth="1.4" />
-        <circle cx="12" cy="12" r="2.2" fill={color} />
+        <circle cx="12" cy="12" r="10" stroke={color} strokeWidth="1.6" />
+        <circle cx="12" cy="12" r="3" fill={color} />
       </svg>
       <span
-        className="font-serif font-medium tracking-tight"
-        style={{ fontSize: size * 0.96, letterSpacing: "-0.01em" }}
+        className="font-serif tracking-tight"
+        style={{ fontSize: size * 0.92, letterSpacing: "-0.01em", fontWeight: 650 }}
       >
         {name}
       </span>
@@ -29,7 +28,7 @@ export function Logo({
   );
 }
 
-type PillTone = "default" | "pos" | "neg" | "accent" | "dark";
+type PillTone = "default" | "pos" | "neg" | "accent" | "dark" | "warn";
 
 export function Pill({
   children,
@@ -40,15 +39,16 @@ export function Pill({
 }) {
   const map: Record<PillTone, string> = {
     default: "border hair bg-white text-[var(--muted)]",
-    pos: "border-transparent bg-[var(--pos-soft)] text-[oklch(40%_0.10_152)]",
-    neg: "border-transparent bg-[var(--neg-soft)] text-[oklch(40%_0.13_28)]",
-    accent: "border-transparent bg-[var(--accent-soft)] text-[oklch(40%_0.07_232)]",
+    pos: "border-transparent bg-[var(--pos-soft)] text-[oklch(38%_0.09_155)]",
+    neg: "border-transparent bg-[var(--neg-soft)] text-[oklch(38%_0.12_30)]",
+    accent: "border-transparent bg-[var(--accent-soft)] text-[oklch(38%_0.09_245)]",
     dark: "border-transparent bg-[var(--deep)] text-white",
+    warn: "border-transparent bg-[var(--warn-soft)] text-[oklch(40%_0.1_80)]",
   };
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] tabular ${map[tone]}`}
+      className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-[12px] font-medium ${map[tone]}`}
     >
       {children}
     </span>
@@ -60,8 +60,8 @@ type BtnSize = "sm" | "md" | "lg";
 
 function btnClassName(kind: BtnKind, size: BtnSize, full?: boolean, className?: string) {
   const sizes: Record<BtnSize, string> = {
-    sm: "min-h-11 px-3.5 text-[13px]",
-    md: "min-h-11 px-4 text-[14px]",
+    sm: "min-h-11 px-3.5 text-[13.5px]",
+    md: "min-h-11 px-4 text-[14.5px]",
     lg: "h-12 px-5 text-[15px]",
   };
 
@@ -69,11 +69,11 @@ function btnClassName(kind: BtnKind, size: BtnSize, full?: boolean, className?: 
     primary:
       "bg-[var(--deep)] text-white hover:bg-black hover:text-white visited:text-white",
     ghost: "bg-transparent text-[var(--ink)] hover:bg-[var(--paper-soft)]",
-    outline: "border hair bg-white text-[var(--ink)] hover:bg-[var(--paper-soft)]",
+    outline: "border hair bg-white text-[var(--ink)] hover:border-[var(--hair-2)] hover:bg-[var(--paper-soft)]",
     accent: "bg-[var(--accent)] text-white hover:brightness-110",
   };
 
-  return `inline-flex items-center justify-center gap-2 rounded-full font-medium tracking-[-0.005em] shadow-[0_0_0_rgba(0,0,0,0)] transition duration-200 hover:-translate-y-px hover:shadow-paper focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 active:translate-y-px ${sizes[size]} ${kinds[kind]} ${
+  return `inline-flex items-center justify-center gap-2 rounded-[10px] font-medium tracking-[-0.005em] transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 ${sizes[size]} ${kinds[kind]} ${
     full ? "w-full" : ""
   } ${className ?? ""}`;
 }

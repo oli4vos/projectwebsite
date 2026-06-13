@@ -110,38 +110,15 @@ export function AppDashboard({ apps }: AppDashboardProps) {
     <div className="space-y-8">
       <KnowledgeLevelSelector />
 
-      <section id="apps" className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
-        <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
-          Stap voor stap
-        </div>
+      <section id="apps" className="rounded-xl border hair bg-white p-6 shadow-paper">
+        <div className="text-[13px] font-medium text-[var(--muted)]">Alle tools</div>
         <h2 className="mt-2 font-serif text-[clamp(1.35rem,1.1rem+1vw,1.9rem)] tracking-[-0.02em] text-[var(--ink)]">
-          Begin klein. Open pas meer als je eraan toe bent.
+          Kies je volgende vraag
         </h2>
         <p className="mt-3 max-w-[62ch] text-[14px] leading-[1.65] text-[var(--ink-2)]">
-          Je hoeft niet meteen alle cijfers te weten. Kies eerst je situatie, vul
-          alleen de velden in die nodig zijn en klap de uitleg open wanneer je meer
-          wilt begrijpen.
+          Gebruik het stappenplan hierboven als startpunt, of kies hier direct
+          een tool. Uitleg en details staan standaard rustig opgeborgen.
         </p>
-        <div className="mt-5 grid gap-3 md:grid-cols-3">
-          <div className="rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] p-4">
-            <div className="text-[12px] font-medium text-[var(--ink)]">1. Begrijp DUO</div>
-            <p className="mt-1 text-[12.5px] leading-[1.55] text-[var(--muted)]">
-              Wat betaal je, wat blijft over en wat blokkeert dat?
-            </p>
-          </div>
-          <div className="rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] p-4">
-            <div className="text-[12px] font-medium text-[var(--ink)]">2. Kies met extra geld</div>
-            <p className="mt-1 text-[12.5px] leading-[1.55] text-[var(--muted)]">
-              Aflossen, buffer, sparen of beleggen naast elkaar.
-            </p>
-          </div>
-          <div className="rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] p-4">
-            <div className="text-[12px] font-medium text-[var(--ink)]">3. Ga naar wonen</div>
-            <p className="mt-1 text-[12.5px] leading-[1.55] text-[var(--muted)]">
-              Pas daarna hypotheek, familiehulp en schenking.
-            </p>
-          </div>
-        </div>
         <div className="mt-4 flex flex-wrap gap-2">
           {visibleAudienceRoutes.map((preset) => (
             <button
@@ -159,9 +136,7 @@ export function AppDashboard({ apps }: AppDashboardProps) {
           ))}
         </div>
         <div className="mt-4 rounded-xl border hair bg-[var(--paper)] p-4">
-          <div className="text-[11px] uppercase tracking-[0.12em] text-[var(--soft)]">
-            Jouw volgende vraag
-          </div>
+          <div className="text-[12px] font-medium text-[var(--soft)]">Jouw volgende vraag</div>
           <p className="mt-2 text-[14px] font-medium leading-[1.55] text-[var(--ink)]">
             {activeAudiencePreset.userQuestion}
           </p>
@@ -179,9 +154,7 @@ export function AppDashboard({ apps }: AppDashboardProps) {
                   href={`/apps/${app.slug}`}
                   className="group rounded-lg border hair bg-white p-3 transition hover:-translate-y-px hover:shadow-paper focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 active:translate-y-0"
                 >
-                  <div className="text-[10px] uppercase tracking-[0.1em] text-[var(--soft)]">
-                    Startpunt
-                  </div>
+                  <div className="text-[11px] font-medium text-[var(--soft)]">Startpunt</div>
                   <div className="mt-1 text-[13px] font-medium leading-[1.35] text-[var(--ink)]">
                     {app.title}
                   </div>
@@ -200,36 +173,12 @@ export function AppDashboard({ apps }: AppDashboardProps) {
         </div>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {filteredGroupedApps.map((group) => (
-          <article key={group.title} className="rounded-xl border hair bg-white p-4 shadow-paper">
-            <h3 className="font-serif text-[1.2rem] tracking-[-0.01em] text-[var(--ink)]">
-              {group.title}
-            </h3>
-            <p className="mt-2 text-[13px] leading-[1.6] text-[var(--muted)]">
-              <GlossaryText text={group.description} />
-            </p>
-            <div className="mt-3 flex items-center justify-between">
-              <span className="text-[12px] text-[var(--soft)]">
-                {group.apps.length} {group.apps.length === 1 ? "tool" : "tools"}
-              </span>
-              <Link
-                href={`#${toAnchorId(group.title, "groep")}`}
-                className="text-[12px] text-[var(--ink)] underline"
-              >
-                Bekijk tools
-              </Link>
-            </div>
-          </article>
-        ))}
-      </section>
-
       <section className="space-y-6">
         {filteredGroupedApps.map((group) => (
           <section
             id={toAnchorId(group.title, "groep")}
             key={group.title}
-            className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper"
+            className="rounded-xl border hair bg-white p-6 shadow-paper"
           >
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
@@ -262,11 +211,9 @@ export function AppDashboard({ apps }: AppDashboardProps) {
       {artifactApps.length > 0 ? (
         <section
           id="apps-artifacts"
-          className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper"
+          className="rounded-xl border hair bg-white p-6 shadow-paper"
         >
-          <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
-            Aparte categorie
-          </div>
+          <div className="text-[13px] font-medium text-[var(--muted)]">Aparte categorie</div>
           <h4 className="mt-2 font-serif text-[clamp(1.2rem,1.05rem+0.7vw,1.5rem)] tracking-[-0.015em] text-[var(--ink)]">
             Artifacts tools (invulbladen)
           </h4>
@@ -280,9 +227,7 @@ export function AppDashboard({ apps }: AppDashboardProps) {
                 key={group.category}
                 className="rounded-xl border border-[var(--hair)] bg-[var(--paper)]/45 p-4"
               >
-                <div className="text-[11px] uppercase tracking-[0.12em] text-[var(--soft)]">
-                  Artifact-categorie
-                </div>
+                <div className="text-[12px] font-medium text-[var(--soft)]">Artifact-categorie</div>
                 <h5 className="mt-1 font-serif text-[1.05rem] tracking-[-0.01em] text-[var(--ink)]">
                   {group.category}
                 </h5>
@@ -299,15 +244,13 @@ export function AppDashboard({ apps }: AppDashboardProps) {
 
       <section
         id="aannames"
-        className={`grid gap-4 rounded-[1.5rem] border hair bg-white p-6 shadow-paper ${
+        className={`grid gap-4 rounded-xl border hair bg-white p-6 shadow-paper ${
           ENABLE_PROFILE ? "md:grid-cols-2" : ""
         }`}
       >
         {ENABLE_PROFILE ? (
           <div>
-            <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
-              Maak het persoonlijker
-            </div>
+            <div className="text-[13px] font-medium text-[var(--muted)]">Maak het persoonlijker</div>
             <p className="mt-2 text-[14px] leading-[1.65] text-[var(--ink-2)]">
               Profiel is optioneel en blijft lokaal in je browser. Tools kunnen daarmee velden voorinvullen.
             </p>
@@ -319,9 +262,7 @@ export function AppDashboard({ apps }: AppDashboardProps) {
           </div>
         ) : null}
         <div>
-          <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
-            Controleer aannames
-          </div>
+          <div className="text-[13px] font-medium text-[var(--muted)]">Controleer aannames</div>
           <p className="mt-2 text-[14px] leading-[1.65] text-[var(--ink-2)]">
             Bekijk met welke percentages en standaardwaarden de site rekent.
           </p>

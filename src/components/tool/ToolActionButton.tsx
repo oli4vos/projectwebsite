@@ -17,7 +17,7 @@ function classesFor(variant: ToolActionButtonVariant, size: ToolActionButtonSize
 
   const widthClass = full ? "w-full justify-center" : "";
   const base =
-    "inline-flex items-center rounded-full transition";
+    "inline-flex items-center rounded-lg transition duration-200 focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 active:translate-y-px";
 
   return `${base} ${sizeClass} ${variantClass} ${widthClass}`.trim();
 }
@@ -73,4 +73,3 @@ export function ToolActionLinkButton({
     </Link>
   );
 }
-
