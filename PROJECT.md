@@ -168,6 +168,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/lib/number-input.ts`: centrale parser voor numerieke invoer; komma wordt als decimaalpunt behandeld
 - `src/lib/copy-glossary.ts`: centrale woordenlijst voor gebruikerstaal bij financiële termen en enumlabels
 - `src/components/GlossaryText.tsx`: maakt bekende financiële begrippen klikbaar met korte hover/focus-uitleg
+- `src/lib/knowledge-sources.ts`: centrale bronregisters en bronhiërarchie voor kennisbankdocumenten
 - `src/lib/duo/`: centrale DUO-domeinlaag met wettelijk maandbedrag, relevant maandbedrag per situatie en scenariofuncties voor extra aflossen
 - `src/lib/planning/`: centrale planninghelpers voor doelgroep-/levensgebeurtenis-tools zoals koop-vs-huur, schulden-volgorde en kind-wordt-18
 - `src/lib/duo/calculations.test.ts`: regressietests voor centrale DUO-berekenfuncties
