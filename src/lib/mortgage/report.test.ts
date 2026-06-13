@@ -35,19 +35,43 @@ describe("mortgage PDF report", () => {
     });
 
     expect(report.title).toContain("Maximale hypotheek");
+    expect(report.timeline).toHaveLength(12);
+    expect(report.timeline[0].title).toContain("Normset");
+    expect(report.timeline[1].title).toContain("Toetsinkomen");
+    expect(report.timeline[2].title).toContain("Toetsrente");
+    expect(report.timeline[3].title).toContain("Financieringslastpercentage");
+    expect(report.timeline[9].formula).toContain("min(");
+    expect(report.timeline[11].outcome.label).toContain("bruto maandlast");
+    expect(report.sources.some((source) => source.key === "mortgage-regulation")).toBe(true);
+    expect(report.sources.some((source) => source.key === "student-loan")).toBe(true);
+    expect(report.sections[0].title).toBe("Resultatentabel");
     expect(report.summaryLines.some((line) => line.label === "Einduitkomst")).toBe(true);
-    expect(report.sections.some((section) => section.title === "3. Inkomensberekening")).toBe(true);
-    expect(report.sections.some((section) => section.title === "4. Woningwaarde- en koopbudgetberekening")).toBe(true);
-    expect(report.sections.some((section) => section.title === "6. Waarschuwingen")).toBe(true);
-    expect(report.sections.some((section) => section.title === "7. Aannames")).toBe(true);
+    expect(report.sections.some((section) => section.title === "Inkomens- en verplichtingentabel")).toBe(true);
+    expect(report.sections.some((section) => section.title === "Woningwaarde, NHG en eigen middelen")).toBe(true);
 
     const studentLoanLine = report.sections
-      .find((section) => section.title === "3. Inkomensberekening")
-      ?.lines?.find((line) => line.label === "Maandlast studieschuld");
+      .find((section) => section.title === "Inkomens- en verplichtingentabel")
+      ?.lines?.find((line) => line.label === "Studieschuldimpact");
 
     expect(studentLoanLine?.note).toContain("Brutering");
     expect(report.warnings.length).toBeGreaterThan(0);
     expect(report.assumptions.length).toBeGreaterThan(0);
+  });
+
+  it("documents the AFM test-rate path before the financing-load lookup", () => {
+    const shortFixedRateInput = {
+      ...input,
+      annualMortgageRate: 3.8,
+      fixedRatePeriodMonths: 60,
+      afmStressAnnualRate: 5,
+    };
+    const result = calculateIndicativeMaxMortgage(shortFixedRateInput);
+    const report = buildMortgagePdfReport(shortFixedRateInput, result);
+
+    expect(result.breakdown.testRateUsed).toBe(5);
+    expect(result.debug.interestRate).toBe(5);
+    expect(report.timeline[2].formula).toContain("max(");
+    expect(report.timeline[3].lines.some((line) => line.value === "5,0%")).toBe(true);
   });
 
   it("creates a stable filename from the final mortgage amount", () => {

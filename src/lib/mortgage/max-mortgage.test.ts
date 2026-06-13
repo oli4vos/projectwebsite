@@ -94,6 +94,7 @@ describe("calculateIndicativeMaxMortgage", () => {
         grossAnnualHouseholdIncome: 45_000,
         annualMortgageRate,
         mortgageTermYears: 30,
+        incomeHousingCostRatio: 24,
       }),
     );
 
@@ -102,6 +103,23 @@ describe("calculateIndicativeMaxMortgage", () => {
       expect(results[index].debug.annuityFactor).toBeLessThan(results[index - 1].debug.annuityFactor);
       expect(results[index].debug.availableMortgageMonthlyCost).toBe(results[0].debug.availableMortgageMonthlyCost);
     }
+  });
+
+  it("uses the AFM test rate for financing-load lookup and principal conversion when fixed for less than ten years", () => {
+    const result = calculateIndicativeMaxMortgage({
+      grossAnnualHouseholdIncome: 60_000,
+      annualMortgageRate: 3.8,
+      fixedRatePeriodMonths: 60,
+      afmStressAnnualRate: 5,
+      mortgageTermYears: 30,
+    });
+
+    expect(result.breakdown.testRateUsed).toBe(5);
+    expect(result.breakdown.testRateSource).toBe("afm_stress_rate");
+    expect(result.breakdown.annualHousingCostRatio).toBe(24.6);
+    expect(result.debug.interestRate).toBe(5);
+    expect(result.breakdown.financingLoadTableYear).toBe(2026);
+    expect(result.breakdown.financingLoadTableVersion).toContain("2026");
   });
 
   it("tracks student-loan impacts separately from generic obligations", () => {

@@ -14,6 +14,49 @@ export type GrossUpFactorBand = {
   label: string;
 };
 
+export type MortgageFinancingLoadAgeGroup = "beforeAow" | "fromAow";
+
+export type MortgageFinancingLoadRateBand = {
+  maxRate: number | null;
+  label: string;
+};
+
+export type MortgageFinancingLoadRow = {
+  minIncome: number;
+  percentages: readonly number[];
+};
+
+export type MortgageFinancingLoadData = {
+  normYear: number;
+  versionLabel: string;
+  sourceLabel: string;
+  sourceUrl: string;
+  lastChecked: string;
+  status: AssumptionStatus;
+  rateBands: readonly MortgageFinancingLoadRateBand[];
+  beforeAow: readonly MortgageFinancingLoadRow[];
+  fromAow: readonly MortgageFinancingLoadRow[];
+};
+
+export type MortgageFinancingLoadTable = {
+  normYear: number;
+  versionLabel: string;
+  sourceLabel: string;
+  sourceUrl: string;
+  lastChecked: string;
+  status: AssumptionStatus;
+  ageGroup: MortgageFinancingLoadAgeGroup;
+  rateBands: readonly MortgageFinancingLoadRateBand[];
+  rows: readonly MortgageFinancingLoadRow[];
+};
+
+export type MortgageFinancingLoadLookupInput = {
+  annualIncome: number;
+  mortgageRate: number;
+  ageYears?: number;
+  year?: number;
+};
+
 export type RepaymentRuleKey =
   | "SF35"
   | "SF15"

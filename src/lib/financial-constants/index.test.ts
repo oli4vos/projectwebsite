@@ -4,6 +4,8 @@ import {
   getDefaultFinancialYear,
   getDuoRateForRule,
   getFinancialConstants,
+  getMortgageFinancingLoadRatio,
+  getMortgageFinancingLoadTable,
   getStudentDebtGrossUpFactor,
 } from "@/lib/financial-constants";
 
@@ -27,6 +29,28 @@ describe("financial constants helpers", () => {
   it("selects the gross-up factor band by mortgage rate", () => {
     expect(getStudentDebtGrossUpFactor(3.6, 2026).factor).toBe(1.2);
     expect(getStudentDebtGrossUpFactor(4.2, 2026).factor).toBe(1.25);
+  });
+
+  it("looks up the official financing-load table for the expected age group and rate band", () => {
+    expect(
+      getMortgageFinancingLoadRatio({
+        annualIncome: 55_000,
+        mortgageRate: 4.5,
+      }),
+    ).toBe(23.6);
+
+    expect(
+      getMortgageFinancingLoadRatio({
+        annualIncome: 55_000,
+        mortgageRate: 4.5,
+        ageYears: 68,
+      }),
+    ).toBe(31.1);
+
+    const table = getMortgageFinancingLoadTable();
+    expect(table.normYear).toBe(2026);
+    expect(table.versionLabel).toContain("2026");
+    expect(table.sourceUrl).toContain("officielebekendmakingen.nl");
   });
 
   it("returns available years in ascending order", () => {

@@ -5,6 +5,7 @@
   "scripts": {
     "create:tool": "node scripts/create-tool.mjs",
     "generate:apps": "node scripts/generate-app-registry.mjs",
+    "update:mortgage-financing-load-table": "node scripts/update-mortgage-financing-load-table.mjs",
     "import:artifact-tools": "node scripts/import-artifact-staging-to-apps.mjs",
     "browser:compare": "tsx scripts/hypotheek-browser-compare.ts",
     "predev": "npm run generate:apps",

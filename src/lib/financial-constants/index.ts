@@ -2,10 +2,15 @@ import {
   DEFAULT_FINANCIAL_YEAR,
   FINANCIAL_CONSTANTS_BY_YEAR,
 } from "@/lib/financial-constants/years";
+import {
+  getMortgageFinancingLoadPercentage,
+  getMortgageFinancingLoadTable,
+} from "@/lib/financial-constants/mortgage-financing-load";
 import type {
   AnnualFinancialConstants,
   GrossUpFactorBand,
   RepaymentRuleKey,
+  MortgageFinancingLoadLookupInput,
 } from "@/lib/financial-constants/types";
 
 function sanitizeYear(year?: number) {
@@ -88,11 +93,22 @@ export function getIndicativeIncomeHousingCostRatio(year?: number) {
   return getFinancialConstants(year).mortgage.indicativeIncomeHousingCostRatio;
 }
 
+export function getMortgageFinancingLoadRatio(input: MortgageFinancingLoadLookupInput) {
+  return getMortgageFinancingLoadPercentage(input);
+}
+
 export type {
   AnnualFinancialConstants,
   AssumptionMeta,
   AssumptionStatus,
   DuoIncomeBasedRule,
   GrossUpFactorBand,
+  MortgageFinancingLoadData,
+  MortgageFinancingLoadAgeGroup,
+  MortgageFinancingLoadLookupInput,
+  MortgageFinancingLoadRateBand,
+  MortgageFinancingLoadRow,
+  MortgageFinancingLoadTable,
   RepaymentRuleKey,
 } from "@/lib/financial-constants/types";
+export { getMortgageFinancingLoadTable };

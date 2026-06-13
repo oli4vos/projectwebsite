@@ -1,4 +1,5 @@
 import type {
+  MortgageCalculationTimelineStep,
   MortgageMaxMortgageInput,
   MortgageMaxMortgageResult,
   MortgagePdfReport,
@@ -154,6 +155,114 @@ function renderParagraph(doc: PdfDocument, text: string, y: number) {
   return lines.length * 12 + 2;
 }
 
+function timelineStepHeight(
+  doc: PdfDocument,
+  step: MortgageCalculationTimelineStep,
+) {
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const textWidth = pageWidth - PAGE_MARGIN * 2 - 52;
+  let height = 34;
+  height += doc.splitTextToSize(step.explanation, textWidth).length * 11 + 8;
+  if (step.formula) {
+    height += doc.splitTextToSize(step.formula, textWidth - 16).length * 11 + 18;
+  }
+  for (const line of step.lines) {
+    const value = `${line.label}: ${line.value}${line.note ? ` — ${line.note}` : ""}`;
+    height += doc.splitTextToSize(value, textWidth).length * 10 + 5;
+  }
+  const outcome = `${step.outcome.label}: ${step.outcome.value}`;
+  height += doc.splitTextToSize(outcome, textWidth - 16).length * 11 + 22;
+  if (step.sourceKeys.length > 0) {
+    height += 18;
+  }
+  return height;
+}
+
+function renderTimelineStep(
+  doc: PdfDocument,
+  step: MortgageCalculationTimelineStep,
+  y: number,
+) {
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const contentWidth = pageWidth - PAGE_MARGIN * 2;
+  const textX = PAGE_MARGIN + 52;
+  const textWidth = contentWidth - 52;
+  const totalHeight = timelineStepHeight(doc, step);
+
+  doc.setDrawColor(209, 215, 224);
+  doc.setFillColor(249, 250, 251);
+  doc.rect(PAGE_MARGIN, y, contentWidth, totalHeight, "FD");
+
+  doc.setFillColor(20, 27, 39);
+  doc.rect(PAGE_MARGIN + 12, y + 12, 28, 28, "F");
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.setTextColor(255, 255, 255);
+  doc.text(String(step.step), PAGE_MARGIN + 26, y + 30, { align: "center" });
+
+  let currentY = y + 18;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.setTextColor(20, 27, 39);
+  doc.text(step.title, textX, currentY, { maxWidth: textWidth });
+  currentY += 18;
+
+  const explanationLines = doc.splitTextToSize(step.explanation, textWidth);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9);
+  doc.setTextColor(71, 85, 105);
+  doc.text(explanationLines, textX, currentY, { maxWidth: textWidth });
+  currentY += explanationLines.length * 11 + 8;
+
+  if (step.formula) {
+    const formulaLines = doc.splitTextToSize(step.formula, textWidth - 16);
+    const formulaHeight = formulaLines.length * 11 + 12;
+    doc.setFillColor(237, 242, 247);
+    doc.rect(textX, currentY - 4, textWidth, formulaHeight, "F");
+    doc.setFont("courier", "normal");
+    doc.setFontSize(8.5);
+    doc.setTextColor(31, 41, 55);
+    doc.text(formulaLines, textX + 8, currentY + 7, {
+      maxWidth: textWidth - 16,
+    });
+    currentY += formulaHeight + 6;
+  }
+
+  for (const line of step.lines) {
+    const value = `${line.label}: ${line.value}${line.note ? ` — ${line.note}` : ""}`;
+    const valueLines = doc.splitTextToSize(value, textWidth);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8.5);
+    doc.setTextColor(51, 65, 85);
+    doc.text(valueLines, textX, currentY, { maxWidth: textWidth });
+    currentY += valueLines.length * 10 + 5;
+  }
+
+  const outcome = `${step.outcome.label}: ${step.outcome.value}`;
+  const outcomeLines = doc.splitTextToSize(outcome, textWidth - 16);
+  const outcomeHeight = outcomeLines.length * 11 + 12;
+  doc.setFillColor(229, 245, 237);
+  doc.rect(textX, currentY - 4, textWidth, outcomeHeight, "F");
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9);
+  doc.setTextColor(23, 92, 65);
+  doc.text(outcomeLines, textX + 8, currentY + 7, {
+    maxWidth: textWidth - 16,
+  });
+  currentY += outcomeHeight + 5;
+
+  if (step.sourceKeys.length > 0) {
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(7.5);
+    doc.setTextColor(100, 116, 139);
+    doc.text(`Bronnen: ${step.sourceKeys.join(", ")}`, textX, currentY + 5, {
+      maxWidth: textWidth,
+    });
+  }
+
+  return totalHeight;
+}
+
 function renderMortgagePdfDocument(doc: PdfDocument, report: MortgagePdfReport) {
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
@@ -188,15 +297,18 @@ function renderMortgagePdfDocument(doc: PdfDocument, report: MortgagePdfReport) 
 
   drawPageHeader();
 
-  ensureSpace(120);
-  y = renderSectionTitle(doc, "Samenvatting", "Belangrijkste uitkomst en beperkende factor.", y);
-  report.summaryLines.forEach((line) => {
-    const lineHeight = Math.max(
-      doc.splitTextToSize(line.label, 220).length,
-      doc.splitTextToSize(line.value, pageWidth - PAGE_MARGIN * 2 - 220 - 12).length,
-    ) * LINE_HEIGHT + (line.note ? 18 : 8);
-    ensureSpace(lineHeight + 8);
-    y += renderLineItem(doc, line.label, line.value, line.note, y) + 6;
+  ensureSpace(80);
+  y = renderSectionTitle(
+    doc,
+    "Berekeningsvolgorde",
+    "De stappen hieronder staan in dezelfde volgorde als waarin de engine de hypotheekindicatie opbouwt.",
+    y,
+  );
+
+  report.timeline.forEach((step) => {
+    const requiredHeight = timelineStepHeight(doc, step);
+    ensureSpace(requiredHeight + 10);
+    y += renderTimelineStep(doc, step, y) + 10;
   });
 
   report.sections.forEach((section) => {
@@ -238,6 +350,26 @@ function renderMortgagePdfDocument(doc: PdfDocument, report: MortgagePdfReport) 
       const lineHeight = doc.splitTextToSize(assumption, pageWidth - PAGE_MARGIN * 2 - 16).length * 12 + 8;
       ensureSpace(lineHeight + 8);
       y += renderParagraph(doc, `• ${assumption}`, y) + 4;
+    });
+  }
+
+  if (report.sources.length > 0) {
+    ensureSpace(60);
+    y += SECTION_GAP;
+    y = renderSectionTitle(
+      doc,
+      "Bronnenregister",
+      "De broncodes in de tijdlijn verwijzen naar deze publicaties.",
+      y,
+    );
+    report.sources.forEach((source) => {
+      const sourceText = `${source.key} — ${source.organization}: ${source.title}. ${source.appliesTo} ${source.url}`;
+      const sourceHeight = doc.splitTextToSize(
+        sourceText,
+        pageWidth - PAGE_MARGIN * 2,
+      ).length * 12 + 8;
+      ensureSpace(sourceHeight + 8);
+      y += renderParagraph(doc, sourceText, y) + 6;
     });
   }
 

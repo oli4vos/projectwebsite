@@ -2,6 +2,8 @@ import {
   getDefaultFinancialYear,
   getFinancialConstants,
   getIndicativeIncomeHousingCostRatio,
+  getMortgageFinancingLoadRatio,
+  getMortgageFinancingLoadTable,
   getStudentDebtGrossUpFactor,
 } from "@/lib/financial-constants";
 import { calculateAnnuityPayment } from "@/lib/mortgage/annuity";
@@ -374,7 +376,7 @@ export function calculateIndicativeMaxMortgage(
     "Deze berekening is indicatief en geen hypotheekadvies.",
   );
   assumptions.push(
-    `Gebaseerd op normjaar ${normYear} en de indicatieve woninglastfactor uit de financiële constants.`,
+    `Gebaseerd op normjaar ${normYear}; de gebruikte tabelversie en eventuele fallback worden afzonderlijk vastgelegd.`,
   );
 
   const { householdIncome, partnerIncome } = resolveHouseholdIncome(input);
@@ -384,11 +386,44 @@ export function calculateIndicativeMaxMortgage(
     financialConstants.mortgage.defaultMortgageTermYears,
   );
   const mortgageTermMonths = Math.max(Math.round(mortgageTermYears * 12), 0);
+  const financingLoadTable = getMortgageFinancingLoadTable(input.borrowerAgeYears);
+  const financingLoadTableRatio = getMortgageFinancingLoadRatio({
+    annualIncome: householdIncome,
+    mortgageRate: mortgageRateResolution.testRateUsed,
+    ageYears: input.borrowerAgeYears,
+    year: normYear,
+  });
+  const fallbackHousingCostRatio =
+    getIndicativeIncomeHousingCostRatio(normYear) ??
+    financialConstants.mortgage.indicativeIncomeHousingCostRatio;
+  const financingLoadSource =
+    input.incomeHousingCostRatio !== undefined
+      ? ("input" as const)
+      : financingLoadTableRatio !== null
+        ? ("official_table" as const)
+        : ("fallback" as const);
   const annualHousingCostRatio = sanitizePercent(
     input.incomeHousingCostRatio ??
-      getIndicativeIncomeHousingCostRatio(normYear) ??
-      financialConstants.mortgage.indicativeIncomeHousingCostRatio,
+      financingLoadTableRatio ??
+      fallbackHousingCostRatio,
   );
+
+  assumptions.push(
+    financingLoadSource === "official_table"
+      ? `Financieringslastpercentage uit ${financingLoadTable.versionLabel} (${financingLoadTable.ageGroup === "fromAow" ? "AOW-leeftijd bereikt" : "AOW-leeftijd niet bereikt"}).`
+      : financingLoadSource === "input"
+        ? "Financieringslastpercentage is handmatig opgegeven."
+        : `Financieringslastpercentage gebruikt de indicatieve fallback van normjaar ${normYear}.`,
+  );
+
+  if (financingLoadSource === "fallback") {
+    pushWarning(
+      warnings,
+      "FINANCING_LOAD_TABLE_FALLBACK",
+      "warning",
+      "De officiële financieringslasttabel paste niet bij het gekozen normjaar; een indicatieve fallback is gebruikt.",
+    );
+  }
 
   if (householdIncome <= 0) {
     pushWarning(warnings, "MISSING_INCOME", "blocking", "Vul je bruto jaarinkomen in.");
@@ -419,7 +454,7 @@ export function calculateIndicativeMaxMortgage(
     Math.max(monthlyHousingBudgetBeforeLiabilities - monthlyLiabilityImpact, 0),
   );
   const annuityFactor = calculateAnnuityFactor({
-    annualRate: annualMortgageRateUsed,
+    annualRate: mortgageRateResolution.testRateUsed,
     years: mortgageTermYears,
   });
   const maxMortgageByIncome = roundMoney(monthlyHousingBudgetAfterLiabilities * annuityFactor);
@@ -516,7 +551,7 @@ export function calculateIndicativeMaxMortgage(
     monthlyObligations: monthlyLiabilityImpact,
     availableMortgageMonthlyCost: monthlyHousingBudgetAfterLiabilities,
     annuityFactor,
-    interestRate: annualMortgageRateUsed,
+    interestRate: mortgageRateResolution.testRateUsed,
     durationMonths: mortgageTermMonths,
     collateralValue: maxMortgageByCollateral ?? null,
     ownFunds,
@@ -531,6 +566,15 @@ export function calculateIndicativeMaxMortgage(
     testRateSource: mortgageRateResolution.testRateSource,
     mortgageTermMonths,
     annualHousingCostRatio,
+    financingLoadSource,
+    financingLoadTableYear:
+      financingLoadSource === "official_table" ? financingLoadTable.normYear : undefined,
+    financingLoadTableVersion:
+      financingLoadSource === "official_table" ? financingLoadTable.versionLabel : undefined,
+    financingLoadTableSourceUrl:
+      financingLoadSource === "official_table" ? financingLoadTable.sourceUrl : undefined,
+    financingLoadAgeGroup:
+      financingLoadSource === "official_table" ? financingLoadTable.ageGroup : undefined,
     monthlyHousingBudgetBeforeLiabilities,
     monthlyLiabilityImpact,
     studentLoanMonthlyImpact,

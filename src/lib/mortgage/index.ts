@@ -26,6 +26,8 @@ export type {
 } from "@/lib/mortgage/types";
 export type {
   MortgagePdfReport,
+  MortgageCalculationTimelineStep,
   MortgageReportLine,
+  MortgageReportSource,
   MortgageReportSection,
 } from "@/lib/mortgage/report";

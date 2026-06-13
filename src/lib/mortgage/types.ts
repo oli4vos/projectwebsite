@@ -39,6 +39,7 @@ export type MortgageMaxMortgageWarningCode =
   | "MISSING_INCOME"
   | "MISSING_RATE"
   | "MISSING_TERM"
+  | "FINANCING_LOAD_TABLE_FALLBACK"
   | "LTV_LIMITING"
   | "INCOME_LIMITING"
   | "NHG_LIMITING"
@@ -115,6 +116,7 @@ export type MortgageMaxMortgageInput = {
   annualMortgageRate?: number;
   fixedRatePeriodMonths?: number;
   mortgageTermYears?: number;
+  borrowerAgeYears?: number;
   householdType?: MortgageMaxMortgageHouseholdType;
   repaymentType?: MortgageMaxMortgageRepaymentType;
   monthlyFinancialObligations?: number;
@@ -141,6 +143,11 @@ export type MortgageMaxMortgageBreakdown = {
   testRateSource: "input" | "afm_stress_rate";
   mortgageTermMonths: number;
   annualHousingCostRatio: number;
+  financingLoadSource: "input" | "official_table" | "fallback";
+  financingLoadTableYear?: number;
+  financingLoadTableVersion?: string;
+  financingLoadTableSourceUrl?: string;
+  financingLoadAgeGroup?: "beforeAow" | "fromAow";
   monthlyHousingBudgetBeforeLiabilities: number;
   monthlyLiabilityImpact: number;
   studentLoanMonthlyImpact: number;
