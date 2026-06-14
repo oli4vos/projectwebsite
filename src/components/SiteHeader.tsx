@@ -10,6 +10,7 @@ const navItems = [
   { href: "/#apps", label: "Alle tools", mobileLabel: "Tools" },
   { href: "/kennisbank", label: "Kennisbank", mobileLabel: "Kennis" },
   { href: "/variabelen", label: "Aannames", mobileLabel: "Aannames" },
+  { href: "/over", label: "Over", mobileLabel: "Over" },
 ] as const;
 
 function navClassName(active: boolean) {

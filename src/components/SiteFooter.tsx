@@ -41,6 +41,12 @@ export function SiteFooter() {
             Aannames
           </Link>
           <Link
+            href="/over"
+            className={footerLinkClassName}
+          >
+            Over
+          </Link>
+          <Link
             href="/apps/studieschuld-vs-beleggen"
             className={footerLinkClassName}
           >
