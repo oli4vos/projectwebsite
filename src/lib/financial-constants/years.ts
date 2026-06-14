@@ -11,9 +11,9 @@ export const FINANCIAL_CONSTANTS_BY_YEAR: Record<number, AnnualFinancialConstant
           sourceLabel: "DUO rente bij DUO",
           lastChecked: "2026-05-18",
           status: "definitief",
-          sourceUrl: "https://www.duo.nl/particulier/studieschuld-terugbetalen/rentemiddeling",
+          sourceUrl: "https://duo.nl/particulier/studieschuld-terugbetalen/terugbetalingsregels.jsp",
           sourceTier: "overheidsuitleg",
-          notes: "DUO-rente volgt de officiële vaststelling; de draagkrachtvrijstellingen en -percentages berusten op de studiefinanciering-regelgeving (aparte bron volgt).",
+          notes: "DUO-rente volgt de officiële vaststelling via https://www.duo.nl/particulier/rente/rente-voor-terugbetalers.jsp; draagkrachtvrijstellingen en -percentages berusten op de studiefinanciering-regelgeving.",
         },
         rates: {
           SF35: 2.33,
@@ -149,7 +149,7 @@ export const FINANCIAL_CONSTANTS_BY_YEAR: Record<number, AnnualFinancialConstant
           sourceLabel: "Belastingdienst box 3 voorlopige aanslag 2026",
           lastChecked: "2026-05-18",
           status: "voorlopig",
-          sourceUrl: "https://www.belastingdienst.nl/box-3-vermogensbelasting",
+          sourceUrl: "https://www.belastingdienst.nl/box3",
           sourceTier: "overheidsuitleg",
           notes:
             "Box 3-percentages voor banktegoeden en schulden kunnen voorlopig zijn en later definitief worden vastgesteld.",
