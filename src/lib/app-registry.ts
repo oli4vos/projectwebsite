@@ -7,7 +7,7 @@ export const appRegistry = [
   {
     "slug": "artifact-hypotheek-wonen-maximale-hypotheek",
     "title": "Maximale hypotheek",
-    "description": "Indicatieve tool voor maximale leencapaciteit op basis van inkomen, woningwaarde, schulden en NHG.",
+    "description": "Indicatieve tool voor starters zonder bestaande hypotheek: schat je maximale hypotheek op basis van inkomen, woningwaarde, studieschuld en NHG.",
     "type": "frontend",
     "category": "Hypotheek",
     "tags": [
@@ -19,7 +19,7 @@ export const appRegistry = [
     ],
     "status": "active",
     "visibility": "public",
-    "reasonHint": "Indicatieve tool voor starters en doorstromers die hun maximale hypotheek willen inschatten.",
+    "reasonHint": "Indicatieve tool voor starters zonder bestaande hypotheek die hun maximale hypotheek willen inschatten.",
     "assumptionsUsed": [
       "mortgage"
     ],

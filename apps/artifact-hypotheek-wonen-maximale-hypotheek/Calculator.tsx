@@ -185,8 +185,9 @@ export default function Calculator() {
             Maximale hypotheek
           </h2>
           <p className="mt-3 text-[14px] leading-[1.7] text-[var(--ink-2)]">
-            Een zelfstandige, indicatieve tool voor maximale leencapaciteit op basis van inkomen,
-            woningwaarde, schulden, NHG en een eenvoudige stressrente.
+            Een indicatieve tool voor starters zonder bestaande hypotheek. Schat je maximale
+            leencapaciteit op basis van inkomen, woningwaarde, studieschuld, NHG en een eenvoudige
+            stressrente.
           </p>
         </>
       }
