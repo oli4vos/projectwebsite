@@ -274,9 +274,9 @@ function CalculatorContent({
           <div className="text-[13px] font-medium text-[var(--muted)]">
             Verdieping: wonen
           </div>
-          <h1 className="mt-2 font-serif text-[clamp(2rem,1.6rem+1.5vw,2.9rem)] leading-[1.05] tracking-[-0.03em] text-[var(--ink)]">
+          <h2 className="mt-2 font-serif text-[clamp(2rem,1.6rem+1.5vw,2.9rem)] leading-[1.05] tracking-[-0.03em] text-[var(--ink)]">
             Lenen of schenken naast je studieschuld
-          </h1>
+          </h2>
           <p className="mt-3 text-[14px] leading-[1.75] text-[var(--ink-2)]">
             Combineer woningprijs, eigen geld, DUO, een familielening en schenkingen
             in één scenario. Contractuele lasten en hulp van familie blijven apart.

@@ -19,7 +19,7 @@ import {
   getOutputTypeLabel,
   getRiskLevelLabel,
 } from "@/lib/copy-glossary";
-import { ENABLE_PROFILE } from "@/lib/feature-flags";
+import { ENABLE_KNOWLEDGE_LEVEL, ENABLE_PROFILE } from "@/lib/feature-flags";
 import { appRegistry, appRegistryBySlug } from "@/lib/app-registry";
 
 type AppDetailPageProps = {
@@ -79,7 +79,7 @@ export default async function AppDetailPage({ params }: AppDetailPageProps) {
       <main id="main-content" className="page-shell min-h-[100dvh] pb-10 pt-8 lg:pb-14">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-[13px] text-[var(--muted)] transition hover:text-[var(--ink)]"
+          className="inline-flex min-h-11 items-center gap-2 rounded-lg text-[13px] text-[var(--muted)] transition hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
         >
           ← Terug naar dashboard
         </Link>
@@ -110,15 +110,17 @@ export default async function AppDetailPage({ params }: AppDetailPageProps) {
         </section>
 
         <section className="pt-6">
-          <div className="mb-4 rounded-xl border hair bg-white px-4 py-3 shadow-paper">
-            <KnowledgeLevelHint />
-          </div>
+          {ENABLE_KNOWLEDGE_LEVEL ? (
+            <div className="mb-4 rounded-xl border hair bg-white px-4 py-3 shadow-paper">
+              <KnowledgeLevelHint />
+            </div>
+          ) : null}
           <AppRenderer slug={app.slug} />
         </section>
 
         <section className="mt-6">
           <details className="rounded-[1.5rem] border hair bg-white p-5 shadow-paper [&_summary::-webkit-details-marker]:hidden">
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-[13px] font-medium text-[var(--ink)]">
+            <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-lg text-[13px] font-medium text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2">
               Toolcontext en aannames
               <span className="text-[var(--muted)]">Uitklappen</span>
             </summary>

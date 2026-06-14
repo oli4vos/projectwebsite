@@ -7,5 +7,9 @@ export function FieldError({ message }: FieldErrorProps) {
     return null;
   }
 
-  return <p className="text-sm text-red-700">{message}</p>;
+  return (
+    <p role="alert" className="text-sm text-red-700">
+      {message}
+    </p>
+  );
 }

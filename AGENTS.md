@@ -52,3 +52,27 @@ Lees dit eerst voordat je berekeningen, manifests of routing aanpast.
 - Blijft de bestaande output exact gelijk of expliciet gemotiveerd gewijzigd?
 - Is de wijziging backward-compatible voor bestaande URL's en tools?
 
+## UX- en frontendregels
+
+- Gebruikersbegrip en taakvoltooiing gaan voor technische voorkeur of visuele vernieuwing.
+- Ontwerp en test mobile-first. Controleer minimaal 390 px mobiel en 1440 px desktop.
+- Introduceer geen nieuw interactiepatroon wanneer een bestaand gedeeld component hetzelfde probleem oplost.
+- Hergebruik `CalculatorShell`, `ToolActionButton`, `MobileFieldFlowControls`, `FieldError`, `DisclosureSection` en de centrale UI-componenten waar passend.
+- Een calculator toont op mobiel eerst de invoer. Na berekenen mag de flow naar het resultaat scrollen.
+- Knoppen en primaire links hebben waar mogelijk een aanraakvlak van minimaal 44 px hoog.
+- Elk invoerveld heeft een zichtbaar label of een gelijkwaardige programmatische naam. Een placeholder is geen label.
+- Fouten verschijnen bij het betreffende veld, worden begrijpelijk beschreven en zijn voor hulptechnologie waarneembaar.
+- Focusstates, toetsenbordbediening, semantische HTML en voldoende contrast zijn verplicht.
+- Respecteer `prefers-reduced-motion`. Voeg geen essentiële informatie toe die alleen via animatie zichtbaar is.
+- Nieuwe schermen bevatten ook relevante loading-, empty-, error- en disabled states.
+- Verander bestaande gebruikersstromen alleen met een expliciete motivatie en regressietest.
+- Werk bij UX-wijzigingen ook `UX_GUIDELINES.md`, `DESIGN_SYSTEM.md` of `docs/UX_AUDIT_2026-06-13.md` bij wanneer de standaard of status verandert.
+
+## UX-check voor oplevering
+
+- Werkt de primaire taak zonder horizontale scroll op 390 px?
+- Is er precies één paginabrede `h1`?
+- Is de tabvolgorde logisch en blijft focus zichtbaar?
+- Zijn CTA, validatie en resultaatstatus begrijpelijk zonder vakkennis?
+- Zijn mobiele vervolgstappen en de uiteindelijke berekenactie bereikbaar?
+- Blijft dezelfde flow op desktop efficiënt en scanbaar?

@@ -36,9 +36,13 @@ export function useMobileFieldFlow(fieldIds: string[]): UseMobileFieldFlowResult
   }
 
   function goNext() {
-    setActiveIndex((current) =>
-      Math.min(current + 1, Math.max(0, sanitizedFieldIds.length - 1)),
-    );
+    setActiveIndex((current) => {
+      const next = Math.min(
+        current + 1,
+        Math.max(0, sanitizedFieldIds.length - 1),
+      );
+      return next;
+    });
   }
 
   function goPrev() {

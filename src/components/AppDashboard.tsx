@@ -125,7 +125,7 @@ export function AppDashboard({ apps }: AppDashboardProps) {
               key={preset.id}
               type="button"
               onClick={() => applyAudienceFilter(preset.id)}
-              className={`rounded-full border px-3 py-1.5 text-[12px] transition ${
+              className={`min-h-11 rounded-full border px-3 py-2 text-[12px] transition focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 active:translate-y-px ${
                 activeAudience === preset.id
                   ? "border-[var(--ink)] bg-[var(--deep)] text-white"
                   : "border-[var(--hair)] bg-white text-[var(--ink)] hover:bg-[var(--paper-soft)]"

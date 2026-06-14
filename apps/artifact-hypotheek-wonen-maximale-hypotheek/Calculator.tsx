@@ -421,15 +421,17 @@ export default function Calculator() {
             ) : null}
           </section>
 
-          <ToolActionButton
-            type="submit"
-            variant="submit"
-            size="md"
-            full
-            disabled={!formValidation.parsed}
-          >
-            {submittedValues && hasDirtyChanges ? "Bereken opnieuw" : "Bereken maximale hypotheek"}
-          </ToolActionButton>
+          <div className="hidden md:block">
+            <ToolActionButton
+              type="submit"
+              variant="submit"
+              size="md"
+              full
+              disabled={!formValidation.parsed}
+            >
+              {submittedValues && hasDirtyChanges ? "Bereken opnieuw" : "Bereken maximale hypotheek"}
+            </ToolActionButton>
+          </div>
 
           <MobileFieldFlowControls
             current={mobileFlow.activeIndex + 1}
@@ -459,8 +461,18 @@ export default function Calculator() {
                   tone="pos"
                 />
                 <ResultCard
-                  label="Maximale hypotheek op woningwaarde"
-                  value={result.maxMortgageByCollateral === null ? "n.v.t." : formatCurrency(result.maxMortgageByCollateral)}
+                  label="Impact DUO-schuld"
+                  value={
+                    result.breakdown.studentLoanBorrowingCapacityImpact > 0
+                      ? `− ${formatCurrency(result.breakdown.studentLoanBorrowingCapacityImpact)}`
+                      : formatCurrency(0)
+                  }
+                  note="Indicatief minder leencapaciteit door de gebruteerde DUO-maandlast."
+                  tone={
+                    result.breakdown.studentLoanBorrowingCapacityImpact > 0
+                      ? "neg"
+                      : "default"
+                  }
                 />
                 <ResultCard
                   label="Einduitkomst"

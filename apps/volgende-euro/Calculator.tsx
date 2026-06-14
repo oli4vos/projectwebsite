@@ -799,7 +799,7 @@ function CalculatorContent({ initialValues, hasRelevantProfileValues, profilePat
         </select>
       </label>
 
-      <div className="space-y-3 border-t border-[var(--hair)] pt-4">
+      <div className="hidden space-y-3 border-t border-[var(--hair)] pt-4 md:block">
         <ToolActionButton type="submit" variant="submit" size="md" full disabled={!parsedValues}>
           {submittedValues && hasDirtyChanges ? "Bereken opnieuw" : "Bereken"}
         </ToolActionButton>

@@ -80,8 +80,17 @@ a {
 
 button,
 input,
-select {
+select,
+textarea {
   font: inherit;
+}
+
+label,
+input,
+select,
+textarea,
+button {
+  min-width: 0;
 }
 
 input::placeholder {
@@ -266,4 +275,19 @@ select,
 textarea,
 button {
   max-width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }

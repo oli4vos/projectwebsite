@@ -472,6 +472,9 @@ export function calculateIndicativeMaxMortgage(
     annualRate: mortgageRateResolution.testRateUsed,
     years: mortgageTermYears,
   });
+  const studentLoanBorrowingCapacityImpact = roundMoney(
+    studentLoanMonthlyImpact * annuityFactor,
+  );
   const baseMaxMortgageByIncome = roundMoney(
     monthlyHousingBudgetAfterLiabilities * annuityFactor,
   );
@@ -599,6 +602,7 @@ export function calculateIndicativeMaxMortgage(
     monthlyHousingBudgetBeforeLiabilities,
     monthlyLiabilityImpact,
     studentLoanMonthlyImpact,
+    studentLoanBorrowingCapacityImpact,
     monthlyHousingBudgetAfterLiabilities,
     baseMaxMortgageByIncome,
     energyLabelAllowance,

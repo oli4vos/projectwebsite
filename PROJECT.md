@@ -463,7 +463,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - formatting via centrale helpers in `src/lib/chart-utils.ts`;
   - geen losse per-tool formatteringslogica dupliceren voor standaard chartlabels.
 - Mobile-first is verplicht: elke nieuwe component of tool moet standaard goed werken op mobiel.
-- Headernavigatie toont altijd de actuele toolcategorieën op basis van `appRegistry`; bij nieuwe categorieën in manifests verschijnen deze automatisch in het menu zonder handmatige header-edit.
+- Headernavigatie bevat vaste hoofdroutes. Toolcategorieën en toolkaarten op de homepage komen uit `appRegistry` en de centrale doelgroep- en toolgroepen.
 - Uitvoerige QA-rondes of brede responsive testmatrices alleen uitvoeren als de gebruiker daarom vraagt én dit bevestigt.
 - Bij runtime laadproblemen na deploy is er een Nederlandse error-fallback via `src/app/error.tsx` en `src/app/global-error.tsx`.
 - Bij “Deze pagina kon niet goed laden”: eerst hard refresh (`Cmd+Shift+R`) of sitegegevens wissen voor `oli4vos.github.io`.
@@ -483,8 +483,8 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - aanbevelingen zijn startpunten, geen financieel advies
   - technische metadata blijft buiten de primaire homepageflow
 - Mobiele tool-layout is gecentraliseerd via `src/components/tool/CalculatorShell.tsx`:
-  - op mobiel staat de samenvatting/resultaatkaart eerst
-  - daarna volgt het formulier met mobile field flow
+  - op mobiel staat de invoer eerst
+  - na berekenen scrollt de tool naar de samenvatting/resultaatkaart
   - op desktop blijft de twee-kolomsindeling actief
   - shell ondersteunt ook een slot-opbouw voor consistente toolflow:
     `intro`, `startActions`, `inputs`, `submitAction`, `result`, `details`, `disclaimer`
@@ -510,7 +510,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - In `studieschuld-vs-beleggen` blijft box 3 een optionele verdieping (toggle + disclosure); de hoofdflow blijft licht en bruikbaar zonder fiscale invoer.
 - In `studieschuld-vs-beleggen` wordt box 3 nu jaarlijks toegepast in het scenario; belasting wordt per jaar betaald en groeit daarna niet mee in compound.
 - `volgende-euro` is een educatieve prioriteitenhulp (geen adviesengine) en moet altijd uitleggen waarom een keuze hoger/lager scoort.
-- Mobiele header schakelt bij omlaag scrollen naar compacte modus (logo + Rekentools/Mijn profiel) en klapt terug open bij omhoog scrollen.
+- De mobiele header gebruikt korte, herkenbare labels zodat alle hoofdroutes zonder afgekapt label zichtbaar blijven.
 - In `hypotheek-impact-studieschuld` is de oude snelle vuistregel verwijderd; de kern blijft netto DUO-last -> brutering -> annuïtaire impact.
 - `hypotheek-impact-studieschuld` toont nu ook een indicatieve inkomens-naar-hypotheek-capaciteit als context (geen officiële leennormberekening).
 - Er zijn nu meerdere pechgeneratie/studieschuld-tools; hou tone of voice en disclaimerstijl tussen die modules consistent.
@@ -561,6 +561,10 @@ De site moet mobile-first worden ontworpen. Elke pagina en rekentool moet goed w
   - desktop: meerdere kolommen alleen als dit de begrijpelijkheid verbetert
 - CTA’s en invoervelden moeten op mobiel makkelijk aanklikbaar zijn.
 - Minimaal aanraakvlak voor knoppen en interactieve elementen: ongeveer 44px hoog.
+- Lange `select`-opties mogen de mobiele viewport niet verbreden; labels en controls moeten `min-width: 0` respecteren.
+- Een mobiele veldflow toont één kernveld tegelijk, met zichtbare voortgang en altijd bereikbare vorige/volgende acties.
+- Toon geen tweede berekenknop naast de mobiele veldnavigatie. De laatste stap gebruikt de primaire actie van `MobileFieldFlowControls`.
+- Respecteer de systeemvoorkeur voor minder beweging via `prefers-reduced-motion`.
 
 ### Typografie
 

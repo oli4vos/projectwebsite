@@ -35,10 +35,11 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 |---|---|---|---|---|---|
 | Toolbibliotheek + categorie-navigatie | actief | n.v.t. | aan | Homepage en routes draaien publiek | n.v.t. |
 | Financiële kennisbank (`/kennisbank`) | actief | n.v.t. | aan | Centrale kennislaag los van tools, met horizon- en keuzekaders | n.v.t. |
-| Publieke calculators (app-registry) | actief | `visibility: "public"` | aan | 14 publieke tools in static build | n.v.t. |
-| Draft tools (concept) | hidden-draft | `visibility: "hidden"` | uit | `box3-indicatie`, `compensatie-pechgeneratie`, `private-lease-impact-hypotheek` | zet manifest op `public` + checks draaien |
+| Publieke calculators (app-registry) | actief | `visibility: "public"` | aan | 6 publieke tools in de huidige registry | n.v.t. |
+| Draft tools (concept) | hidden-draft | `visibility: "hidden"` | uit | 153 manifests zijn niet publiek; valideer per tool vóór publicatie | zet manifest op `public` + checks draaien |
 | Centrale tax/DUO/pension/constants lagen | actief | n.v.t. | aan | Hergebruikt door meerdere tools | n.v.t. |
 | Submit-driven calculatorflow | actief | n.v.t. | aan | Patroon beschikbaar via `CalculatorShell` + submitlogica | n.v.t. |
+| DUO-impact in maximale-hypotheektool | actief | n.v.t. | aan | Kernuitkomst toont rechtsboven de indicatieve daling van de leencapaciteit | n.v.t. |
 | Chart-standaardisatie (jaar/euro/tooltips) | actief | n.v.t. | aan | Centrale charthelpers/componenten | n.v.t. |
 | Profielfunctie (`/profiel`, prefillpad) | uitgeschakeld | `NEXT_PUBLIC_ENABLE_PROFILE` | `false` | UI/CTA's verborgen, code blijft intact | zet op `1` en valideer profiel + tools |
 | Kennisniveaufunctionaliteit | uitgeschakeld | `NEXT_PUBLIC_ENABLE_KNOWLEDGE_LEVEL` | `false` | Bewust niet zichtbaar in productieflow | zet op `1` en valideer homepage/toolhints |
@@ -52,6 +53,8 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 
 | Datum | Commit | Wijziging | Impact |
 |---|---|---|---|
+| 2026-06-14 | `pending` | DUO-impact centraal berekend en rechtsboven in de maximale-hypotheekuitkomst geplaatst | Maximale hypotheek / studieschuld |
+| 2026-06-13 | `pending` | Mobiele calculatorflow, invoersemantiek en projectbrede UX-richtlijnen aangescherpt | Publieke calculatorflow en toegankelijkheid |
 | 2026-05-28 | `36c6b0e` | Saved scenario’s direct heropenen in oorspronkelijke tool toegevoegd (deep-linkflow) | Saved calculations MVP |
 | 2026-05-28 | `pending` | Financiële kennisbankpagina + centrale kennislaag toegevoegd | Kennislaag / navigatie |
 | 2026-05-28 | `85d5864` | Nieuwe doelgroeptools live gezet + glossary-dekking verbreed | Toolzichtbaarheid + copy |

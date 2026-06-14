@@ -466,7 +466,7 @@ function CalculatorContent({
 
   return (
     <CalculatorShell>
-      <section className="order-2 min-w-0 rounded-[1.5rem] border hair bg-white p-6 shadow-paper lg:order-1">
+      <section className="order-1 min-w-0 rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
         <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
           Scenario
         </div>
@@ -833,7 +833,7 @@ function CalculatorContent({
             onComplete={handleCalculate}
           />
 
-          <div className="flex flex-wrap items-center gap-3 border-t border-[var(--hair)] pt-2">
+          <div className="hidden flex-wrap items-center gap-3 border-t border-[var(--hair)] pt-2 md:flex">
             <ToolActionButton type="button" onClick={handleCalculate} variant="accent" size="md">
               {submittedValues && hasDirtyChanges ? "Bereken opnieuw" : "Bereken"}
             </ToolActionButton>
@@ -844,7 +844,7 @@ function CalculatorContent({
         </div>
       </section>
 
-      <section className="order-1 min-w-0 space-y-5 lg:order-2">
+      <section className="order-2 min-w-0 space-y-5">
         <div id="tool-result-summary" className="rounded-[1.5rem] bg-[var(--deep)] p-6 text-white shadow-paper-lg">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="text-[11px] uppercase tracking-[0.12em] text-white/55">

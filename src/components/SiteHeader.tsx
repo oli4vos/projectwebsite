@@ -6,14 +6,14 @@ import { BtnLink, Logo } from "@/components/ui";
 import { ENABLE_PROFILE } from "@/lib/feature-flags";
 
 const navItems = [
-  { href: "/#route", label: "Stappenplan" },
-  { href: "/#apps", label: "Alle tools" },
-  { href: "/kennisbank", label: "Kennisbank" },
-  { href: "/variabelen", label: "Aannames" },
+  { href: "/#route", label: "Stappenplan", mobileLabel: "Stappen" },
+  { href: "/#apps", label: "Alle tools", mobileLabel: "Tools" },
+  { href: "/kennisbank", label: "Kennisbank", mobileLabel: "Kennis" },
+  { href: "/variabelen", label: "Aannames", mobileLabel: "Aannames" },
 ] as const;
 
 function navClassName(active: boolean) {
-  return `inline-flex min-h-10 shrink-0 items-center rounded-lg px-3 py-2 text-[13px] transition focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 ${
+  return `inline-flex min-h-11 shrink-0 items-center rounded-lg px-3 py-2 text-[13px] transition focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 ${
     active
       ? "bg-white text-[var(--ink)] shadow-paper"
       : "text-[var(--muted)] hover:bg-white hover:text-[var(--ink)]"
@@ -30,7 +30,7 @@ export function SiteHeader() {
           <Link
             href="/"
             aria-label="Naar home"
-            className="rounded-lg focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
+            className="inline-flex min-h-11 items-center rounded-lg px-1 focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
           >
             <Logo size={22} />
           </Link>
@@ -73,7 +73,7 @@ export function SiteHeader() {
               href={item.href}
               className={navClassName(pathname === item.href)}
             >
-              {item.label}
+              {item.mobileLabel}
             </Link>
           ))}
           {ENABLE_PROFILE ? (

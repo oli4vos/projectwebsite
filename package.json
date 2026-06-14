@@ -14,6 +14,7 @@
     "build": "next build",
     "start": "next start",
     "test": "vitest run",
+    "test:ux": "playwright test",
     "check": "npm run generate:apps && git diff --exit-code src/lib/app-registry.ts src/lib/app-components.tsx && npm run test && npm run lint && npm run typecheck && npm run build",
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit"

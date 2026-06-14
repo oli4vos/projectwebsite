@@ -579,7 +579,7 @@ function CalculatorContent({
 
   return (
     <CalculatorShell>
-      <section className="order-2 min-w-0 rounded-[1.5rem] border hair bg-white p-6 shadow-paper lg:order-1">
+      <section className="order-1 min-w-0 rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
         <div>
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
             Rekentool v2
@@ -663,7 +663,7 @@ function CalculatorContent({
                   updateField("situation", event.target.value as DuoSituation)
                 }
                 onKeyDown={mobileFlow.handleEnterAdvance("situation")}
-                className="ring-focus hair h-12 rounded-md border bg-white px-4 text-[15px] text-[var(--ink)] outline-none"
+                className="ring-focus hair h-12 w-full min-w-0 rounded-md border bg-white px-4 text-[15px] text-[var(--ink)] outline-none"
               >
                 {Object.entries(situationLabels).map(([value, label]) => (
                   <option key={value} value={value}>
@@ -683,7 +683,7 @@ function CalculatorContent({
                   updateField("repaymentRule", event.target.value as RepaymentRule)
                 }
                 onKeyDown={mobileFlow.handleEnterAdvance("repaymentRule")}
-                className="ring-focus hair h-12 rounded-md border bg-white px-4 text-[15px] text-[var(--ink)] outline-none"
+                className="ring-focus hair h-12 w-full min-w-0 rounded-md border bg-white px-4 text-[15px] text-[var(--ink)] outline-none"
               >
                 {Object.entries(ruleLabels).map(([value, label]) => (
                   <option key={value} value={value}>
@@ -1046,6 +1046,8 @@ function CalculatorContent({
               ) : null}
             </label>
           </div>
+        </div>
+
           <MobileFieldFlowControls
             current={mobileFlow.activeIndex + 1}
             total={mobileFlow.total}
@@ -1056,7 +1058,7 @@ function CalculatorContent({
             onNext={mobileFlow.goNext}
             onComplete={handleCalculate}
           />
-          <div className="mt-3 flex flex-wrap items-center gap-3 border-t border-[var(--hair)] pt-2">
+          <div className="mt-3 hidden flex-wrap items-center gap-3 border-t border-[var(--hair)] pt-2 md:flex">
             <ToolActionButton type="button" onClick={handleCalculate} variant="accent" size="md">
               {submittedValues && hasDirtyChanges ? "Bereken opnieuw" : "Bereken"}
             </ToolActionButton>
@@ -1064,7 +1066,6 @@ function CalculatorContent({
               De tool rekent alleen met ingevulde gegevens.
             </p>
           </div>
-        </div>
 
         {hasErrors ? (
           <div className="mt-6 rounded-xl border border-[var(--neg-soft)] bg-[var(--neg-soft)]/55 px-4 py-3 text-sm text-[oklch(35%_0.13_28)]">
@@ -1074,7 +1075,7 @@ function CalculatorContent({
         ) : null}
       </section>
 
-      <section className="order-1 min-w-0 space-y-5 lg:order-2">
+      <section className="order-2 min-w-0 space-y-5">
         <div id="tool-result-summary" className="rounded-[1.5rem] bg-[var(--deep)] p-6 text-white shadow-paper-lg">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="text-[11px] uppercase tracking-[0.12em] text-white/55">

@@ -186,6 +186,11 @@ describe("calculateIndicativeMaxMortgage", () => {
 
     expect(withLoan.maxMortgageByIncome).toBeLessThan(withoutLoan.maxMortgageByIncome);
     expect(withLoan.breakdown.studentLoanMonthlyImpact).toBeGreaterThan(0);
+    expect(withLoan.breakdown.studentLoanBorrowingCapacityImpact).toBeCloseTo(
+      withoutLoan.maxMortgageByIncome - withLoan.maxMortgageByIncome,
+      1,
+    );
+    expect(withoutLoan.breakdown.studentLoanBorrowingCapacityImpact).toBe(0);
     expect(withLoan.debug.monthlyObligations).toBeGreaterThan(0);
   });
 

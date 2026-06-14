@@ -2,7 +2,6 @@ import type {
   MortgageMaxMortgageInput,
   MortgageMaxMortgageResult,
 } from "@/lib/mortgage/types";
-import { calculatePresentValueFromMonthlyPayment } from "@/lib/mortgage/present-value";
 
 export type MortgageReportLine = {
   label: string;
@@ -500,13 +499,7 @@ export function buildMortgagePdfReport(
       input.property?.purchasePrice,
   );
   const studentLoanImpactOnLeencapaciteit =
-    result.breakdown.studentLoanMonthlyImpact > 0
-      ? calculatePresentValueFromMonthlyPayment({
-          monthlyPayment: result.breakdown.studentLoanMonthlyImpact,
-          annualRate: result.debug.interestRate,
-          years: result.debug.durationMonths / 12,
-        })
-      : 0;
+    result.breakdown.studentLoanBorrowingCapacityImpact;
 
   const summaryLines: MortgageReportLine[] = [
     { label: "Maximale hypotheek op inkomen", value: formatCurrency(result.maxMortgageByIncome, 2) },

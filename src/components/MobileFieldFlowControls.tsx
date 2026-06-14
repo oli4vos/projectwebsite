@@ -1,3 +1,5 @@
+"use client";
+
 type MobileFieldFlowControlsProps = {
   current: number;
   total: number;
@@ -34,8 +36,17 @@ export function MobileFieldFlowControls({
 
   return (
     <div className="mt-4 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] p-3 md:hidden">
-      <div className="mb-2 text-[12px] text-[var(--muted)]">
+      <div aria-live="polite" className="mb-2 text-[12px] text-[var(--muted)]">
         Veld {current} van {total}
+      </div>
+      <div className="mb-3 h-1 overflow-hidden rounded-full bg-white" aria-hidden="true">
+        <div
+          className="h-full rounded-full bg-[var(--accent)] transition-transform duration-200"
+          style={{
+            transform: `scaleX(${Math.min(1, Math.max(0, current / total))})`,
+            transformOrigin: "left",
+          }}
+        />
       </div>
       <div className="flex gap-2">
         <button

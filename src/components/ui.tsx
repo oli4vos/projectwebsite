@@ -67,13 +67,13 @@ function btnClassName(kind: BtnKind, size: BtnSize, full?: boolean, className?: 
 
   const kinds: Record<BtnKind, string> = {
     primary:
-      "bg-[var(--deep)] text-white hover:bg-black hover:text-white visited:text-white",
+      "bg-[var(--deep)] text-white hover:bg-[var(--ink-2)] hover:text-white visited:text-white",
     ghost: "bg-transparent text-[var(--ink)] hover:bg-[var(--paper-soft)]",
     outline: "border hair bg-white text-[var(--ink)] hover:border-[var(--hair-2)] hover:bg-[var(--paper-soft)]",
     accent: "bg-[var(--accent)] text-white hover:brightness-110",
   };
 
-  return `inline-flex items-center justify-center gap-2 rounded-[10px] font-medium tracking-[-0.005em] transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 ${sizes[size]} ${kinds[kind]} ${
+  return `inline-flex items-center justify-center gap-2 rounded-[10px] font-medium tracking-[-0.005em] transition duration-150 focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-50 disabled:active:translate-y-0 ${sizes[size]} ${kinds[kind]} ${
     full ? "w-full" : ""
   } ${className ?? ""}`;
 }

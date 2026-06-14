@@ -170,7 +170,7 @@ export default function Calculator() {
       intro={
         <>
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
-            Concepttool (hidden)
+            Beta-rekentool
           </div>
           <h2 className="mt-2 font-serif text-[28px] tracking-[-0.02em] text-[var(--ink)]">
             Welke schuld eerst?
@@ -219,13 +219,17 @@ export default function Calculator() {
                 </div>
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
                   <label className="grid gap-1">
+                    <span className="text-[11px] font-medium text-[var(--muted)]">
+                      Bedrag voor {kindLabels[debt.kind].toLowerCase()}
+                    </span>
                     <input
                       inputMode="decimal"
-                      placeholder="Bedrag"
+                      placeholder="€ 0"
                       value={debt.amount}
                       onChange={(event) =>
                         updateDebt(index, { amount: event.target.value })
                       }
+                      aria-invalid={Boolean(errors.debts[index]?.amount)}
                       className="ring-focus hair h-11 rounded-md border bg-white px-3 font-mono text-[15px] outline-none"
                     />
                     <FieldError
@@ -237,13 +241,17 @@ export default function Calculator() {
                     />
                   </label>
                   <label className="grid gap-1">
+                    <span className="text-[11px] font-medium text-[var(--muted)]">
+                      Rente voor {kindLabels[debt.kind].toLowerCase()}
+                    </span>
                     <input
                       inputMode="decimal"
-                      placeholder="Rente %"
+                      placeholder="0%"
                       value={debt.interestRate}
                       onChange={(event) =>
                         updateDebt(index, { interestRate: event.target.value })
                       }
+                      aria-invalid={Boolean(errors.debts[index]?.interestRate)}
                       className="ring-focus hair h-11 rounded-md border bg-white px-3 font-mono text-[15px] outline-none"
                     />
                     <FieldError

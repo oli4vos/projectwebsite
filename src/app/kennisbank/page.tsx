@@ -153,7 +153,7 @@ export default function KnowledgeBasePage() {
                     <Link
                       key={slug}
                       href={`/apps/${slug}`}
-                      className="inline-flex items-center rounded-full border border-[var(--hair)] bg-white px-3 py-1.5 text-[12px] text-[var(--ink)] transition hover:bg-[var(--paper-soft)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
+                      className="inline-flex min-h-11 items-center rounded-full border border-[var(--hair)] bg-white px-3 py-2 text-[12px] text-[var(--ink)] transition hover:bg-[var(--paper-soft)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
                     >
                       {getRelatedToolLabel(slug)}
                     </Link>
@@ -209,7 +209,7 @@ export default function KnowledgeBasePage() {
                     href={source.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="underline decoration-dotted underline-offset-4 transition hover:text-[var(--ink)]"
+                    className="inline-flex min-h-11 items-center rounded-md underline decoration-dotted underline-offset-4 transition hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
                   >
                     Open bron
                   </a>
@@ -250,7 +250,7 @@ export default function KnowledgeBasePage() {
                         href={source.url}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center rounded-full border border-[var(--hair)] bg-white px-3 py-1.5 text-[12px] text-[var(--ink)] transition hover:bg-[var(--paper-soft)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
+                        className="inline-flex min-h-11 items-center rounded-full border border-[var(--hair)] bg-white px-3 py-2 text-[12px] text-[var(--ink)] transition hover:bg-[var(--paper-soft)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
                         title={`${source.title} · ${source.publisher}`}
                       >
                         {source.title}
@@ -294,7 +294,7 @@ export default function KnowledgeBasePage() {
                         href={source.url}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center rounded-full border border-[var(--hair)] bg-white px-3 py-1.5 text-[12px] text-[var(--ink)] transition hover:bg-[var(--paper-soft)]"
+                        className="inline-flex min-h-11 items-center rounded-full border border-[var(--hair)] bg-white px-3 py-2 text-[12px] text-[var(--ink)] transition hover:bg-[var(--paper-soft)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
                       >
                         {source.title}
                       </a>

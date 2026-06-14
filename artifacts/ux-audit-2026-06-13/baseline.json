@@ -1,0 +1,3408 @@
+[
+  {
+    "mode": "mobile",
+    "name": "home",
+    "route": "/",
+    "status": 200,
+    "errors": [],
+    "title": "Financiële rekentools",
+    "bodyWidth": 390,
+    "viewportWidth": 390,
+    "overflow": false,
+    "interactiveCount": 48,
+    "smallTargets": [
+      {
+        "tag": "a",
+        "name": "Ga direct naar de inhoud",
+        "width": 1,
+        "height": 1
+      },
+      {
+        "tag": "a",
+        "name": "Naar home",
+        "width": 72,
+        "height": 32
+      },
+      {
+        "tag": "a",
+        "name": "Stappenplan",
+        "width": 100,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Alle tools",
+        "width": 79,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Kennisbank",
+        "width": 93,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Aannames",
+        "width": 87,
+        "height": 40
+      },
+      {
+        "tag": "button",
+        "name": "Alle tools",
+        "width": 91,
+        "height": 38
+      },
+      {
+        "tag": "button",
+        "name": "Start bij DUO",
+        "width": 117,
+        "height": 38
+      },
+      {
+        "tag": "button",
+        "name": "Daarna wonen",
+        "width": 126,
+        "height": 38
+      },
+      {
+        "tag": "button",
+        "name": "maandlast: Het bedrag dat je gemiddeld per maand betaalt, bijvoorbeeld voor huur, hypotheek, verzekering of aflossing.",
+        "width": 63,
+        "height": 22
+      },
+      {
+        "tag": "button",
+        "name": "buffer: Geld dat je achter de hand houdt voor tegenvallers, zodat je niet direct hoeft te lenen of verkopen.",
+        "width": 35,
+        "height": 22
+      },
+      {
+        "tag": "button",
+        "name": "buffer: Geld dat je achter de hand houdt voor tegenvallers, zodat je niet direct hoeft te lenen of verkopen.",
+        "width": 37,
+        "height": 23
+      },
+      {
+        "tag": "button",
+        "name": "buffer: Geld dat je achter de hand houdt voor tegenvallers, zodat je niet direct hoeft te lenen of verkopen.",
+        "width": 37,
+        "height": 22
+      },
+      {
+        "tag": "button",
+        "name": "achteraf betalen: Nu kopen en later betalen. Het voelt klein, maar kan je overzicht en maandruimte verminderen.",
+        "width": 101,
+        "height": 22
+      },
+      {
+        "tag": "button",
+        "name": "maandlast: Het bedrag dat je gemiddeld per maand betaalt, bijvoorbeeld voor huur, hypotheek, verzekering of aflossing.",
+        "width": 65,
+        "height": 23
+      },
+      {
+        "tag": "button",
+        "name": "achteraf betalen: Nu kopen en later betalen. Het voelt klein, maar kan je overzicht en maandruimte verminderen.",
+        "width": 101,
+        "height": 22
+      },
+      {
+        "tag": "button",
+        "name": "indicatief: Een vereenvoudigde berekening voor inzicht; geen officiële aangifte of advies.",
+        "width": 57,
+        "height": 22
+      },
+      {
+        "tag": "button",
+        "name": "eigen geld: Spaargeld of ander geld dat je zelf inbrengt, bijvoorbeeld bij het kopen van een huis.",
+        "width": 64,
+        "height": 23
+      },
+      {
+        "tag": "button",
+        "name": "indicatief: Een vereenvoudigde berekening voor inzicht; geen officiële aangifte of advies.",
+        "width": 57,
+        "height": 22
+      },
+      {
+        "tag": "a",
+        "name": "Alle tools",
+        "width": 69,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Kennisbank",
+        "width": 83,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Aannames",
+        "width": 76,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Voorbeeldtool",
+        "width": 96,
+        "height": 28
+      }
+    ],
+    "smallTargetCount": 23,
+    "unlabeled": [],
+    "duplicateIds": [],
+    "headings": [
+      {
+        "level": 1,
+        "text": "Eerst grip op je studieschuld."
+      },
+      {
+        "level": 2,
+        "text": "Het stappenplan"
+      },
+      {
+        "level": 3,
+        "text": "Begrijp je studieschuld"
+      },
+      {
+        "level": 3,
+        "text": "Kies wat je doet met extra geld"
+      },
+      {
+        "level": 3,
+        "text": "Verdieping: een huis kopen"
+      },
+      {
+        "level": 2,
+        "text": "Kies je volgende vraag"
+      },
+      {
+        "level": 4,
+        "text": "Extra geld"
+      },
+      {
+        "level": 3,
+        "text": "Wat doe ik met mijn volgende euro?"
+      },
+      {
+        "level": 3,
+        "text": "Welke schuld eerst?"
+      },
+      {
+        "level": 4,
+        "text": "Studieschuld"
+      },
+      {
+        "level": 3,
+        "text": "Studieschuld extra aflossen of beleggen?"
+      },
+      {
+        "level": 3,
+        "text": "Welke schuld eerst?"
+      },
+      {
+        "level": 3,
+        "text": "Hypotheek-impact studieschuld"
+      },
+      {
+        "level": 4,
+        "text": "Wonen"
+      },
+      {
+        "level": 3,
+        "text": "Maximale hypotheek"
+      },
+      {
+        "level": 3,
+        "text": "Hypotheek-impact studieschuld"
+      }
+    ],
+    "h1Count": 1,
+    "mainCount": 1,
+    "formCount": 0,
+    "inputCount": 0
+  },
+  {
+    "mode": "mobile",
+    "name": "kennisbank",
+    "route": "/kennisbank",
+    "status": 200,
+    "errors": [],
+    "title": "Financiële kennisbank | Financiële rekentools",
+    "bodyWidth": 390,
+    "viewportWidth": 390,
+    "overflow": false,
+    "interactiveCount": 107,
+    "smallTargets": [
+      {
+        "tag": "a",
+        "name": "Ga direct naar de inhoud",
+        "width": 1,
+        "height": 1
+      },
+      {
+        "tag": "a",
+        "name": "Naar home",
+        "width": 72,
+        "height": 32
+      },
+      {
+        "tag": "a",
+        "name": "Stappenplan",
+        "width": 100,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Alle tools",
+        "width": 79,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Kennisbank",
+        "width": 93,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Aannames",
+        "width": 87,
+        "height": 40
+      },
+      {
+        "tag": "button",
+        "name": "buffer: Geld dat je achter de hand houdt voor tegenvallers, zodat je niet direct hoeft te lenen of verkopen.",
+        "width": 35,
+        "height": 22
+      },
+      {
+        "tag": "button",
+        "name": "rendement: De opbrengst of het verlies op geld dat je spaart of belegt. Het is onzeker bij beleggen.",
+        "width": 64,
+        "height": 22
+      },
+      {
+        "tag": "button",
+        "name": "noodbuffer: Geld dat je achter de hand houdt voor tegenvallers, zodat je niet direct hoeft te lenen of verkopen.",
+        "width": 62,
+        "height": 20
+      },
+      {
+        "tag": "button",
+        "name": "scenario's: Een doorgerekende situatie met jouw ingevulde aannames, zodat je keuzes kunt vergelijken.",
+        "width": 59,
+        "height": 22
+      },
+      {
+        "tag": "button",
+        "name": "rendement: De opbrengst of het verlies op geld dat je spaart of belegt. Het is onzeker bij beleggen.",
+        "width": 62,
+        "height": 20
+      },
+      {
+        "tag": "button",
+        "name": "box 3: Belasting over sparen, beleggen en sommige schulden.",
+        "width": 32,
+        "height": 20
+      },
+      {
+        "tag": "button",
+        "name": "scenario's: Een doorgerekende situatie met jouw ingevulde aannames, zodat je keuzes kunt vergelijken.",
+        "width": 57,
+        "height": 20
+      },
+      {
+        "tag": "button",
+        "name": "rendement: De opbrengst of het verlies op geld dat je spaart of belegt. Het is onzeker bij beleggen.",
+        "width": 69,
+        "height": 25
+      },
+      {
+        "tag": "button",
+        "name": "eigen geld: Spaargeld of ander geld dat je zelf inbrengt, bijvoorbeeld bij het kopen van een huis.",
+        "width": 62,
+        "height": 22
+      },
+      {
+        "tag": "button",
+        "name": "maandlasten: Het bedrag dat je gemiddeld per maand betaalt, bijvoorbeeld voor huur, hypotheek, verzekering of aflossing.",
+        "width": 77,
+        "height": 22
+      },
+      {
+        "tag": "button",
+        "name": "eigen geld: Spaargeld of ander geld dat je zelf inbrengt, bijvoorbeeld bij het kopen van een huis.",
+        "width": 62,
+        "height": 22
+      },
+      {
+        "tag": "button",
+        "name": "scenario's: Een doorgerekende situatie met jouw ingevulde aannames, zodat je keuzes kunt vergelijken.",
+        "width": 59,
+        "height": 22
+      },
+      {
+        "tag": "button",
+        "name": "eigen geld: Spaargeld of ander geld dat je zelf inbrengt, bijvoorbeeld bij het kopen van een huis.",
+        "width": 62,
+        "height": 22
+      },
+      {
+        "tag": "button",
+        "name": "buffer: Geld dat je achter de hand houdt voor tegenvallers, zodat je niet direct hoeft te lenen of verkopen.",
+        "width": 35,
+        "height": 22
+      },
+      {
+        "tag": "a",
+        "name": "koop-vs-huur",
+        "width": 101,
+        "height": 33
+      },
+      {
+        "tag": "a",
+        "name": "Hypotheek-impact studieschuld",
+        "width": 201,
+        "height": 33
+      },
+      {
+        "tag": "a",
+        "name": "hypotheek-aflossen-vs-beleggen",
+        "width": 208,
+        "height": 33
+      },
+      {
+        "tag": "button",
+        "name": "eigen geld: Spaargeld of ander geld dat je zelf inbrengt, bijvoorbeeld bij het kopen van een huis.",
+        "width": 62,
+        "height": 22
+      },
+      {
+        "tag": "button",
+        "name": "maandlast: Het bedrag dat je gemiddeld per maand betaalt, bijvoorbeeld voor huur, hypotheek, verzekering of aflossing.",
+        "width": 63,
+        "height": 22
+      },
+      {
+        "tag": "a",
+        "name": "koop-vs-huur",
+        "width": 101,
+        "height": 33
+      },
+      {
+        "tag": "a",
+        "name": "hypotheekrenteaftrek-afschaffen",
+        "width": 207,
+        "height": 33
+      },
+      {
+        "tag": "a",
+        "name": "annuitair-lineair",
+        "width": 112,
+        "height": 33
+      },
+      {
+        "tag": "button",
+        "name": "scenario's: Een doorgerekende situatie met jouw ingevulde aannames, zodat je keuzes kunt vergelijken.",
+        "width": 59,
+        "height": 22
+      },
+      {
+        "tag": "button",
+        "name": "rendement: De opbrengst of het verlies op geld dat je spaart of belegt. Het is onzeker bij beleggen.",
+        "width": 64,
+        "height": 22
+      }
+    ],
+    "smallTargetCount": 87,
+    "unlabeled": [],
+    "duplicateIds": [],
+    "headings": [
+      {
+        "level": 1,
+        "text": "Wanneer overweeg je wat met je geld?"
+      },
+      {
+        "level": 2,
+        "text": "Stap 1: kies je horizon"
+      },
+      {
+        "level": 3,
+        "text": "Korte horizon"
+      },
+      {
+        "level": 3,
+        "text": "Middellange horizon"
+      },
+      {
+        "level": 3,
+        "text": "Lange horizon"
+      },
+      {
+        "level": 2,
+        "text": "Over 5 jaar een huis kopen"
+      },
+      {
+        "level": 2,
+        "text": "Huren of kopen vergelijken"
+      },
+      {
+        "level": 2,
+        "text": "Beleggen: horizon en risico"
+      },
+      {
+        "level": 2,
+        "text": "Inflatie en koopkracht"
+      },
+      {
+        "level": 2,
+        "text": "Aflossen of beleggen"
+      },
+      {
+        "level": 2,
+        "text": "Bronnen die de kennisbank dragen"
+      },
+      {
+        "level": 3,
+        "text": "Tijdelijke regeling hypothecair krediet 2026"
+      },
+      {
+        "level": 3,
+        "text": "Advies hypotheeknormen 2026"
+      },
+      {
+        "level": 3,
+        "text": "Leennormen voor hypotheken"
+      },
+      {
+        "level": 3,
+        "text": "Hypothecair krediet"
+      },
+      {
+        "level": 3,
+        "text": "Toetsrente hypotheken derde kwartaal 2026 is 5%"
+      },
+      {
+        "level": 3,
+        "text": "Hoe zwaar telt mijn studieschuld mee voor mijn hypotheek?"
+      },
+      {
+        "level": 3,
+        "text": "Leennormen 2026: hypotheek kan iets omhoog door verwachte loonstijging"
+      },
+      {
+        "level": 3,
+        "text": "Kun je de hypotheek betalen?"
+      },
+      {
+        "level": 3,
+        "text": "Hypotheek afsluiten met studieschuld in 2026?"
+      },
+      {
+        "level": 2,
+        "text": "Bronnen per kennisdocument"
+      },
+      {
+        "level": 3,
+        "text": "Maximale hypotheek berekenen"
+      },
+      {
+        "level": 3,
+        "text": "Studieschuld en hypotheek"
+      },
+      {
+        "level": 3,
+        "text": "Waarom calculators verschillen"
+      },
+      {
+        "level": 3,
+        "text": "Eigen geld, familiehulp en schenking"
+      },
+      {
+        "level": 3,
+        "text": "Energielabel en extra hypotheekruimte"
+      },
+      {
+        "level": 3,
+        "text": "Starter of doorstromer"
+      },
+      {
+        "level": 3,
+        "text": "Indicatieve berekening"
+      },
+      {
+        "level": 2,
+        "text": "Bronhiërarchie"
+      }
+    ],
+    "h1Count": 1,
+    "mainCount": 1,
+    "formCount": 0,
+    "inputCount": 0
+  },
+  {
+    "mode": "mobile",
+    "name": "variabelen",
+    "route": "/variabelen",
+    "status": 200,
+    "errors": [],
+    "title": "Financiële rekentools",
+    "bodyWidth": 390,
+    "viewportWidth": 390,
+    "overflow": false,
+    "interactiveCount": 20,
+    "smallTargets": [
+      {
+        "tag": "a",
+        "name": "Ga direct naar de inhoud",
+        "width": 1,
+        "height": 1
+      },
+      {
+        "tag": "a",
+        "name": "Naar home",
+        "width": 72,
+        "height": 32
+      },
+      {
+        "tag": "a",
+        "name": "Stappenplan",
+        "width": 100,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Alle tools",
+        "width": 79,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Kennisbank",
+        "width": 93,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Aannames",
+        "width": 87,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Alle tools",
+        "width": 69,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Kennisbank",
+        "width": 83,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Aannames",
+        "width": 76,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Voorbeeldtool",
+        "width": 96,
+        "height": 28
+      }
+    ],
+    "smallTargetCount": 10,
+    "unlabeled": [],
+    "duplicateIds": [],
+    "headings": [
+      {
+        "level": 1,
+        "text": "Aannames en vaste variabelen"
+      },
+      {
+        "level": 2,
+        "text": "Belangrijkste waarden"
+      },
+      {
+        "level": 3,
+        "text": "DUO"
+      },
+      {
+        "level": 3,
+        "text": "Hypotheek"
+      },
+      {
+        "level": 3,
+        "text": "Box 1"
+      },
+      {
+        "level": 3,
+        "text": "Box 3"
+      },
+      {
+        "level": 3,
+        "text": "Grafieken en presentatie"
+      }
+    ],
+    "h1Count": 1,
+    "mainCount": 1,
+    "formCount": 0,
+    "inputCount": 0
+  },
+  {
+    "mode": "mobile",
+    "name": "max-hypotheek",
+    "route": "/apps/artifact-hypotheek-wonen-maximale-hypotheek",
+    "status": 200,
+    "errors": [
+      "console: Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "title": "Maximale hypotheek | Financiële rekentools",
+    "bodyWidth": 390,
+    "viewportWidth": 390,
+    "overflow": false,
+    "interactiveCount": 38,
+    "smallTargets": [
+      {
+        "tag": "a",
+        "name": "Ga direct naar de inhoud",
+        "width": 1,
+        "height": 1
+      },
+      {
+        "tag": "a",
+        "name": "Naar home",
+        "width": 72,
+        "height": 32
+      },
+      {
+        "tag": "a",
+        "name": "Stappenplan",
+        "width": 100,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Alle tools",
+        "width": 79,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Kennisbank",
+        "width": 93,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Aannames",
+        "width": 87,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "← Terug naar dashboard",
+        "width": 146,
+        "height": 21
+      },
+      {
+        "tag": "button",
+        "name": "Voorbeeld invullen",
+        "width": 154,
+        "height": 42
+      },
+      {
+        "tag": "button",
+        "name": "Wis invoer",
+        "width": 98,
+        "height": 42
+      },
+      {
+        "tag": "button",
+        "name": "PDF-rapport downloaden",
+        "width": 201,
+        "height": 42
+      },
+      {
+        "tag": "input",
+        "name": "Bruto jaarinkomenper jaarVul je bruto jaarinkomen in.",
+        "width": 237,
+        "height": 24
+      },
+      {
+        "tag": "input",
+        "name": "Studieschuld aanwezigDUO wordt gebruteerd volgens de centrale hypotheeklaag.",
+        "width": 13,
+        "height": 16
+      },
+      {
+        "tag": "summary",
+        "name": "Toolcontext en aannamesUitklappen",
+        "width": 316,
+        "height": 21
+      },
+      {
+        "tag": "a",
+        "name": "Alle tools",
+        "width": 69,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Kennisbank",
+        "width": 83,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Aannames",
+        "width": 76,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Voorbeeldtool",
+        "width": 96,
+        "height": 28
+      }
+    ],
+    "smallTargetCount": 17,
+    "unlabeled": [],
+    "duplicateIds": [],
+    "headings": [
+      {
+        "level": 1,
+        "text": "Maximale hypotheek"
+      },
+      {
+        "level": 2,
+        "text": "Maximale hypotheek"
+      },
+      {
+        "level": 3,
+        "text": "Inkomsten"
+      },
+      {
+        "level": 3,
+        "text": "Woning en eigen geld"
+      },
+      {
+        "level": 3,
+        "text": "Schulden"
+      }
+    ],
+    "h1Count": 1,
+    "mainCount": 1,
+    "formCount": 1,
+    "inputCount": 15
+  },
+  {
+    "mode": "mobile",
+    "name": "familiehulp",
+    "route": "/apps/familiehulp-eerste-woning",
+    "status": 200,
+    "errors": [],
+    "title": "Lenen of schenken voor eerste woning | Financiële rekentools",
+    "bodyWidth": 390,
+    "viewportWidth": 390,
+    "overflow": false,
+    "interactiveCount": 60,
+    "smallTargets": [
+      {
+        "tag": "a",
+        "name": "Ga direct naar de inhoud",
+        "width": 1,
+        "height": 1
+      },
+      {
+        "tag": "a",
+        "name": "Naar home",
+        "width": 72,
+        "height": 32
+      },
+      {
+        "tag": "a",
+        "name": "Stappenplan",
+        "width": 100,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Alle tools",
+        "width": 79,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Kennisbank",
+        "width": 93,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Aannames",
+        "width": 87,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "← Terug naar dashboard",
+        "width": 146,
+        "height": 21
+      },
+      {
+        "tag": "button",
+        "name": "eigen geld: Spaargeld of ander geld dat je zelf inbrengt, bijvoorbeeld bij het kopen van een huis.",
+        "width": 78,
+        "height": 29
+      },
+      {
+        "tag": "input",
+        "name": "Woningprijs€Gebruik een woningprijs groter dan 0.",
+        "width": 231,
+        "height": 24
+      },
+      {
+        "tag": "input",
+        "name": "Aankoopkosten€",
+        "width": 231,
+        "height": 24
+      },
+      {
+        "tag": "input",
+        "name": "Eigen geld€",
+        "width": 231,
+        "height": 24
+      },
+      {
+        "tag": "input",
+        "name": "Minimale bufferNa de aankoop beschikbaar houden€",
+        "width": 231,
+        "height": 24
+      },
+      {
+        "tag": "input",
+        "name": "Bancaire hypotheek€",
+        "width": 231,
+        "height": 24
+      },
+      {
+        "tag": "input",
+        "name": "Hypotheekrente%",
+        "width": 230,
+        "height": 24
+      },
+      {
+        "tag": "input",
+        "name": "Hypotheeklooptijdjaar",
+        "width": 218,
+        "height": 24
+      },
+      {
+        "tag": "select",
+        "name": "DUO-situatieIk betaal al afAanloopfaseVerlaagd door draagkrachtAflossingsvrije periodeWeet ik niet",
+        "width": 248,
+        "height": 21
+      },
+      {
+        "tag": "select",
+        "name": "TerugbetalingsregelSF35SF15SF15-oudLevenlanglerenkredietOnbekend",
+        "width": 248,
+        "height": 21
+      },
+      {
+        "tag": "input",
+        "name": "Resterende studieschuld€",
+        "width": 231,
+        "height": 24
+      },
+      {
+        "tag": "input",
+        "name": "DUO-rente%",
+        "width": 230,
+        "height": 24
+      },
+      {
+        "tag": "input",
+        "name": "Resterende looptijd DUOjaar",
+        "width": 218,
+        "height": 24
+      },
+      {
+        "tag": "input",
+        "name": "Huidige DUO-maandlast€ p/m",
+        "width": 202,
+        "height": 24
+      },
+      {
+        "tag": "input",
+        "name": "Wettelijk maandbedrag€ p/m",
+        "width": 202,
+        "height": 24
+      },
+      {
+        "tag": "input",
+        "name": "Jouw bruto jaarinkomen€",
+        "width": 231,
+        "height": 24
+      },
+      {
+        "tag": "input",
+        "name": "Partnerinkomen€",
+        "width": 231,
+        "height": 24
+      },
+      {
+        "tag": "input",
+        "name": "Extra DUO-aflossing€",
+        "width": 231,
+        "height": 24
+      },
+      {
+        "tag": "input",
+        "name": "Familielening€",
+        "width": 231,
+        "height": 24
+      },
+      {
+        "tag": "input",
+        "name": "Rente familielening%",
+        "width": 230,
+        "height": 24
+      },
+      {
+        "tag": "input",
+        "name": "Looptijd familieleningjaar",
+        "width": 218,
+        "height": 24
+      },
+      {
+        "tag": "select",
+        "name": "AflossingsvormAnnuïtairLineair",
+        "width": 248,
+        "height": 21
+      },
+      {
+        "tag": "input",
+        "name": "Eenmalige schenking€",
+        "width": 231,
+        "height": 24
+      }
+    ],
+    "smallTargetCount": 50,
+    "unlabeled": [],
+    "duplicateIds": [],
+    "headings": [
+      {
+        "level": 1,
+        "text": "Lenen of schenken voor eerste woning"
+      },
+      {
+        "level": 1,
+        "text": "Lenen of schenken naast je studieschuld"
+      },
+      {
+        "level": 3,
+        "text": "Woning en eigen geld"
+      },
+      {
+        "level": 3,
+        "text": "DUO en extra aflossen"
+      },
+      {
+        "level": 3,
+        "text": "Lenen of schenken via familie"
+      },
+      {
+        "level": 2,
+        "text": "Eerst de conclusie"
+      },
+      {
+        "level": 3,
+        "text": "Vaste maandlasten (contracten)"
+      },
+      {
+        "level": 3,
+        "text": "Wat je netto kwijt bent"
+      },
+      {
+        "level": 3,
+        "text": "Toekomstige schenkingen zijn niet zeker"
+      },
+      {
+        "level": 3,
+        "text": "Hoe je dit leest"
+      },
+      {
+        "level": 3,
+        "text": "Inputkwaliteit"
+      }
+    ],
+    "h1Count": 2,
+    "mainCount": 1,
+    "formCount": 1,
+    "inputCount": 28
+  },
+  {
+    "mode": "mobile",
+    "name": "hypotheek-impact",
+    "route": "/apps/hypotheek-impact-studieschuld",
+    "status": 200,
+    "errors": [],
+    "title": "Hypotheek-impact studieschuld | Financiële rekentools",
+    "bodyWidth": 427,
+    "viewportWidth": 390,
+    "overflow": true,
+    "interactiveCount": 39,
+    "smallTargets": [
+      {
+        "tag": "a",
+        "name": "Ga direct naar de inhoud",
+        "width": 1,
+        "height": 1
+      },
+      {
+        "tag": "a",
+        "name": "Naar home",
+        "width": 72,
+        "height": 32
+      },
+      {
+        "tag": "a",
+        "name": "Stappenplan",
+        "width": 100,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Alle tools",
+        "width": 79,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Kennisbank",
+        "width": 93,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Aannames",
+        "width": 87,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "← Terug naar dashboard",
+        "width": 146,
+        "height": 21
+      },
+      {
+        "tag": "button",
+        "name": "indicatief: Een vereenvoudigde berekening voor inzicht; geen officiële aangifte of advies.",
+        "width": 69,
+        "height": 29
+      },
+      {
+        "tag": "button",
+        "name": "Start met voorbeeldwaarden",
+        "width": 195,
+        "height": 39
+      },
+      {
+        "tag": "button",
+        "name": "Wis invoer",
+        "width": 87,
+        "height": 39
+      },
+      {
+        "tag": "summary",
+        "name": "Toolcontext en aannamesUitklappen",
+        "width": 316,
+        "height": 21
+      },
+      {
+        "tag": "a",
+        "name": "Alle tools",
+        "width": 69,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Kennisbank",
+        "width": 83,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Aannames",
+        "width": 76,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Voorbeeldtool",
+        "width": 96,
+        "height": 28
+      }
+    ],
+    "smallTargetCount": 15,
+    "unlabeled": [],
+    "duplicateIds": [],
+    "headings": [
+      {
+        "level": 1,
+        "text": "Hypotheek-impact studieschuld"
+      },
+      {
+        "level": 2,
+        "text": "Hypotheek-impact van je studieschuld"
+      },
+      {
+        "level": 3,
+        "text": "Jouw DUO-situatie"
+      },
+      {
+        "level": 3,
+        "text": "DUO-bedragen"
+      },
+      {
+        "level": 3,
+        "text": "Woningdoel"
+      },
+      {
+        "level": 3,
+        "text": "Hypotheek-aannames"
+      },
+      {
+        "level": 3,
+        "text": "Hoe rekenen we dit?"
+      },
+      {
+        "level": 3,
+        "text": "Hoe komen we aan het DUO-bedrag?"
+      },
+      {
+        "level": 3,
+        "text": "Verplicht DUO-bedrag vs keuzebedrag"
+      },
+      {
+        "level": 3,
+        "text": "Wat is brutering?"
+      },
+      {
+        "level": 3,
+        "text": "Wat betekent dit voor je hypotheek?"
+      },
+      {
+        "level": 3,
+        "text": "Wat als je extra aflost?"
+      },
+      {
+        "level": 3,
+        "text": "Wat kun je hiermee?"
+      },
+      {
+        "level": 3,
+        "text": "Checklist Mijn DUO"
+      },
+      {
+        "level": 3,
+        "text": "SF35, SF15 en SF15-oud kort uitgelegd"
+      },
+      {
+        "level": 3,
+        "text": "Waarom eerlijk opgeven?"
+      },
+      {
+        "level": 3,
+        "text": "Belangrijke aannames"
+      },
+      {
+        "level": 3,
+        "text": "Waarom geen snelle vuistregel meer?"
+      }
+    ],
+    "h1Count": 1,
+    "mainCount": 1,
+    "formCount": 0,
+    "inputCount": 15
+  },
+  {
+    "mode": "mobile",
+    "name": "schulden-volgorde",
+    "route": "/apps/schulden-volgorde",
+    "status": 200,
+    "errors": [],
+    "title": "Welke schuld eerst? | Financiële rekentools",
+    "bodyWidth": 390,
+    "viewportWidth": 390,
+    "overflow": false,
+    "interactiveCount": 29,
+    "smallTargets": [
+      {
+        "tag": "a",
+        "name": "Ga direct naar de inhoud",
+        "width": 1,
+        "height": 1
+      },
+      {
+        "tag": "a",
+        "name": "Naar home",
+        "width": 72,
+        "height": 32
+      },
+      {
+        "tag": "a",
+        "name": "Stappenplan",
+        "width": 100,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Alle tools",
+        "width": 79,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Kennisbank",
+        "width": 93,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Aannames",
+        "width": 87,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "← Terug naar dashboard",
+        "width": 146,
+        "height": 21
+      },
+      {
+        "tag": "button",
+        "name": "achteraf betalen: Nu kopen en later betalen. Het voelt klein, maar kan je overzicht en maandruimte verminderen.",
+        "width": 123,
+        "height": 29
+      },
+      {
+        "tag": "button",
+        "name": "achteraf betalen: Nu kopen en later betalen. Het voelt klein, maar kan je overzicht en maandruimte verminderen.",
+        "width": 105,
+        "height": 25
+      },
+      {
+        "tag": "summary",
+        "name": "Toolcontext en aannamesUitklappen",
+        "width": 316,
+        "height": 21
+      },
+      {
+        "tag": "a",
+        "name": "Alle tools",
+        "width": 69,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Kennisbank",
+        "width": 83,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Aannames",
+        "width": 76,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Voorbeeldtool",
+        "width": 96,
+        "height": 28
+      }
+    ],
+    "smallTargetCount": 14,
+    "unlabeled": [
+      {
+        "tag": "input",
+        "type": null,
+        "id": ""
+      },
+      {
+        "tag": "input",
+        "type": null,
+        "id": ""
+      },
+      {
+        "tag": "input",
+        "type": null,
+        "id": ""
+      },
+      {
+        "tag": "input",
+        "type": null,
+        "id": ""
+      },
+      {
+        "tag": "input",
+        "type": null,
+        "id": ""
+      },
+      {
+        "tag": "input",
+        "type": null,
+        "id": ""
+      },
+      {
+        "tag": "input",
+        "type": null,
+        "id": ""
+      },
+      {
+        "tag": "input",
+        "type": null,
+        "id": ""
+      }
+    ],
+    "duplicateIds": [],
+    "headings": [
+      {
+        "level": 1,
+        "text": "Welke schuld eerst?"
+      },
+      {
+        "level": 2,
+        "text": "Welke schuld eerst?"
+      }
+    ],
+    "h1Count": 1,
+    "mainCount": 1,
+    "formCount": 1,
+    "inputCount": 9
+  },
+  {
+    "mode": "mobile",
+    "name": "studieschuld-beleggen",
+    "route": "/apps/studieschuld-vs-beleggen",
+    "status": 200,
+    "errors": [],
+    "title": "Studieschuld extra aflossen of beleggen? | Financiële rekentools",
+    "bodyWidth": 390,
+    "viewportWidth": 390,
+    "overflow": false,
+    "interactiveCount": 34,
+    "smallTargets": [
+      {
+        "tag": "a",
+        "name": "Ga direct naar de inhoud",
+        "width": 1,
+        "height": 1
+      },
+      {
+        "tag": "a",
+        "name": "Naar home",
+        "width": 72,
+        "height": 32
+      },
+      {
+        "tag": "a",
+        "name": "Stappenplan",
+        "width": 100,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Alle tools",
+        "width": 79,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Kennisbank",
+        "width": 93,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Aannames",
+        "width": 87,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "← Terug naar dashboard",
+        "width": 146,
+        "height": 21
+      },
+      {
+        "tag": "button",
+        "name": "Start met voorbeeldwaarden",
+        "width": 195,
+        "height": 39
+      },
+      {
+        "tag": "button",
+        "name": "Voeg schulddeel toe",
+        "width": 168,
+        "height": 42
+      },
+      {
+        "tag": "button",
+        "name": "Bereken",
+        "width": 90,
+        "height": 40
+      },
+      {
+        "tag": "summary",
+        "name": "Toolcontext en aannamesUitklappen",
+        "width": 316,
+        "height": 21
+      },
+      {
+        "tag": "a",
+        "name": "Alle tools",
+        "width": 69,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Kennisbank",
+        "width": 83,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Aannames",
+        "width": 76,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Voorbeeldtool",
+        "width": 96,
+        "height": 28
+      }
+    ],
+    "smallTargetCount": 15,
+    "unlabeled": [],
+    "duplicateIds": [],
+    "headings": [
+      {
+        "level": 1,
+        "text": "Studieschuld extra aflossen of beleggen?"
+      },
+      {
+        "level": 2,
+        "text": "Studieschuld extra aflossen of beleggen?"
+      },
+      {
+        "level": 3,
+        "text": "DUO-kernbedragen"
+      },
+      {
+        "level": 3,
+        "text": "Extra aflossen vs beleggen"
+      },
+      {
+        "level": 3,
+        "text": "Grafiek: schuldverloop en beleggingswaarde"
+      },
+      {
+        "level": 3,
+        "text": "Hoe rekenen we dit?"
+      },
+      {
+        "level": 3,
+        "text": "Welke aannames gebruiken we?"
+      }
+    ],
+    "h1Count": 1,
+    "mainCount": 1,
+    "formCount": 0,
+    "inputCount": 9
+  },
+  {
+    "mode": "mobile",
+    "name": "volgende-euro",
+    "route": "/apps/volgende-euro",
+    "status": 200,
+    "errors": [],
+    "title": "Wat doe ik met mijn volgende euro? | Financiële rekentools",
+    "bodyWidth": 390,
+    "viewportWidth": 390,
+    "overflow": false,
+    "interactiveCount": 32,
+    "smallTargets": [
+      {
+        "tag": "a",
+        "name": "Ga direct naar de inhoud",
+        "width": 1,
+        "height": 1
+      },
+      {
+        "tag": "a",
+        "name": "Naar home",
+        "width": 72,
+        "height": 32
+      },
+      {
+        "tag": "a",
+        "name": "Stappenplan",
+        "width": 100,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Alle tools",
+        "width": 79,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Kennisbank",
+        "width": 93,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Aannames",
+        "width": 87,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "← Terug naar dashboard",
+        "width": 146,
+        "height": 21
+      },
+      {
+        "tag": "button",
+        "name": "buffer: Geld dat je achter de hand houdt voor tegenvallers, zodat je niet direct hoeft te lenen of verkopen.",
+        "width": 44,
+        "height": 29
+      },
+      {
+        "tag": "button",
+        "name": "Start met voorbeeldwaarden",
+        "width": 195,
+        "height": 39
+      },
+      {
+        "tag": "summary",
+        "name": "Toolcontext en aannamesUitklappen",
+        "width": 316,
+        "height": 21
+      },
+      {
+        "tag": "a",
+        "name": "Alle tools",
+        "width": 69,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Kennisbank",
+        "width": 83,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Aannames",
+        "width": 76,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Voorbeeldtool",
+        "width": 96,
+        "height": 28
+      }
+    ],
+    "smallTargetCount": 14,
+    "unlabeled": [],
+    "duplicateIds": [],
+    "headings": [
+      {
+        "level": 1,
+        "text": "Wat doe ik met mijn volgende euro?"
+      },
+      {
+        "level": 2,
+        "text": "Wat doe ik met mijn volgende euro?"
+      },
+      {
+        "level": 3,
+        "text": "Hoe rekenen we dit?"
+      },
+      {
+        "level": 3,
+        "text": "Welke aannames gebruiken we?"
+      },
+      {
+        "level": 3,
+        "text": "Waar moet je op letten?"
+      }
+    ],
+    "h1Count": 1,
+    "mainCount": 1,
+    "formCount": 1,
+    "inputCount": 7
+  },
+  {
+    "mode": "desktop",
+    "name": "home",
+    "route": "/",
+    "status": 200,
+    "errors": [],
+    "title": "Financiële rekentools",
+    "bodyWidth": 1440,
+    "viewportWidth": 1440,
+    "overflow": false,
+    "interactiveCount": 48,
+    "smallTargets": [
+      {
+        "tag": "a",
+        "name": "Ga direct naar de inhoud",
+        "width": 1,
+        "height": 1
+      },
+      {
+        "tag": "a",
+        "name": "Naar home",
+        "width": 72,
+        "height": 32
+      },
+      {
+        "tag": "a",
+        "name": "Stappenplan",
+        "width": 100,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Alle tools",
+        "width": 79,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Kennisbank",
+        "width": 93,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Aannames",
+        "width": 87,
+        "height": 40
+      },
+      {
+        "tag": "button",
+        "name": "Alle tools",
+        "width": 98,
+        "height": 41
+      },
+      {
+        "tag": "button",
+        "name": "Start bij DUO",
+        "width": 126,
+        "height": 41
+      },
+      {
+        "tag": "button",
+        "name": "Daarna wonen",
+        "width": 136,
+        "height": 41
+      },
+      {
+        "tag": "button",
+        "name": "maandlast: Het bedrag dat je gemiddeld per maand betaalt, bijvoorbeeld voor huur, hypotheek, verzekering of aflossing.",
+        "width": 63,
+        "height": 22
+      },
+      {
+        "tag": "button",
+        "name": "buffer: Geld dat je achter de hand houdt voor tegenvallers, zodat je niet direct hoeft te lenen of verkopen.",
+        "width": 35,
+        "height": 22
+      },
+      {
+        "tag": "button",
+        "name": "buffer: Geld dat je achter de hand houdt voor tegenvallers, zodat je niet direct hoeft te lenen of verkopen.",
+        "width": 37,
+        "height": 23
+      },
+      {
+        "tag": "button",
+        "name": "buffer: Geld dat je achter de hand houdt voor tegenvallers, zodat je niet direct hoeft te lenen of verkopen.",
+        "width": 37,
+        "height": 22
+      },
+      {
+        "tag": "button",
+        "name": "achteraf betalen: Nu kopen en later betalen. Het voelt klein, maar kan je overzicht en maandruimte verminderen.",
+        "width": 101,
+        "height": 22
+      },
+      {
+        "tag": "button",
+        "name": "maandlast: Het bedrag dat je gemiddeld per maand betaalt, bijvoorbeeld voor huur, hypotheek, verzekering of aflossing.",
+        "width": 65,
+        "height": 23
+      },
+      {
+        "tag": "button",
+        "name": "achteraf betalen: Nu kopen en later betalen. Het voelt klein, maar kan je overzicht en maandruimte verminderen.",
+        "width": 101,
+        "height": 22
+      },
+      {
+        "tag": "button",
+        "name": "indicatief: Een vereenvoudigde berekening voor inzicht; geen officiële aangifte of advies.",
+        "width": 57,
+        "height": 22
+      },
+      {
+        "tag": "button",
+        "name": "eigen geld: Spaargeld of ander geld dat je zelf inbrengt, bijvoorbeeld bij het kopen van een huis.",
+        "width": 64,
+        "height": 23
+      },
+      {
+        "tag": "button",
+        "name": "indicatief: Een vereenvoudigde berekening voor inzicht; geen officiële aangifte of advies.",
+        "width": 57,
+        "height": 22
+      },
+      {
+        "tag": "a",
+        "name": "Alle tools",
+        "width": 69,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Kennisbank",
+        "width": 83,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Aannames",
+        "width": 76,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Voorbeeldtool",
+        "width": 96,
+        "height": 28
+      }
+    ],
+    "smallTargetCount": 23,
+    "unlabeled": [],
+    "duplicateIds": [],
+    "headings": [
+      {
+        "level": 1,
+        "text": "Eerst grip op je studieschuld."
+      },
+      {
+        "level": 2,
+        "text": "Het stappenplan"
+      },
+      {
+        "level": 3,
+        "text": "Begrijp je studieschuld"
+      },
+      {
+        "level": 3,
+        "text": "Kies wat je doet met extra geld"
+      },
+      {
+        "level": 3,
+        "text": "Verdieping: een huis kopen"
+      },
+      {
+        "level": 2,
+        "text": "Kies je volgende vraag"
+      },
+      {
+        "level": 4,
+        "text": "Extra geld"
+      },
+      {
+        "level": 3,
+        "text": "Wat doe ik met mijn volgende euro?"
+      },
+      {
+        "level": 3,
+        "text": "Welke schuld eerst?"
+      },
+      {
+        "level": 4,
+        "text": "Studieschuld"
+      },
+      {
+        "level": 3,
+        "text": "Studieschuld extra aflossen of beleggen?"
+      },
+      {
+        "level": 3,
+        "text": "Welke schuld eerst?"
+      },
+      {
+        "level": 3,
+        "text": "Hypotheek-impact studieschuld"
+      },
+      {
+        "level": 4,
+        "text": "Wonen"
+      },
+      {
+        "level": 3,
+        "text": "Maximale hypotheek"
+      },
+      {
+        "level": 3,
+        "text": "Hypotheek-impact studieschuld"
+      }
+    ],
+    "h1Count": 1,
+    "mainCount": 1,
+    "formCount": 0,
+    "inputCount": 0
+  },
+  {
+    "mode": "desktop",
+    "name": "kennisbank",
+    "route": "/kennisbank",
+    "status": 200,
+    "errors": [],
+    "title": "Financiële kennisbank | Financiële rekentools",
+    "bodyWidth": 1440,
+    "viewportWidth": 1440,
+    "overflow": false,
+    "interactiveCount": 107,
+    "smallTargets": [
+      {
+        "tag": "a",
+        "name": "Ga direct naar de inhoud",
+        "width": 1,
+        "height": 1
+      },
+      {
+        "tag": "a",
+        "name": "Naar home",
+        "width": 72,
+        "height": 32
+      },
+      {
+        "tag": "a",
+        "name": "Stappenplan",
+        "width": 100,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Alle tools",
+        "width": 79,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Kennisbank",
+        "width": 93,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Aannames",
+        "width": 87,
+        "height": 40
+      },
+      {
+        "tag": "button",
+        "name": "buffer: Geld dat je achter de hand houdt voor tegenvallers, zodat je niet direct hoeft te lenen of verkopen.",
+        "width": 35,
+        "height": 22
+      },
+      {
+        "tag": "button",
+        "name": "rendement: De opbrengst of het verlies op geld dat je spaart of belegt. Het is onzeker bij beleggen.",
+        "width": 64,
+        "height": 22
+      },
+      {
+        "tag": "button",
+        "name": "noodbuffer: Geld dat je achter de hand houdt voor tegenvallers, zodat je niet direct hoeft te lenen of verkopen.",
+        "width": 62,
+        "height": 20
+      },
+      {
+        "tag": "button",
+        "name": "scenario's: Een doorgerekende situatie met jouw ingevulde aannames, zodat je keuzes kunt vergelijken.",
+        "width": 59,
+        "height": 22
+      },
+      {
+        "tag": "button",
+        "name": "rendement: De opbrengst of het verlies op geld dat je spaart of belegt. Het is onzeker bij beleggen.",
+        "width": 62,
+        "height": 20
+      },
+      {
+        "tag": "button",
+        "name": "box 3: Belasting over sparen, beleggen en sommige schulden.",
+        "width": 32,
+        "height": 20
+      },
+      {
+        "tag": "button",
+        "name": "scenario's: Een doorgerekende situatie met jouw ingevulde aannames, zodat je keuzes kunt vergelijken.",
+        "width": 57,
+        "height": 20
+      },
+      {
+        "tag": "button",
+        "name": "rendement: De opbrengst of het verlies op geld dat je spaart of belegt. Het is onzeker bij beleggen.",
+        "width": 69,
+        "height": 25
+      },
+      {
+        "tag": "button",
+        "name": "eigen geld: Spaargeld of ander geld dat je zelf inbrengt, bijvoorbeeld bij het kopen van een huis.",
+        "width": 62,
+        "height": 22
+      },
+      {
+        "tag": "button",
+        "name": "maandlasten: Het bedrag dat je gemiddeld per maand betaalt, bijvoorbeeld voor huur, hypotheek, verzekering of aflossing.",
+        "width": 77,
+        "height": 22
+      },
+      {
+        "tag": "button",
+        "name": "eigen geld: Spaargeld of ander geld dat je zelf inbrengt, bijvoorbeeld bij het kopen van een huis.",
+        "width": 62,
+        "height": 22
+      },
+      {
+        "tag": "button",
+        "name": "scenario's: Een doorgerekende situatie met jouw ingevulde aannames, zodat je keuzes kunt vergelijken.",
+        "width": 59,
+        "height": 22
+      },
+      {
+        "tag": "button",
+        "name": "eigen geld: Spaargeld of ander geld dat je zelf inbrengt, bijvoorbeeld bij het kopen van een huis.",
+        "width": 62,
+        "height": 22
+      },
+      {
+        "tag": "button",
+        "name": "buffer: Geld dat je achter de hand houdt voor tegenvallers, zodat je niet direct hoeft te lenen of verkopen.",
+        "width": 35,
+        "height": 22
+      },
+      {
+        "tag": "a",
+        "name": "koop-vs-huur",
+        "width": 101,
+        "height": 33
+      },
+      {
+        "tag": "a",
+        "name": "Hypotheek-impact studieschuld",
+        "width": 201,
+        "height": 33
+      },
+      {
+        "tag": "a",
+        "name": "hypotheek-aflossen-vs-beleggen",
+        "width": 208,
+        "height": 33
+      },
+      {
+        "tag": "button",
+        "name": "eigen geld: Spaargeld of ander geld dat je zelf inbrengt, bijvoorbeeld bij het kopen van een huis.",
+        "width": 62,
+        "height": 22
+      },
+      {
+        "tag": "button",
+        "name": "maandlast: Het bedrag dat je gemiddeld per maand betaalt, bijvoorbeeld voor huur, hypotheek, verzekering of aflossing.",
+        "width": 63,
+        "height": 22
+      },
+      {
+        "tag": "a",
+        "name": "koop-vs-huur",
+        "width": 101,
+        "height": 33
+      },
+      {
+        "tag": "a",
+        "name": "hypotheekrenteaftrek-afschaffen",
+        "width": 207,
+        "height": 33
+      },
+      {
+        "tag": "a",
+        "name": "annuitair-lineair",
+        "width": 112,
+        "height": 33
+      },
+      {
+        "tag": "button",
+        "name": "scenario's: Een doorgerekende situatie met jouw ingevulde aannames, zodat je keuzes kunt vergelijken.",
+        "width": 59,
+        "height": 22
+      },
+      {
+        "tag": "button",
+        "name": "rendement: De opbrengst of het verlies op geld dat je spaart of belegt. Het is onzeker bij beleggen.",
+        "width": 64,
+        "height": 22
+      }
+    ],
+    "smallTargetCount": 98,
+    "unlabeled": [],
+    "duplicateIds": [],
+    "headings": [
+      {
+        "level": 1,
+        "text": "Wanneer overweeg je wat met je geld?"
+      },
+      {
+        "level": 2,
+        "text": "Stap 1: kies je horizon"
+      },
+      {
+        "level": 3,
+        "text": "Korte horizon"
+      },
+      {
+        "level": 3,
+        "text": "Middellange horizon"
+      },
+      {
+        "level": 3,
+        "text": "Lange horizon"
+      },
+      {
+        "level": 2,
+        "text": "Over 5 jaar een huis kopen"
+      },
+      {
+        "level": 2,
+        "text": "Huren of kopen vergelijken"
+      },
+      {
+        "level": 2,
+        "text": "Beleggen: horizon en risico"
+      },
+      {
+        "level": 2,
+        "text": "Inflatie en koopkracht"
+      },
+      {
+        "level": 2,
+        "text": "Aflossen of beleggen"
+      },
+      {
+        "level": 2,
+        "text": "Bronnen die de kennisbank dragen"
+      },
+      {
+        "level": 3,
+        "text": "Tijdelijke regeling hypothecair krediet 2026"
+      },
+      {
+        "level": 3,
+        "text": "Advies hypotheeknormen 2026"
+      },
+      {
+        "level": 3,
+        "text": "Leennormen voor hypotheken"
+      },
+      {
+        "level": 3,
+        "text": "Hypothecair krediet"
+      },
+      {
+        "level": 3,
+        "text": "Toetsrente hypotheken derde kwartaal 2026 is 5%"
+      },
+      {
+        "level": 3,
+        "text": "Hoe zwaar telt mijn studieschuld mee voor mijn hypotheek?"
+      },
+      {
+        "level": 3,
+        "text": "Leennormen 2026: hypotheek kan iets omhoog door verwachte loonstijging"
+      },
+      {
+        "level": 3,
+        "text": "Kun je de hypotheek betalen?"
+      },
+      {
+        "level": 3,
+        "text": "Hypotheek afsluiten met studieschuld in 2026?"
+      },
+      {
+        "level": 2,
+        "text": "Bronnen per kennisdocument"
+      },
+      {
+        "level": 3,
+        "text": "Maximale hypotheek berekenen"
+      },
+      {
+        "level": 3,
+        "text": "Studieschuld en hypotheek"
+      },
+      {
+        "level": 3,
+        "text": "Waarom calculators verschillen"
+      },
+      {
+        "level": 3,
+        "text": "Eigen geld, familiehulp en schenking"
+      },
+      {
+        "level": 3,
+        "text": "Energielabel en extra hypotheekruimte"
+      },
+      {
+        "level": 3,
+        "text": "Starter of doorstromer"
+      },
+      {
+        "level": 3,
+        "text": "Indicatieve berekening"
+      },
+      {
+        "level": 2,
+        "text": "Bronhiërarchie"
+      }
+    ],
+    "h1Count": 1,
+    "mainCount": 1,
+    "formCount": 0,
+    "inputCount": 0
+  },
+  {
+    "mode": "desktop",
+    "name": "variabelen",
+    "route": "/variabelen",
+    "status": 200,
+    "errors": [],
+    "title": "Financiële rekentools",
+    "bodyWidth": 1440,
+    "viewportWidth": 1440,
+    "overflow": false,
+    "interactiveCount": 20,
+    "smallTargets": [
+      {
+        "tag": "a",
+        "name": "Ga direct naar de inhoud",
+        "width": 1,
+        "height": 1
+      },
+      {
+        "tag": "a",
+        "name": "Naar home",
+        "width": 72,
+        "height": 32
+      },
+      {
+        "tag": "a",
+        "name": "Stappenplan",
+        "width": 100,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Alle tools",
+        "width": 79,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Kennisbank",
+        "width": 93,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Aannames",
+        "width": 87,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Alle tools",
+        "width": 69,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Kennisbank",
+        "width": 83,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Aannames",
+        "width": 76,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Voorbeeldtool",
+        "width": 96,
+        "height": 28
+      }
+    ],
+    "smallTargetCount": 10,
+    "unlabeled": [],
+    "duplicateIds": [],
+    "headings": [
+      {
+        "level": 1,
+        "text": "Aannames en vaste variabelen"
+      },
+      {
+        "level": 2,
+        "text": "Belangrijkste waarden"
+      },
+      {
+        "level": 3,
+        "text": "DUO"
+      },
+      {
+        "level": 3,
+        "text": "Hypotheek"
+      },
+      {
+        "level": 3,
+        "text": "Box 1"
+      },
+      {
+        "level": 3,
+        "text": "Box 3"
+      },
+      {
+        "level": 3,
+        "text": "Grafieken en presentatie"
+      }
+    ],
+    "h1Count": 1,
+    "mainCount": 1,
+    "formCount": 0,
+    "inputCount": 0
+  },
+  {
+    "mode": "desktop",
+    "name": "max-hypotheek",
+    "route": "/apps/artifact-hypotheek-wonen-maximale-hypotheek",
+    "status": 200,
+    "errors": [
+      "console: Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "title": "Maximale hypotheek | Financiële rekentools",
+    "bodyWidth": 1440,
+    "viewportWidth": 1440,
+    "overflow": false,
+    "interactiveCount": 38,
+    "smallTargets": [
+      {
+        "tag": "a",
+        "name": "Ga direct naar de inhoud",
+        "width": 1,
+        "height": 1
+      },
+      {
+        "tag": "a",
+        "name": "Naar home",
+        "width": 72,
+        "height": 32
+      },
+      {
+        "tag": "a",
+        "name": "Stappenplan",
+        "width": 100,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Alle tools",
+        "width": 79,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Kennisbank",
+        "width": 93,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Aannames",
+        "width": 87,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "← Terug naar dashboard",
+        "width": 146,
+        "height": 21
+      },
+      {
+        "tag": "input",
+        "name": "Bruto jaarinkomenper jaarVul je bruto jaarinkomen in.",
+        "width": 420,
+        "height": 27
+      },
+      {
+        "tag": "input",
+        "name": "Partnerinkomenper jaar",
+        "width": 420,
+        "height": 27
+      },
+      {
+        "tag": "input",
+        "name": "Hypotheekrente%Gebruik een rente tussen 0 en 25 procent.",
+        "width": 455,
+        "height": 27
+      },
+      {
+        "tag": "input",
+        "name": "Toetsrente bij rentevast korter dan 10 jaar%",
+        "width": 455,
+        "height": 27
+      },
+      {
+        "tag": "input",
+        "name": "Rentevaste periodemaanden",
+        "width": 411,
+        "height": 27
+      },
+      {
+        "tag": "input",
+        "name": "Looptijd hypotheekjaar",
+        "width": 443,
+        "height": 27
+      },
+      {
+        "tag": "input",
+        "name": "KoopprijseuroVul een koopprijs in groter dan 0.",
+        "width": 439,
+        "height": 27
+      },
+      {
+        "tag": "input",
+        "name": "WoningwaardeLaat leeg als de woningwaarde gelijk is aan de koopprijs.euroVul een geldige woningwaarde in.",
+        "width": 439,
+        "height": 27
+      },
+      {
+        "tag": "input",
+        "name": "Eigen geldeuroGebruik 0 of een hoger bedrag.",
+        "width": 439,
+        "height": 27
+      },
+      {
+        "tag": "select",
+        "name": "NHG gewenst?JaNee",
+        "width": 474,
+        "height": 24
+      },
+      {
+        "tag": "select",
+        "name": "EnergielabelOnbekendA++++A+++A++A+ABCDEFG",
+        "width": 474,
+        "height": 24
+      },
+      {
+        "tag": "input",
+        "name": "Verduurzamingskosteneuro",
+        "width": 439,
+        "height": 27
+      },
+      {
+        "tag": "input",
+        "name": "Verbouwing overige kosteneuro",
+        "width": 439,
+        "height": 27
+      },
+      {
+        "tag": "input",
+        "name": "Maandlast overige schuldenper maandGebruik 0 of een hoger bedrag.",
+        "width": 402,
+        "height": 27
+      },
+      {
+        "tag": "input",
+        "name": "Studieschuld aanwezigDUO wordt gebruteerd volgens de centrale hypotheeklaag.",
+        "width": 16,
+        "height": 16
+      },
+      {
+        "tag": "summary",
+        "name": "Toolcontext en aannamesUitklappen",
+        "width": 1186,
+        "height": 21
+      },
+      {
+        "tag": "a",
+        "name": "Alle tools",
+        "width": 69,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Kennisbank",
+        "width": 83,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Aannames",
+        "width": 76,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Voorbeeldtool",
+        "width": 96,
+        "height": 28
+      }
+    ],
+    "smallTargetCount": 27,
+    "unlabeled": [],
+    "duplicateIds": [],
+    "headings": [
+      {
+        "level": 1,
+        "text": "Maximale hypotheek"
+      },
+      {
+        "level": 2,
+        "text": "Maximale hypotheek"
+      },
+      {
+        "level": 3,
+        "text": "Inkomsten"
+      },
+      {
+        "level": 3,
+        "text": "Woning en eigen geld"
+      },
+      {
+        "level": 3,
+        "text": "Schulden"
+      }
+    ],
+    "h1Count": 1,
+    "mainCount": 1,
+    "formCount": 1,
+    "inputCount": 15
+  },
+  {
+    "mode": "desktop",
+    "name": "familiehulp",
+    "route": "/apps/familiehulp-eerste-woning",
+    "status": 200,
+    "errors": [],
+    "title": "Lenen of schenken voor eerste woning | Financiële rekentools",
+    "bodyWidth": 1440,
+    "viewportWidth": 1440,
+    "overflow": false,
+    "interactiveCount": 60,
+    "smallTargets": [
+      {
+        "tag": "a",
+        "name": "Ga direct naar de inhoud",
+        "width": 1,
+        "height": 1
+      },
+      {
+        "tag": "a",
+        "name": "Naar home",
+        "width": 72,
+        "height": 32
+      },
+      {
+        "tag": "a",
+        "name": "Stappenplan",
+        "width": 100,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Alle tools",
+        "width": 79,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Kennisbank",
+        "width": 93,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Aannames",
+        "width": 87,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "← Terug naar dashboard",
+        "width": 146,
+        "height": 21
+      },
+      {
+        "tag": "button",
+        "name": "eigen geld: Spaargeld of ander geld dat je zelf inbrengt, bijvoorbeeld bij het kopen van een huis.",
+        "width": 88,
+        "height": 33
+      },
+      {
+        "tag": "input",
+        "name": "Woningprijs€Gebruik een woningprijs groter dan 0.",
+        "width": 195,
+        "height": 27
+      },
+      {
+        "tag": "input",
+        "name": "Aankoopkosten€",
+        "width": 195,
+        "height": 27
+      },
+      {
+        "tag": "input",
+        "name": "Eigen geld€",
+        "width": 195,
+        "height": 27
+      },
+      {
+        "tag": "input",
+        "name": "Minimale bufferNa de aankoop beschikbaar houden€",
+        "width": 195,
+        "height": 27
+      },
+      {
+        "tag": "input",
+        "name": "Bancaire hypotheek€",
+        "width": 195,
+        "height": 27
+      },
+      {
+        "tag": "input",
+        "name": "Hypotheekrente%",
+        "width": 195,
+        "height": 27
+      },
+      {
+        "tag": "input",
+        "name": "Hypotheeklooptijdjaar",
+        "width": 195,
+        "height": 27
+      },
+      {
+        "tag": "select",
+        "name": "DUO-situatieIk betaal al afAanloopfaseVerlaagd door draagkrachtAflossingsvrije periodeWeet ik niet",
+        "width": 195,
+        "height": 24
+      },
+      {
+        "tag": "select",
+        "name": "TerugbetalingsregelSF35SF15SF15-oudLevenlanglerenkredietOnbekend",
+        "width": 195,
+        "height": 24
+      },
+      {
+        "tag": "input",
+        "name": "Resterende studieschuld€",
+        "width": 195,
+        "height": 27
+      },
+      {
+        "tag": "input",
+        "name": "DUO-rente%",
+        "width": 195,
+        "height": 27
+      },
+      {
+        "tag": "input",
+        "name": "Resterende looptijd DUOjaar",
+        "width": 195,
+        "height": 27
+      },
+      {
+        "tag": "input",
+        "name": "Huidige DUO-maandlast€ p/m",
+        "width": 195,
+        "height": 27
+      },
+      {
+        "tag": "input",
+        "name": "Wettelijk maandbedrag€ p/m",
+        "width": 195,
+        "height": 27
+      },
+      {
+        "tag": "input",
+        "name": "Jouw bruto jaarinkomen€",
+        "width": 195,
+        "height": 27
+      },
+      {
+        "tag": "input",
+        "name": "Partnerinkomen€",
+        "width": 195,
+        "height": 27
+      },
+      {
+        "tag": "input",
+        "name": "Extra DUO-aflossing€",
+        "width": 195,
+        "height": 27
+      },
+      {
+        "tag": "input",
+        "name": "Familielening€",
+        "width": 195,
+        "height": 27
+      },
+      {
+        "tag": "input",
+        "name": "Rente familielening%",
+        "width": 195,
+        "height": 27
+      },
+      {
+        "tag": "input",
+        "name": "Looptijd familieleningjaar",
+        "width": 195,
+        "height": 27
+      },
+      {
+        "tag": "select",
+        "name": "AflossingsvormAnnuïtairLineair",
+        "width": 195,
+        "height": 24
+      },
+      {
+        "tag": "input",
+        "name": "Eenmalige schenking€",
+        "width": 195,
+        "height": 27
+      }
+    ],
+    "smallTargetCount": 48,
+    "unlabeled": [],
+    "duplicateIds": [],
+    "headings": [
+      {
+        "level": 1,
+        "text": "Lenen of schenken voor eerste woning"
+      },
+      {
+        "level": 1,
+        "text": "Lenen of schenken naast je studieschuld"
+      },
+      {
+        "level": 3,
+        "text": "Woning en eigen geld"
+      },
+      {
+        "level": 3,
+        "text": "DUO en extra aflossen"
+      },
+      {
+        "level": 3,
+        "text": "Lenen of schenken via familie"
+      },
+      {
+        "level": 2,
+        "text": "Eerst de conclusie"
+      },
+      {
+        "level": 3,
+        "text": "Vaste maandlasten (contracten)"
+      },
+      {
+        "level": 3,
+        "text": "Wat je netto kwijt bent"
+      },
+      {
+        "level": 3,
+        "text": "Toekomstige schenkingen zijn niet zeker"
+      },
+      {
+        "level": 3,
+        "text": "Hoe je dit leest"
+      },
+      {
+        "level": 3,
+        "text": "Inputkwaliteit"
+      }
+    ],
+    "h1Count": 2,
+    "mainCount": 1,
+    "formCount": 1,
+    "inputCount": 28
+  },
+  {
+    "mode": "desktop",
+    "name": "hypotheek-impact",
+    "route": "/apps/hypotheek-impact-studieschuld",
+    "status": 200,
+    "errors": [],
+    "title": "Hypotheek-impact studieschuld | Financiële rekentools",
+    "bodyWidth": 1440,
+    "viewportWidth": 1440,
+    "overflow": false,
+    "interactiveCount": 39,
+    "smallTargets": [
+      {
+        "tag": "a",
+        "name": "Ga direct naar de inhoud",
+        "width": 1,
+        "height": 1
+      },
+      {
+        "tag": "a",
+        "name": "Naar home",
+        "width": 72,
+        "height": 32
+      },
+      {
+        "tag": "a",
+        "name": "Stappenplan",
+        "width": 100,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Alle tools",
+        "width": 79,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Kennisbank",
+        "width": 93,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Aannames",
+        "width": 87,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "← Terug naar dashboard",
+        "width": 146,
+        "height": 21
+      },
+      {
+        "tag": "button",
+        "name": "indicatief: Een vereenvoudigde berekening voor inzicht; geen officiële aangifte of advies.",
+        "width": 78,
+        "height": 33
+      },
+      {
+        "tag": "button",
+        "name": "Start met voorbeeldwaarden",
+        "width": 195,
+        "height": 39
+      },
+      {
+        "tag": "button",
+        "name": "Wis invoer",
+        "width": 87,
+        "height": 39
+      },
+      {
+        "tag": "input",
+        "name": "Toon geavanceerde aannamesToon gebruikte defaults en bruteringscontext",
+        "width": 16,
+        "height": 16
+      },
+      {
+        "tag": "button",
+        "name": "Bereken",
+        "width": 96,
+        "height": 43
+      },
+      {
+        "tag": "summary",
+        "name": "Toolcontext en aannamesUitklappen",
+        "width": 1186,
+        "height": 21
+      },
+      {
+        "tag": "a",
+        "name": "Alle tools",
+        "width": 69,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Kennisbank",
+        "width": 83,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Aannames",
+        "width": 76,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Voorbeeldtool",
+        "width": 96,
+        "height": 28
+      }
+    ],
+    "smallTargetCount": 17,
+    "unlabeled": [],
+    "duplicateIds": [],
+    "headings": [
+      {
+        "level": 1,
+        "text": "Hypotheek-impact studieschuld"
+      },
+      {
+        "level": 2,
+        "text": "Hypotheek-impact van je studieschuld"
+      },
+      {
+        "level": 3,
+        "text": "Jouw DUO-situatie"
+      },
+      {
+        "level": 3,
+        "text": "DUO-bedragen"
+      },
+      {
+        "level": 3,
+        "text": "Woningdoel"
+      },
+      {
+        "level": 3,
+        "text": "Hypotheek-aannames"
+      },
+      {
+        "level": 3,
+        "text": "Hoe rekenen we dit?"
+      },
+      {
+        "level": 3,
+        "text": "Hoe komen we aan het DUO-bedrag?"
+      },
+      {
+        "level": 3,
+        "text": "Verplicht DUO-bedrag vs keuzebedrag"
+      },
+      {
+        "level": 3,
+        "text": "Wat is brutering?"
+      },
+      {
+        "level": 3,
+        "text": "Wat betekent dit voor je hypotheek?"
+      },
+      {
+        "level": 3,
+        "text": "Wat als je extra aflost?"
+      },
+      {
+        "level": 3,
+        "text": "Wat kun je hiermee?"
+      },
+      {
+        "level": 3,
+        "text": "Checklist Mijn DUO"
+      },
+      {
+        "level": 3,
+        "text": "SF35, SF15 en SF15-oud kort uitgelegd"
+      },
+      {
+        "level": 3,
+        "text": "Waarom eerlijk opgeven?"
+      },
+      {
+        "level": 3,
+        "text": "Belangrijke aannames"
+      },
+      {
+        "level": 3,
+        "text": "Waarom geen snelle vuistregel meer?"
+      }
+    ],
+    "h1Count": 1,
+    "mainCount": 1,
+    "formCount": 0,
+    "inputCount": 15
+  },
+  {
+    "mode": "desktop",
+    "name": "schulden-volgorde",
+    "route": "/apps/schulden-volgorde",
+    "status": 200,
+    "errors": [],
+    "title": "Welke schuld eerst? | Financiële rekentools",
+    "bodyWidth": 1440,
+    "viewportWidth": 1440,
+    "overflow": false,
+    "interactiveCount": 29,
+    "smallTargets": [
+      {
+        "tag": "a",
+        "name": "Ga direct naar de inhoud",
+        "width": 1,
+        "height": 1
+      },
+      {
+        "tag": "a",
+        "name": "Naar home",
+        "width": 72,
+        "height": 32
+      },
+      {
+        "tag": "a",
+        "name": "Stappenplan",
+        "width": 100,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Alle tools",
+        "width": 79,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Kennisbank",
+        "width": 93,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Aannames",
+        "width": 87,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "← Terug naar dashboard",
+        "width": 146,
+        "height": 21
+      },
+      {
+        "tag": "button",
+        "name": "achteraf betalen: Nu kopen en later betalen. Het voelt klein, maar kan je overzicht en maandruimte verminderen.",
+        "width": 139,
+        "height": 33
+      },
+      {
+        "tag": "button",
+        "name": "achteraf betalen: Nu kopen en later betalen. Het voelt klein, maar kan je overzicht en maandruimte verminderen.",
+        "width": 105,
+        "height": 25
+      },
+      {
+        "tag": "summary",
+        "name": "Toolcontext en aannamesUitklappen",
+        "width": 1186,
+        "height": 21
+      },
+      {
+        "tag": "a",
+        "name": "Alle tools",
+        "width": 69,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Kennisbank",
+        "width": 83,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Aannames",
+        "width": 76,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Voorbeeldtool",
+        "width": 96,
+        "height": 28
+      }
+    ],
+    "smallTargetCount": 14,
+    "unlabeled": [
+      {
+        "tag": "input",
+        "type": null,
+        "id": ""
+      },
+      {
+        "tag": "input",
+        "type": null,
+        "id": ""
+      },
+      {
+        "tag": "input",
+        "type": null,
+        "id": ""
+      },
+      {
+        "tag": "input",
+        "type": null,
+        "id": ""
+      },
+      {
+        "tag": "input",
+        "type": null,
+        "id": ""
+      },
+      {
+        "tag": "input",
+        "type": null,
+        "id": ""
+      },
+      {
+        "tag": "input",
+        "type": null,
+        "id": ""
+      },
+      {
+        "tag": "input",
+        "type": null,
+        "id": ""
+      }
+    ],
+    "duplicateIds": [],
+    "headings": [
+      {
+        "level": 1,
+        "text": "Welke schuld eerst?"
+      },
+      {
+        "level": 2,
+        "text": "Welke schuld eerst?"
+      }
+    ],
+    "h1Count": 1,
+    "mainCount": 1,
+    "formCount": 1,
+    "inputCount": 9
+  },
+  {
+    "mode": "desktop",
+    "name": "studieschuld-beleggen",
+    "route": "/apps/studieschuld-vs-beleggen",
+    "status": 200,
+    "errors": [],
+    "title": "Studieschuld extra aflossen of beleggen? | Financiële rekentools",
+    "bodyWidth": 1440,
+    "viewportWidth": 1440,
+    "overflow": false,
+    "interactiveCount": 34,
+    "smallTargets": [
+      {
+        "tag": "a",
+        "name": "Ga direct naar de inhoud",
+        "width": 1,
+        "height": 1
+      },
+      {
+        "tag": "a",
+        "name": "Naar home",
+        "width": 72,
+        "height": 32
+      },
+      {
+        "tag": "a",
+        "name": "Stappenplan",
+        "width": 100,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Alle tools",
+        "width": 79,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Kennisbank",
+        "width": 93,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Aannames",
+        "width": 87,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "← Terug naar dashboard",
+        "width": 146,
+        "height": 21
+      },
+      {
+        "tag": "button",
+        "name": "Start met voorbeeldwaarden",
+        "width": 195,
+        "height": 39
+      },
+      {
+        "tag": "input",
+        "name": "Geavanceerde aannameBox 3-effect indicatief meenemen",
+        "width": 16,
+        "height": 16
+      },
+      {
+        "tag": "button",
+        "name": "Bereken",
+        "width": 96,
+        "height": 43
+      },
+      {
+        "tag": "summary",
+        "name": "Toolcontext en aannamesUitklappen",
+        "width": 1186,
+        "height": 21
+      },
+      {
+        "tag": "a",
+        "name": "Alle tools",
+        "width": 69,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Kennisbank",
+        "width": 83,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Aannames",
+        "width": 76,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Voorbeeldtool",
+        "width": 96,
+        "height": 28
+      }
+    ],
+    "smallTargetCount": 15,
+    "unlabeled": [],
+    "duplicateIds": [],
+    "headings": [
+      {
+        "level": 1,
+        "text": "Studieschuld extra aflossen of beleggen?"
+      },
+      {
+        "level": 2,
+        "text": "Studieschuld extra aflossen of beleggen?"
+      },
+      {
+        "level": 3,
+        "text": "DUO-kernbedragen"
+      },
+      {
+        "level": 3,
+        "text": "Extra aflossen vs beleggen"
+      },
+      {
+        "level": 3,
+        "text": "Grafiek: schuldverloop en beleggingswaarde"
+      },
+      {
+        "level": 3,
+        "text": "Hoe rekenen we dit?"
+      },
+      {
+        "level": 3,
+        "text": "Welke aannames gebruiken we?"
+      }
+    ],
+    "h1Count": 1,
+    "mainCount": 1,
+    "formCount": 0,
+    "inputCount": 9
+  },
+  {
+    "mode": "desktop",
+    "name": "volgende-euro",
+    "route": "/apps/volgende-euro",
+    "status": 200,
+    "errors": [],
+    "title": "Wat doe ik met mijn volgende euro? | Financiële rekentools",
+    "bodyWidth": 1440,
+    "viewportWidth": 1440,
+    "overflow": false,
+    "interactiveCount": 32,
+    "smallTargets": [
+      {
+        "tag": "a",
+        "name": "Ga direct naar de inhoud",
+        "width": 1,
+        "height": 1
+      },
+      {
+        "tag": "a",
+        "name": "Naar home",
+        "width": 72,
+        "height": 32
+      },
+      {
+        "tag": "a",
+        "name": "Stappenplan",
+        "width": 100,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Alle tools",
+        "width": 79,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Kennisbank",
+        "width": 93,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "Aannames",
+        "width": 87,
+        "height": 40
+      },
+      {
+        "tag": "a",
+        "name": "← Terug naar dashboard",
+        "width": 146,
+        "height": 21
+      },
+      {
+        "tag": "button",
+        "name": "buffer: Geld dat je achter de hand houdt voor tegenvallers, zodat je niet direct hoeft te lenen of verkopen.",
+        "width": 50,
+        "height": 33
+      },
+      {
+        "tag": "button",
+        "name": "Start met voorbeeldwaarden",
+        "width": 195,
+        "height": 39
+      },
+      {
+        "tag": "input",
+        "name": "Sta je open voor beleggen?Ja",
+        "width": 16,
+        "height": 16
+      },
+      {
+        "tag": "input",
+        "name": "Heb je schulden?Ja",
+        "width": 16,
+        "height": 16
+      },
+      {
+        "tag": "input",
+        "name": "Heb je een hypotheek?Ja",
+        "width": 16,
+        "height": 16
+      },
+      {
+        "tag": "summary",
+        "name": "Toolcontext en aannamesUitklappen",
+        "width": 1186,
+        "height": 21
+      },
+      {
+        "tag": "a",
+        "name": "Alle tools",
+        "width": 69,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Kennisbank",
+        "width": 83,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Aannames",
+        "width": 76,
+        "height": 28
+      },
+      {
+        "tag": "a",
+        "name": "Voorbeeldtool",
+        "width": 96,
+        "height": 28
+      }
+    ],
+    "smallTargetCount": 17,
+    "unlabeled": [],
+    "duplicateIds": [],
+    "headings": [
+      {
+        "level": 1,
+        "text": "Wat doe ik met mijn volgende euro?"
+      },
+      {
+        "level": 2,
+        "text": "Wat doe ik met mijn volgende euro?"
+      },
+      {
+        "level": 3,
+        "text": "Hoe rekenen we dit?"
+      },
+      {
+        "level": 3,
+        "text": "Welke aannames gebruiken we?"
+      },
+      {
+        "level": 3,
+        "text": "Waar moet je op letten?"
+      }
+    ],
+    "h1Count": 1,
+    "mainCount": 1,
+    "formCount": 1,
+    "inputCount": 7
+  }
+]

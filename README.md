@@ -29,6 +29,7 @@ npm run dev
 npm run typecheck
 npm run lint
 npm run build
+npm run test:ux
 npm run start
 ```
 
@@ -175,3 +176,11 @@ Belangrijk:
 - Apps worden alleen zichtbaar via een geldig manifest.
 - Inputvalidatie gebeurt in de calculatorcomponenten.
 - De generator weigert ongeldige manifests of onveilige `entry`-paden.
+
+## Ontwikkelrichtlijnen
+
+- `AGENTS.md`: verplichte architectuur- en UX-regels voor agents en engineers.
+- `UX_GUIDELINES.md`: gebruikersstromen, formulieren, toegankelijkheid en responsive gedrag.
+- `DESIGN_SYSTEM.md`: tokens, componentpatronen en interactiestates.
+- `CONTRIBUTING.md`: lokale workflow, controles en opleverchecklist.
+- `docs/UX_AUDIT_2026-06-13.md`: laatste projectbrede UX-audit en open aanbevelingen.
