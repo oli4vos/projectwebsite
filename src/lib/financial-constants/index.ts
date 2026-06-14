@@ -110,5 +110,6 @@ export type {
   MortgageFinancingLoadRow,
   MortgageFinancingLoadTable,
   RepaymentRuleKey,
+  SourceTier,
 } from "@/lib/financial-constants/types";
 export { getMortgageFinancingLoadTable };

@@ -5,7 +5,8 @@ import {
   getDefaultFinancialYear,
   getFinancialConstants,
 } from "@/lib/financial-constants";
-import type { AssumptionStatus } from "@/lib/financial-constants";
+import type { AssumptionStatus, SourceTier } from "@/lib/financial-constants";
+import { SOURCE_TIER_LABELS, isApproximation } from "@/lib/source-tier";
 
 function formatPercent(value: number) {
   return new Intl.NumberFormat("nl-NL", {
@@ -70,20 +71,52 @@ function MetaBlock({
   status,
   lastChecked,
   notes,
+  sourceUrl,
+  sourceTier,
 }: {
   year: number;
   sourceLabel: string;
   status: AssumptionStatus;
   lastChecked: string;
   notes?: string;
+  sourceUrl: string | null;
+  sourceTier: SourceTier;
 }) {
+  const isApprox = isApproximation(sourceTier);
+
   return (
     <div className="mt-4 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[12.5px] leading-[1.6] text-[var(--muted)]">
       <p>Jaar: {year}</p>
       <p>Status: {formatStatusLabel(status)}</p>
       <p>Gecontroleerd op: {formatIsoDate(lastChecked)}</p>
-      <p>Bron/aannameset: {sourceLabel}</p>
-      {notes ? <p>Toelichting: {notes}</p> : null}
+      <p>
+        Bron/aannameset:{" "}
+        {sourceUrl ? (
+          <a
+            href={sourceUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline text-[var(--ink)] hover:text-[var(--ink-2)]"
+          >
+            {sourceLabel}
+          </a>
+        ) : (
+          sourceLabel
+        )}
+      </p>
+      <p className="mt-2">
+        Niveau:{" "}
+        <span
+          className={`inline-block rounded-md px-2 py-1 text-[11px] font-medium ${
+            isApprox
+              ? "bg-amber-100/50 text-amber-900"
+              : "bg-slate-200/50 text-slate-900"
+          }`}
+        >
+          {SOURCE_TIER_LABELS[sourceTier]}
+        </span>
+      </p>
+      {notes ? <p className="mt-2">Toelichting: {notes}</p> : null}
     </div>
   );
 }
