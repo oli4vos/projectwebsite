@@ -1,10 +1,21 @@
 export type AssumptionStatus = "definitief" | "voorlopig" | "indicatief";
 
+export type SourceTier =
+  | "wet"
+  | "normadvies"
+  | "toezicht"
+  | "overheidsuitleg"
+  | "praktijk"
+  | "indicatieve-benadering"
+  | "projectaanname";
+
 export type AssumptionMeta = {
   sourceLabel: string;
   lastChecked: string;
   status: AssumptionStatus;
   notes?: string;
+  sourceUrl: string | null;
+  sourceTier: SourceTier;
 };
 
 export type GrossUpFactorBand = {

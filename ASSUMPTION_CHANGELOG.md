@@ -15,6 +15,11 @@ Doel: wijzigingen in vaste aannames/percentages expliciet loggen los van feature
 - Wijziging: geen aanname/percentagewijziging, alleen copy-vereenvoudiging.
 - Impact: geen rekentechnische impact.
 
+## 2026-06-14
+- Commit: `73cb154`, `8b42bb8`
+- Wijziging: bronmetadata toegevoegd (sourceUrl + sourceTier per AssumptionMeta-blok in years.ts); velden verplicht gesteld in types.ts.
+- Impact: geen rekentechnische impact; puur machineleesbare documentatie.
+
 ## Template
 - Datum:
 - Commit:
