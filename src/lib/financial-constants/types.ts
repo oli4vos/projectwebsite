@@ -14,8 +14,8 @@ export type AssumptionMeta = {
   lastChecked: string;
   status: AssumptionStatus;
   notes?: string;
-  sourceUrl?: string | null;
-  sourceTier?: SourceTier;
+  sourceUrl: string | null;
+  sourceTier: SourceTier;
 };
 
 export type GrossUpFactorBand = {
