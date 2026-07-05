@@ -193,6 +193,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/components/GlossaryText.tsx`: maakt bekende financiële begrippen klikbaar met korte hover/focus-uitleg
 - `src/lib/knowledge-sources.ts`: centrale bronregisters en bronhiërarchie voor kennisbankdocumenten
 - `src/lib/duo/`: centrale DUO-domeinlaag met wettelijk maandbedrag, relevant maandbedrag per situatie en scenariofuncties voor extra aflossen
+- `src/lib/duo/project-duo-loan.ts`: centrale leenfaseprojectie voor doorlenen of stoppen, inclusief rentevolgorde, aanloopfase, theoretische SF35-maandtermijn en optionele hypotheekimpact
 - `src/lib/planning/`: centrale planninghelpers voor doelgroep-/levensgebeurtenis-tools zoals koop-vs-huur, schulden-volgorde en kind-wordt-18
 - `src/lib/duo/calculations.test.ts`: regressietests voor centrale DUO-berekenfuncties
 - `src/lib/tax/`: centrale indicatieve tax-laag voor box 1, hypotheekrenteaftrek en box 3
@@ -292,6 +293,12 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - gebruikt optioneel centrale tax-laag voor een indicatieve box 3-correctie in de verdiepingslaag
   - box 3-effect wordt jaarlijks toegepast; jaarlijkse heffing wordt uit het beleggingsscenario betaald en telt daarna niet mee in verdere compoundgroei
   - als box 3-toggle uit staat, toont de tool expliciet dat de beleggingsuitkomst dan mogelijk te optimistisch is
+- `apps/duo-doorlenen-of-stoppen`
+  - publieke beta-tool voor studenten/starters die willen zien wat langer of meer lenen in de leenfase doet
+  - gebruikt centrale DUO-projectie: rente per maand eerst over de openstaande schuld, daarna de maandelijkse opname
+  - vergelijkt “nu stoppen” met “doorlenen tot de gekozen laatste leenmaand”
+  - toont schuld bij start aflossen, theoretische DUO-maandtermijn, totaal terugbetalen en optioneel hypotheekimpact
+  - gebruikt de centrale DUO-leenlimiet uit `src/lib/financial-constants/` voor slider en validatie
 - `apps/box3-indicatie`
   - aparte box 3-tool met light invoer + beknopte samenvatting + uitklapbare verdieping
   - ondersteunt werkelijk rendement (default) en forfaitair scenario

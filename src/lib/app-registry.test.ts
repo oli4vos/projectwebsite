@@ -11,8 +11,9 @@ describe("generated app registry", () => {
   });
 
   it("contains expected public tools", () => {
-    expect(appRegistry).toHaveLength(6);
+    expect(appRegistry).toHaveLength(7);
     expect(appRegistryBySlug["artifact-hypotheek-wonen-maximale-hypotheek"]).toBeDefined();
+    expect(appRegistryBySlug["duo-doorlenen-of-stoppen"]).toBeDefined();
     expect(appRegistryBySlug["familiehulp-eerste-woning"]).toBeDefined();
     expect(appRegistryBySlug["hypotheek-impact-studieschuld"]).toBeDefined();
     expect(appRegistryBySlug["studieschuld-vs-beleggen"]).toBeDefined();

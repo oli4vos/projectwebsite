@@ -1,0 +1,19 @@
+{
+  "slug": "duo-doorlenen-of-stoppen",
+  "title": "DUO doorlenen of stoppen",
+  "description": "Projecteer wat doorlenen in de leenfase doet met je studieschuld, toekomstige maandtermijn en optionele hypotheekruimte.",
+  "type": "frontend",
+  "category": "Schulden",
+  "tags": ["DUO", "studieschuld", "leenfase", "hypotheek", "starter"],
+  "status": "beta",
+  "visibility": "public",
+  "requiredProfileFields": ["studentDebt.remainingDebt"],
+  "reasonHint": "Handig als je wilt zien wat langer of meer lenen doet met je eindschuld en toekomstige DUO-maandtermijn.",
+  "assumptionsUsed": ["duo", "mortgage"],
+  "calculationDomains": ["studentDebt", "mortgage", "cashflow"],
+  "riskLevel": "medium",
+  "disclaimerType": "duoIndicative",
+  "outputType": "scenarioComparison",
+  "version": "1.0.0",
+  "entry": "Calculator.tsx"
+}
