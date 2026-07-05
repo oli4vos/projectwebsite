@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { AreaChart, getAdaptiveEuroTicks, getAdaptiveYearTicks } from "@/components/charts";
 import { ChartContainer, ChartLegend } from "@/components/ChartPrimitives";
 import { DisclosureSection } from "@/components/DisclosureSection";
@@ -105,6 +106,15 @@ function formatCsvNumber(value: number) {
   return value.toFixed(2).replace(".", ",");
 }
 
+function escapeHtml(value: string | number) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
 function buildPlanningCsv(result: NonNullable<ReturnType<typeof calculateJaarruimteVsVrijBeleggen>>) {
   const lines: string[] = [
     "Jaarruimte of vrij beleggen - vermogensplanning",
@@ -156,13 +166,13 @@ function openPlanningPdfExport(result: NonNullable<ReturnType<typeof calculateJa
     .map(
       (point) =>
         `<tr>
-          <td>${point.year}</td>
-          <td>${formatCurrency(point.pensionGross)}</td>
-          <td>${formatCurrency(point.pensionNetIndicative)}</td>
-          <td>${formatCurrency(point.investingGrossWithoutBox3)}</td>
-          <td>${formatCurrency(point.investingNetAfterBox3)}</td>
-          <td>${formatCurrency(point.box3TaxThisYear)}</td>
-          <td>${formatCurrency(point.cumulativeBox3Tax)}</td>
+          <td>${escapeHtml(point.year)}</td>
+          <td>${escapeHtml(formatCurrency(point.pensionGross))}</td>
+          <td>${escapeHtml(formatCurrency(point.pensionNetIndicative))}</td>
+          <td>${escapeHtml(formatCurrency(point.investingGrossWithoutBox3))}</td>
+          <td>${escapeHtml(formatCurrency(point.investingNetAfterBox3))}</td>
+          <td>${escapeHtml(formatCurrency(point.box3TaxThisYear))}</td>
+          <td>${escapeHtml(formatCurrency(point.cumulativeBox3Tax))}</td>
         </tr>`,
     )
     .join("");
@@ -184,10 +194,10 @@ function openPlanningPdfExport(result: NonNullable<ReturnType<typeof calculateJa
 </head>
 <body>
   <h1>Vermogensplanning - Jaarruimte of vrij beleggen</h1>
-  <p>Belastingjaar: ${result.year}</p>
-  <p>Horizon: ${result.horizonYears} jaar</p>
-  <p>Verwacht rendement: ${formatPercent(result.expectedAnnualReturn)}%</p>
-  <p>Totaal box 3 over horizon (indicatief): ${formatCurrency(result.wealthPlanning.totalBox3TaxPaid)}</p>
+  <p>Belastingjaar: ${escapeHtml(result.year)}</p>
+  <p>Horizon: ${escapeHtml(result.horizonYears)} jaar</p>
+  <p>Verwacht rendement: ${escapeHtml(formatPercent(result.expectedAnnualReturn))}%</p>
+  <p>Totaal box 3 over horizon (indicatief): ${escapeHtml(formatCurrency(result.wealthPlanning.totalBox3TaxPaid))}</p>
   <table>
     <thead>
       <tr>
@@ -205,14 +215,26 @@ function openPlanningPdfExport(result: NonNullable<ReturnType<typeof calculateJa
 </body>
 </html>`;
 
-  const printWindow = window.open("", "_blank", "noopener,noreferrer,width=980,height=780");
+  const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const printWindow = window.open(url, "_blank", "width=980,height=780");
   if (!printWindow) {
-    return;
+    URL.revokeObjectURL(url);
+    return "De PDF-export kon niet openen. Sta pop-ups toe voor deze site en probeer opnieuw.";
   }
-  printWindow.document.write(html);
-  printWindow.document.close();
-  printWindow.focus();
-  printWindow.print();
+
+  printWindow.opener = null;
+  printWindow.addEventListener(
+    "load",
+    () => {
+      printWindow.focus();
+      printWindow.print();
+      window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    },
+    { once: true },
+  );
+
+  return undefined;
 }
 
 function validateForm(values: FormState) {
@@ -350,6 +372,7 @@ function CalculatorContent({
   hasRelevantProfileValues,
   profilePatch,
 }: CalculatorContentProps) {
+  const [pdfExportMessage, setPdfExportMessage] = useState<string | null>(null);
   const {
     formValues,
     setFormValues,
@@ -430,6 +453,10 @@ function CalculatorContent({
     if (parsedValues) {
       goToResult();
     }
+  }
+
+  function handlePlanningPdfExport(resultToExport: NonNullable<ReturnType<typeof calculateJaarruimteVsVrijBeleggen>>) {
+    setPdfExportMessage(openPlanningPdfExport(resultToExport) ?? null);
   }
 
   return (
@@ -755,12 +782,17 @@ function CalculatorContent({
                   type="button"
                   kind="ghost"
                   size="sm"
-                  onClick={() => openPlanningPdfExport(result)}
+                  onClick={() => handlePlanningPdfExport(result)}
                 >
                   PDF-export
                 </Btn>
               </div>
             </div>
+            {pdfExportMessage ? (
+              <p className="mt-3 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[13px] leading-6 text-[var(--muted)]">
+                {pdfExportMessage}
+              </p>
+            ) : null}
             <div className="mt-5">
               <ResultRow label="Gevraagde inleg" value={formatCurrency(result.contributionRequested)} />
               <ResultRow
