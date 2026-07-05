@@ -23,18 +23,18 @@ describe("profile recommendations", () => {
     expect(recommendations[0].reason.length).toBeGreaterThan(0);
   });
 
-  it("returns volgende-euro fallback for empty profile", () => {
+  it("returns duo-maandbedrag fallback for empty profile", () => {
     const slugs = getRecommendedAppSlugsForProfile({}, { availableSlugs });
-    expect(slugs).toEqual(["volgende-euro"]);
+    expect(slugs).toEqual(["duo-maandbedrag"]);
   });
 
-  it("returns a general reason for volgende-euro fallback", () => {
+  it("returns a general reason for duo-maandbedrag fallback", () => {
     const recommendations = getRecommendedAppsForProfile({}, { availableSlugs });
     expect(recommendations).toEqual([
       {
-        slug: "volgende-euro",
+        slug: "duo-maandbedrag",
         reason:
-          "Omdat dit een brede starttool is als je nog niet weet waar je geld het beste naartoe kan.",
+          "Handig als je eerst wilt begrijpen welk DUO-maandbedrag bij je schuld hoort.",
       },
     ]);
   });
@@ -43,11 +43,11 @@ describe("profile recommendations", () => {
     const recommendations = getRecommendedAppsForProfile(
       {},
       {
-        availableSlugs: ["volgende-euro"],
+        availableSlugs: ["duo-maandbedrag"],
         apps: [
           {
-            slug: "volgende-euro",
-            reasonHint: "Handig als je eerst breed wilt verkennen waar je volgende euro naartoe kan.",
+            slug: "duo-maandbedrag",
+            reasonHint: "Handig als je je DUO-maandbedrag eerst wilt begrijpen.",
           },
         ],
       },
@@ -55,9 +55,8 @@ describe("profile recommendations", () => {
 
     expect(recommendations).toEqual([
       {
-        slug: "volgende-euro",
-        reason:
-          "Handig als je eerst breed wilt verkennen waar je volgende euro naartoe kan.",
+        slug: "duo-maandbedrag",
+        reason: "Handig als je je DUO-maandbedrag eerst wilt begrijpen.",
       },
     ]);
   });
@@ -69,18 +68,18 @@ describe("profile recommendations", () => {
         availableSlugs,
         apps: [
           {
-            slug: "studieschuld-vs-beleggen",
+            slug: "duo-extra-aflossen",
             reasonHint: "Handig als je studieschuldscenario's wilt vergelijken.",
           },
         ],
       },
     );
     const studieschuldRecommendation = recommendations.find(
-      (item) => item.slug === "studieschuld-vs-beleggen",
+      (item) => item.slug === "duo-extra-aflossen",
     );
 
     expect(studieschuldRecommendation?.reason).toBe(
-      "Omdat je studieschuld hebt ingevuld en extra aflossen niet altijd de enige logische keuze is.",
+      "Omdat je studieschuld hebt ingevuld en extra aflossen je maandbedrag of looptijd kan veranderen.",
     );
   });
 
@@ -88,16 +87,16 @@ describe("profile recommendations", () => {
     const recommendations = getRecommendedAppsForProfile(
       {},
       {
-        availableSlugs: ["volgende-euro"],
-        apps: [{ slug: "volgende-euro" }],
+        availableSlugs: ["duo-maandbedrag"],
+        apps: [{ slug: "duo-maandbedrag" }],
       },
     );
 
     expect(recommendations).toEqual([
       {
-        slug: "volgende-euro",
+        slug: "duo-maandbedrag",
         reason:
-          "Omdat dit een brede starttool is als je nog niet weet waar je geld het beste naartoe kan.",
+          "Handig als je eerst wilt begrijpen welk DUO-maandbedrag bij je schuld hoort.",
       },
     ]);
   });
@@ -109,7 +108,8 @@ describe("profile recommendations", () => {
       },
     };
     const slugs = getRecommendedAppSlugsForProfile(profile, { availableSlugs });
-    expect(slugs).toContain("studieschuld-vs-beleggen");
+    expect(slugs).toContain("duo-maandbedrag");
+    expect(slugs).toContain("duo-extra-aflossen");
     expect(slugs).toContain("hypotheek-impact-studieschuld");
   });
 
@@ -119,7 +119,7 @@ describe("profile recommendations", () => {
       { availableSlugs },
     );
     const studieschuldRecommendation = recommendations.find(
-      (item) => item.slug === "studieschuld-vs-beleggen",
+      (item) => item.slug === "duo-maandbedrag",
     );
 
     expect(studieschuldRecommendation?.reason).toContain("studieschuld");
@@ -133,7 +133,7 @@ describe("profile recommendations", () => {
     };
     const slugs = getRecommendedAppSlugsForProfile(profile, { availableSlugs });
     expect(slugs).toContain("hypotheek-impact-studieschuld");
-    expect(slugs).not.toContain("hypotheek-aflossen-vs-beleggen");
+    expect(slugs).toContain("artifact-hypotheek-wonen-maximale-hypotheek");
   });
 
   it("adds housing specific reason text", () => {
@@ -155,12 +155,12 @@ describe("profile recommendations", () => {
       },
     };
     const slugs = getRecommendedAppSlugsForProfile(profile, { availableSlugs });
-    expect(slugs).toEqual(["volgende-euro"]);
+    expect(slugs).toEqual(["duo-maandbedrag"]);
     expect(slugs).not.toContain("box-3-impact");
     expect(slugs).not.toContain("fire-na-belasting");
   });
 
-  it("adds investing specific reason text", () => {
+  it("adds buffer specific reason text", () => {
     const recommendations = getRecommendedAppsForProfile(
       { savingInvesting: { currentSavings: 30000 } },
       { availableSlugs },
@@ -170,7 +170,7 @@ describe("profile recommendations", () => {
     );
 
     expect(box3Recommendation).toBeUndefined();
-    expect(recommendations[0]?.reason).toContain("brede starttool");
+    expect(recommendations[0]?.reason).toContain("buffer");
   });
 
   it("recommends zzp tool for self-employed profile", () => {
@@ -180,7 +180,7 @@ describe("profile recommendations", () => {
       },
     };
     const slugs = getRecommendedAppSlugsForProfile(profile, { availableSlugs });
-    expect(slugs).toEqual(["volgende-euro"]);
+    expect(slugs).toEqual(["duo-maandbedrag"]);
     expect(slugs).not.toContain("zzp-uurtarief");
   });
 
@@ -194,7 +194,7 @@ describe("profile recommendations", () => {
     );
 
     expect(zzpRecommendation).toBeUndefined();
-    expect(recommendations[0]?.reason).toContain("brede starttool");
+    expect(recommendations[0]?.reason).toContain("draagkrachtindicatie");
   });
 
   it("returns max 3 unique slugs", () => {
@@ -230,22 +230,22 @@ describe("profile recommendations", () => {
       studentDebt: { remainingDebt: 1000 },
     };
     const slugs = getRecommendedAppSlugsForProfile(profile, {
-      availableSlugs: ["volgende-euro"],
+      availableSlugs: ["duo-maandbedrag"],
     });
-    expect(slugs).toEqual(["volgende-euro"]);
+    expect(slugs).toEqual(["duo-maandbedrag"]);
   });
 
   it("filters recommendation objects against available list", () => {
     const recommendations = getRecommendedAppsForProfile(
       { studentDebt: { remainingDebt: 1000 } },
-      { availableSlugs: ["volgende-euro"] },
+      { availableSlugs: ["duo-maandbedrag"] },
     );
 
     expect(recommendations).toEqual([
       {
-        slug: "volgende-euro",
+        slug: "duo-maandbedrag",
         reason:
-          "Omdat dit een brede starttool is als je nog niet weet waar je geld het beste naartoe kan.",
+          "Omdat je studieschuld hebt ingevuld en eerst je wettelijke DUO-maandbedrag wilt begrijpen.",
       },
     ]);
   });
@@ -257,7 +257,7 @@ describe("profile recommendations", () => {
     );
 
     expect(slugs.every((slug) => typeof slug === "string")).toBe(true);
-    expect(slugs).toContain("studieschuld-vs-beleggen");
+    expect(slugs).toContain("duo-maandbedrag");
   });
 });
 

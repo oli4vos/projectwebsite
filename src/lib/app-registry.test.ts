@@ -14,11 +14,13 @@ describe("generated app registry", () => {
     expect(appRegistry).toHaveLength(7);
     expect(appRegistryBySlug["artifact-hypotheek-wonen-maximale-hypotheek"]).toBeDefined();
     expect(appRegistryBySlug["duo-doorlenen-of-stoppen"]).toBeDefined();
+    expect(appRegistryBySlug["duo-extra-aflossen"]).toBeDefined();
+    expect(appRegistryBySlug["duo-maandbedrag"]).toBeDefined();
     expect(appRegistryBySlug["familiehulp-eerste-woning"]).toBeDefined();
     expect(appRegistryBySlug["hypotheek-impact-studieschuld"]).toBeDefined();
-    expect(appRegistryBySlug["studieschuld-vs-beleggen"]).toBeDefined();
-    expect(appRegistryBySlug["volgende-euro"]).toBeDefined();
     expect(appRegistryBySlug["schulden-volgorde"]).toBeDefined();
+    expect(appRegistryBySlug["studieschuld-vs-beleggen"]).toBeUndefined();
+    expect(appRegistryBySlug["volgende-euro"]).toBeUndefined();
     expect(appRegistryBySlug["jaarruimte-vs-vrij-beleggen"]).toBeUndefined();
     expect(appRegistryBySlug["box-3-impact"]).toBeUndefined();
     expect(appRegistryBySlug["hypotheek-aflossen-vs-beleggen"]).toBeUndefined();

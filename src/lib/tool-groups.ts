@@ -9,93 +9,66 @@ export type ToolGroup = {
 
 export const toolGroups: ToolGroup[] = [
   {
-    title: "Extra geld",
-    description: "Wat doe je als er geld overblijft: aflossen, buffer houden of iets anders?",
-    slugs: ["volgende-euro", "schulden-volgorde", "kind-wordt-18-impact"],
-  },
-  {
     title: "Studieschuld",
-    description: "Begin hier: je maandlast, extra aflossen en wat DUO voor je keuzes betekent.",
+    description: "Begin hier: schuldopbouw, maandbedrag en wat DUO voor je keuzes betekent.",
     slugs: [
-      "studieschuld-vs-beleggen",
+      "duo-doorlenen-of-stoppen",
+      "duo-maandbedrag",
+      "duo-extra-aflossen",
       "schulden-volgorde",
       "hypotheek-impact-studieschuld",
     ],
   },
   {
     title: "Wonen",
-    description: "Verdieping voor kopen: hypotheekruimte, eigen geld en hulp van familie.",
+    description: "Verdieping voor kopen: hypotheekruimte, woningwaarde, eigen geld en hulp van familie.",
     slugs: [
-      "artifact-hypotheek-wonen-maximale-hypotheek",
       "hypotheek-impact-studieschuld",
-      "hypotheek-aflossen-vs-beleggen",
-      "annuitair-lineair",
-      "koop-vs-huur",
-      "hypotheekrenteaftrek-afschaffen",
+      "artifact-hypotheek-wonen-maximale-hypotheek",
+      "familiehulp-eerste-woning",
     ],
   },
   {
-    title: "Sparen & beleggen",
-    description: "Voor vermogensopbouw met belastingimpact en flexibiliteit.",
-    slugs: [
-      "prive-beleggen-eindvermogen",
-      "box-3-impact",
-      "jaarruimte-vs-vrij-beleggen",
-      "fire-na-belasting",
-    ],
-  },
-  {
-    title: "Belasting",
-    description: "Rekentools rond box 3 en fiscale afwegingen.",
-    slugs: ["box-3-impact", "jaarruimte-vs-vrij-beleggen", "hypotheekrenteaftrek-afschaffen"],
-  },
-  {
-    title: "FIRE / financiële vrijheid",
-    description: "Langetermijnprojectie richting minder of niet meer hoeven werken.",
-    slugs: ["fire-na-belasting"],
-  },
-  {
-    title: "Werk & ZZP",
-    description: "Inschatten welk uurtarief nodig is inclusief reserveringen.",
-    slugs: ["zzp-uurtarief"],
+    title: "Terugbetalen",
+    description: "Bekijk aflossen als volgorde- en maandruimte-vraag, zonder adviesclaim.",
+    slugs: ["duo-extra-aflossen", "duo-maandbedrag", "schulden-volgorde"],
   },
 ];
 
 const categoryToGroupTitle: Record<string, string> = {
   Schulden: "Studieschuld",
   Hypotheek: "Wonen",
-  Beleggen: "Sparen & beleggen",
+  Beleggen: "Terugbetalen",
   Belasting: "Belasting",
   Werk: "Werk & ZZP",
-  "Persoonlijke financiën": "Extra geld",
+  "Persoonlijke financiën": "Terugbetalen",
   "Studieschuld & wonen": "Wonen",
 };
 
 const preferredSlugsByCategory: Record<string, string[]> = {
   Schulden: [
-    "schulden-volgorde",
-    "studieschuld-vs-beleggen",
+    "duo-doorlenen-of-stoppen",
+    "duo-maandbedrag",
+    "duo-extra-aflossen",
     "hypotheek-impact-studieschuld",
   ],
   Hypotheek: [
+    "hypotheek-impact-studieschuld",
     "artifact-hypotheek-wonen-maximale-hypotheek",
-    "koop-vs-huur",
-    "hypotheek-aflossen-vs-beleggen",
-    "annuitair-lineair",
-    "hypotheekrenteaftrek-afschaffen",
+    "familiehulp-eerste-woning",
   ],
-  Beleggen: ["prive-beleggen-eindvermogen", "box-3-impact", "fire-na-belasting"],
-  Belasting: ["box-3-impact", "jaarruimte-vs-vrij-beleggen"],
+  Beleggen: ["duo-extra-aflossen", "duo-maandbedrag"],
+  Belasting: ["duo-maandbedrag"],
   Werk: ["zzp-uurtarief"],
   "Persoonlijke financiën": [
-    "volgende-euro",
+    "duo-maandbedrag",
+    "duo-extra-aflossen",
     "schulden-volgorde",
-    "kind-wordt-18-impact",
   ],
   "Studieschuld & wonen": [
-    "familiehulp-eerste-woning",
     "hypotheek-impact-studieschuld",
-    "studieschuld-vs-beleggen",
+    "artifact-hypotheek-wonen-maximale-hypotheek",
+    "familiehulp-eerste-woning",
   ],
 };
 
@@ -105,7 +78,7 @@ export function getGroupAnchorForCategory(category: string) {
 }
 
 export function getCategoryFallbackToolHref(category: string, apps: AppManifest[]) {
-  const preferred = preferredSlugsByCategory[category] ?? ["volgende-euro"];
+  const preferred = preferredSlugsByCategory[category] ?? ["duo-doorlenen-of-stoppen"];
   const match = preferred.find((slug) => apps.some((app) => app.slug === slug));
-  return `/apps/${match ?? "volgende-euro"}`;
+  return `/apps/${match ?? "duo-doorlenen-of-stoppen"}`;
 }

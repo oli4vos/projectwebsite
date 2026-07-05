@@ -6,27 +6,28 @@ import { appRegistry } from "@/lib/app-registry";
 
 const routeSteps = [
   {
-    title: "Begrijp je studieschuld",
-    body: "Wat betaal je DUO per maand, wat blijft er over en waar blokkeert je schuld toekomstige keuzes?",
+    title: "Wat wordt mijn schuld?",
+    body: "Bekijk wat je tijdens je studie opbouwt en welke rente daarbij hoort.",
     links: [
-      { href: "/apps/schulden-volgorde", label: "Welke schuld eerst?" },
+      { href: "/apps/duo-doorlenen-of-stoppen", label: "Doorlenen of stoppen" },
+      { href: "/kennisbank", label: "Lees hoe DUO-rente werkt" },
+    ],
+  },
+  {
+    title: "Wat ga ik betalen?",
+    body: "Bereken je wettelijke DUO-maandbedrag en wat extra aflossen feitelijk verandert.",
+    links: [
+      { href: "/apps/duo-maandbedrag", label: "DUO-maandbedrag" },
+      { href: "/apps/duo-extra-aflossen", label: "Extra aflossen" },
+    ],
+  },
+  {
+    title: "Wat betekent dit voor een huis?",
+    body: "Bekijk de impact van je studieschuld op hypotheekruimte, eigen geld en familiehulp.",
+    links: [
       { href: "/apps/hypotheek-impact-studieschuld", label: "Impact op hypotheek" },
-    ],
-  },
-  {
-    title: "Kies wat je doet met extra geld",
-    body: "Leg extra aflossen, buffer houden, sparen en beleggen rustig naast elkaar.",
-    links: [
-      { href: "/apps/volgende-euro", label: "Volgende euro" },
-      { href: "/apps/studieschuld-vs-beleggen", label: "Aflossen of beleggen" },
-    ],
-  },
-  {
-    title: "Verdieping: een huis kopen",
-    body: "Pas als stap 1 en 2 helder zijn: hypotheek, eigen geld, familielening en schenking.",
-    links: [
-      { href: "/apps/familiehulp-eerste-woning", label: "Lenen of schenken" },
       { href: "/apps/artifact-hypotheek-wonen-maximale-hypotheek", label: "Maximale hypotheek" },
+      { href: "/apps/familiehulp-eerste-woning", label: "Familiehulp eerste woning" },
     ],
   },
 ];
@@ -48,8 +49,8 @@ export default async function HomePage() {
               Eerst grip op je studieschuld.
             </h1>
             <p className="text-fluid-lead mt-5 max-w-[58ch] leading-[1.75] text-[var(--ink-2)]">
-              Zie wat je DUO-maandlast betekent voor wat je overhoudt. Daarna
-              kijk je pas verder: extra aflossen, sparen, of een huis kopen.
+              Zie wat je opbouwt, wat je straks betaalt en wat je studieschuld
+              betekent als je later een huis wilt kopen.
             </p>
             <div className="mt-7">
               <BtnLink href="#route" kind="primary" size="lg">

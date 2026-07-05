@@ -47,10 +47,10 @@ export function SiteFooter() {
             Over
           </Link>
           <Link
-            href="/apps/studieschuld-vs-beleggen"
+            href="/apps/duo-maandbedrag"
             className={footerLinkClassName}
           >
-            Voorbeeldtool
+            DUO-maandbedrag
           </Link>
         </div>
       </div>

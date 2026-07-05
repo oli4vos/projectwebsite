@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  calculateDuoExtraRepaymentProjection,
   calculateDuoMonthlyPaymentAfterExtraRepayment,
   calculateExtraRepaymentVsInvesting,
   calculateRemainingDebtAfterExtraRepayment,
@@ -165,6 +166,62 @@ describe("DUO calculations", () => {
       result.oldStatutoryMonthlyPayment,
     );
     expect(result.monthlyPaymentReduction).toBeGreaterThan(0);
+  });
+
+  it("projects extra DUO repayment with lower monthly payment strategy", () => {
+    const result = calculateDuoExtraRepaymentProjection({
+      repaymentRule: "SF35",
+      remainingDebt: 30000,
+      annualInterestRate: 2.33,
+      remainingTermYears: 35,
+      extraRepaymentAmount: 5000,
+      strategy: "lowerMonthlyPayment",
+      startDate: "2026-01-01",
+    });
+
+    expect(result.extraRepaymentUsed).toBe(5000);
+    expect(result.newRemainingDebt).toBe(25000);
+    expect(result.newRequiredMonthlyPayment).toBeLessThan(result.originalMonthlyPayment);
+    expect(result.interestSaved).toBeGreaterThan(0);
+    expect(result.timelineBefore.points.length).toBeGreaterThan(0);
+    expect(result.timelineAfter.points.length).toBeGreaterThan(0);
+  });
+
+  it("projects extra DUO repayment with shorter term strategy and monthly extra", () => {
+    const result = calculateDuoExtraRepaymentProjection({
+      repaymentRule: "SF35",
+      remainingDebt: 30000,
+      annualInterestRate: 2.33,
+      remainingTermYears: 35,
+      monthlyPayment: 120,
+      extraRepaymentAmount: 1000,
+      extraMonthlyAmount: 50,
+      strategy: "shortenTerm",
+      startDate: "2026-01-01",
+    });
+
+    expect(result.newRequiredMonthlyPayment).toBe(120);
+    expect(result.effectiveNewMonthlyPayment).toBe(170);
+    expect(result.timelineAfter.months).toBeLessThan(result.timelineBefore.months);
+    expect(result.payoffImpact.strategy).toBe("shortenTerm");
+  });
+
+  it("sanitizes invalid DUO extra repayment projection input", () => {
+    const result = calculateDuoExtraRepaymentProjection({
+      repaymentRule: "SF35",
+      remainingDebt: -1,
+      annualInterestRate: -2,
+      remainingTermYears: -5,
+      monthlyPayment: -10,
+      extraRepaymentAmount: -100,
+      extraMonthlyAmount: -50,
+      strategy: "lowerMonthlyPayment",
+    });
+
+    expect(result.newRemainingDebt).toBe(0);
+    expect(result.interestSaved).toBe(0);
+    expect(result.timelineBefore.points).toHaveLength(0);
+    expect(result.timelineAfter.points).toHaveLength(0);
   });
 
   it("compares extra repayment vs investing without invalid numbers", () => {

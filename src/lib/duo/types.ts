@@ -105,6 +105,50 @@ export type ExtraRepaymentPayoffImpactResult = {
   warnings: string[];
 };
 
+export type DuoRepaymentTimelinePoint = {
+  month: number;
+  date: string;
+  openingDebt: number;
+  interest: number;
+  payment: number;
+  principalPaid: number;
+  closingDebt: number;
+};
+
+export type DuoRepaymentTimelineSummary = {
+  months: number;
+  payoffDate: string | null;
+  totalPaid: number;
+  totalInterest: number;
+  finalDebt: number;
+  points: DuoRepaymentTimelinePoint[];
+};
+
+export type DuoExtraRepaymentProjectionInput = DuoRepaymentInput & {
+  monthlyPayment?: number;
+  extraRepaymentAmount?: number;
+  extraMonthlyAmount?: number;
+  strategy?: ExtraRepaymentStrategy;
+  startDate?: string;
+};
+
+export type DuoExtraRepaymentProjectionResult = {
+  repaymentRule: RepaymentRule;
+  annualInterestRateUsed: number;
+  remainingTermYearsUsed: number;
+  originalMonthlyPayment: number;
+  extraRepaymentUsed: number;
+  extraMonthlyAmountUsed: number;
+  newRemainingDebt: number;
+  newRequiredMonthlyPayment: number;
+  effectiveNewMonthlyPayment: number;
+  interestSaved: number;
+  payoffImpact: ExtraRepaymentPayoffImpactResult;
+  timelineBefore: DuoRepaymentTimelineSummary;
+  timelineAfter: DuoRepaymentTimelineSummary;
+  warnings: string[];
+};
+
 export type RelevantDuoPaymentResult = {
   primaryMonthlyPayment: number;
   optimisticMonthlyPayment: number;

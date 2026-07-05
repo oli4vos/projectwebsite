@@ -70,6 +70,74 @@ export const appRegistry = [
     "entry": "Calculator.tsx"
   },
   {
+    "slug": "duo-extra-aflossen",
+    "title": "Wat doet extra aflossen?",
+    "description": "Bekijk feitelijk wat een extra DUO-aflossing doet met maandtermijn, looptijd en rentelast.",
+    "type": "frontend",
+    "category": "Schulden",
+    "tags": [
+      "DUO",
+      "studieschuld",
+      "extra aflossen",
+      "looptijd"
+    ],
+    "status": "beta",
+    "visibility": "public",
+    "requiredProfileFields": [
+      "studentDebt.remainingDebt",
+      "studentDebt.currentMonthlyPayment",
+      "studentDebt.repaymentRule"
+    ],
+    "reasonHint": "Handig als je wilt zien wat extra aflossen bij DUO verandert in maandlast en looptijd.",
+    "assumptionsUsed": [
+      "duo",
+      "charts"
+    ],
+    "calculationDomains": [
+      "studentDebt",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "duoIndicative",
+    "outputType": "timeline",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "duo-maandbedrag",
+    "title": "Wat wordt mijn DUO-maandbedrag?",
+    "description": "Bereken je wettelijke DUO-maandtermijn en bekijk optioneel een draagkrachtindicatie.",
+    "type": "frontend",
+    "category": "Schulden",
+    "tags": [
+      "DUO",
+      "studieschuld",
+      "maandbedrag",
+      "draagkracht"
+    ],
+    "status": "beta",
+    "visibility": "public",
+    "requiredProfileFields": [
+      "studentDebt.remainingDebt",
+      "studentDebt.repaymentRule",
+      "income.grossAnnualIncome",
+      "income.householdType"
+    ],
+    "reasonHint": "Handig als je wilt begrijpen welk DUO-maandbedrag bij je schuld hoort.",
+    "assumptionsUsed": [
+      "duo"
+    ],
+    "calculationDomains": [
+      "studentDebt",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "duoIndicative",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
     "slug": "familiehulp-eerste-woning",
     "title": "Lenen of schenken voor eerste woning",
     "description": "Vergelijk studieschuld, bankhypotheek, eigen geld, familielening en schenkingen voor een eerste woning.",
@@ -194,102 +262,6 @@ export const appRegistry = [
     "riskLevel": "high",
     "disclaimerType": "financialEducation",
     "outputType": "checklist",
-    "version": "1.0.0",
-    "entry": "Calculator.tsx"
-  },
-  {
-    "slug": "studieschuld-vs-beleggen",
-    "title": "Studieschuld extra aflossen of beleggen?",
-    "description": "Vergelijk wat extra aflossen op je studieschuld doet ten opzichte van sparen of beleggen.",
-    "type": "frontend",
-    "category": "Schulden",
-    "tags": [
-      "studieschuld",
-      "beleggen",
-      "rente"
-    ],
-    "status": "active",
-    "visibility": "public",
-    "requiredProfileFields": [
-      "studentDebt.remainingDebt",
-      "studentDebt.duoInterestRate",
-      "studentDebt.remainingTermYears",
-      "income.grossAnnualIncome",
-      "income.partnerGrossAnnualIncome",
-      "savingInvesting.monthlyFreeCashflow",
-      "savingInvesting.expectedAnnualReturn",
-      "savingInvesting.investmentHorizonYears",
-      "savingInvesting.currentSavings",
-      "tax.preferredTaxYear",
-      "tax.hasFiscalPartner",
-      "tax.preferredBox3Method"
-    ],
-    "reasonHint": "Handig als je wilt vergelijken wat extra aflossen op je studieschuld doet ten opzichte van beleggen.",
-    "assumptionsUsed": [
-      "duo",
-      "box3",
-      "investment"
-    ],
-    "calculationDomains": [
-      "studentDebt",
-      "investing",
-      "saving",
-      "tax"
-    ],
-    "riskLevel": "medium",
-    "disclaimerType": "financialEducation",
-    "outputType": "scenarioComparison",
-    "version": "1.0.0",
-    "entry": "Calculator.tsx"
-  },
-  {
-    "slug": "volgende-euro",
-    "title": "Wat doe ik met mijn volgende euro?",
-    "description": "Ontdek of extra geld logischer naar buffer, aflossen, pensioen, woning of beleggen kan.",
-    "type": "frontend",
-    "category": "Persoonlijke financiën",
-    "tags": [
-      "buffer",
-      "beleggen",
-      "aflossen",
-      "pensioen",
-      "FIRE"
-    ],
-    "status": "beta",
-    "visibility": "public",
-    "requiredProfileFields": [
-      "savingInvesting.currentSavings",
-      "savingInvesting.targetEmergencyFund",
-      "savingInvesting.monthlyFreeCashflow",
-      "savingInvesting.expectedAnnualReturn",
-      "savingInvesting.investmentHorizonYears",
-      "savingInvesting.riskProfile",
-      "studentDebt.remainingDebt",
-      "studentDebt.duoInterestRate",
-      "housing.mortgageRate",
-      "housing.targetHomePrice",
-      "housing.ownFunds"
-    ],
-    "reasonHint": "Handig als je niet zeker weet of extra geld beter naar buffer, aflossen, pensioen of beleggen kan.",
-    "assumptionsUsed": [
-      "duo",
-      "tax",
-      "box3",
-      "mortgage",
-      "investment"
-    ],
-    "calculationDomains": [
-      "saving",
-      "investing",
-      "studentDebt",
-      "mortgage",
-      "tax",
-      "cashflow",
-      "pension"
-    ],
-    "riskLevel": "high",
-    "disclaimerType": "financialEducation",
-    "outputType": "scenarioComparison",
     "version": "1.0.0",
     "entry": "Calculator.tsx"
   }

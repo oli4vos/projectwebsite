@@ -1,6 +1,7 @@
 export {
   calculateIndicativeIncomeBasedMonthlyPayment,
   calculateDuoMonthlyPaymentAfterExtraRepayment,
+  calculateDuoExtraRepaymentProjection,
   calculateExtraRepaymentPayoffImpact,
   calculateExtraRepaymentVsInvesting,
   calculatePayoffDate,
@@ -14,6 +15,8 @@ export {
 export { projectDuoLoan } from "@/lib/duo/project-duo-loan";
 export type {
   DuoLoanProjectionContext,
+  DuoExtraRepaymentProjectionInput,
+  DuoExtraRepaymentProjectionResult,
   DuoLoanProjectionInput,
   DuoLoanProjectionMortgageImpact,
   DuoLoanProjectionResult,
@@ -32,4 +35,6 @@ export type {
   ExtraRepaymentVsInvestingInput,
   RelevantDuoPaymentResult,
   RepaymentRule,
+  DuoRepaymentTimelinePoint,
+  DuoRepaymentTimelineSummary,
 } from "@/lib/duo/types";
