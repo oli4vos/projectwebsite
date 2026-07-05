@@ -21,26 +21,22 @@ export type ProfileRecommendation = {
   reason: string;
 };
 
-const defaultRecommendation = "volgende-euro";
+const defaultRecommendation = "duo-maandbedrag";
 const generalReasonsBySlug: Record<string, string> = {
-  "studieschuld-vs-beleggen":
-    "Handig als je wilt vergelijken wat extra aflossen op je studieschuld doet ten opzichte van beleggen.",
+  "duo-maandbedrag":
+    "Handig als je eerst wilt begrijpen welk DUO-maandbedrag bij je schuld hoort.",
+  "duo-extra-aflossen":
+    "Handig als je wilt zien wat extra aflossen bij DUO verandert in maandlast en looptijd.",
+  "duo-doorlenen-of-stoppen":
+    "Handig als je tijdens je studie wilt zien wat doorlenen of stoppen met lenen later betekent.",
   "hypotheek-impact-studieschuld":
     "Handig als je wilt weten welk DUO-bedrag kan meetellen bij je hypotheekruimte.",
-  "box-3-impact":
-    "Handig als je wilt zien wat spaargeld, beleggingen en schulden indicatief doen in box 3.",
-  "fire-na-belasting":
-    "Handig als je wilt zien hoe rendement, inleg, uitgaven en box 3 je financiële vrijheid beïnvloeden.",
-  "jaarruimte-vs-vrij-beleggen":
-    "Handig als je twijfelt tussen pensioeninleg met belastingvoordeel en flexibel vrij beleggen.",
-  "hypotheek-aflossen-vs-beleggen":
-    "Handig als je extra geld wilt vergelijken tussen hypotheek aflossen en vrij beleggen.",
-  "zzp-uurtarief":
-    "Handig als je wilt weten welk uurtarief past bij inkomen, belasting, pensioen, AOV en buffer.",
-  "annuitair-lineair":
-    "Handig als je annuïtaire en lineaire hypotheeklasten naast elkaar wilt zetten.",
-  "volgende-euro":
-    "Omdat dit een brede starttool is als je nog niet weet waar je geld het beste naartoe kan.",
+  "artifact-hypotheek-wonen-maximale-hypotheek":
+    "Handig als je daarna je maximale hypotheek indicatief wilt inschatten.",
+  "familiehulp-eerste-woning":
+    "Handig als je eigen geld, DUO en hulp van familie samen wilt bekijken.",
+  "schulden-volgorde":
+    "Handig als je meerdere schulden feitelijk naast elkaar wilt zetten.",
 };
 
 type RecommendationAppMetadata = Pick<AppManifest, "slug" | "reasonHint">;
@@ -183,9 +179,14 @@ export function getRecommendedAppsForProfile(
 
   if (hasPositiveNumber(safeProfile.studentDebt?.remainingDebt)) {
     recommendations.push({
-      slug: "studieschuld-vs-beleggen",
+      slug: "duo-maandbedrag",
       specificReason:
-        "Omdat je studieschuld hebt ingevuld en extra aflossen niet altijd de enige logische keuze is.",
+        "Omdat je studieschuld hebt ingevuld en eerst je wettelijke DUO-maandbedrag wilt begrijpen.",
+    });
+    recommendations.push({
+      slug: "duo-extra-aflossen",
+      specificReason:
+        "Omdat je studieschuld hebt ingevuld en extra aflossen je maandbedrag of looptijd kan veranderen.",
     });
     recommendations.push({
       slug: "hypotheek-impact-studieschuld",
@@ -204,9 +205,9 @@ export function getRecommendedAppsForProfile(
         "Omdat je studieschuld of woningdoel hebt ingevuld en DUO invloed kan hebben op je hypotheekruimte.",
     });
     recommendations.push({
-      slug: "hypotheek-aflossen-vs-beleggen",
+      slug: "artifact-hypotheek-wonen-maximale-hypotheek",
       specificReason:
-        "Omdat je hypotheekgegevens hebt ingevuld en extra aflossen niet altijd beter is dan beleggen.",
+        "Omdat je woninggegevens hebt ingevuld en je maximale hypotheek indicatief wilt inschatten.",
     });
   }
 
@@ -215,27 +216,17 @@ export function getRecommendedAppsForProfile(
     hasPositiveNumber(safeProfile.savingInvesting?.expectedAnnualReturn)
   ) {
     recommendations.push({
-      slug: "box-3-impact",
+      slug: "duo-maandbedrag",
       specificReason:
-        "Omdat je spaargeld of beleggingen hebt ingevuld en box 3 je netto rendement kan beïnvloeden.",
-    });
-    recommendations.push({
-      slug: "fire-na-belasting",
-      specificReason:
-        "Omdat je beleggingsgegevens hebt ingevuld en box 3 je FIRE-pad kan vertragen.",
-    });
-    recommendations.push({
-      slug: "jaarruimte-vs-vrij-beleggen",
-      specificReason:
-        "Omdat pensioeninleg fiscaal gunstig kan zijn, maar minder flexibel is dan vrij beleggen.",
+        "Omdat je buffer of maandruimte hebt ingevuld en je DUO-maandbedrag daar eerst naast wilt zetten.",
     });
   }
 
   if (safeProfile.income?.employmentType === "selfEmployed") {
     recommendations.push({
-      slug: "zzp-uurtarief",
+      slug: "duo-maandbedrag",
       specificReason:
-        "Omdat je ZZP of zelfstandig werken hebt ingevuld en omzet geen salaris is.",
+        "Omdat wisselend inkomen invloed kan hebben op je DUO-draagkrachtindicatie.",
     });
   }
 
