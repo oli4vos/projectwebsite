@@ -11,7 +11,12 @@ export {
   sanitizeDuoMoney,
   sanitizeDuoPercent,
 } from "@/lib/duo/calculations";
+export { projectDuoLoan } from "@/lib/duo/project-duo-loan";
 export type {
+  DuoLoanProjectionContext,
+  DuoLoanProjectionInput,
+  DuoLoanProjectionMortgageImpact,
+  DuoLoanProjectionResult,
   DuoIncomeBasedMonthlyPaymentResult,
   DuoIncomeBasedInput,
   DuoMonthlyPaymentAfterExtraRepaymentInput,

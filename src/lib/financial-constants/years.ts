@@ -60,6 +60,13 @@ export const FINANCIAL_CONSTANTS_BY_YEAR: Record<number, AnnualFinancialConstant
               "Onbekende regeling valt indicatief terug op SF35-draagkrachtregels.",
           },
         },
+        borrowingLimits: {
+          monthlyLoanAmountMax: 1213.95,
+          monthlyLoanAmountStep: 25,
+          sourceUrl: "https://duo.nl/particulier/studiefinanciering/bedragen.jsp",
+          notes:
+            "DUO vermeldt op de bedragenpagina voor 2026 dat de gewone rentedragende lening in de leenfase maximaal € 1.213,95 per maand is. Collegegeldkrediet staat daar apart van en is niet opgenomen in deze standaard sliderlimiet.",
+        },
       },
       mortgage: {
         meta: {

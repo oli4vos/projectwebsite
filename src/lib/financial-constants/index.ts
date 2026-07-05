@@ -61,6 +61,10 @@ export function getDuoIncomeBasedRuleForRepaymentRule(
   );
 }
 
+export function getDuoBorrowingLimits(year?: number) {
+  return getFinancialConstants(year).duo.borrowingLimits;
+}
+
 export function getStudentDebtGrossUpFactor(
   mortgageRate: number,
   year?: number,

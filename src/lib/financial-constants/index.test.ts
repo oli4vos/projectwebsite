@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   getAvailableFinancialYears,
   getDefaultFinancialYear,
+  getDuoBorrowingLimits,
   getDuoRateForRule,
   getFinancialConstants,
   getMortgageFinancingLoadRatio,
@@ -24,6 +25,14 @@ describe("financial constants helpers", () => {
 
   it("returns expected DUO rate for SF35 in 2026", () => {
     expect(getDuoRateForRule("SF35", 2026)).toBe(2.33);
+  });
+
+  it("exposes central DUO borrowing limits for tool sliders", () => {
+    const limits = getDuoBorrowingLimits();
+
+    expect(limits.monthlyLoanAmountMax).toBe(1213.95);
+    expect(limits.monthlyLoanAmountStep).toBeGreaterThan(0);
+    expect(limits.sourceUrl).toContain("duo.nl");
   });
 
   it("selects the gross-up factor band by mortgage rate", () => {

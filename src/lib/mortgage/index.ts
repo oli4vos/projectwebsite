@@ -1,5 +1,6 @@
 export { calculateAnnuityPayment } from "@/lib/mortgage/annuity";
 export { calculateIndicativeMaxMortgage } from "@/lib/mortgage/max-mortgage";
+export { calculateMonthlyObligationMortgageCapacityReduction } from "@/lib/mortgage/monthly-obligation-impact";
 export { calculatePresentValueFromMonthlyPayment } from "@/lib/mortgage/present-value";
 export {
   buildMortgagePdfReport,
@@ -7,6 +8,8 @@ export {
 } from "@/lib/mortgage/report";
 export type {
   MortgageAnnuityInput,
+  MortgageMonthlyObligationCapacityReductionInput,
+  MortgageMonthlyObligationCapacityReductionResult,
   MortgageMaxMortgageBreakdown,
   MortgageMaxMortgageDebug,
   MortgageMaxMortgageHouseholdType,

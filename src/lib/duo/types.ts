@@ -115,3 +115,46 @@ export type RelevantDuoPaymentResult = {
   explanation: string;
   warnings: string[];
 };
+
+export type DuoLoanProjectionInput = {
+  currentDebt: number;
+  monthlyLoanAmount: number;
+  expectedLastLoanMonth: string;
+  includeMortgageImpact?: boolean;
+};
+
+export type DuoLoanProjectionContext = {
+  calculationMonth?: string;
+  repaymentRegime?: "SF35";
+  duoRateVersion?: string;
+  normYear?: number;
+  getAnnualInterestRateForYear?: (year: number) => number;
+  calculateMortgageCapacityReduction?: (monthlyPayment: number) => number;
+};
+
+export type DuoLoanProjectionMortgageImpact = {
+  reductionStopNow: number;
+  reductionKeepBorrowing: number;
+  difference: number;
+};
+
+export type DuoLoanProjectionResult = {
+  calculationMonth: string;
+  lastLoanMonth: string;
+  borrowingMonths: number;
+  futurePrincipalBorrowed: number;
+  interestDuringBorrowingPhase: number;
+  debtAtLastLoanMonth: number;
+  repaymentStartMonth: string;
+  gracePeriodMonths: number;
+  interestDuringGracePeriod: number;
+  debtAtRepaymentStart: number;
+  projectedAnnualInterestRate: number;
+  repaymentTermMonths: number;
+  theoreticalMonthlyPayment: number;
+  totalRepayment: number;
+  totalInterest: number;
+  mortgageImpact?: DuoLoanProjectionMortgageImpact;
+  assumptions: string[];
+  normVersion: string;
+};

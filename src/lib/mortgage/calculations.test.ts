@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   calculateAnnuityPayment,
+  calculateMonthlyObligationMortgageCapacityReduction,
   calculatePresentValueFromMonthlyPayment,
 } from "@/lib/mortgage";
 
@@ -103,5 +104,23 @@ describe("mortgage calculations", () => {
         years: 30,
       }),
     ).toBe(41390.87);
+  });
+
+  it("converts a monthly DUO obligation into mortgage capacity reduction centrally", () => {
+    const result = calculateMonthlyObligationMortgageCapacityReduction({
+      monthlyPayment: 200,
+      annualMortgageRate: 4.1,
+      mortgageTermYears: 30,
+    });
+
+    expect(result.grossUpFactor).toBe(1.25);
+    expect(result.grossedMonthlyImpact).toBe(250);
+    expect(result.principalReduction).toBe(
+      calculatePresentValueFromMonthlyPayment({
+        monthlyPayment: 250,
+        annualRate: 4.1,
+        years: 30,
+      }),
+    );
   });
 });

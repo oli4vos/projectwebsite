@@ -10,6 +10,23 @@ export type MortgagePresentValueInput = {
   years: number;
 };
 
+export type MortgageMonthlyObligationCapacityReductionInput = {
+  monthlyPayment: number;
+  annualMortgageRate?: number;
+  mortgageTermYears?: number;
+  normYear?: number;
+};
+
+export type MortgageMonthlyObligationCapacityReductionResult = {
+  monthlyPayment: number;
+  grossUpFactor: number;
+  grossedMonthlyImpact: number;
+  principalReduction: number;
+  annualMortgageRateUsed: number;
+  mortgageTermYearsUsed: number;
+  assumptions: string[];
+};
+
 export type MortgageMaxMortgageHouseholdType = "single" | "partners";
 
 export type MortgageMaxMortgageRepaymentType = "annuity" | "linear";

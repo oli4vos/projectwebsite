@@ -89,6 +89,12 @@ export type AnnualFinancialConstants = {
     rates: Record<RepaymentRuleKey, number>;
     defaultTerms: Record<RepaymentRuleKey, number>;
     incomeBasedRules: Record<RepaymentRuleKey, DuoIncomeBasedRule>;
+    borrowingLimits: {
+      monthlyLoanAmountMax: number;
+      monthlyLoanAmountStep: number;
+      sourceUrl: string;
+      notes: string;
+    };
   };
   mortgage: {
     meta: AssumptionMeta;
