@@ -25,6 +25,7 @@ import {
   type FlexibilityPreference,
   type JaarruimteVsVrijBeleggenInput,
 } from "./logic";
+import { escapeHtml } from "./pdf-export";
 
 type FormState = {
   year: string;
@@ -104,15 +105,6 @@ function formatPercent(value: number) {
 
 function formatCsvNumber(value: number) {
   return value.toFixed(2).replace(".", ",");
-}
-
-function escapeHtml(value: string | number) {
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
 }
 
 function buildPlanningCsv(result: NonNullable<ReturnType<typeof calculateJaarruimteVsVrijBeleggen>>) {
