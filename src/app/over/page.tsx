@@ -37,7 +37,7 @@ export default function OverPage() {
               </h2>
               <p>
                 Geen advies, geen advertenties, geen doorverwijzing naar
-                aanbieders. De berekeningen zijn scenario's, geen persoonlijk
+                aanbieders. De berekeningen zijn scenario&rsquo;s, geen persoonlijk
                 advies.
               </p>
             </div>
@@ -115,7 +115,7 @@ export default function OverPage() {
                 Belangrijk
               </h2>
               <p className="text-[13px] text-[var(--muted)]">
-                Dit zijn indicatieve scenario's, geen persoonlijk financieel
+                Dit zijn indicatieve scenario&rsquo;s, geen persoonlijk financieel
                 advies. Voor een besluit dat veel geld of lange tijd raakt,
                 raadpleeg een onafhankelijk adviseur.
               </p>
