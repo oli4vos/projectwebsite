@@ -5,6 +5,7 @@ export type KnowledgeSourceEntry = {
   type: string;
   description: string;
   url: string;
+  lastChecked?: string;
 };
 
 export const knowledgeSources = {
@@ -89,6 +90,156 @@ export const knowledgeSources = {
       "Praktische uitleg over de invloed van studieschuld op hypotheekruimte. Alleen gebruiken als aanvullende uitleg, niet als primaire normbron.",
     url: "https://www.hypotheker.nl/begrippenlijst/veelgestelde-vragen/studieschuld-en-hypotheek/",
   },
+  "duo-rente-terugbetalers": {
+    title: "Rente voor terugbetalers",
+    publisher: "DUO",
+    date: "Actuele DUO-pagina",
+    type: "Primaire uitvoeringsbron",
+    description:
+      "DUO-uitleg over rentepercentages voor terugbetalers, rentevaste perioden en de koppeling met terugbetalingsregels.",
+    url: "https://www.duo.nl/particulier/rente/rente-voor-terugbetalers.jsp",
+    lastChecked: "2026-07-05",
+  },
+  "duo-rente-studenten": {
+    title: "Rente voor studenten",
+    publisher: "DUO",
+    date: "Actuele DUO-pagina",
+    type: "Primaire uitvoeringsbron",
+    description:
+      "DUO-uitleg over rente tijdens de studie en actuele rentepercentages voor studenten per terugbetalingsregel.",
+    url: "https://www.duo.nl/particulier/rente/rente-voor-studenten.jsp",
+    lastChecked: "2026-07-05",
+  },
+  "duo-nieuwe-rentepercentages-2026": {
+    title: "Nieuwe rentepercentages bekend",
+    publisher: "DUO",
+    date: "10 oktober 2025",
+    type: "Actuele uitvoeringsinformatie",
+    description:
+      "DUO-nieuwsbericht met de rentepercentages voor 2026 voor SF35 en SF15.",
+    url: "https://www.duo.nl/particulier/home/actueel/nieuwe-rentepercentages.jsp",
+    lastChecked: "2026-07-05",
+  },
+  "duo-zo-werkt-terugbetalen": {
+    title: "Zo werkt terugbetalen",
+    publisher: "DUO",
+    date: "Actuele DUO-pagina",
+    type: "Primaire uitvoeringsbron",
+    description:
+      "DUO-uitleg over maandbedrag, looptijd, terugbetalingsregels en vrijwillig meer terugbetalen.",
+    url: "https://duo.nl/particulier/studieschuld-terugbetalen/zo-werkt-terugbetalen.jsp",
+    lastChecked: "2026-07-05",
+  },
+  "duo-berekening-maandbedrag": {
+    title: "Berekening maandbedrag",
+    publisher: "DUO",
+    date: "Actuele DUO-pagina",
+    type: "Primaire uitvoeringsbron",
+    description:
+      "DUO-uitleg over wettelijk maandbedrag, draagkracht en het gebruik van inkomen en partnerinkomen.",
+    url: "https://duo.nl/particulier/studieschuld-terugbetalen/berekening-maandbedrag.jsp",
+    lastChecked: "2026-07-05",
+  },
+  "duo-terugbetalingsregels": {
+    title: "Terugbetalingsregels",
+    publisher: "DUO",
+    date: "Actuele DUO-pagina",
+    type: "Primaire uitvoeringsbron",
+    description:
+      "DUO-uitleg over terugbetalingsregels, betaalwijze, verlaging van maandbedrag en partnerinkomen.",
+    url: "https://duo.nl/particulier/studieschuld-terugbetalen/terugbetalingsregels.jsp",
+    lastChecked: "2026-07-05",
+  },
+  "duo-minder-of-niets-aflossen": {
+    title: "Wat is er mogelijk?",
+    publisher: "DUO",
+    date: "Actuele DUO-pagina",
+    type: "Primaire uitvoeringsbron",
+    description:
+      "DUO-uitleg over maandbedrag verlagen, peiljaarverlegging, aflosvrije periode en gevolgen voor rente en looptijd.",
+    url: "https://duo.nl/particulier/minder-of-niets-aflossen/wat-is-er-mogelijk.jsp",
+    lastChecked: "2026-07-05",
+  },
+  "duo-aflosvrije-periode": {
+    title: "Aflosvrije periode",
+    publisher: "DUO",
+    date: "Actuele DUO-pagina",
+    type: "Primaire uitvoeringsbron",
+    description:
+      "DUO-uitleg over maximaal 60 maanden aflosvrije periode, doorlopende rente en verlenging van de terugbetalingsperiode.",
+    url: "https://duo.nl/particulier/minder-of-niets-aflossen/aflosvrije-periode.jsp",
+    lastChecked: "2026-07-05",
+  },
+  "duo-u-studeert-nog": {
+    title: "U studeert nog",
+    publisher: "DUO",
+    date: "Actuele DUO-pagina",
+    type: "Primaire uitvoeringsbron",
+    description:
+      "DUO-uitleg over stoppen van aflossing wanneer iemand studeert en over de aanloopfase na het stoppen van studiefinanciering.",
+    url: "https://duo.nl/particulier/minder-of-niets-aflossen/u-studeert-nog.jsp",
+    lastChecked: "2026-07-05",
+  },
+  "duo-eerder-extra-aflossen": {
+    title: "Eerder of extra aflossen",
+    publisher: "DUO",
+    date: "Actuele DUO-pagina",
+    type: "Primaire uitvoeringsbron",
+    description:
+      "DUO-uitleg over eerder of extra aflossen en de aanloopfase waarin DUO nog niet automatisch mag afschrijven.",
+    url: "https://duo.nl/particulier/eerder-of-extra-aflossen/index.jsp",
+    lastChecked: "2026-07-05",
+  },
+  "duo-extra-betaling-doen": {
+    title: "Extra betaling doen",
+    publisher: "DUO",
+    date: "Actuele DUO-pagina",
+    type: "Primaire uitvoeringsbron",
+    description:
+      "DUO-uitleg over extra betalingen, verwerking, automatische incasso en herberekening van maandbedrag.",
+    url: "https://www.duo.nl/particulier/eerder-of-extra-aflossen/extra-betaling-doen.jsp",
+    lastChecked: "2026-07-05",
+  },
+  "duo-in-een-keer-aflossen": {
+    title: "In 1 keer aflossen",
+    publisher: "DUO",
+    date: "Actuele DUO-pagina",
+    type: "Primaire uitvoeringsbron",
+    description:
+      "DUO-uitleg over volledige aflossing ineens en dat daarbij geen boete of korting geldt.",
+    url: "https://duo.nl/particulier/eerder-of-extra-aflossen/in-een-keer-aflossen.jsp",
+    lastChecked: "2026-07-05",
+  },
+  "duo-maandbedrag-verhogen": {
+    title: "Maandbedrag verhogen",
+    publisher: "DUO",
+    date: "Actuele DUO-pagina",
+    type: "Primaire uitvoeringsbron",
+    description:
+      "DUO-uitleg over vrijwillig het maandbedrag verhogen, voorwaarden en ingangsdatum.",
+    url: "https://www.duo.nl/particulier/eerder-of-extra-aflossen/maandbedrag-verhogen.jsp",
+    lastChecked: "2026-07-05",
+  },
+  "duo-lenen-studiefinanciering": {
+    title: "Lenen",
+    publisher: "DUO",
+    date: "Actuele DUO-pagina",
+    type: "Primaire uitvoeringsbron",
+    description:
+      "DUO-uitleg over lenen binnen studiefinanciering en renteopbouw vanaf de maand na ontvangst.",
+    url: "https://duo.nl/particulier/studiefinanciering/lenen.jsp",
+    lastChecked: "2026-07-05",
+  },
+  "duo-uw-inkomen": {
+    title: "Uw inkomen",
+    publisher: "DUO",
+    date: "Actuele DUO-pagina",
+    type: "Primaire uitvoeringsbron",
+    description:
+      "DUO-uitleg over inkomen, terugbetalen naar draagkracht en situaties waarin kwijtschelding niet geldt.",
+    url: "https://duo.nl/particulier/studieschuld-terugbetalen/uw-inkomen.jsp",
+    lastChecked: "2026-07-05",
+  },
 } as const satisfies Record<string, KnowledgeSourceEntry>;
 
 export type KnowledgeSourceId = keyof typeof knowledgeSources;
@@ -103,9 +254,38 @@ export const knowledgeDocumentSourceGroups = {
   ],
   "studieschuld-en-hypotheek": [
     "rijksoverheid-studieschuld-hypotheek",
+    "duo-berekening-maandbedrag",
     "tijdelijke-regeling-hypothecair-krediet-2026",
     "nibud-advies-hypotheeknormen-2026",
     "hypotheker-studieschuld-2026",
+  ],
+  "duo-rente-werkt": [
+    "duo-rente-terugbetalers",
+    "duo-rente-studenten",
+    "duo-nieuwe-rentepercentages-2026",
+    "duo-lenen-studiefinanciering",
+  ],
+  "duo-aanloopfase": [
+    "duo-eerder-extra-aflossen",
+    "duo-u-studeert-nog",
+    "duo-lenen-studiefinanciering",
+  ],
+  "duo-draagkracht-jokerjaren": [
+    "duo-berekening-maandbedrag",
+    "duo-minder-of-niets-aflossen",
+    "duo-aflosvrije-periode",
+    "duo-terugbetalingsregels",
+  ],
+  "duo-na-35-jaar": [
+    "duo-zo-werkt-terugbetalen",
+    "duo-minder-of-niets-aflossen",
+    "duo-uw-inkomen",
+  ],
+  "duo-extra-aflossen": [
+    "duo-extra-betaling-doen",
+    "duo-in-een-keer-aflossen",
+    "duo-maandbedrag-verhogen",
+    "duo-berekening-maandbedrag",
   ],
   "waarom-calculators-verschillen": [
     "tijdelijke-regeling-hypothecair-krediet-2026",
@@ -143,6 +323,11 @@ export const knowledgeDocumentTitles = {
   "energielabel-en-extra-hypotheekruimte": "Energielabel en extra hypotheekruimte",
   "starter-of-doorstromer": "Starter of doorstromer",
   "indicatieve-berekening": "Indicatieve berekening",
+  "duo-rente-werkt": "Hoe DUO-rente werkt",
+  "duo-aanloopfase": "De aanloopfase",
+  "duo-draagkracht-jokerjaren": "Draagkracht en jokerjaren",
+  "duo-na-35-jaar": "Wat er na 35 jaar gebeurt",
+  "duo-extra-aflossen": "Extra aflossen bij DUO",
 } as const satisfies Record<keyof typeof knowledgeDocumentSourceGroups, string>;
 
 export const knowledgeSourceEntries = Object.entries(
@@ -184,5 +369,15 @@ export const knowledgeSourceHierarchy = [
     label: "Praktijkbronnen",
     sourceIds: ["hypotheker-studieschuld-2026"],
     useFor: "Aanvullende uitleg; nooit leidend boven wet of normadvies.",
+  },
+  {
+    label: "DUO-uitvoering",
+    sourceIds: [
+      "duo-rente-terugbetalers",
+      "duo-berekening-maandbedrag",
+      "duo-minder-of-niets-aflossen",
+      "duo-extra-betaling-doen",
+    ],
+    useFor: "Uitvoeringsregels en publieksuitleg voor studieschuld en terugbetalen.",
   },
 ] as const;

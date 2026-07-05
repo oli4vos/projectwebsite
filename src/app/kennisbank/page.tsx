@@ -15,9 +15,9 @@ import {
 } from "@/lib/knowledge-sources";
 
 export const metadata: Metadata = {
-  title: "Financiële kennisbank | Financiële rekentools",
+  title: "Kennisbank studieschuld | Financiële rekentools",
   description:
-    "Praktische kennisbank met besliskaders, bronverwijzingen en uitleg voor sparen, beleggen, aflossen, kopen of huren, horizon en inflatie.",
+    "Praktische kennisbank over DUO-rente, aanloopfase, draagkracht, extra aflossen en de impact van studieschuld op hypotheekruimte.",
 };
 
 function getRelatedToolLabel(slug: string) {
@@ -35,6 +35,13 @@ function getSourceTone(
 }
 
 export default function KnowledgeBasePage() {
+  const visibleHorizonBands = knowledgeHorizonBands.filter(
+    (band) => band.visibility !== "hidden",
+  );
+  const visibleTopics = knowledgeTopics.filter(
+    (topic) => topic.visibility !== "hidden",
+  );
+
   return (
     <>
       <SiteHeader />
@@ -48,12 +55,12 @@ export default function KnowledgeBasePage() {
               Kennisbank
             </div>
             <h1 className="text-fluid-h1 mt-4 font-serif tracking-[-0.03em] text-[var(--ink)]">
-              Wanneer overweeg je wat met je geld?
+              Studieschuld begrijpen, stap voor stap
             </h1>
             <p className="text-fluid-lead mt-5 max-w-[66ch] leading-[1.7] text-[var(--ink-2)]">
-              Deze kennisbank helpt je keuzes kaderen vóórdat je gaat rekenen.
-              Denk aan: sparen voor een huis over 5 jaar, huren versus kopen,
-              beleggen per horizon, risico en <GlossaryText text="inflatie" />.
+              Feitelijke uitleg over wat je tijdens je studie opbouwt, wat je
+              na je studie betaalt en wat je studieschuld betekent als je later
+              een huis wilt kopen.
             </p>
             <p className="mt-4 max-w-[66ch] text-[13.5px] leading-[1.65] text-[var(--muted)]">
               Gebruik dit als routehulp. Voor je eigen cijfers en scenario&apos;s
@@ -62,106 +69,176 @@ export default function KnowledgeBasePage() {
           </div>
         </section>
 
+        {visibleHorizonBands.length > 0 ? (
+          <section className="mt-8 rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
+            <h2 className="font-serif text-[clamp(1.25rem,1.05rem+0.8vw,1.7rem)] tracking-[-0.02em] text-[var(--ink)]">
+              Stap 1: kies je horizon
+            </h2>
+            <p className="mt-2 max-w-[66ch] text-[14px] leading-[1.65] text-[var(--ink-2)]">
+              Hoe lang je geld kan blijven staan bepaalt vaak meer dan het gekozen
+              product.
+            </p>
+            <div className="mt-5 grid gap-4 md:grid-cols-3">
+              {visibleHorizonBands.map((band) => (
+                <article
+                  key={band.id}
+                  className="rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] p-4"
+                >
+                  <div className="text-[11px] uppercase tracking-[0.12em] text-[var(--soft)]">
+                    {band.periodLabel}
+                  </div>
+                  <h3 className="mt-1 font-serif text-[1.2rem] text-[var(--ink)]">
+                    {band.title}
+                  </h3>
+                  <p className="mt-2 text-[13px] leading-[1.6] text-[var(--muted)]">
+                    <GlossaryText text={band.primaryGoal} />
+                  </p>
+                  <p className="mt-2 text-[13px] leading-[1.6] text-[var(--muted)]">
+                    <GlossaryText text={band.typicalApproach} />
+                  </p>
+                  <p className="mt-2 text-[12.5px] leading-[1.55] text-[var(--soft)]">
+                    Let op: <GlossaryText text={band.watchOut} />
+                  </p>
+                  <ul className="mt-3 space-y-1 text-[12.5px] leading-[1.55] text-[var(--muted)]">
+                    {band.firstChecks.map((item) => (
+                      <li key={item}>• <GlossaryText text={item} /></li>
+                    ))}
+                  </ul>
+                </article>
+              ))}
+            </div>
+          </section>
+        ) : null}
+
+        <section className="mt-8 space-y-6">
+          {visibleTopics.map((topic) => {
+            const relatedTools = topic.relatedTools.filter(
+              (slug) => appRegistryBySlug[slug],
+            );
+            const sourceIds = topic.sourceIds ?? [];
+
+            return (
+              <article
+                key={topic.id}
+                className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper"
+              >
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <h2 className="font-serif text-[clamp(1.2rem,1.02rem+0.75vw,1.6rem)] tracking-[-0.02em] text-[var(--ink)]">
+                    {topic.title}
+                  </h2>
+                  <Pill>Kader</Pill>
+                </div>
+                <p className="mt-3 max-w-[68ch] text-[14px] leading-[1.7] text-[var(--ink-2)]">
+                  <GlossaryText text={topic.summary} />
+                </p>
+                <p className="mt-2 max-w-[68ch] text-[13px] leading-[1.65] text-[var(--muted)]">
+                  <strong className="text-[var(--ink)]">Wanneer relevant:</strong>{" "}
+                  <GlossaryText text={topic.whenRelevant} />
+                </p>
+
+                <div className="mt-5 grid gap-4 md:grid-cols-2">
+                  <div className="rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] p-4">
+                    <div className="text-[11px] uppercase tracking-[0.12em] text-[var(--soft)]">
+                      Checklist
+                    </div>
+                    <ul className="mt-2 space-y-1 text-[13px] leading-[1.6] text-[var(--muted)]">
+                      {topic.checklist.map((item) => (
+                        <li key={item}>• <GlossaryText text={item} /></li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] p-4">
+                    <div className="text-[11px] uppercase tracking-[0.12em] text-[var(--soft)]">
+                      Veelgemaakte fouten
+                    </div>
+                    <ul className="mt-2 space-y-1 text-[13px] leading-[1.6] text-[var(--muted)]">
+                      {topic.commonMistakes.map((item) => (
+                        <li key={item}>• <GlossaryText text={item} /></li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                {relatedTools.length > 0 ? (
+                  <div className="mt-5">
+                    <div className="text-[11px] uppercase tracking-[0.12em] text-[var(--soft)]">
+                      Verdiepen met tools
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {relatedTools.map((slug) => (
+                        <Link
+                          key={slug}
+                          href={`/apps/${slug}`}
+                          className="inline-flex min-h-11 items-center rounded-full border border-[var(--hair)] bg-white px-3 py-2 text-[12px] text-[var(--ink)] transition hover:bg-[var(--paper-soft)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
+                        >
+                          {getRelatedToolLabel(slug)}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+
+                {sourceIds.length > 0 ? (
+                  <div className="mt-5">
+                    <div className="text-[11px] uppercase tracking-[0.12em] text-[var(--soft)]">
+                      Bronnen
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {sourceIds.map((sourceId) => {
+                        const source = knowledgeSources[sourceId];
+
+                        return (
+                          <a
+                            key={sourceId}
+                            href={source.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex min-h-11 items-center rounded-full border border-[var(--hair)] bg-white px-3 py-2 text-[12px] text-[var(--ink)] transition hover:bg-[var(--paper-soft)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
+                          >
+                            {source.publisher}: {source.title}
+                          </a>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ) : null}
+              </article>
+            );
+          })}
+        </section>
+
         <section className="mt-8 rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
           <h2 className="font-serif text-[clamp(1.25rem,1.05rem+0.8vw,1.7rem)] tracking-[-0.02em] text-[var(--ink)]">
-            Stap 1: kies je horizon
+            De drie fases
           </h2>
-          <p className="mt-2 max-w-[66ch] text-[14px] leading-[1.65] text-[var(--ink-2)]">
-            Hoe lang je geld kan blijven staan bepaalt vaak meer dan het gekozen
-            product.
-          </p>
           <div className="mt-5 grid gap-4 md:grid-cols-3">
-            {knowledgeHorizonBands.map((band) => (
+            {[
+              {
+                title: "Tijdens je studie",
+                text: "Wat bouw ik op, welke rente hoort erbij en wat betekent doorlenen later?",
+              },
+              {
+                title: "Na je studie",
+                text: "Wat wordt mijn maandbedrag, hoe werkt draagkracht en wat doet extra aflossen?",
+              },
+              {
+                title: "Verder",
+                text: "Wat betekent mijn studieschuld voor hypotheekruimte, buffer en woningplannen?",
+              },
+            ].map((phase) => (
               <article
-                key={band.id}
+                key={phase.title}
                 className="rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] p-4"
               >
-                <div className="text-[11px] uppercase tracking-[0.12em] text-[var(--soft)]">
-                  {band.periodLabel}
-                </div>
-                <h3 className="mt-1 font-serif text-[1.2rem] text-[var(--ink)]">
-                  {band.title}
+                <h3 className="font-serif text-[1.15rem] text-[var(--ink)]">
+                  {phase.title}
                 </h3>
-                <p className="mt-2 text-[13px] leading-[1.6] text-[var(--muted)]">
-                  <GlossaryText text={band.primaryGoal} />
+                <p className="mt-2 text-[13px] leading-[1.65] text-[var(--muted)]">
+                  {phase.text}
                 </p>
-                <p className="mt-2 text-[13px] leading-[1.6] text-[var(--muted)]">
-                  <GlossaryText text={band.typicalApproach} />
-                </p>
-                <p className="mt-2 text-[12.5px] leading-[1.55] text-[var(--soft)]">
-                  Let op: <GlossaryText text={band.watchOut} />
-                </p>
-                <ul className="mt-3 space-y-1 text-[12.5px] leading-[1.55] text-[var(--muted)]">
-                  {band.firstChecks.map((item) => (
-                    <li key={item}>• <GlossaryText text={item} /></li>
-                  ))}
-                </ul>
               </article>
             ))}
           </div>
-        </section>
-
-        <section className="mt-8 space-y-6">
-          {knowledgeTopics.map((topic) => (
-            <article
-              key={topic.id}
-              className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper"
-            >
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <h2 className="font-serif text-[clamp(1.2rem,1.02rem+0.75vw,1.6rem)] tracking-[-0.02em] text-[var(--ink)]">
-                  {topic.title}
-                </h2>
-                <Pill>Kader</Pill>
-              </div>
-              <p className="mt-3 max-w-[68ch] text-[14px] leading-[1.7] text-[var(--ink-2)]">
-                <GlossaryText text={topic.summary} />
-              </p>
-              <p className="mt-2 max-w-[68ch] text-[13px] leading-[1.65] text-[var(--muted)]">
-                <strong className="text-[var(--ink)]">Wanneer relevant:</strong>{" "}
-                <GlossaryText text={topic.whenRelevant} />
-              </p>
-
-              <div className="mt-5 grid gap-4 md:grid-cols-2">
-                <div className="rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] p-4">
-                  <div className="text-[11px] uppercase tracking-[0.12em] text-[var(--soft)]">
-                    Checklist
-                  </div>
-                  <ul className="mt-2 space-y-1 text-[13px] leading-[1.6] text-[var(--muted)]">
-                    {topic.checklist.map((item) => (
-                      <li key={item}>• <GlossaryText text={item} /></li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] p-4">
-                  <div className="text-[11px] uppercase tracking-[0.12em] text-[var(--soft)]">
-                    Veelgemaakte fouten
-                  </div>
-                  <ul className="mt-2 space-y-1 text-[13px] leading-[1.6] text-[var(--muted)]">
-                    {topic.commonMistakes.map((item) => (
-                      <li key={item}>• <GlossaryText text={item} /></li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-
-              <div className="mt-5">
-                <div className="text-[11px] uppercase tracking-[0.12em] text-[var(--soft)]">
-                  Verdiepen met tools
-                </div>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {topic.relatedTools.map((slug) => (
-                    <Link
-                      key={slug}
-                      href={`/apps/${slug}`}
-                      className="inline-flex min-h-11 items-center rounded-full border border-[var(--hair)] bg-white px-3 py-2 text-[12px] text-[var(--ink)] transition hover:bg-[var(--paper-soft)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
-                    >
-                      {getRelatedToolLabel(slug)}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </article>
-          ))}
         </section>
 
         <section className="mt-8 rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
