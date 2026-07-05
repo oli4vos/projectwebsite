@@ -4,11 +4,12 @@ Dit bestand is bedoeld als werksamenvatting voor toekomstige agent-rondes. Werk 
 
 ## Doel en toon
 
-- Financiële rekentool-site voor mensen die meer grip, regie en inzicht willen in financiële keuzes.
-- Subtiele knipoog naar de pechgeneratie, zonder slachtoffertaal of politieke boosheid.
-- Copy moet handelingsgericht zijn: scenario's, keuzes, vooruitkijken, heldere aannames.
+- De huidige launch-scope is: mensen met een studieschuld helpen hun schuld te begrijpen.
+- De site vertelt één informatieve route in drie fases: wat bouw ik op, wat ga ik betalen en wat betekent mijn schuld voor een huis?
+- Copy moet feitelijk en terughoudend zijn: scenario's, eigen cijfers, vooruitkijken, heldere aannames.
+- De rode draad blijft: geen advies, jij bepaalt.
+- Er is bewust geen zichtbare aflossen-vs-beleggen- of vermogensallocatieflow in de publieke site.
 - De site moet toegankelijk zijn voor mensen met weinig financiële kennis, maar ook verdieping bieden voor mensen die de berekening echt willen begrijpen.
-- Onderliggende boodschap: we hebben misschien pech gehad, maar we zijn niet zielig; we pakken de controle terug.
 
 ## Taalconventie frontend
 
@@ -90,6 +91,15 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - in UI/UX verborgen;
   - functioneel uitgezet;
   - technisch in code behouden voor snelle heractivatie.
+- De publieke app-registry is nu gericht op studieschuld en wonen:
+  - `duo-doorlenen-of-stoppen`
+  - `duo-maandbedrag`
+  - `duo-extra-aflossen`
+  - `hypotheek-impact-studieschuld`
+  - `artifact-hypotheek-wonen-maximale-hypotheek`
+  - `schulden-volgorde`
+  - `familiehulp-eerste-woning`
+- `studieschuld-vs-beleggen` en `volgende-euro` blijven technisch aanwezig maar zijn hidden.
 
 ## Centrale berekeningslaag
 
@@ -139,9 +149,9 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/components/charts.tsx`: gedeelde chartcomponenten met interactieve tooltip-ondersteuning
 - `src/app/apps/[slug]/page.tsx`: toont ook manifestmetadata (domeinen, aannames, output/disclaimer/risico) zonder de dashboardflow zwaarder te maken
 - Homepage en dashboard zijn nu bibliotheek-first:
-  - primaire navigatie via categorieën en tools per onderwerp
-  - doelgroep-/geldroutes zijn centrale configuratie en sturen naar relevante toolgroepen
-  - hero is kort en taakgericht, zonder lange uitlegblokken
+  - primaire navigatie via drie fases: schuldopbouw, maandbedrag, wonen
+  - doelgroep-/geldroutes zijn centrale configuratie en sturen naar de actieve studieschuld- en woninggroepen
+  - hero is kort en taakgericht, zonder aflossen-vs-beleggen-route
   - kennisniveau-keuze (Basis / Normaal / Verdiept) wordt lokaal opgeslagen
   - persoonlijke route blijft beschikbaar maar staat lager en compacter
   - profiel en aannames blijven secundaire, subtiele blokken
@@ -187,11 +197,11 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/hooks/useUserPreferences.ts`: sync-hook voor lokale kennisniveauvoorkeur
 - `src/lib/financial-constants/`: centrale jaarlijkse aannames/variabelen + helpers
 - `src/lib/chart-utils.ts`: centrale format/tick helpers voor grafieken (hele jaren + eurolabels)
-- `src/lib/knowledge-base.ts`: centrale kennisbankcontent (horizonbanden, checklists, keuzecontexten, toolkoppelingen)
+- `src/lib/knowledge-base.ts`: centrale kennisbankcontent; zichtbare topics zijn nu studieschuldartikelen, oude horizon-/beleggingskaders blijven hidden
 - `src/lib/number-input.ts`: centrale parser voor numerieke invoer; komma wordt als decimaalpunt behandeld
 - `src/lib/copy-glossary.ts`: centrale woordenlijst voor gebruikerstaal bij financiële termen en enumlabels
 - `src/components/GlossaryText.tsx`: maakt bekende financiële begrippen klikbaar met korte hover/focus-uitleg
-- `src/lib/knowledge-sources.ts`: centrale bronregisters en bronhiërarchie voor kennisbankdocumenten
+- `src/lib/knowledge-sources.ts`: centrale bronregisters en bronhiërarchie voor kennisbankdocumenten, inclusief DUO-bronnen met `lastChecked`
 - `src/lib/duo/`: centrale DUO-domeinlaag met wettelijk maandbedrag, relevant maandbedrag per situatie en scenariofuncties voor extra aflossen
 - `src/lib/duo/project-duo-loan.ts`: centrale leenfaseprojectie voor doorlenen of stoppen, inclusief rentevolgorde, aanloopfase, theoretische SF35-maandtermijn en optionele hypotheekimpact
 - `src/lib/planning/`: centrale planninghelpers voor doelgroep-/levensgebeurtenis-tools zoals koop-vs-huur, schulden-volgorde en kind-wordt-18

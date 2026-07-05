@@ -34,9 +34,13 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 | Onderdeel | Status | Schakelaar | Default | Opmerking | Heractivatie |
 |---|---|---|---|---|---|
 | Toolbibliotheek + categorie-navigatie | actief | n.v.t. | aan | Homepage en routes draaien publiek | n.v.t. |
-| Financiële kennisbank (`/kennisbank`) | actief | n.v.t. | aan | Centrale kennislaag los van tools, met horizon- en keuzekaders | n.v.t. |
+| Financiële kennisbank (`/kennisbank`) | actief | n.v.t. | aan | Centrale studieschuld-kennislaag met DUO-bronnen, hidden oude horizon-/beleggingskaders | n.v.t. |
 | Publieke calculators (app-registry) | actief | `visibility: "public"` | aan | 7 publieke tools in de huidige registry | n.v.t. |
-| Draft tools (concept) | hidden-draft | `visibility: "hidden"` | uit | 153 manifests zijn niet publiek; valideer per tool vóór publicatie | zet manifest op `public` + checks draaien |
+| Draft tools (concept) | hidden-draft | `visibility: "hidden"` | uit | 155 manifests zijn niet publiek; valideer per tool vóór publicatie | zet manifest op `public` + checks draaien |
+| Studieschuld-vs-beleggen | hidden-draft | `visibility: "hidden"` | uit | Bewust uit zichtbare positionering; code behouden voor mogelijke latere heractivatie | alleen heractiveren met nieuwe productbeslissing + copycheck |
+| Volgende euro | hidden-draft | `visibility: "hidden"` | uit | Bewust uit zichtbare positionering; route niet meer gelinkt vanuit publieke UI | alleen heractiveren met nieuwe productbeslissing + copycheck |
+| DUO-maandbedrag | experimenteel | `visibility: "public"` | aan | Nieuwe fase-2-tool voor wettelijke maandtermijn en optionele draagkrachtindicatie | n.v.t. |
+| DUO-extra-aflossen | experimenteel | `visibility: "public"` | aan | Nieuwe fase-2-tool voor extra DUO-aflossing, looptijd/maandbedrag en afloscurve | n.v.t. |
 | Centrale tax/DUO/pension/constants lagen | actief | n.v.t. | aan | Hergebruikt door meerdere tools | n.v.t. |
 | Submit-driven calculatorflow | actief | n.v.t. | aan | Patroon beschikbaar via `CalculatorShell` + submitlogica | n.v.t. |
 | DUO-impact in maximale-hypotheektool | actief | n.v.t. | aan | Kernuitkomst toont rechtsboven de indicatieve daling van de leencapaciteit | n.v.t. |
@@ -54,6 +58,9 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 | Datum | Commit | Wijziging | Impact |
 |---|---|---|---|
 | 2026-07-05 | `pending` | Nieuwe publieke beta-tool `DUO doorlenen of stoppen` toegevoegd met centrale leenfaseprojectie | DUO / studieschuld / leenfase |
+| 2026-07-05 | `pending` | Site herpositioneerd naar “studieschuld begrijpen” met drie fases: opbouw, maandbedrag, wonen | Homepage / kennisbank / navigatie |
+| 2026-07-05 | `pending` | Nieuwe publieke beta-tools `duo-maandbedrag` en `duo-extra-aflossen` toegevoegd | DUO / studieschuld / terugbetalen |
+| 2026-07-05 | `pending` | `studieschuld-vs-beleggen` en `volgende-euro` verborgen gehouden; links uit zichtbare UI verwijderd | Toolzichtbaarheid / positionering |
 | 2026-06-14 | `pending` | DUO-impact centraal berekend en rechtsboven in de maximale-hypotheekuitkomst geplaatst | Maximale hypotheek / studieschuld |
 | 2026-06-13 | `pending` | Mobiele calculatorflow, invoersemantiek en projectbrede UX-richtlijnen aangescherpt | Publieke calculatorflow en toegankelijkheid |
 | 2026-05-28 | `36c6b0e` | Saved scenario’s direct heropenen in oorspronkelijke tool toegevoegd (deep-linkflow) | Saved calculations MVP |

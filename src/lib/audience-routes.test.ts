@@ -9,6 +9,8 @@ import {
   visibleAudienceRoutes,
 } from "@/lib/audience-routes";
 import { appRegistryBySlug } from "@/lib/app-registry";
+import { knowledgeTopics } from "@/lib/knowledge-base";
+import { toolGroups } from "@/lib/tool-groups";
 
 const baseApp: Omit<AppManifest, "slug" | "title"> = {
   description: "Test app",
@@ -79,26 +81,26 @@ describe("audience routes", () => {
 
   it("returns route apps in configured order", () => {
     const apps = [
+      app("duo-doorlenen-of-stoppen", "Doorlenen"),
+      app("duo-extra-aflossen", "Extra aflossen"),
+      app("duo-maandbedrag", "Maandbedrag"),
       app("familiehulp-eerste-woning", "Familiehulp"),
+      app("artifact-hypotheek-wonen-maximale-hypotheek", "Maximale hypotheek"),
       app("hypotheek-impact-studieschuld", "Hypotheek"),
-      app("volgende-euro", "Volgende euro"),
-      app("studieschuld-vs-beleggen", "Studieschuld"),
-      app("schulden-volgorde", "Schulden volgorde"),
     ];
 
     expect(getAudienceRouteApps("starter-studieschuld", apps).map((item) => item.slug)).toEqual([
-      "schulden-volgorde",
-      "volgende-euro",
-      "studieschuld-vs-beleggen",
+      "duo-doorlenen-of-stoppen",
+      "duo-maandbedrag",
+      "duo-extra-aflossen",
       "hypotheek-impact-studieschuld",
     ]);
 
     expect(getAudienceRouteApps("koopstarter-familiehulp", apps).map((item) => item.slug)).toEqual([
-      "familiehulp-eerste-woning",
       "hypotheek-impact-studieschuld",
-      "studieschuld-vs-beleggen",
-      "schulden-volgorde",
-      "volgende-euro",
+      "artifact-hypotheek-wonen-maximale-hypotheek",
+      "familiehulp-eerste-woning",
+      "duo-doorlenen-of-stoppen",
     ]);
   });
 
@@ -106,6 +108,26 @@ describe("audience routes", () => {
     for (const route of visibleAudienceRoutes) {
       for (const slug of route.primaryToolSlugs) {
         expect(appRegistryBySlug[slug], `${route.id} -> ${slug}`).toBeDefined();
+      }
+    }
+  });
+
+  it("keeps visible knowledge links pointed at public registry apps", () => {
+    for (const topic of knowledgeTopics) {
+      if (topic.visibility === "hidden") {
+        continue;
+      }
+
+      for (const slug of topic.relatedTools) {
+        expect(appRegistryBySlug[slug], `${topic.id} -> ${slug}`).toBeDefined();
+      }
+    }
+  });
+
+  it("keeps visible tool groups pointed at public registry apps", () => {
+    for (const group of toolGroups) {
+      for (const slug of group.slugs) {
+        expect(appRegistryBySlug[slug], `${group.title} -> ${slug}`).toBeDefined();
       }
     }
   });
