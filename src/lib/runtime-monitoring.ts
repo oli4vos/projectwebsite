@@ -8,6 +8,9 @@ export type RuntimeMonitoringEvent = {
 
 const STORAGE_KEY = "project-site:runtime-monitoring:v1";
 const MAX_EVENTS = 50;
+const WEBHOOK_RATE_LIMIT_MAX_EVENTS = 5;
+const WEBHOOK_RATE_LIMIT_WINDOW_MS = 60_000;
+let webhookSendTimestamps: number[] = [];
 
 function getReleaseVersion() {
   return process.env.NEXT_PUBLIC_RELEASE_VERSION?.trim() || "dev-local";
@@ -63,10 +66,26 @@ function storeEvent(event: RuntimeMonitoringEvent) {
 }
 
 async function sendToWebhook(event: RuntimeMonitoringEvent) {
+  /**
+   * NEXT_PUBLIC_MONITORING_WEBHOOK_URL zit publiek in de client-bundle.
+   * Gebruik deze URL alleen voor niet-gevoelige, spam-tolerante endpoints.
+   */
   const webhookUrl = process.env.NEXT_PUBLIC_MONITORING_WEBHOOK_URL?.trim();
   if (!webhookUrl || typeof window === "undefined") {
     return;
   }
+
+  const now = Date.now();
+  webhookSendTimestamps = webhookSendTimestamps.filter(
+    (timestamp) => now - timestamp < WEBHOOK_RATE_LIMIT_WINDOW_MS,
+  );
+
+  if (webhookSendTimestamps.length >= WEBHOOK_RATE_LIMIT_MAX_EVENTS) {
+    return;
+  }
+
+  webhookSendTimestamps.push(now);
+
   try {
     await fetch(webhookUrl, {
       method: "POST",
