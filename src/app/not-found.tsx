@@ -27,8 +27,8 @@ export default function NotFound() {
               <BtnLink href="/" kind="primary" size="md">
                 Terug naar dashboard
               </BtnLink>
-              <BtnLink href="/apps/studieschuld-vs-beleggen" kind="outline" size="md">
-                Start met voorbeeldwaarden
+              <BtnLink href="/apps/duo-maandbedrag" kind="outline" size="md">
+                Bereken DUO-maandbedrag
               </BtnLink>
             </div>
           </div>
@@ -45,15 +45,15 @@ export default function NotFound() {
                 </div>
               </div>
               <div>
-                <div className="font-medium">Studieschuld vs beleggen</div>
+                <div className="font-medium">DUO-maandbedrag</div>
                 <div className="mt-1 text-white/72">
-                  Scenariovergelijking met simpele aannames en directe uitkomst.
+                  Feitelijke indicatie van wettelijke termijn en draagkracht.
                 </div>
               </div>
               <div>
-                <div className="font-medium">Annuïtair vs lineair</div>
+                <div className="font-medium">Hypotheekimpact studieschuld</div>
                 <div className="mt-1 text-white/72">
-                  Vergelijk maandlast, rente en bufferopbouw over de looptijd.
+                  Bekijk wat je studieschuld doet met je hypotheekruimte.
                 </div>
               </div>
             </div>

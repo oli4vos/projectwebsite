@@ -38,15 +38,15 @@ export const audienceRoutes: AudienceRoute[] = [
     id: "starter-studieschuld",
     label: "Start bij DUO",
     summary:
-      "Begin bij maandlast, buffer, extra aflossen en wat je studieschuld blokkeert.",
+      "Begin bij schuldopbouw, maandbedrag, extra aflossen en wat je studieschuld later betekent.",
     userQuestion: "Wat doet mijn studieschuld met mijn ruimte per maand?",
     researchSignal:
-      "Eerst grip op DUO, daarna pas wonen, vermogen en familiehulp.",
-    groups: ["Studieschuld", "Wonen", "Extra geld"],
+      "Eerst grip op DUO, daarna pas wonen en familiehulp.",
+    groups: ["Studieschuld", "Wonen"],
     primaryToolSlugs: [
-      "schulden-volgorde",
-      "volgende-euro",
-      "studieschuld-vs-beleggen",
+      "duo-doorlenen-of-stoppen",
+      "duo-maandbedrag",
+      "duo-extra-aflossen",
       "hypotheek-impact-studieschuld",
     ],
   },
@@ -59,13 +59,12 @@ export const audienceRoutes: AudienceRoute[] = [
       "Kan ik kopen met studieschuld, eigen geld en hulp van familie?",
     researchSignal:
       "Wonen is een verdiepingslaag: familielening, schenking en contractuele lasten blijven apart.",
-    groups: ["Studieschuld", "Wonen", "Extra geld"],
+    groups: ["Studieschuld", "Wonen"],
     primaryToolSlugs: [
-      "familiehulp-eerste-woning",
       "hypotheek-impact-studieschuld",
-      "studieschuld-vs-beleggen",
-      "schulden-volgorde",
-      "volgende-euro",
+      "artifact-hypotheek-wonen-maximale-hypotheek",
+      "familiehulp-eerste-woning",
+      "duo-doorlenen-of-stoppen",
     ],
   },
   {
@@ -94,8 +93,8 @@ export const audienceRoutes: AudienceRoute[] = [
     userQuestion: "Wat kan ik veilig privé uitgeven als mijn inkomen wisselt?",
     researchSignal:
       "Huishoudens met wisselend inkomen ervaren vaker onzekerheid; tools moeten daarom reserveringen en buffer expliciet maken.",
-    groups: ["Werk & ZZP", "Belasting", "Extra geld", "Sparen & beleggen"],
-    primaryToolSlugs: ["zzp-uurtarief", "volgende-euro", "jaarruimte-vs-vrij-beleggen"],
+    groups: ["Werk & ZZP", "Belasting", "Terugbetalen"],
+    primaryToolSlugs: ["zzp-uurtarief"],
   },
   {
     id: "schulden",
@@ -106,13 +105,8 @@ export const audienceRoutes: AudienceRoute[] = [
     userQuestion: "Welke schuld of keuze moet eerst aandacht krijgen?",
     researchSignal:
       "Kredieten, achteraf betalen en betalingsachterstanden vragen om een concrete volgorde in plaats van losse percentages.",
-    groups: ["Extra geld", "Studieschuld", "Wonen"],
-    primaryToolSlugs: [
-      "schulden-volgorde",
-      "volgende-euro",
-      "studieschuld-vs-beleggen",
-      "hypotheek-aflossen-vs-beleggen",
-    ],
+    groups: ["Terugbetalen", "Studieschuld", "Wonen"],
+    primaryToolSlugs: ["schulden-volgorde", "duo-maandbedrag", "duo-extra-aflossen"],
   },
   {
     id: "gezin-kind-18",
@@ -123,29 +117,20 @@ export const audienceRoutes: AudienceRoute[] = [
     userQuestion: "Wat verandert er in mijn maandruimte als gezinssituatie of inkomsten wijzigen?",
     researchSignal:
       "Overgangsmomenten zoals een kind dat 18 wordt, werkuren en toeslagen veroorzaken juist behoefte aan eenvoudige scenario's.",
-    groups: ["Extra geld", "Werk & ZZP", "Belasting"],
-    primaryToolSlugs: [
-      "kind-wordt-18-impact",
-      "volgende-euro",
-      "zzp-uurtarief",
-      "box-3-impact",
-    ],
+    groups: ["Terugbetalen", "Werk & ZZP", "Belasting"],
+    primaryToolSlugs: ["kind-wordt-18-impact", "zzp-uurtarief"],
   },
   {
     id: "pensioen-fire",
-    label: "Pensioen / FIRE",
+    label: "Pensioen / lange termijn",
     enabled: false,
     summary:
-      "Vergelijk vrij beleggen, jaarruimte, box 3 en financiële vrijheid met focus op netto uitkomsten.",
-    userQuestion: "Hoe bouw ik vermogen op zonder flexibiliteit en belastingeffecten te vergeten?",
+      "Vergelijk pensioenruimte, box 3 en lange termijn met focus op netto uitkomsten.",
+    userQuestion: "Hoe plan ik later zonder flexibiliteit en belastingeffecten te vergeten?",
     researchSignal:
       "Veel mensen denken laat na over pensioen; een light-first route kan jaarruimte, box 3 en FIRE begrijpelijk naast elkaar zetten.",
-    groups: ["Sparen & beleggen", "FIRE / financiële vrijheid", "Belasting"],
-    primaryToolSlugs: [
-      "prive-beleggen-eindvermogen",
-      "jaarruimte-vs-vrij-beleggen",
-      "fire-na-belasting",
-    ],
+    groups: ["Belasting"],
+    primaryToolSlugs: [],
   },
 ];
 

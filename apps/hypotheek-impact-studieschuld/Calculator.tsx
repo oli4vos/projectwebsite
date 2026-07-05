@@ -1154,7 +1154,7 @@ function CalculatorContent({
                 label: "Bekijk familiehulp",
               },
               {
-                href: "/apps/studieschuld-vs-beleggen",
+                href: "/apps/duo-extra-aflossen",
                 label: "Vergelijk extra aflossen",
               },
             ]}
@@ -1238,8 +1238,8 @@ function CalculatorContent({
             DUO werkt met twee lagen: eerst een wettelijk maandbedrag op basis van
             schuld, rente en looptijd. Daarna een draagkrachttoets op inkomen. Je
             betaalt in de praktijk het laagste van die twee. Alles wat je daarboven
-            vrijwillig extra betaalt is een keuze en kun je ook als alternatief
-            scenario (buffer, woning of beleggen) vergelijken.
+            vrijwillig extra betaalt is een keuze die je apart kunt doorrekenen
+            voor buffer, woningplannen of looptijd.
           </p>
           <p className="mt-2 text-[12.5px] leading-[1.6] text-[var(--soft)]">
             {getGlossaryExplanation("wettelijkDuoBedrag")}{" "}

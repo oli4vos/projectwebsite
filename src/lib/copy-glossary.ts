@@ -81,7 +81,7 @@ const glossaryLabels: Record<GlossaryTerm, string> = {
 };
 
 const glossaryExplanations: Record<GlossaryTerm, string> = {
-  box3: "Belasting over sparen, beleggen en sommige schulden.",
+  box3: "Belasting over spaargeld, overige bezittingen en sommige schulden.",
   jaarruimte:
     "Het bedrag dat je mogelijk fiscaal voordelig voor pensioen kunt inleggen.",
   brutering:
@@ -112,7 +112,7 @@ const glossaryExplanations: Record<GlossaryTerm, string> = {
   buffer:
     "Geld dat je achter de hand houdt voor tegenvallers, zodat je niet direct hoeft te lenen of verkopen.",
   rendement:
-    "De opbrengst of het verlies op geld dat je spaart of belegt. Het is onzeker bij beleggen.",
+    "De opbrengst of het verlies op geld dat je inzet. De uitkomst kan onzeker zijn.",
   vrijstelling:
     "Een bedrag waarover je geen of minder belasting betaalt.",
   toeslagen:

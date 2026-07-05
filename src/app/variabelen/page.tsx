@@ -182,7 +182,7 @@ export default function VariabelenPage() {
               value={`${formatPercent(constants.mortgage.defaultMortgageRate)}%`}
             />
             <SummaryCard
-              label="Forfait beleggingen"
+              label="Forfait overige bezittingen"
               value={`${formatPercent(constants.box3.deemedReturns.investmentsAndOtherAssets)}%`}
             />
             <SummaryCard
@@ -305,7 +305,7 @@ export default function VariabelenPage() {
               value={`${formatPercent(constants.box3.deemedReturns.bankDeposits)}%`}
             />
             <ValueRow
-              name="Forfait beleggingen/overige bezittingen"
+              name="Forfait overige bezittingen"
               value={`${formatPercent(constants.box3.deemedReturns.investmentsAndOtherAssets)}%`}
             />
             <ValueRow
@@ -314,7 +314,7 @@ export default function VariabelenPage() {
             />
             <ValueRow
               name="Standaardmethode in tools"
-              value="Werkelijk rendement (aanpasbaar naar forfaitair)"
+              value="Werkelijke opbrengst (aanpasbaar naar forfaitair)"
             />
             <MetaBlock year={year} {...constants.box3.meta} />
           </ToolDisclosure>
