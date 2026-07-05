@@ -1,6 +1,6 @@
 # Start Hier — Agent Protocol voor Invulbladen
 
-Laatst bijgewerkt: 2026-05-29
+Laatst bijgewerkt: 2026-07-05
 
 Dit bestand is het vaste startpunt voor de agent wanneer de opdracht is:
 
@@ -50,7 +50,8 @@ Verplichte onderhoudsregel voor de robot/agent:
 1. Categorie-invulblad (bijv. `basis-berekeningen-logic-invulblad.md`)
 2. Eventuele categorie-varianten met alternatieve naam (bijv. `basisberekeningen-logic-invulblad.md`)
 3. `extracted/` alleen voor controle/aanvulling
-4. `raw/` alleen als fallback
+
+De map `raw/` met gescrapete third-party bronbestanden is verwijderd en mag niet opnieuw worden ingecheckt.
 
 ## Canonical categoriebestanden
 

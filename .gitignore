@@ -13,6 +13,9 @@
 /playwright-report/
 /blob-report/
 
+# scraped third-party source snapshots
+artifacts/**/raw/
+
 # misc
 .DS_Store
 Redesign*/
