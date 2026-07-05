@@ -225,23 +225,35 @@ export default function DuoExtraAflossenCalculator() {
       </section>
 
       {view.chart.labels.length > 1 ? (
-        <ChartContainer title="Afloscurve vóór en na">
-          <AreaChart
-            series={[
-              { color: "oklch(50% 0.08 250)", points: view.chart.before },
-              { color: "oklch(52% 0.10 150)", points: view.chart.after },
-            ]}
-            seriesLabels={["Voor extra aflossen", "Na extra aflossen"]}
+        <section className="rounded-xl border hair bg-white p-5 shadow-paper">
+          <h2 className="text-lg font-semibold tracking-tight text-[var(--ink)]">
+            Afloscurve vóór en na
+          </h2>
+          <ChartContainer
             xValues={view.chart.labels.map(Number)}
-            yTicks={getAdaptiveEuroTicks(Math.max(...view.chart.before, ...view.chart.after))}
+            chart={
+              <div className="space-y-3">
+                <AreaChart
+                  series={[
+                    { color: "oklch(50% 0.08 250)", points: view.chart.before },
+                    { color: "oklch(52% 0.10 150)", points: view.chart.after },
+                  ]}
+                  seriesLabels={["Voor extra aflossen", "Na extra aflossen"]}
+                  xValues={view.chart.labels.map(Number)}
+                  yTicks={getAdaptiveEuroTicks(
+                    Math.max(...view.chart.before, ...view.chart.after),
+                  )}
+                />
+                <ChartLegend
+                  items={[
+                    { label: "Voor extra aflossen", color: "oklch(50% 0.08 250)" },
+                    { label: "Na extra aflossen", color: "oklch(52% 0.10 150)" },
+                  ]}
+                />
+              </div>
+            }
           />
-          <ChartLegend
-            items={[
-              { label: "Voor extra aflossen", color: "oklch(50% 0.08 250)" },
-              { label: "Na extra aflossen", color: "oklch(52% 0.10 150)" },
-            ]}
-          />
-        </ChartContainer>
+        </section>
       ) : null}
     </div>
   ) : (
