@@ -11,9 +11,11 @@ describe("generated app registry", () => {
   });
 
   it("contains expected public tools", () => {
-    expect(appRegistry).toHaveLength(5);
+    expect(appRegistry).toHaveLength(7);
     expect(appRegistryBySlug["artifact-hypotheek-wonen-maximale-hypotheek"]).toBeDefined();
     expect(appRegistryBySlug["duo-doorlenen-of-stoppen"]).toBeDefined();
+    expect(appRegistryBySlug["duo-extra-aflossen"]).toBeDefined();
+    expect(appRegistryBySlug["duo-maandbedrag"]).toBeDefined();
     expect(appRegistryBySlug["familiehulp-eerste-woning"]).toBeDefined();
     expect(appRegistryBySlug["hypotheek-impact-studieschuld"]).toBeDefined();
     expect(appRegistryBySlug["schulden-volgorde"]).toBeDefined();

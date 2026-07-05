@@ -1,0 +1,83 @@
+import { describe, expect, it } from "vitest";
+import {
+  calculateDuoExtraRepaymentView,
+  createDuoExtraRepaymentDefaultValues,
+  validateDuoExtraRepaymentForm,
+} from "./logic";
+
+describe("duo-extra-aflossen logic", () => {
+  it("calculates a shorter-term scenario through central DUO projection", () => {
+    const view = calculateDuoExtraRepaymentView(
+      {
+        remainingDebt: "30000",
+        repaymentRule: "SF35",
+        currentMonthlyPayment: "120",
+        oneTimeExtraRepayment: "1000",
+        monthlyExtraRepayment: "50",
+        strategy: "shortenTerm",
+      },
+      { annualInterestRate: 0, remainingTermYears: 35, normVersion: "fixture-zero" },
+    );
+
+    expect(view.isValid).toBe(true);
+    if (!view.isValid) throw new Error("expected valid view");
+    expect(view.result.newRequiredMonthlyPayment).toBe(120);
+    expect(view.result.effectiveNewMonthlyPayment).toBe(170);
+    expect(view.result.timelineAfter.months).toBeLessThan(view.result.timelineBefore.months);
+    expect(view.normVersion).toBe("fixture-zero");
+  });
+
+  it("calculates a lower monthly payment scenario", () => {
+    const view = calculateDuoExtraRepaymentView(
+      {
+        remainingDebt: "30000",
+        repaymentRule: "SF35",
+        currentMonthlyPayment: "",
+        oneTimeExtraRepayment: "5000",
+        monthlyExtraRepayment: "",
+        strategy: "lowerMonthlyPayment",
+      },
+      { annualInterestRate: 0, remainingTermYears: 35 },
+    );
+
+    expect(view.isValid).toBe(true);
+    if (!view.isValid) throw new Error("expected valid view");
+    expect(view.result.newRequiredMonthlyPayment).toBeLessThan(
+      view.result.originalMonthlyPayment,
+    );
+    expect(view.result.interestSaved).toBe(0);
+  });
+
+  it("validates negative and empty input", () => {
+    expect(validateDuoExtraRepaymentForm({
+      remainingDebt: "",
+      repaymentRule: "SF35",
+      currentMonthlyPayment: "",
+      oneTimeExtraRepayment: "",
+      monthlyExtraRepayment: "",
+      strategy: "shortenTerm",
+    }).remainingDebt).toBeDefined();
+
+    expect(validateDuoExtraRepaymentForm({
+      remainingDebt: "-1",
+      repaymentRule: "SF35",
+      currentMonthlyPayment: "-2",
+      oneTimeExtraRepayment: "-3",
+      monthlyExtraRepayment: "-4",
+      strategy: "shortenTerm",
+    }).currentMonthlyPayment).toBeDefined();
+  });
+
+  it("builds chart data from central timeline points", () => {
+    const view = calculateDuoExtraRepaymentView(createDuoExtraRepaymentDefaultValues(), {
+      annualInterestRate: 0,
+      remainingTermYears: 35,
+    });
+
+    expect(view.isValid).toBe(true);
+    if (!view.isValid) throw new Error("expected valid view");
+    expect(view.chart.labels.length).toBeGreaterThan(0);
+    expect(view.chart.before.length).toBe(view.chart.labels.length);
+    expect(view.chart.after.length).toBe(view.chart.labels.length);
+  });
+});

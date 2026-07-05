@@ -70,6 +70,74 @@ export const appRegistry = [
     "entry": "Calculator.tsx"
   },
   {
+    "slug": "duo-extra-aflossen",
+    "title": "Wat doet extra aflossen?",
+    "description": "Bekijk feitelijk wat een extra DUO-aflossing doet met maandtermijn, looptijd en rentelast.",
+    "type": "frontend",
+    "category": "Schulden",
+    "tags": [
+      "DUO",
+      "studieschuld",
+      "extra aflossen",
+      "looptijd"
+    ],
+    "status": "beta",
+    "visibility": "public",
+    "requiredProfileFields": [
+      "studentDebt.remainingDebt",
+      "studentDebt.currentMonthlyPayment",
+      "studentDebt.repaymentRule"
+    ],
+    "reasonHint": "Handig als je wilt zien wat extra aflossen bij DUO verandert in maandlast en looptijd.",
+    "assumptionsUsed": [
+      "duo",
+      "charts"
+    ],
+    "calculationDomains": [
+      "studentDebt",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "duoIndicative",
+    "outputType": "timeline",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "duo-maandbedrag",
+    "title": "Wat wordt mijn DUO-maandbedrag?",
+    "description": "Bereken je wettelijke DUO-maandtermijn en bekijk optioneel een draagkrachtindicatie.",
+    "type": "frontend",
+    "category": "Schulden",
+    "tags": [
+      "DUO",
+      "studieschuld",
+      "maandbedrag",
+      "draagkracht"
+    ],
+    "status": "beta",
+    "visibility": "public",
+    "requiredProfileFields": [
+      "studentDebt.remainingDebt",
+      "studentDebt.repaymentRule",
+      "income.grossAnnualIncome",
+      "income.householdType"
+    ],
+    "reasonHint": "Handig als je wilt begrijpen welk DUO-maandbedrag bij je schuld hoort.",
+    "assumptionsUsed": [
+      "duo"
+    ],
+    "calculationDomains": [
+      "studentDebt",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "duoIndicative",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
     "slug": "familiehulp-eerste-woning",
     "title": "Lenen of schenken voor eerste woning",
     "description": "Vergelijk studieschuld, bankhypotheek, eigen geld, familielening en schenkingen voor een eerste woning.",
