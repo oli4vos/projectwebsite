@@ -20,6 +20,11 @@ Doel: wijzigingen in vaste aannames/percentages expliciet loggen los van feature
 - Wijziging: bronmetadata toegevoegd (sourceUrl + sourceTier per AssumptionMeta-blok in years.ts); velden verplicht gesteld in types.ts.
 - Impact: geen rekentechnische impact; puur machineleesbare documentatie.
 
+## 2026-07-05
+- Commit: `fc17f93`
+- Wijziging: studieschuld-positionering en nieuwe DUO-tools gepubliceerd zonder nieuwe financiële aannames of percentages.
+- Impact: geen rekentechnische impact; bestaande DUO-rentes, hypotheeknormen en bronmetadata blijven centraal in `src/lib/financial-constants/`.
+
 ## Template
 - Datum:
 - Commit:
