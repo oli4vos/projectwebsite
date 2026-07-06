@@ -1,28 +1,39 @@
 # Kennisbank bronnenregister
 
-Dit document legt vast welke bronnen de kennisbank en toekomstige blogcontent
-als primaire basis moeten gebruiken.
+Dit document legt vast welke bronnen de kennisbank en toekomstige blogcontent als basis gebruiken. De bijbehorende code staat in [`src/lib/knowledge-sources.ts`](../src/lib/knowledge-sources.ts). Houd dit document synchroon met `knowledgeSources`, `knowledgeDocumentSourceGroups` en `knowledgeSourceHierarchy`.
 
-De bijbehorende code staat in [`src/lib/knowledge-sources.ts`](../src/lib/knowledge-sources.ts).
+## 1. Alle geregistreerde bronnen
 
-## 1. Primaire bronnen
-
-Gebruik deze bronnen als leidend:
-
-- `tijdelijke-regeling-hypothecair-krediet-2026`
-- `nibud-advies-hypotheeknormen-2026`
-- `volkshuisvesting-leennormen-hypotheek`
-- `afm-hypothecair-krediet`
-- `afm-toetsrente-q3-2026`
-- `rijksoverheid-studieschuld-hypotheek`
-- `rijksoverheid-leennormen-2026`
-- `afm-consumenten-hypotheek-betalen`
+| Bron-ID | Titel | Uitgever | Type |
+|---|---|---|---|
+| `tijdelijke-regeling-hypothecair-krediet-2026` | Tijdelijke regeling hypothecair krediet 2026 | Staatscourant / officiële bekendmakingen | Primaire juridische bron |
+| `nibud-advies-hypotheeknormen-2026` | Advies hypotheeknormen 2026 | Nibud | Normadvies / beleidsbasis |
+| `volkshuisvesting-leennormen-hypotheek` | Leennormen voor hypotheken | Volkshuisvesting Nederland | Overheidsuitleg |
+| `afm-hypothecair-krediet` | Hypothecair krediet | Autoriteit Financiële Markten | Toezichtbron |
+| `afm-toetsrente-q3-2026` | Toetsrente hypotheken derde kwartaal 2026 is 5% | Autoriteit Financiële Markten | Actuele toezichtinformatie |
+| `rijksoverheid-studieschuld-hypotheek` | Hoe zwaar telt mijn studieschuld mee voor mijn hypotheek? | Rijksoverheid | Overheidsuitleg |
+| `rijksoverheid-leennormen-2026` | Leennormen 2026: hypotheek kan iets omhoog door verwachte loonstijging | Rijksoverheid | Beleidsnieuws |
+| `afm-consumenten-hypotheek-betalen` | Kun je de hypotheek betalen? | Autoriteit Financiële Markten | Consumentenuitleg |
+| `hypotheker-studieschuld-2026` | Hypotheek afsluiten met studieschuld in 2026? | De Hypotheker | Praktijkbron |
+| `duo-rente-terugbetalers` | Rente voor terugbetalers | DUO | Primaire uitvoeringsbron |
+| `duo-rente-studenten` | Rente voor studenten | DUO | Primaire uitvoeringsbron |
+| `duo-nieuwe-rentepercentages-2026` | Nieuwe rentepercentages bekend | DUO | Actuele uitvoeringsinformatie |
+| `duo-zo-werkt-terugbetalen` | Zo werkt terugbetalen | DUO | Primaire uitvoeringsbron |
+| `duo-berekening-maandbedrag` | Berekening maandbedrag | DUO | Primaire uitvoeringsbron |
+| `duo-terugbetalingsregels` | Terugbetalingsregels | DUO | Primaire uitvoeringsbron |
+| `duo-minder-of-niets-aflossen` | Wat is er mogelijk? | DUO | Primaire uitvoeringsbron |
+| `duo-aflosvrije-periode` | Aflosvrije periode | DUO | Primaire uitvoeringsbron |
+| `duo-u-studeert-nog` | U studeert nog | DUO | Primaire uitvoeringsbron |
+| `duo-eerder-extra-aflossen` | Eerder of extra aflossen | DUO | Primaire uitvoeringsbron |
+| `duo-extra-betaling-doen` | Extra betaling doen | DUO | Primaire uitvoeringsbron |
+| `duo-in-een-keer-aflossen` | In 1 keer aflossen | DUO | Primaire uitvoeringsbron |
+| `duo-maandbedrag-verhogen` | Maandbedrag verhogen | DUO | Primaire uitvoeringsbron |
+| `duo-lenen-studiefinanciering` | Lenen | DUO | Primaire uitvoeringsbron |
+| `duo-uw-inkomen` | Uw inkomen | DUO | Primaire uitvoeringsbron |
 
 ## 2. Bronnen per kennisdocument
 
 ### Maximale hypotheek berekenen
-
-Gebruik:
 
 - `tijdelijke-regeling-hypothecair-krediet-2026`
 - `nibud-advies-hypotheeknormen-2026`
@@ -32,16 +43,13 @@ Gebruik:
 
 ### Studieschuld en hypotheek
 
-Gebruik:
-
 - `rijksoverheid-studieschuld-hypotheek`
+- `duo-berekening-maandbedrag`
 - `tijdelijke-regeling-hypothecair-krediet-2026`
 - `nibud-advies-hypotheeknormen-2026`
 - `hypotheker-studieschuld-2026`
 
 ### Waarom calculators verschillen
-
-Gebruik:
 
 - `tijdelijke-regeling-hypothecair-krediet-2026`
 - `nibud-advies-hypotheeknormen-2026`
@@ -51,14 +59,10 @@ Gebruik:
 
 ### Eigen geld, familiehulp en schenking
 
-Gebruik primair:
-
 - `tijdelijke-regeling-hypothecair-krediet-2026`
 - `afm-consumenten-hypotheek-betalen`
 
 ### Energielabel en extra hypotheekruimte
-
-Gebruik:
 
 - `rijksoverheid-leennormen-2026`
 - `tijdelijke-regeling-hypothecair-krediet-2026`
@@ -66,49 +70,73 @@ Gebruik:
 
 ### Starter of doorstromer
 
-Gebruik:
-
 - `tijdelijke-regeling-hypothecair-krediet-2026`
 - `afm-consumenten-hypotheek-betalen`
 - `afm-hypothecair-krediet`
 
 ### Indicatieve berekening
 
-Gebruik:
-
 - `afm-consumenten-hypotheek-betalen`
 - `rijksoverheid-studieschuld-hypotheek`
 - `volkshuisvesting-leennormen-hypotheek`
 
-## 3. Extra bronnen uit eerdere projectcontext
+### Hoe DUO-rente werkt
 
-Uit eerdere projectcontext blijken ook deze bronnen relevant:
+- `duo-rente-terugbetalers`
+- `duo-rente-studenten`
+- `duo-nieuwe-rentepercentages-2026`
+- `duo-lenen-studiefinanciering`
 
-1. Tijdelijke regeling hypothecair krediet
-2. Nibud hypotheeknormen / financieringslastpercentages
-3. Rijksoverheid-pagina over studieschuld en hypotheek
-4. AFM toetsrente
-5. Rijksoverheid leennormen 2026
-6. Independer als publieke vergelijkingscalculator
-7. ABN AMRO als publieke hypotheekcalculator
-8. Rabobank als publieke hypotheekcalculator
-9. ING als publieke hypotheekcalculator
-10. De Hypotheker als praktijkuitleg over studieschuld/brutering
-11. DUO voor actuele studieschuld, maandlast, aflosfase en betaalpauze
-12. NHG als toekomstige bron voor normen/acceptatie
-13. Belastingdienst als toekomstige bron voor schenkingen, familieleningen en eigenwoningrente
+### De aanloopfase
 
-Voor de rekentool zelf zijn vooral de eerste vijf leidend.
-De calculators van Independer, ABN AMRO, Rabobank en ING zijn bruikbaar als
-vergelijkingsmateriaal voor UX en publieke gedragspatronen, niet als normbron.
+- `duo-eerder-extra-aflossen`
+- `duo-u-studeert-nog`
+- `duo-lenen-studiefinanciering`
 
-## 4. Bronverwijzing in de tekst
+### Draagkracht en jokerjaren
+
+- `duo-berekening-maandbedrag`
+- `duo-minder-of-niets-aflossen`
+- `duo-aflosvrije-periode`
+- `duo-terugbetalingsregels`
+
+### Wat er na 35 jaar gebeurt
+
+- `duo-zo-werkt-terugbetalen`
+- `duo-minder-of-niets-aflossen`
+- `duo-uw-inkomen`
+
+### Extra aflossen bij DUO
+
+- `duo-extra-betaling-doen`
+- `duo-in-een-keer-aflossen`
+- `duo-maandbedrag-verhogen`
+- `duo-berekening-maandbedrag`
+
+## 3. Bronhiërarchie
+
+Gebruik deze volgorde:
+
+1. Wet / regeling
+2. Normadvies
+3. Toezichthouder
+4. Overheidsuitleg
+5. Primaire DUO-uitvoering voor studieschuld- en terugbetaalregels
+6. Praktijkbronnen
+
+Voor rekentools zijn wet, normadvies, toezichthouder en primaire uitvoeringsbronnen leidend. Praktijkbronnen zijn alleen aanvullende uitleg en nooit normbron.
+
+## 4. Vergelijkingsbronnen buiten het bronregister
+
+Eerdere context noemt ook publieke calculators van Independer, ABN AMRO, Rabobank en ING. Die zijn bruikbaar als vergelijkingsmateriaal voor UX en publiek zichtbaar gedrag, maar niet als normbron voor berekeningen.
+
+## 5. Bronverwijzing in tekst
 
 Gebruik in kennisdocumenten bij voorkeur bronverwijzingen zoals:
 
 ```tsx
-<BronRef id="tijdelijke-regeling-hypothecair-krediet-2026">
-  Tijdelijke regeling hypothecair krediet 2026
+<BronRef id="duo-berekening-maandbedrag">
+  Berekening maandbedrag
 </BronRef>
 ```
 
@@ -117,17 +145,3 @@ Website-instructie:
 - onderstreep subtiel met een gestippelde lijn;
 - toon op hover een bronkaart met titel, uitgever, datum en toelichting;
 - open de bron op klik in een nieuw tabblad.
-
-## 5. Bronhiërarchie
-
-Gebruik deze volgorde:
-
-1. Wet / regeling
-2. Normadvies
-3. Toezichthouder
-4. Overheidsuitleg
-5. Praktijkbronnen
-
-Voor rekentools zijn vooral wet, normadvies en toezichthouder leidend.
-Voor uitleg in de kennisbank kun je daar de overheidsuitleg naast zetten.
-

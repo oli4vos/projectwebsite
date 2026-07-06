@@ -1,5 +1,7 @@
 # Ideetjes Audit (2026-05-28)
 
+Momentopname: auditstatus per 2026-05-28; latere product- en positioneringswijzigingen kunnen hiervan afwijken.
+
 Dit document koppelt `ideetjes.txt` aan de huidige implementatie.
 
 ## Verwerkt (geheel of functioneel gelijkwaardig)

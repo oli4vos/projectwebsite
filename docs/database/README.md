@@ -1,5 +1,7 @@
 # Database Side-by-Side Plan
 
+Momentopname: documentatiestatus per 2026-07-06; de live site blijft local-first totdat een aparte databasefase expliciet wordt geactiveerd.
+
 Deze repository blijft local-first werken en moet zonder account bruikbaar blijven.
 De databasevariant is aanvullend en draait later naast de huidige browser-only flow.
 

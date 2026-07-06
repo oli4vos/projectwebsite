@@ -16,6 +16,7 @@ npm run dev
 2. Zoek bestaande centrale berekeningslogica en gedeelde componenten.
 3. Controleer `FUNCTIONALITY_STATUS.md` voor flags en zichtbaarheid.
 4. Houd de wijziging klein en backward-compatible voor bestaande routes.
+5. Controleer bij zichtbare copy of die past binnen de huidige positionering: feitelijk, geen advies en geen beleggen-framing in de publieke UI.
 
 ## Berekeningen
 

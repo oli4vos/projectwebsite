@@ -294,88 +294,46 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 
 ## Huidige tools
 
-- `apps/studieschuld-vs-beleggen`
-  - focust op verplichte DUO-betaling (wettelijk + draagkracht) versus vrijwillige extra ruimte
-  - wettelijk DUO-maandbedrag wordt annuïtair berekend en niet als vrij invulveld gebruikt
-  - vrijwillige ruimte boven het verplichte bedrag wordt vergeleken als keuze: extra aflossen of beleggen
-  - beleggingshorizon wordt automatisch gezet tot het verwachte aflosmoment met het gekozen extra maandbedrag (geen losse horizon-input)
-  - bevat uitklapbare grafiek met schuldverloop versus beleggingswaarde per heel jaar
-  - gebruikt optioneel centrale tax-laag voor een indicatieve box 3-correctie in de verdiepingslaag
-  - box 3-effect wordt jaarlijks toegepast; jaarlijkse heffing wordt uit het beleggingsscenario betaald en telt daarna niet mee in verdere compoundgroei
-  - als box 3-toggle uit staat, toont de tool expliciet dat de beleggingsuitkomst dan mogelijk te optimistisch is
-- `apps/duo-doorlenen-of-stoppen`
-  - publieke beta-tool voor studenten/starters die willen zien wat langer of meer lenen in de leenfase doet
-  - gebruikt centrale DUO-projectie: rente per maand eerst over de openstaande schuld, daarna de maandelijkse opname
-  - vergelijkt “nu stoppen” met “doorlenen tot de gekozen laatste leenmaand”
-  - toont schuld bij start aflossen, theoretische DUO-maandtermijn, totaal terugbetalen en optioneel hypotheekimpact
-  - gebruikt de centrale DUO-leenlimiet uit `src/lib/financial-constants/` voor slider en validatie
-- `apps/box3-indicatie`
-  - aparte box 3-tool met light invoer + beknopte samenvatting + uitklapbare verdieping
-  - ondersteunt werkelijk rendement (default) en forfaitair scenario
-  - rekent via centrale tax-laag en toont gebruikte tarieven/aannames uit centrale constants
-- `apps/box-3-impact`
-  - box 3-impact calculator met focus op vrijstelling, belastbare grondslag en effectieve druk
-  - toont indicatief effect van spaargeld, beleggingen en schulden via centrale `calculateBox3Tax`
-  - ondersteunt optioneel netto rendement na box 3 op basis van ingevulde rendementsverwachtingen
-- `apps/jaarruimte-vs-vrij-beleggen`
-  - vergelijkt pensioeninleg via jaarruimte met vrij beleggen in box 3
-  - gebruiker vult beschikbare jaarruimte zelf in; tool claimt geen officiële jaarruimteberekening
-  - gebruikt centrale box 1- en box 3-logica voor indicatief voordeel nu en netto eindwaarde
-  - bevat nu jaarlijkse vermogensplanning met jaarlijkse box 3-afboeking, plus clean PDF/Excel-export (CSV)
-  - bevat onder het jaarruimteveld een directe “Help mij berekenen”-link naar externe jaarruimte-berekenhulp
-  - benadrukt afweging tussen fiscaal voordeel en flexibiliteit (relevant voor FIRE-scenario's)
-- `apps/volgende-euro`
-  - centrale prioriteitenhulp voor de vraag waar extra geld nu het meest logisch naartoe kan
-  - werkt submit-gedreven met expliciete `Bereken`-knop (geen misleidende live-output op halflege invoer)
-  - combineert buffer, dure schuld, studieschuld, hypotheek, jaarruimte, beleggen en woningdoel in één educatief stappenplan
-  - toont alleen relevante aanbevelingen; ontbrekende gegevens worden als hulp getoond, niet als fout
-  - als er geen relevante opties zijn, toont de tool bewust geen nep-aanbeveling maar eerst invoerhints
-  - gebruikt centrale profieldefaults plus DUO/constants-context, maar blijft expliciet geen financieel advies
-- `apps/fire-na-belasting`
-  - indicatieve FIRE-tool met jaarlijkse tijdlijn voor vermogen, inleg, groei, box 3-heffing en FIRE-doel
-  - rekent met rendement, inflatie, withdrawal rate en optioneel box 3 via centrale tax-laag
-  - educatief hulpmiddel; geen financieel advies of zekerheid over haalbaarheid
-- `apps/hypotheek-aflossen-vs-beleggen`
-  - vergelijkt extra aflossen op hypotheek met vrij beleggen en buffer aanhouden
-  - gebruikt centrale `calculateMortgageInterestDeduction` en `calculateBox3Tax` voor indicatieve netto vergelijking
-  - toont netto rentebesparing, gemiste aftrek, beleggingsuitkomst, box 3-correctie en break-even rendement
-- `apps/zzp-uurtarief`
-  - indicatieve werkvorm-tool voor benodigd ZZP-uurtarief inclusief belastingreservering, buffer, pensioen, AOV en kosten
-  - rekent met declarabele uren, actieve werkweken en niet-declarabele ruimte via invoer
-  - is expliciet geen volledige ZZP/IB-aangifte en gebruikt box 1 alleen als indicatieve referentie
-- `apps/annuitair-lineair`
-  - vergelijkt netto/bruto maandlasten en totale rentelast tussen annuïtair en lineair
-  - optionele verdieping toont wat maandelijkse netto-verschillen doen als beleggingsinleg/onttrekking
-  - in die verdieping is box 3-effect optioneel mee te nemen
-  - bevat oudere rekenscripts in `.js` als onderliggende rekenkern
-- `apps/hypotheekrenteaftrek-afschaffen`
-  - scenariovergelijking van netto rentelasten mét en zonder hypotheekrenteaftrek
-  - gebruikt centrale `calculateMortgageInterestDeduction`
-  - toont meerjarige tijdlijn en cumulatief verschil als aftrek zou vervallen
-- `apps/hypotheek-impact-studieschuld`
-  - indicatieve tool voor de impact van een DUO-maandlast op hypotheekruimte
-  - v2 rekent primair via relevante DUO-maandlast -> brutering -> annuïtaire hypotheekimpact
-  - verwerkt DUO-situaties zoals aanloopfase, draagkrachtverlaging en betaalpauze
-  - bevat nu ook indicatie van DUO-verplichting op inkomen (draagkracht) versus vrijwillige extra ruimte
-  - bevat checklist voor Mijn DUO, uitleg van SF35/SF15-varianten en een nauwkeuriger aflosscenario
-- `apps/compensatie-pechgeneratie`
-  - staat als draft in de codebase met `visibility: "hidden"`
-  - wordt daardoor niet opgenomen in dashboard/route-registry
-- `apps/private-lease-impact-hypotheek`
-  - staat als draft in de codebase met `visibility: "hidden"`
-  - conceptuele indicatie van private lease-impact op hypotheekruimte
-- `apps/koop-vs-huur`
-  - staat nu als publieke beta-tool in de bibliotheek
-  - conceptuele vergelijking van huren en kopen op maandlast, eigen geld en rente-stresstest
-  - gebruikt centrale planninghelper `calculateBuyVsRent`
-- `apps/schulden-volgorde`
-  - staat nu als publieke beta-tool in de bibliotheek
-  - zet achteraf betalen, creditcard, DUO, hypotheek en overige schulden in een extra-aflosvolgorde
-  - gebruikt centrale planninghelper `calculateDebtPriority`
-- `apps/kind-wordt-18-impact`
-  - staat nu als publieke beta-tool in de bibliotheek
-  - brengt kinderbijslag, kindgebonden budget, zorgverzekering, zorgtoeslag en studiekosten terug naar maandimpact
-  - gebruikt centrale planninghelper `calculateChild18Impact`
+### Publieke tools
+
+- `[public]` `apps/duo-doorlenen-of-stoppen`
+  - beta-tool voor studenten/starters die willen zien wat langer of meer lenen in de leenfase doet.
+  - gebruikt centrale DUO-projectie: rente per maand eerst over de openstaande schuld, daarna de maandelijkse opname.
+  - vergelijkt “nu stoppen” met “doorlenen tot de gekozen laatste leenmaand”.
+  - toont schuld bij start aflossen, theoretische DUO-maandtermijn, totaal terugbetalen en optioneel hypotheekimpact.
+- `[public]` `apps/duo-maandbedrag`
+  - beta-tool voor wettelijke DUO-maandtermijn en optionele draagkrachtindicatie.
+  - gebruikt centrale DUO-berekeningen en centrale DUO-rente/looptijdconstants.
+- `[public]` `apps/duo-extra-aflossen`
+  - beta-tool voor extra aflossen bij DUO.
+  - toont feitelijk effect op maandtermijn, looptijd, rentelast en afloscurve zonder beleggingsvergelijking.
+- `[public]` `apps/hypotheek-impact-studieschuld`
+  - indicatieve tool voor de impact van een DUO-maandlast op hypotheekruimte.
+  - rekent primair via relevante DUO-maandlast -> brutering -> annuïtaire hypotheekimpact.
+  - verwerkt DUO-situaties zoals aanloopfase, draagkrachtverlaging en betaalpauze.
+- `[public]` `apps/artifact-hypotheek-wonen-maximale-hypotheek`
+  - indicatieve maximale-hypotheektool voor starters zonder bestaande hypotheek.
+  - toont inkomen, woningwaarde, studieschuld, NHG, financieringslast en energieruimte in een uitlegpad.
+  - gebruikt de centrale hypotheeklaag en centrale financieringslasttabellen.
+- `[public]` `apps/schulden-volgorde`
+  - beta-tool die achteraf betalen, creditcard, DUO, hypotheek en overige schulden in een extra-aflosvolgorde zet.
+  - gebruikt centrale planninghelper `calculateDebtPriority`.
+- `[public]` `apps/familiehulp-eerste-woning`
+  - beta-tool voor eerste woning met studieschuld, bankhypotheek, eigen geld, familielening en schenking.
+  - gebruikt de centrale DUO-, mortgage- en family-financing-lagen.
+
+### Verborgen tools (bewust uit positionering)
+
+- `[hidden]` `apps/studieschuld-vs-beleggen`
+  - technisch aanwezig maar bewust uit de zichtbare site gehaald.
+  - reden: huidige positionering is informatief over studieschuld, niet aflossen-vs-beleggen of vermogensallocatie.
+  - alleen heractiveren met expliciete productbeslissing, copycheck en update van `FUNCTIONALITY_STATUS.md`.
+- `[hidden]` `apps/volgende-euro`
+  - technisch aanwezig maar niet meer gelinkt vanuit de publieke route.
+  - reden: bredere prioriteitenhulp valt buiten de huidige studieschuld-launchscope.
+- `[hidden]` overige artifact-, hypotheek-, tax-, pensioen-, FIRE-, planning- en concepttools.
+  - code en manifests blijven behouden voor heractivatie.
+  - publicatie verloopt via manifest `visibility: "public"` plus `npm run generate:apps` en groene checks.
 
 ## Profiel-MVP
 
@@ -550,16 +508,18 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 
 ## Aanbevolen uitbreidingsrichting
 
-- Voor nieuwe tools dezelfde modulevorm aanhouden onder `apps/`.
-- Eerst metadata/manifest stabiel houden, daarna UI en logica per tool.
-- Als er meer tools bijkomen, overweeg `app.json` uit te breiden met extra velden zoals `hero`, `assumptions`, `disclaimer` of `order`.
-- Toekomstige tax-engine kan deze centrale constantslaag hergebruiken, maar is nu bewust nog niet gebouwd.
-- Volgende DUO-stap: officiële draagkrachtberekening pas toevoegen zodra alle actuele draagkrachtparameters betrouwbaar in de constantslaag staan.
-- Volgende teststap: tax-engine en chart-utils pas opnemen in testlaag zodra die modules stabiel zijn.
-- Volgende inhoudelijke stap: DUO-draagkrachtlogica verder verdiepen zodra actuele officiële parameters stabiel en centraal beschikbaar zijn.
-- Toekomstige tax-verdieping: meerjarige box 3-projectie of aparte box 3-tool, pas na validatie van gebruikservaring in de huidige optionele v1-koppeling.
-- Toekomstige werkvorm-stap: uitgebreidere vergelijking vaste dienst vs ZZP met aanvullende werkgeverslasten, secundaire arbeidsvoorwaarden en ondernemersregelingen.
+- Volgende DUO-stap: draagkracht verder verfijnen zodra alle actuele draagkrachtparameters betrouwbaar en centraal in `src/lib/financial-constants/` staan.
+- Compensatie-pechgeneratie centraal modelleren als studieschuldcontext, niet als losse ad-hoc toolformule.
+- Kennisbank uitbreiden met korte feitelijke artikelen over rente, aanloopfase, draagkracht, extra aflossen, hypotheekimpact en onzekerheden.
+- Hypotheekimpact en maximale hypotheek technisch blijven koppelen via centrale `src/lib/duo/`, `src/lib/mortgage/` en `src/lib/financial-constants/`.
+- Browserautomatisering voor externe hypotheekcalculators alleen gebruiken als validatie-/vergelijkingshulp, niet als normbron.
+- Voor nieuwe tools dezelfde modulevorm aanhouden onder `apps/`: hidden-first, manifest compleet, centrale logica, tests en daarna pas public.
 - CI controleert expliciet dat `src/lib/app-registry.ts` en `src/lib/app-components.tsx` na `generate:apps` geen diff hebben.
+
+### Later, buiten huidige scope
+
+- Aflossen-vs-beleggen, FIRE, box 3, jaarruimte en bredere vermogensallocatie kunnen technisch worden heractiveerd, maar horen niet in de huidige zichtbare studieschuld-positionering.
+- Werkvorm-/ZZP-uitbreidingen en brede “volgende euro”-prioritering zijn latere productrichtingen.
 
 ## Responsive design en layout-conventies
 
