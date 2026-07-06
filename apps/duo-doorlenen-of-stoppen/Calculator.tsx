@@ -13,9 +13,14 @@ import {
   calculateDuoLoanProjectionView,
   createDuoLoanProjectionDefaultValues,
   createEmptyDuoLoanProjectionValues,
+  createFutureLoanMonthOptions,
+  createStoppedBorrowingMonthOptions,
   getCurrentYearMonth,
+  updateDuoLoanProjectionLoanStatus,
   type DuoLoanProjectionComparisonRow,
   type DuoLoanProjectionFormValues,
+  type DuoLoanProjectionLoanStatus,
+  type DuoLoanProjectionMonthOption,
 } from "./logic";
 
 function formatCurrency(value: number) {
@@ -67,9 +72,9 @@ type InputFieldProps = {
   prefix?: string;
   suffix?: string;
   type?: "number" | "month";
-  min?: number;
-  max?: number;
-  step?: number;
+  min?: number | string;
+  max?: number | string;
+  step?: number | string;
   hint?: string;
   onChange: (value: string) => void;
   onEnter?: (event: KeyboardEvent) => void;
@@ -180,16 +185,65 @@ function ComparisonTable({
   );
 }
 
-const fieldIds: Array<keyof DuoLoanProjectionFormValues> = [
-  "currentDebt",
-  "monthlyLoanAmount",
-  "expectedLastLoanMonth",
-];
+function MonthChoiceButtons({
+  options,
+  value,
+  onChange,
+}: {
+  options: DuoLoanProjectionMonthOption[];
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <div className="grid gap-2 sm:grid-cols-2">
+      {options.map((option) => {
+        const selected = option.value === value;
+
+        return (
+          <ToolActionButton
+            key={option.value}
+            type="button"
+            size="sm"
+            aria-pressed={selected}
+            className={
+              selected
+                ? "border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--ink)]"
+                : undefined
+            }
+            onClick={() => onChange(option.value)}
+          >
+            <span className="grid text-left leading-tight">
+              <span>{option.label}</span>
+              <span className="text-[11px] font-normal text-[var(--soft)]">
+                {formatYearMonth(option.value)}
+              </span>
+            </span>
+          </ToolActionButton>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function DuoDoorlenenOfStoppenCalculator() {
   const calculationMonth = useMemo(() => getCurrentYearMonth(), []);
   const [formValues, setFormValues] = useState<DuoLoanProjectionFormValues>(() =>
     createDuoLoanProjectionDefaultValues(calculationMonth),
+  );
+  const futureLoanMonthOptions = useMemo(
+    () => createFutureLoanMonthOptions(calculationMonth),
+    [calculationMonth],
+  );
+  const stoppedBorrowingMonthOptions = useMemo(
+    () => createStoppedBorrowingMonthOptions(calculationMonth),
+    [calculationMonth],
+  );
+  const fieldIds = useMemo<Array<keyof DuoLoanProjectionFormValues>>(
+    () =>
+      formValues.loanStatus === "already-stopped"
+        ? ["currentDebt", "loanStatus", "stoppedBorrowingMonth"]
+        : ["currentDebt", "loanStatus", "monthlyLoanAmount", "expectedLastLoanMonth"],
+    [formValues.loanStatus],
   );
   const view = useMemo(
     () => calculateDuoLoanProjectionView(formValues, calculationMonth),
@@ -211,8 +265,15 @@ export default function DuoDoorlenenOfStoppenCalculator() {
   function applyScenario(monthlyLoanAmount: string) {
     setFormValues((current) => ({
       ...current,
+      loanStatus: "still-borrowing",
       monthlyLoanAmount,
     }));
+  }
+
+  function setLoanStatus(loanStatus: DuoLoanProjectionLoanStatus) {
+    setFormValues((current) =>
+      updateDuoLoanProjectionLoanStatus(current, loanStatus, calculationMonth),
+    );
   }
 
   const inputs = (
@@ -237,7 +298,55 @@ export default function DuoDoorlenenOfStoppenCalculator() {
         />
       </div>
 
-      <div className={fieldFlow.getFieldClassName("monthlyLoanAmount")}>
+      <div className={fieldFlow.getFieldClassName("loanStatus")}>
+        <div className="grid gap-2">
+          <span className="text-[12px] font-medium uppercase tracking-[0.04em] text-[var(--muted)]">
+            Leen je nu nog bij DUO?
+          </span>
+          <div className="grid gap-2 sm:grid-cols-2" role="radiogroup" aria-label="Leenstatus">
+            {[
+              {
+                value: "still-borrowing" as const,
+                label: "Ik leen nog",
+                helper: "Vergelijk doorlenen met stoppen vanaf nu.",
+              },
+              {
+                value: "already-stopped" as const,
+                label: "Ik leen niet meer",
+                helper: "Bereken vanaf je huidige schuld zonder nieuwe opname.",
+              },
+            ].map((option) => {
+              const selected = formValues.loanStatus === option.value;
+
+              return (
+                <ToolActionButton
+                  key={option.value}
+                  type="button"
+                  size="md"
+                  aria-pressed={selected}
+                  className={
+                    selected
+                      ? "border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--ink)]"
+                      : undefined
+                  }
+                  onClick={() => setLoanStatus(option.value)}
+                >
+                  <span className="grid text-left leading-tight">
+                    <span>{option.label}</span>
+                    <span className="text-[11px] font-normal text-[var(--soft)]">
+                      {option.helper}
+                    </span>
+                  </span>
+                </ToolActionButton>
+              );
+            })}
+          </div>
+          <FieldError message={view.errors.loanStatus} />
+        </div>
+      </div>
+
+      {formValues.loanStatus === "still-borrowing" ? (
+        <div className={fieldFlow.getFieldClassName("monthlyLoanAmount")}>
         <div className="grid gap-3">
           <InputField
             id="monthlyLoanAmount"
@@ -284,22 +393,76 @@ export default function DuoDoorlenenOfStoppenCalculator() {
           </div>
         </div>
       </div>
+      ) : null}
 
-      <div className={fieldFlow.getFieldClassName("expectedLastLoanMonth")}>
-        <InputField
-          id="expectedLastLoanMonth"
-          label="Verwachte laatste leenmaand"
-          value={formValues.expectedLastLoanMonth}
-          error={view.errors.expectedLastLoanMonth}
-          type="month"
-          hint="Niet vóór de rekenmaand"
-          onChange={(value) => updateField("expectedLastLoanMonth", value)}
-          onEnter={fieldFlow.handleEnterAdvance(
-            "expectedLastLoanMonth",
-            Boolean(view.errors.expectedLastLoanMonth),
-          )}
-        />
-      </div>
+      {formValues.loanStatus === "still-borrowing" ? (
+        <div className={fieldFlow.getFieldClassName("expectedLastLoanMonth")}>
+          <div className="grid gap-3">
+            <div>
+              <span className="mb-1.5 flex items-baseline justify-between gap-3">
+                <span className="text-[12px] font-medium uppercase tracking-[0.04em] text-[var(--muted)]">
+                  Hoe lang verwacht je nog te lenen?
+                </span>
+                <span className="text-right text-[11px] leading-snug text-[var(--soft)]">
+                  Geen typen nodig
+                </span>
+              </span>
+              <MonthChoiceButtons
+                options={futureLoanMonthOptions}
+                value={formValues.expectedLastLoanMonth}
+                onChange={(value) => updateField("expectedLastLoanMonth", value)}
+              />
+            </div>
+            <InputField
+              id="expectedLastLoanMonth"
+              label="Of kies zelf de laatste leenmaand"
+              value={formValues.expectedLastLoanMonth}
+              error={view.errors.expectedLastLoanMonth}
+              type="month"
+              hint="Niet vóór de rekenmaand"
+              onChange={(value) => updateField("expectedLastLoanMonth", value)}
+              onEnter={fieldFlow.handleEnterAdvance(
+                "expectedLastLoanMonth",
+                Boolean(view.errors.expectedLastLoanMonth),
+              )}
+            />
+          </div>
+        </div>
+      ) : (
+        <div className={fieldFlow.getFieldClassName("stoppedBorrowingMonth")}>
+          <div className="grid gap-3">
+            <div>
+              <span className="mb-1.5 flex items-baseline justify-between gap-3">
+                <span className="text-[12px] font-medium uppercase tracking-[0.04em] text-[var(--muted)]">
+                  Vanaf wanneer leen je niet meer?
+                </span>
+                <span className="text-right text-[11px] leading-snug text-[var(--soft)]">
+                  Kies snel of zelf
+                </span>
+              </span>
+              <MonthChoiceButtons
+                options={stoppedBorrowingMonthOptions}
+                value={formValues.stoppedBorrowingMonth}
+                onChange={(value) => updateField("stoppedBorrowingMonth", value)}
+              />
+            </div>
+            <InputField
+              id="stoppedBorrowingMonth"
+              label="Of kies zelf de stopmaand"
+              value={formValues.stoppedBorrowingMonth}
+              error={view.errors.stoppedBorrowingMonth}
+              type="month"
+              max={calculationMonth}
+              hint="Niet in de toekomst"
+              onChange={(value) => updateField("stoppedBorrowingMonth", value)}
+              onEnter={fieldFlow.handleEnterAdvance(
+                "stoppedBorrowingMonth",
+                Boolean(view.errors.stoppedBorrowingMonth),
+              )}
+            />
+          </div>
+        </div>
+      )}
 
       <MobileFieldFlowControls
         current={fieldFlow.activeIndex + 1}
@@ -354,15 +517,26 @@ export default function DuoDoorlenenOfStoppenCalculator() {
     <div id="tool-result-summary" className="space-y-5">
       <div className="grid gap-3 sm:grid-cols-2">
         <ResultCard
-          label="Schuld bij start aflossen"
+          label="Totale schuld bij start aflossen"
           value={formatCurrency(view.keepBorrowing.debtAtRepaymentStart)}
-          note={`Na ${view.keepBorrowing.borrowingMonths} leenmaand(en), aanloopfase en rente.`}
+          note={
+            view.loanStatus === "already-stopped"
+              ? `Gebaseerd op je huidige schuld en rente tot ${formatYearMonth(
+                  view.keepBorrowing.repaymentStartMonth,
+                )}.`
+              : `Na ${view.keepBorrowing.borrowingMonths} leenmaand(en), aanloopfase en rente.`
+          }
           tone="warn"
         />
         <ResultCard
           label="Theoretische DUO-maandtermijn"
           value={formatCurrencyPrecise(view.keepBorrowing.theoreticalMonthlyPayment)}
           note="Annuïtaire betaling over 35 jaar, vóór eventuele draagkrachtverlaging."
+        />
+        <ResultCard
+          label="Totaal terugbetalen"
+          value={formatCurrency(view.keepBorrowing.totalRepayment)}
+          note="Maandtermijn x volledige SF35-looptijd; indicatief en vóór draagkrachttoets."
         />
       </div>
 
@@ -374,7 +548,13 @@ export default function DuoDoorlenenOfStoppenCalculator() {
           <ResultRow
             label="Leenmaanden"
             value={`${formatNumber(view.keepBorrowing.borrowingMonths)} maanden`}
-            sub={`Tot en met ${formatYearMonth(view.keepBorrowing.lastLoanMonth)}.`}
+            sub={
+              view.loanStatus === "already-stopped"
+                ? `Je hebt aangegeven dat je gestopt bent sinds ${formatYearMonth(
+                    view.stoppedBorrowingMonth ?? view.calculationMonth,
+                  )}.`
+                : `Tot en met ${formatYearMonth(view.keepBorrowing.lastLoanMonth)}.`
+            }
           />
           <ResultRow
             label="Nieuwe hoofdsom door lenen"
@@ -405,12 +585,17 @@ export default function DuoDoorlenenOfStoppenCalculator() {
             value={formatCurrencyPrecise(view.keepBorrowing.interestDuringGracePeriod)}
           />
           <ResultRow
+            label="Totale schuld bij start aflossen"
+            value={formatCurrency(view.keepBorrowing.debtAtRepaymentStart)}
+            sub="Dit is de schuld waarmee de theoretische terugbetaling start."
+            strong
+          />
+          <ResultRow
             label="Totaal terugbetalen bij vaste termijn"
             value={formatCurrency(view.keepBorrowing.totalRepayment)}
             sub={`Theoretisch: ${view.keepBorrowing.repaymentTermMonths} maanden x ${formatCurrencyPrecise(
               view.keepBorrowing.theoreticalMonthlyPayment,
             )}.`}
-            strong
           />
           <ResultRow
             label="Waarvan rente vanaf start aflossen"
@@ -455,9 +640,8 @@ export default function DuoDoorlenenOfStoppenCalculator() {
         Vul de drie kernvelden in
       </h2>
       <p className="mt-2 text-[13px] leading-[1.7] text-[var(--muted)]">
-        Gebruik een huidige schuld, een maandelijkse opname en een laatste
-        leenmaand vanaf {formatYearMonth(calculationMonth)}. Daarna verschijnt de
-        projectie direct.
+        Gebruik een huidige schuld en kies of je nog leent of al gestopt bent.
+        Daarna verschijnt de projectie direct.
       </p>
     </section>
   );

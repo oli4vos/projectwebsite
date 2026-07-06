@@ -8,10 +8,14 @@ import { parseOptionalDecimalInput } from "@/lib/number-input";
 
 export type DuoLoanProjectionFormValues = {
   currentDebt: string;
+  loanStatus: DuoLoanProjectionLoanStatus;
   monthlyLoanAmount: string;
   expectedLastLoanMonth: string;
+  stoppedBorrowingMonth: string;
   includeMortgageImpact: boolean;
 };
+
+export type DuoLoanProjectionLoanStatus = "still-borrowing" | "already-stopped";
 
 export type DuoLoanProjectionValidationErrors = Partial<
   Record<keyof DuoLoanProjectionFormValues, string>
@@ -57,6 +61,9 @@ export type DuoLoanProjectionView =
       comparison: DuoLoanProjectionComparison;
       slider: DuoLoanProjectionSliderConfig;
       showMortgageImpact: boolean;
+      loanStatus: DuoLoanProjectionLoanStatus;
+      stoppedBorrowingMonth?: string;
+      effectiveLastLoanMonth: string;
     };
 
 export type DuoLoanProjectionSliderConfig = {
@@ -65,6 +72,12 @@ export type DuoLoanProjectionSliderConfig = {
   step: number;
   sourceUrl: string;
   notes: string;
+};
+
+export type DuoLoanProjectionMonthOption = {
+  label: string;
+  value: string;
+  helper: string;
 };
 
 type YearMonth = {
@@ -118,6 +131,49 @@ export function getCurrentYearMonth() {
   return formatYearMonth(createCurrentYearMonth());
 }
 
+export function createFutureLoanMonthOptions(
+  calculationMonth = getCurrentYearMonth(),
+): DuoLoanProjectionMonthOption[] {
+  const parsedCalculationMonth = parseYearMonth(calculationMonth) ?? createCurrentYearMonth();
+  const options = [
+    { loanMonths: 1, label: "Deze maand" },
+    { loanMonths: 3, label: "3 maanden" },
+    { loanMonths: 6, label: "6 maanden" },
+    { loanMonths: 12, label: "12 maanden" },
+    { loanMonths: 24, label: "24 maanden" },
+  ];
+
+  return options.map((option) => ({
+    label: option.label,
+    value: formatYearMonth(addMonths(parsedCalculationMonth, option.loanMonths - 1)),
+    helper:
+      option.loanMonths === 1
+        ? "Alleen de rekenmaand telt mee."
+        : `${option.loanMonths} leenmaanden inclusief de rekenmaand.`,
+  }));
+}
+
+export function createStoppedBorrowingMonthOptions(
+  calculationMonth = getCurrentYearMonth(),
+): DuoLoanProjectionMonthOption[] {
+  const parsedCalculationMonth = parseYearMonth(calculationMonth) ?? createCurrentYearMonth();
+  const options = [
+    { monthsAgo: 0, label: "Deze maand" },
+    { monthsAgo: 1, label: "Vorige maand" },
+    { monthsAgo: 6, label: "6 maanden geleden" },
+    { monthsAgo: 12, label: "12 maanden geleden" },
+  ];
+
+  return options.map((option) => ({
+    label: option.label,
+    value: formatYearMonth(addMonths(parsedCalculationMonth, -option.monthsAgo)),
+    helper:
+      option.monthsAgo === 0
+        ? "Je neemt vanaf nu niets meer op."
+        : `Je bent ${option.label.toLowerCase()} gestopt met opnemen.`,
+  }));
+}
+
 export function getDuoLoanProjectionSliderConfig(): DuoLoanProjectionSliderConfig {
   const limits = getDuoBorrowingLimits();
 
@@ -137,8 +193,10 @@ export function createDuoLoanProjectionDefaultValues(
 
   return {
     currentDebt: "25000",
+    loanStatus: "still-borrowing",
     monthlyLoanAmount: "300",
     expectedLastLoanMonth: formatYearMonth(addMonths(parsedCalculationMonth, 11)),
+    stoppedBorrowingMonth: calculationMonth,
     includeMortgageImpact: false,
   };
 }
@@ -146,8 +204,10 @@ export function createDuoLoanProjectionDefaultValues(
 export function createEmptyDuoLoanProjectionValues(): DuoLoanProjectionFormValues {
   return {
     currentDebt: "",
+    loanStatus: "still-borrowing",
     monthlyLoanAmount: "",
     expectedLastLoanMonth: "",
+    stoppedBorrowingMonth: "",
     includeMortgageImpact: false,
   };
 }
@@ -168,6 +228,32 @@ export function updateDuoLoanProjectionMonthlyLoanAmount(
   };
 }
 
+export function updateDuoLoanProjectionLoanStatus(
+  values: DuoLoanProjectionFormValues,
+  loanStatus: DuoLoanProjectionLoanStatus,
+  calculationMonth = getCurrentYearMonth(),
+): DuoLoanProjectionFormValues {
+  const parsedCalculationMonth = parseYearMonth(calculationMonth) ?? createCurrentYearMonth();
+
+  if (loanStatus === "already-stopped") {
+    return {
+      ...values,
+      loanStatus,
+      monthlyLoanAmount: "0",
+      expectedLastLoanMonth: calculationMonth,
+      stoppedBorrowingMonth: values.stoppedBorrowingMonth || calculationMonth,
+    };
+  }
+
+  return {
+    ...values,
+    loanStatus,
+    monthlyLoanAmount: values.monthlyLoanAmount === "0" ? "300" : values.monthlyLoanAmount,
+    expectedLastLoanMonth:
+      values.expectedLastLoanMonth || formatYearMonth(addMonths(parsedCalculationMonth, 11)),
+  };
+}
+
 export function validateDuoLoanProjectionForm(
   values: DuoLoanProjectionFormValues,
   calculationMonth = getCurrentYearMonth(),
@@ -176,30 +262,44 @@ export function validateDuoLoanProjectionForm(
   const currentDebt = parseOptionalDecimalInput(values.currentDebt);
   const monthlyLoanAmount = parseOptionalDecimalInput(values.monthlyLoanAmount);
   const lastLoanMonth = parseYearMonth(values.expectedLastLoanMonth);
+  const stoppedBorrowingMonth = parseYearMonth(values.stoppedBorrowingMonth);
   const parsedCalculationMonth = parseYearMonth(calculationMonth) ?? createCurrentYearMonth();
   const slider = getDuoLoanProjectionSliderConfig();
+  const isAlreadyStopped = values.loanStatus === "already-stopped";
 
   if (currentDebt === undefined || !Number.isFinite(currentDebt) || currentDebt < 0) {
     errors.currentDebt = "Gebruik 0 of een hogere huidige studieschuld.";
   }
 
-  if (
-    monthlyLoanAmount === undefined ||
-    !Number.isFinite(monthlyLoanAmount) ||
-    monthlyLoanAmount < 0 ||
-    monthlyLoanAmount > slider.max
-  ) {
-    errors.monthlyLoanAmount = `Gebruik een maandbedrag tussen 0 en ${slider.max.toLocaleString(
-      "nl-NL",
-      { style: "currency", currency: "EUR" },
-    )}.`;
+  if (values.loanStatus !== "still-borrowing" && values.loanStatus !== "already-stopped") {
+    errors.loanStatus = "Kies of je nog leent of al gestopt bent.";
   }
 
-  if (!lastLoanMonth) {
-    errors.expectedLastLoanMonth = "Gebruik een geldige laatste leenmaand.";
-  } else if (compareYearMonth(lastLoanMonth, parsedCalculationMonth) < 0) {
-    errors.expectedLastLoanMonth =
-      "De laatste leenmaand mag niet vóór de rekenmaand liggen.";
+  if (isAlreadyStopped) {
+    if (!stoppedBorrowingMonth) {
+      errors.stoppedBorrowingMonth = "Kies vanaf welke maand je niet meer leent.";
+    } else if (compareYearMonth(stoppedBorrowingMonth, parsedCalculationMonth) > 0) {
+      errors.stoppedBorrowingMonth = "De stopmaand mag niet in de toekomst liggen.";
+    }
+  } else {
+    if (
+      monthlyLoanAmount === undefined ||
+      !Number.isFinite(monthlyLoanAmount) ||
+      monthlyLoanAmount < 0 ||
+      monthlyLoanAmount > slider.max
+    ) {
+      errors.monthlyLoanAmount = `Gebruik een maandbedrag tussen 0 en ${slider.max.toLocaleString(
+        "nl-NL",
+        { style: "currency", currency: "EUR" },
+      )}.`;
+    }
+
+    if (!lastLoanMonth) {
+      errors.expectedLastLoanMonth = "Kies een geldige laatste leenmaand.";
+    } else if (compareYearMonth(lastLoanMonth, parsedCalculationMonth) < 0) {
+      errors.expectedLastLoanMonth =
+        "De laatste leenmaand mag niet vóór de rekenmaand liggen.";
+    }
   }
 
   return errors;
@@ -222,8 +322,14 @@ export function mapDuoLoanProjectionFormToInput(
     errors,
     input: {
       currentDebt: parseOptionalDecimalInput(values.currentDebt) ?? 0,
-      monthlyLoanAmount: parseOptionalDecimalInput(values.monthlyLoanAmount) ?? 0,
-      expectedLastLoanMonth: values.expectedLastLoanMonth,
+      monthlyLoanAmount:
+        values.loanStatus === "already-stopped"
+          ? 0
+          : (parseOptionalDecimalInput(values.monthlyLoanAmount) ?? 0),
+      expectedLastLoanMonth:
+        values.loanStatus === "already-stopped"
+          ? calculationMonth
+          : values.expectedLastLoanMonth,
       includeMortgageImpact: values.includeMortgageImpact,
     },
   };
@@ -245,6 +351,8 @@ function createComparison(input: {
   stopNow: DuoLoanProjectionResult;
   keepBorrowing: DuoLoanProjectionResult;
   showMortgageImpact: boolean;
+  loanStatus: DuoLoanProjectionLoanStatus;
+  stoppedBorrowingMonth?: string;
 }): DuoLoanProjectionComparison {
   const mortgageImpact = input.keepBorrowing.mortgageImpact;
   const stopMortgageReduction = input.showMortgageImpact
@@ -266,6 +374,7 @@ function createComparison(input: {
   const totalRepaymentDifference = roundMoney(
     input.keepBorrowing.totalRepayment - input.stopNow.totalRepayment,
   );
+  const isAlreadyStopped = input.loanStatus === "already-stopped";
 
   return {
     debtAtRepaymentStartDifference,
@@ -275,30 +384,36 @@ function createComparison(input: {
     tableRows: [
       {
         key: "stop-now",
-        label: "Nu stoppen met lenen",
+        label: isAlreadyStopped ? "Niet meer lenen" : "Nu stoppen met lenen",
         debtAtRepaymentStart: input.stopNow.debtAtRepaymentStart,
         theoreticalMonthlyPayment: input.stopNow.theoreticalMonthlyPayment,
         totalRepayment: input.stopNow.totalRepayment,
         mortgageCapacityReduction: stopMortgageReduction,
-        note: "Geen extra opname vanaf de rekenmaand.",
+        note: isAlreadyStopped
+          ? `Geen nieuwe opname; gestopt sinds ${input.stoppedBorrowingMonth ?? "de gekozen maand"}.`
+          : "Geen extra opname vanaf de rekenmaand.",
       },
       {
         key: "keep-borrowing",
-        label: "Doorlenen tot gekozen maand",
+        label: isAlreadyStopped ? "Projectie vanaf huidige schuld" : "Doorlenen tot gekozen maand",
         debtAtRepaymentStart: input.keepBorrowing.debtAtRepaymentStart,
         theoreticalMonthlyPayment: input.keepBorrowing.theoreticalMonthlyPayment,
         totalRepayment: input.keepBorrowing.totalRepayment,
         mortgageCapacityReduction: keepMortgageReduction,
-        note: "Maandelijkse opname loopt door tot en met de laatste leenmaand.",
+        note: isAlreadyStopped
+          ? "Je vult je huidige schuld in; er komt geen nieuwe opname bij."
+          : "Maandelijkse opname loopt door tot en met de laatste leenmaand.",
       },
       {
         key: "difference",
-        label: "Verschil",
+        label: isAlreadyStopped ? "Extra effect" : "Verschil",
         debtAtRepaymentStart: debtAtRepaymentStartDifference,
         theoreticalMonthlyPayment: theoreticalMonthlyPaymentDifference,
         totalRepayment: totalRepaymentDifference,
         mortgageCapacityReduction: mortgageCapacityReductionDifference,
-        note: "Extra effect van doorlenen ten opzichte van nu stoppen.",
+        note: isAlreadyStopped
+          ? "Omdat je niet meer leent, is er geen extra doorleenverschil."
+          : "Extra effect van doorlenen ten opzichte van nu stoppen.",
       },
     ],
   };
@@ -328,6 +443,8 @@ export function calculateDuoLoanProjectionView(
     stopNow,
     keepBorrowing,
     showMortgageImpact: mapping.input.includeMortgageImpact === true,
+    loanStatus: values.loanStatus,
+    stoppedBorrowingMonth: values.stoppedBorrowingMonth || undefined,
   });
 
   return {
@@ -340,5 +457,9 @@ export function calculateDuoLoanProjectionView(
     comparison,
     slider,
     showMortgageImpact: mapping.input.includeMortgageImpact === true,
+    loanStatus: values.loanStatus,
+    stoppedBorrowingMonth:
+      values.loanStatus === "already-stopped" ? values.stoppedBorrowingMonth : undefined,
+    effectiveLastLoanMonth: mapping.input.expectedLastLoanMonth,
   };
 }
