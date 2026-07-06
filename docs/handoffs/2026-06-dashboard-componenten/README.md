@@ -1,3 +1,9 @@
+# Status
+
+- Datum archivering: 2026-07-06
+- Status: ontwerp/overdracht — componentvoorstellen zijn deels verwerkt in de echte UI-componenten onder `src/components/`, niet zelfstandig actueel.
+- Relatie tot huidige code: gebruik dit alleen als ontwerpgeschiedenis; actuele componentstandaarden staan in `DESIGN_SYSTEM.md`, `UX_GUIDELINES.md` en de echte componenten.
+
 # Olivier — Rekentools (handoff)
 
 Componentvoorstellen voor het dashboard met financiële rekentools.
@@ -6,7 +12,7 @@ Pure **React + TypeScript + Tailwind**, geen runtime dependencies buiten React.
 ## Structuur
 
 ```
-handoff/
+docs/handoffs/2026-06-dashboard-componenten/
 ├── README.md
 ├── tailwind.config.ts          ← extend dit in je eigen tailwind config
 ├── src/

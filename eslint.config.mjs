@@ -11,7 +11,7 @@ const eslintConfig = defineConfig([
     "build/**",
     "artifacts/**",
     "next-env.d.ts",
-    "handoff/**",
+    "docs/handoffs/**",
     "Redesign*/**",
   ]),
 ]);

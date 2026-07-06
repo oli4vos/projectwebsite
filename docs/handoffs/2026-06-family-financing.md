@@ -1,3 +1,9 @@
+# Status
+
+- Datum archivering: 2026-07-06
+- Status: ontwerp/overdracht — beschrijft repo-staat op commit `6749bd5`, niet actueel.
+- Relatie tot huidige code: dit document is achtergrond voor de familiefinancieringsrichting; de app `familiehulp-eerste-woning` en branch `feat/family-financing-foundation` zijn later uitgewerkt en kunnen van deze momentopname afwijken.
+
 # Repository snapshot
 
 - Branch: `main`
