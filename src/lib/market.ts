@@ -1,3 +1,8 @@
+import {
+  getDefaultFinancialYear,
+  getDuoRateForRule,
+} from "@/lib/financial-constants";
+
 export type MarketRow = {
   label: string;
   value: string;
@@ -6,14 +11,33 @@ export type MarketRow = {
   points: number[];
 };
 
+function formatPercent(value: number): string {
+  return `${value.toLocaleString("nl-NL", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}%`;
+}
+
+function createDuoRateRow(): MarketRow {
+  const year = getDefaultFinancialYear();
+  const rate = getDuoRateForRule("SF35", year);
+
+  return {
+    label: `DUO-rente ${year}`,
+    value: formatPercent(rate),
+    delta: "stabiel",
+    negative: false,
+    points: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
+  };
+}
+
 const FALLBACK: MarketRow[] = [
-  { label: "DUO-rente 2026", value: "2,56%", delta: "stabiel", negative: false, points: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5] },
+  createDuoRateRow(),
   { label: "Hypotheek 10 jaar", value: "3,89%", delta: "+0,02", negative: false, points: [4, 4, 4, 5, 4, 5, 6, 6, 5, 5] },
   { label: "AEX", value: "942,17", delta: "+1,24%", negative: false, points: [3, 4, 3, 5, 4, 5, 6, 5, 7, 8] },
   { label: "Spaarrente top-3", value: "1,80%", delta: "-0,05", negative: true, points: [7, 7, 6, 6, 5, 5, 4, 4, 3, 3] },
 ];
 
-// DUO rate is set once per year on January 1st — update this constant annually.
 const DUO_RENTE = FALLBACK[0];
 
 function normalizePoints(values: number[]): number[] {
