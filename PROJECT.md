@@ -298,17 +298,19 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 ### Publieke tools
 
 - `[public]` `apps/duo-doorlenen-of-stoppen`
-  - beta-tool voor studenten/starters die willen zien wat langer of meer lenen in de leenfase doet.
-  - gebruikt centrale DUO-projectie: rente per maand eerst over de openstaande schuld, daarna de maandelijkse opname.
-  - vergelijkt “nu stoppen” met “doorlenen tot de gekozen laatste leenmaand”.
-  - toont schuld bij start aflossen, theoretische DUO-maandtermijn, totaal terugbetalen en optioneel hypotheekimpact.
-  - toont nu ook een expliciete vervolgstap naar hypotheekimpact en maximale hypotheek, zodat de route van studieschuld naar woonruimte duidelijker is.
+  - beta-tool voor studenten/starters die willen zien wat nu stoppen, later alsnog een diploma halen of doorstuderen tot diploma betekent voor hun DUO-schuld.
+  - gebruikt centrale DUO-projectie met afzonderlijke tracking van lening, collegegeldkrediet, basisbeurs, aanvullende beurs en studentenreisproduct.
+  - vergelijkt de scenario's “nu stoppen en geen diploma”, “nu stoppen en later alsnog diploma” en “doorstuderen tot diploma”.
+  - toont schuld op stopmoment, schuld bij start terugbetaling, indicatief maandbedrag, schuldenvrije datum en maandelijkse tijdlijn.
+  - biedt een uitgebreide PDF-download op dezelfde centrale uitkomstdata.
 - `[public]` `apps/duo-maandbedrag`
   - beta-tool voor wettelijke DUO-maandtermijn en optionele draagkrachtindicatie.
   - gebruikt centrale DUO-berekeningen en centrale DUO-rente/looptijdconstants.
+  - biedt een uitgebreide PDF-download op dezelfde centrale uitkomstdata.
 - `[public]` `apps/duo-extra-aflossen`
   - beta-tool voor extra aflossen bij DUO.
   - toont feitelijk effect op maandtermijn, looptijd, rentelast en afloscurve zonder beleggingsvergelijking.
+  - biedt een uitgebreide PDF-download op dezelfde centrale uitkomstdata.
 - `[public]` `apps/hypotheek-impact-studieschuld`
   - indicatieve tool voor de impact van een DUO-maandlast op hypotheekruimte.
   - rekent primair via relevante DUO-maandlast -> brutering -> annuïtaire hypotheekimpact.

@@ -38,7 +38,7 @@ export const audienceRoutes: AudienceRoute[] = [
     id: "starter-studieschuld",
     label: "Start bij DUO",
     summary:
-      "Begin bij schuldopbouw, maandbedrag, extra aflossen en wat je studieschuld later betekent.",
+      "Begin bij stoppen, schuldopbouw, maandbedrag en wat je studieschuld later betekent.",
     userQuestion: "Wat doet mijn studieschuld met mijn ruimte per maand?",
     researchSignal:
       "Eerst grip op DUO, daarna pas wonen en familiehulp.",

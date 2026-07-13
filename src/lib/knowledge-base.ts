@@ -146,7 +146,7 @@ export const knowledgeTopics: KnowledgeTopic[] = [
       "Niet controleren of DUO automatisch of op aanvraag rekening houdt met inkomen.",
       "Vergeten dat minder aflossen kan betekenen dat de schuld langer blijft staan.",
     ],
-    relatedTools: ["duo-maandbedrag", "duo-extra-aflossen"],
+    relatedTools: ["duo-doorlenen-of-stoppen", "duo-maandbedrag", "duo-extra-aflossen"],
     sourceIds: [
       "duo-berekening-maandbedrag",
       "duo-minder-of-niets-aflossen",
@@ -172,7 +172,7 @@ export const knowledgeTopics: KnowledgeTopic[] = [
       "Kwijtschelding als zekerheid behandelen zonder je eigen voorwaarden te controleren.",
       "Alleen naar totale schuld kijken en niet naar het verloop van rente en betalingen.",
     ],
-    relatedTools: ["duo-maandbedrag", "duo-extra-aflossen"],
+    relatedTools: ["duo-doorlenen-of-stoppen", "duo-maandbedrag", "duo-extra-aflossen"],
     sourceIds: [
       "duo-zo-werkt-terugbetalen",
       "duo-minder-of-niets-aflossen",

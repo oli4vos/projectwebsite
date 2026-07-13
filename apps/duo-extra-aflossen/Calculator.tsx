@@ -23,6 +23,7 @@ import {
   repaymentRuleOptions,
   type DuoExtraRepaymentFormValues,
 } from "./logic";
+import { downloadDuoExtraRepaymentPdfReport } from "./report";
 
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("nl-NL", {
@@ -78,6 +79,7 @@ export default function DuoExtraAflossenCalculator() {
   const [formValues, setFormValues] = useState<DuoExtraRepaymentFormValues>(
     createDuoExtraRepaymentDefaultValues,
   );
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
   const view = useMemo(() => calculateDuoExtraRepaymentView(formValues), [formValues]);
 
   function updateField<K extends keyof DuoExtraRepaymentFormValues>(
@@ -115,6 +117,19 @@ export default function DuoExtraAflossenCalculator() {
           ? current.debtParts.filter((part) => part.id !== id)
           : current.debtParts,
     }));
+  }
+
+  async function handleDownloadPdf() {
+    if (!view.isValid || isDownloadingPdf) {
+      return;
+    }
+
+    setIsDownloadingPdf(true);
+    try {
+      await downloadDuoExtraRepaymentPdfReport(formValues, view);
+    } finally {
+      setIsDownloadingPdf(false);
+    }
   }
 
   function toggleDebtParts(enabled: boolean) {
@@ -276,6 +291,16 @@ export default function DuoExtraAflossenCalculator() {
 
   const result = view.isValid ? (
     <div id="tool-result-summary" className="space-y-5">
+      <div className="flex flex-wrap items-center gap-2">
+        <ToolActionButton
+          type="button"
+          variant="accent"
+          onClick={handleDownloadPdf}
+          disabled={isDownloadingPdf}
+        >
+          {isDownloadingPdf ? "PDF wordt gemaakt..." : "Download uitgebreid PDF-overzicht"}
+        </ToolActionButton>
+      </div>
       <div className="grid gap-3 sm:grid-cols-2">
         <ResultCard
           label="Nieuwe verplichte maandtermijn"
@@ -393,9 +418,9 @@ export default function DuoExtraAflossenCalculator() {
     <CalculatorShell
       intro={
         <>
-          <h1 className="text-2xl font-semibold tracking-tight text-[var(--ink)]">
+          <h2 className="text-2xl font-semibold tracking-tight text-[var(--ink)]">
             Wat doet extra aflossen?
-          </h1>
+          </h2>
           <p className="mt-3 text-[15px] leading-[1.7] text-[var(--muted)]">
             Bekijk feitelijk wat een eenmalige of maandelijkse extra DUO-aflossing
             doet met je maandtermijn, einddatum en rentelast. Je wettelijke

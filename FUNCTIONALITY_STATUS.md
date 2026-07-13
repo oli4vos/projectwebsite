@@ -41,12 +41,13 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 | Draft tools (concept) | hidden-draft | `visibility: "hidden"` | uit | Alle tools en flows die niet meer actief aangeroepen worden blijven hier verborgen totdat er expliciet heractivatie is | zet manifest op `public` + checks draaien |
 | Studieschuld-vs-beleggen | hidden-draft | `visibility: "hidden"` | uit | Bewust uit zichtbare positionering; code behouden voor mogelijke latere heractivatie | alleen heractiveren met nieuwe productbeslissing + copycheck |
 | Volgende euro | hidden-draft | `visibility: "hidden"` | uit | Bewust uit zichtbare positionering; route niet meer gelinkt vanuit publieke UI | alleen heractiveren met nieuwe productbeslissing + copycheck |
-| DUO-maandbedrag | experimenteel | `visibility: "public"` | aan | Nieuwe fase-2-tool voor wettelijke maandtermijn en optionele draagkrachtindicatie | n.v.t. |
-| DUO-extra-aflossen | experimenteel | `visibility: "public"` | aan | Nieuwe fase-2-tool voor extra DUO-aflossing, looptijd/maandbedrag en afloscurve | n.v.t. |
+| DUO-doorlenen-of-stoppen | actief | `visibility: "public"` | aan | Nieuwe stopscenario-tool voor nu stoppen, later diploma, doorstuderen, schuldenvrij-datum en uitgebreide PDF | n.v.t. |
+| DUO-maandbedrag | experimenteel | `visibility: "public"` | aan | Nieuwe fase-2-tool voor wettelijke maandtermijn, optionele draagkrachtindicatie en uitgebreide PDF | n.v.t. |
+| DUO-extra-aflossen | experimenteel | `visibility: "public"` | aan | Nieuwe fase-2-tool voor extra DUO-aflossing, looptijd/maandbedrag, afloscurve en uitgebreide PDF | n.v.t. |
 | Centrale tax/DUO/pension/constants lagen | actief | n.v.t. | aan | Hergebruikt door meerdere tools | n.v.t. |
 | Submit-driven calculatorflow | actief | n.v.t. | aan | Patroon beschikbaar via `CalculatorShell` + submitlogica | n.v.t. |
 | DUO-impact in maximale-hypotheektool | actief | n.v.t. | aan | Kernuitkomst toont rechtsboven de indicatieve daling van de leencapaciteit | n.v.t. |
-| Doorstap vanaf DUO-doorlenen-of-stoppen | actief | n.v.t. | aan | Resultaat toont directe vervolgstap naar hypotheekimpact en maximale hypotheek | n.v.t. |
+| Doorstap vanaf DUO-doorlenen-of-stoppen | actief | n.v.t. | aan | Resultaat toont scenariovergelijking, schuldenvrije datum en uitgebreide PDF | n.v.t. |
 | Chart-standaardisatie (jaar/euro/tooltips) | actief | n.v.t. | aan | Centrale charthelpers/componenten | n.v.t. |
 | Profielfunctie (`/profiel`, prefillpad) | uitgeschakeld | `NEXT_PUBLIC_ENABLE_PROFILE` | `false` | UI/CTA's verborgen, code blijft intact | zet op `1` en valideer profiel + tools |
 | Kennisniveaufunctionaliteit | uitgeschakeld | `NEXT_PUBLIC_ENABLE_KNOWLEDGE_LEVEL` | `false` | Bewust niet zichtbaar in productieflow | zet op `1` en valideer homepage/toolhints |
@@ -60,6 +61,8 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 
 | Datum | Commit | Wijziging | Impact |
 |---|---|---|---|
+| 2026-07-13 | `pending` | DUO-maandbedrag en DUO-extra-aflossen krijgen uitgebreide PDF-overzichten vanuit dezelfde centrale DUO-rekendata | DUO / studieschuld / PDF |
+| 2026-07-13 | `pending` | DUO-doorlenen-of-stoppen omgebouwd naar stopscenario-tool met prestatiebeurs, diplomatermijn, schuldenvrij-datum en uitgebreide PDF-export | DUO / studieschuld / scenario's |
 | 2026-07-13 | `pending` | DUO-doorlenen-of-stoppen hypotheekhint opgeschoond: irrelevante copy vervangen door relevante hypotheekvoorwaarden | DUO / studieschuld / copy |
 | 2026-07-13 | `pending` | DUO-doorlenen-of-stoppen toont directe vervolgstap naar hypotheekimpact en maximale hypotheek | DUO / studieschuld / woonroute |
 | 2026-07-13 | `cc39fb9` | DUO-renteselectie op laatste 5 jaar, debt-parts editor en hypotheek-prefill op historisch DUO-rentejaar toegevoegd | DUO / studieschuld / hypotheek-impact |

@@ -21,6 +21,7 @@ import {
   type DuoHouseholdSituation,
   type DuoMonthlyPaymentFormValues,
 } from "./logic";
+import { downloadDuoMonthlyPaymentPdfReport } from "./report";
 
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("nl-NL", {
@@ -77,6 +78,7 @@ export default function DuoMaandbedragCalculator() {
   const [formValues, setFormValues] = useState<DuoMonthlyPaymentFormValues>(
     createDuoMonthlyPaymentDefaultValues,
   );
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
   const view = useMemo(() => calculateDuoMonthlyPaymentView(formValues), [formValues]);
 
   function updateField<K extends keyof DuoMonthlyPaymentFormValues>(
@@ -114,6 +116,19 @@ export default function DuoMaandbedragCalculator() {
           ? current.debtParts.filter((part) => part.id !== id)
           : current.debtParts,
     }));
+  }
+
+  async function handleDownloadPdf() {
+    if (!view.isValid || isDownloadingPdf) {
+      return;
+    }
+
+    setIsDownloadingPdf(true);
+    try {
+      await downloadDuoMonthlyPaymentPdfReport(formValues, view);
+    } finally {
+      setIsDownloadingPdf(false);
+    }
   }
 
   function toggleDebtParts(enabled: boolean) {
@@ -267,6 +282,16 @@ export default function DuoMaandbedragCalculator() {
 
   const result = view.isValid ? (
     <div id="tool-result-summary" className="space-y-5">
+      <div className="flex flex-wrap items-center gap-2">
+        <ToolActionButton
+          type="button"
+          variant="accent"
+          onClick={handleDownloadPdf}
+          disabled={isDownloadingPdf}
+        >
+          {isDownloadingPdf ? "PDF wordt gemaakt..." : "Download uitgebreid PDF-overzicht"}
+        </ToolActionButton>
+      </div>
       <div className="grid gap-3 sm:grid-cols-2">
         <ResultCard
           label="Wettelijke maandtermijn"
@@ -345,9 +370,9 @@ export default function DuoMaandbedragCalculator() {
     <CalculatorShell
       intro={
         <>
-          <h1 className="text-2xl font-semibold tracking-tight text-[var(--ink)]">
+          <h2 className="text-2xl font-semibold tracking-tight text-[var(--ink)]">
             Wat wordt mijn DUO-maandbedrag?
-          </h1>
+          </h2>
           <p className="mt-3 text-[15px] leading-[1.7] text-[var(--muted)]">
             Bereken feitelijk welk maandbedrag bij je studieschuld hoort. Met
             inkomen erbij zie je ook een indicatieve draagkrachtgrens. Het

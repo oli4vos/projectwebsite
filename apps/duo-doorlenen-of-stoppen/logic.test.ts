@@ -1,189 +1,123 @@
 import { describe, expect, it } from "vitest";
 import {
-  calculateDuoLoanProjectionView,
-  createDuoLoanProjectionDefaultValues,
-  createFutureLoanMonthOptions,
-  createStoppedBorrowingMonthOptions,
-  getDuoLoanProjectionSliderConfig,
-  mapDuoLoanProjectionFormToInput,
-  updateDuoLoanProjectionLoanStatus,
-  updateDuoLoanProjectionMonthlyLoanAmount,
-  validateDuoLoanProjectionForm,
-  type DuoLoanProjectionFormValues,
+  createEmptyStudyStopValues,
+  createStudyStopDefaultValues,
+  createStudyStopView,
+  mapStudyStopFormToInput,
+  validateStudyStopForm,
+  type StudyStopFormValues,
 } from "./logic";
 
-const CALCULATION_MONTH = "2026-01";
+const CALCULATION_MONTH = "2026-07";
 
-const validValues: DuoLoanProjectionFormValues = {
-  currentDebt: "25000",
-  loanStatus: "still-borrowing",
-  monthlyLoanAmount: "300",
-  expectedLastLoanMonth: "2026-12",
-  stoppedBorrowingMonth: "2026-01",
-  includeMortgageImpact: false,
+const validValues: StudyStopFormValues = {
+  calculationMonth: CALCULATION_MONTH,
+  studyLevel: "hbo",
+  currentLoanDebt: "30000",
+  currentCollegegeldkredietDebt: "2000",
+  currentBasisbeursDebt: "3000",
+  currentAanvullendeBeursDebt: "1000",
+  currentReisproductDebt: "0",
+  monthlyLoan: "300",
+  monthlyCollegegeldkrediet: "25",
+  monthlyBasisbeurs: "100",
+  monthlyAanvullendeBeurs: "50",
+  monthlyReisproduct: "10",
+  monthsUntilLaterDiploma: "24",
+  monthsUntilContinueDiploma: "12",
+  remainingDiplomaTermMonths: "120",
+  repaymentRule: "SF35",
+  duoRateYear: "2026",
+  annualStudyInterestRate: "0",
+  annualRepaymentInterestRate: "0",
+  grossAnnualIncome: "0",
+  partnerGrossAnnualIncome: "0",
+  hasPartner: false,
+  oneTimeExtraRepayment: "0",
+  monthlyExtraRepayment: "0",
+  aflosvrijeMonths: "0",
 };
 
 describe("duo-doorlenen-of-stoppen logic", () => {
-  it("maps UI input to the central DUO loan projection input", () => {
-    const mapping = mapDuoLoanProjectionFormToInput(validValues, CALCULATION_MONTH);
+  it("creates a realistic default and empty state", () => {
+    const defaults = createStudyStopDefaultValues(CALCULATION_MONTH);
+    const empty = createEmptyStudyStopValues(CALCULATION_MONTH);
 
-    expect(mapping.errors).toEqual({});
-    expect(mapping.input).toEqual({
-      currentDebt: 25_000,
-      monthlyLoanAmount: 300,
-      expectedLastLoanMonth: "2026-12",
-      includeMortgageImpact: false,
-    });
+    expect(defaults.calculationMonth).toBe(CALCULATION_MONTH);
+    expect(defaults.studyLevel).toBe("hbo");
+    expect(defaults.repaymentRule).toBe("SF35");
+    expect(empty.currentLoanDebt).toBe("");
+    expect(empty.monthsUntilLaterDiploma).toBe("");
   });
 
-  it("keeps slider and number input synchronized through one field value", () => {
-    const updated = updateDuoLoanProjectionMonthlyLoanAmount(validValues, "600");
+  it("maps the form input to the central DUO stop scenario input", () => {
+    const mapping = mapStudyStopFormToInput(validValues);
 
-    expect(updated.monthlyLoanAmount).toBe("600");
-    expect(mapDuoLoanProjectionFormToInput(updated, CALCULATION_MONTH).input)
-      .toMatchObject({ monthlyLoanAmount: 600 });
-  });
-
-  it("uses central DUO borrowing limits for the slider", () => {
-    const slider = getDuoLoanProjectionSliderConfig();
-
-    expect(slider.min).toBe(0);
-    expect(slider.max).toBe(1213.95);
-    expect(slider.step).toBeGreaterThan(0);
-    expect(slider.sourceUrl).toContain("duo.nl");
-  });
-
-  it("validates negative debt, excessive monthly borrowing and past last loan month", () => {
-    const errors = validateDuoLoanProjectionForm(
-      {
-        currentDebt: "-1",
-        loanStatus: "still-borrowing",
-        monthlyLoanAmount: "99999",
-        expectedLastLoanMonth: "2025-12",
-        stoppedBorrowingMonth: "2026-01",
-        includeMortgageImpact: false,
-      },
-      CALCULATION_MONTH,
-    );
-
-    expect(errors.currentDebt).toBeDefined();
-    expect(errors.monthlyLoanAmount).toBeDefined();
-    expect(errors.expectedLastLoanMonth).toBeDefined();
-  });
-
-  it("maps already-stopped input to zero future borrowing from the calculation month", () => {
-    const stoppedValues = updateDuoLoanProjectionLoanStatus(
-      {
-        ...validValues,
-        monthlyLoanAmount: "600",
-        expectedLastLoanMonth: "2026-12",
-      },
-      "already-stopped",
-      CALCULATION_MONTH,
-    );
-    const mapping = mapDuoLoanProjectionFormToInput(stoppedValues, CALCULATION_MONTH);
-
-    expect(stoppedValues.loanStatus).toBe("already-stopped");
-    expect(stoppedValues.monthlyLoanAmount).toBe("0");
     expect(mapping.errors).toEqual({});
     expect(mapping.input).toMatchObject({
-      currentDebt: 25_000,
-      monthlyLoanAmount: 0,
-      expectedLastLoanMonth: CALCULATION_MONTH,
+      calculationMonth: CALCULATION_MONTH,
+      studyLevel: "hbo",
+      currentLoanDebt: 30000,
+      currentCollegegeldkredietDebt: 2000,
+      currentBasisbeursDebt: 3000,
+      currentAanvullendeBeursDebt: 1000,
+      currentReisproductDebt: 0,
+      monthlyLoan: 300,
+      monthlyCollegegeldkrediet: 25,
+      monthlyBasisbeurs: 100,
+      monthlyAanvullendeBeurs: 50,
+      monthlyReisproduct: 10,
+      monthsUntilLaterDiploma: 24,
+      monthsUntilContinueDiploma: 12,
+      remainingDiplomaTermMonths: 120,
+      repaymentRule: "SF35",
+      duoRateYear: 2026,
+      annualStudyInterestRate: 0,
+      annualRepaymentInterestRate: 0,
+      grossAnnualIncome: 0,
+      partnerGrossAnnualIncome: 0,
+      hasPartner: false,
+      oneTimeExtraRepayment: 0,
+      monthlyExtraRepayment: 0,
+      aflosvrijeMonths: 0,
     });
   });
 
-  it("validates stopped borrowing month separately from future loan month", () => {
-    const errors = validateDuoLoanProjectionForm(
-      {
-        ...validValues,
-        loanStatus: "already-stopped",
-        monthlyLoanAmount: "99999",
-        expectedLastLoanMonth: "2025-12",
-        stoppedBorrowingMonth: "2026-02",
-      },
-      CALCULATION_MONTH,
-    );
+  it("validates negative and malformed input", () => {
+    const errors = validateStudyStopForm({
+      ...validValues,
+      currentLoanDebt: "-1",
+      monthsUntilLaterDiploma: "-1",
+      annualStudyInterestRate: "-1",
+      annualRepaymentInterestRate: "-1",
+      oneTimeExtraRepayment: "40000",
+      calculationMonth: "2026/07",
+    });
 
-    expect(errors.monthlyLoanAmount).toBeUndefined();
-    expect(errors.expectedLastLoanMonth).toBeUndefined();
-    expect(errors.stoppedBorrowingMonth).toBeDefined();
+    expect(errors.currentLoanDebt).toBeDefined();
+    expect(errors.monthsUntilLaterDiploma).toBeDefined();
+    expect(errors.annualStudyInterestRate).toBeDefined();
+    expect(errors.annualRepaymentInterestRate).toBeDefined();
+    expect(errors.oneTimeExtraRepayment).toBeDefined();
+    expect(errors.calculationMonth).toBeDefined();
   });
 
-  it("creates quick month choices so users do not have to type a final loan month", () => {
-    const futureOptions = createFutureLoanMonthOptions(CALCULATION_MONTH);
-    const stoppedOptions = createStoppedBorrowingMonthOptions(CALCULATION_MONTH);
-
-    expect(futureOptions.map((option) => option.value)).toEqual([
-      "2026-01",
-      "2026-03",
-      "2026-06",
-      "2026-12",
-      "2027-12",
-    ]);
-    expect(stoppedOptions.map((option) => option.value)).toEqual([
-      "2026-01",
-      "2025-12",
-      "2025-07",
-      "2025-01",
-    ]);
-  });
-
-  it("compares stopping now with borrowing through the chosen final loan month", () => {
-    const view = calculateDuoLoanProjectionView(validValues, CALCULATION_MONTH);
+  it("produces the stop-now scenarios and timeline for a valid submission", () => {
+    const view = createStudyStopView(validValues);
 
     expect(view.isValid).toBe(true);
     if (!view.isValid) {
       throw new Error("view should be valid");
     }
 
-    expect(view.stopNow.lastLoanMonth).toBe(CALCULATION_MONTH);
-    expect(view.keepBorrowing.lastLoanMonth).toBe("2026-12");
-    expect(view.keepBorrowing.borrowingMonths).toBe(12);
-    expect(view.comparison.debtAtRepaymentStartDifference).toBeGreaterThan(0);
-    expect(view.comparison.theoreticalMonthlyPaymentDifference).toBeGreaterThan(0);
-  });
-
-  it("does not show mortgage impact columns unless the user opts in", () => {
-    const view = calculateDuoLoanProjectionView(validValues, CALCULATION_MONTH);
-
-    expect(view.isValid).toBe(true);
-    if (!view.isValid) {
-      throw new Error("view should be valid");
-    }
-
-    expect(view.showMortgageImpact).toBe(false);
-    expect(view.keepBorrowing.mortgageImpact).toBeUndefined();
-    expect(view.comparison.tableRows.every((row) => row.mortgageCapacityReduction === undefined))
-      .toBe(true);
-  });
-
-  it("shows mortgage impact when opted in and keeps it separate from DUO payments", () => {
-    const view = calculateDuoLoanProjectionView(
-      { ...validValues, includeMortgageImpact: true },
-      CALCULATION_MONTH,
+    expect(view.result.scenarios).toHaveLength(3);
+    expect(view.comparisonRows).toHaveLength(3);
+    expect(view.result.currentBalances.total).toBe(36000);
+    expect(view.result.scenarios[0].debtAtStop.total).toBe(36000);
+    expect(view.result.scenarios[1].diplomaMonth).toBe("2028-07");
+    expect(view.result.scenarios[2].debtAtStop.alwaysRepayable).toBeGreaterThan(
+      view.result.scenarios[0].debtAtStop.alwaysRepayable,
     );
-
-    expect(view.isValid).toBe(true);
-    if (!view.isValid) {
-      throw new Error("view should be valid");
-    }
-
-    expect(view.showMortgageImpact).toBe(true);
-    expect(view.keepBorrowing.mortgageImpact).toBeDefined();
-    expect(view.comparison.mortgageCapacityReductionDifference).toBeGreaterThan(0);
-    expect(view.comparison.theoreticalMonthlyPaymentDifference).toBe(
-      view.comparison.tableRows[2]?.theoreticalMonthlyPayment,
-    );
-  });
-
-  it("creates a realistic default with a future final loan month", () => {
-    const defaults = createDuoLoanProjectionDefaultValues(CALCULATION_MONTH);
-
-    expect(defaults.currentDebt).toBe("25000");
-    expect(defaults.loanStatus).toBe("still-borrowing");
-    expect(defaults.monthlyLoanAmount).toBe("300");
-    expect(defaults.expectedLastLoanMonth).toBe("2026-12");
-    expect(defaults.stoppedBorrowingMonth).toBe(CALCULATION_MONTH);
+    expect(view.result.scenarios[0].timeline.length).toBeGreaterThan(0);
   });
 });

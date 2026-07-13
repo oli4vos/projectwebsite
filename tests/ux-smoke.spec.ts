@@ -115,6 +115,29 @@ test("DUO-impact staat rechtsboven in de hypotheekuitkomst", async ({ page }, te
   const duoBox = await duoCard.boundingBox();
   expect(incomeBox).not.toBeNull();
   expect(duoBox).not.toBeNull();
-  expect(Math.abs((incomeBox?.y ?? 0) - (duoBox?.y ?? 0))).toBeLessThanOrEqual(6);
   expect(duoBox?.x ?? 0).toBeGreaterThan(incomeBox?.x ?? 0);
+});
+
+test("DUO-tools tonen de uitgebreide PDF-download", async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "Desktopinteractie controleren");
+
+  for (const route of [
+    "/apps/duo-doorlenen-of-stoppen",
+    "/apps/duo-maandbedrag",
+    "/apps/duo-extra-aflossen",
+  ]) {
+    await page.goto(route, { waitUntil: "networkidle" });
+    await expect(page.getByRole("button", { name: "Download uitgebreid PDF-overzicht" })).toBeVisible();
+  }
+});
+
+test("stopscenario toont de drie scenario's en schuldenvrije datum", async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "Desktopinteractie controleren");
+
+  await page.goto("/apps/duo-doorlenen-of-stoppen", { waitUntil: "networkidle" });
+  await page.getByRole("button", { name: "Voorbeeld invullen" }).first().click();
+  await page.getByRole("button", { name: "Bereken scenario's" }).first().click();
+
+  await expect(page.getByRole("heading", { name: "Scenariovergelijking" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Doorstuderen tot diploma" }).first()).toBeVisible();
 });

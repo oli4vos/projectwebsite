@@ -37,30 +37,29 @@ export const appRegistry = [
   },
   {
     "slug": "duo-doorlenen-of-stoppen",
-    "title": "DUO doorlenen of stoppen",
-    "description": "Projecteer wat doorlenen in de leenfase doet met je studieschuld, toekomstige maandtermijn en optionele hypotheekruimte.",
+    "title": "Studeren stoppen en DUO",
+    "description": "Vergelijk nu stoppen, later alsnog een diploma halen of doorstuderen tot diploma en zie wat dat doet met je studieschuld.",
     "type": "frontend",
     "category": "Schulden",
     "tags": [
       "DUO",
       "studieschuld",
-      "leenfase",
-      "hypotheek",
-      "starter"
+      "diploma",
+      "prestatiebeurs",
+      "scenario"
     ],
     "status": "beta",
     "visibility": "public",
     "requiredProfileFields": [
-      "studentDebt.remainingDebt"
+      "studentDebt.remainingDebt",
+      "studentDebt.repaymentRule"
     ],
-    "reasonHint": "Handig als je wilt zien wat langer of meer lenen doet met je eindschuld en toekomstige DUO-maandtermijn.",
+    "reasonHint": "Handig als je wilt zien wat stoppen, doorstuderen of later een diploma halen doet met je DUO-schuld.",
     "assumptionsUsed": [
-      "duo",
-      "mortgage"
+      "duo"
     ],
     "calculationDomains": [
       "studentDebt",
-      "mortgage",
       "cashflow"
     ],
     "riskLevel": "medium",

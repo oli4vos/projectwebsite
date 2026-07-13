@@ -10,7 +10,7 @@ export type ToolGroup = {
 export const toolGroups: ToolGroup[] = [
   {
     title: "Studieschuld",
-    description: "Begin hier: schuldopbouw, maandbedrag en wat DUO voor je keuzes betekent.",
+    description: "Begin hier: stoppen, schuldopbouw, maandbedrag en wat DUO voor je keuzes betekent.",
     slugs: [
       "duo-doorlenen-of-stoppen",
       "duo-maandbedrag",

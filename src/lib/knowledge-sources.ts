@@ -110,6 +110,66 @@ export const knowledgeSources = {
     url: "https://www.duo.nl/particulier/rente/rente-voor-studenten.jsp",
     lastChecked: "2026-07-05",
   },
+  "duo-gift-of-terugbetalen": {
+    title: "Gift of terugbetalen",
+    publisher: "DUO",
+    date: "Actuele DUO-pagina",
+    type: "Primaire uitvoeringsbron",
+    description:
+      "DUO-uitleg over prestatiebeurs, giftomzetting, rentedragende lening, collegegeldkrediet en de 10-jaarstermijn voor mbo 3/4, hbo en universiteit.",
+    url: "https://www.duo.nl/particulier/studiefinanciering/gift-of-terugbetalen.jsp",
+    lastChecked: "2026-07-13",
+  },
+  "duo-rente-als-studiefinanciering-stopt": {
+    title: "Rente als uw studiefinanciering stopt",
+    publisher: "DUO",
+    date: "Actuele DUO-pagina",
+    type: "Primaire uitvoeringsbron",
+    description:
+      "DUO-uitleg over rentevastzetting na stoppen met studeren, de aanloopfase en rente op de prestatiebeurs.",
+    url: "https://www.duo.nl/particulier/rente/rente-als-uw-studiefinanciering-stopt.jsp",
+    lastChecked: "2026-07-13",
+  },
+  "duo-studievertraging": {
+    title: "Studievertraging",
+    publisher: "DUO",
+    date: "Actuele DUO-pagina",
+    type: "Primaire uitvoeringsbron",
+    description:
+      "DUO-uitleg over regelingen bij studievertraging, diplomatermijn en de gevolgen voor prestatiebeurs en nieuwe aanspraak.",
+    url: "https://www.duo.nl/particulier/studievertraging/",
+    lastChecked: "2026-07-13",
+  },
+  "duo-hoelang-recht": {
+    title: "Hoelang recht",
+    publisher: "DUO",
+    date: "Actuele DUO-pagina",
+    type: "Primaire uitvoeringsbron",
+    description:
+      "DUO-uitleg over de 10-jaarsperiode voor studiefinanciering voor mbo 3/4, hbo en universiteit.",
+    url: "https://www.duo.nl/particulier/studiefinanciering/hoelang-recht.jsp",
+    lastChecked: "2026-07-13",
+  },
+  "duo-studentenreisproduct-hoelang-recht": {
+    title: "Hoelang recht – Studentenreisproduct",
+    publisher: "DUO",
+    date: "Actuele DUO-pagina",
+    type: "Primaire uitvoeringsbron",
+    description:
+      "DUO-uitleg over de diplomatermijn en het studentenreisproduct, inclusief opnieuw recht bij overstap.",
+    url: "https://www.duo.nl/particulier/ov-en-reizen/hoelang-recht.jsp",
+    lastChecked: "2026-07-13",
+  },
+  "duo-terugbetalingsregels": {
+    title: "Terugbetalingsregels",
+    publisher: "DUO",
+    date: "Actuele DUO-pagina",
+    type: "Primaire uitvoeringsbron",
+    description:
+      "DUO-uitleg over SF15, SF35, looptijd, rentevastperiode en regels voor terugbetalers.",
+    url: "https://www.duo.nl/particulier/studieschuld-terugbetalen/terugbetalingsregels.jsp",
+    lastChecked: "2026-07-13",
+  },
   "duo-nieuwe-rentepercentages-2026": {
     title: "Nieuwe rentepercentages bekend",
     publisher: "DUO",
@@ -138,16 +198,6 @@ export const knowledgeSources = {
     description:
       "DUO-uitleg over wettelijk maandbedrag, draagkracht en het gebruik van inkomen en partnerinkomen.",
     url: "https://duo.nl/particulier/studieschuld-terugbetalen/berekening-maandbedrag.jsp",
-    lastChecked: "2026-07-05",
-  },
-  "duo-terugbetalingsregels": {
-    title: "Terugbetalingsregels",
-    publisher: "DUO",
-    date: "Actuele DUO-pagina",
-    type: "Primaire uitvoeringsbron",
-    description:
-      "DUO-uitleg over terugbetalingsregels, betaalwijze, verlaging van maandbedrag en partnerinkomen.",
-    url: "https://duo.nl/particulier/studieschuld-terugbetalen/terugbetalingsregels.jsp",
     lastChecked: "2026-07-05",
   },
   "duo-minder-of-niets-aflossen": {
@@ -265,6 +315,19 @@ export const knowledgeDocumentSourceGroups = {
     "duo-nieuwe-rentepercentages-2026",
     "duo-lenen-studiefinanciering",
   ],
+  "duo-studeren-stoppen": [
+    "duo-gift-of-terugbetalen",
+    "duo-rente-studenten",
+    "duo-rente-als-studiefinanciering-stopt",
+    "duo-studievertraging",
+    "duo-hoelang-recht",
+    "duo-studentenreisproduct-hoelang-recht",
+    "duo-terugbetalingsregels",
+    "duo-berekening-maandbedrag",
+    "duo-aflosvrije-periode",
+    "duo-u-studeert-nog",
+    "duo-lenen-studiefinanciering",
+  ],
   "duo-aanloopfase": [
     "duo-eerder-extra-aflossen",
     "duo-u-studeert-nog",
@@ -328,6 +391,7 @@ export const knowledgeDocumentTitles = {
   "duo-draagkracht-jokerjaren": "Draagkracht en jokerjaren",
   "duo-na-35-jaar": "Wat er na 35 jaar gebeurt",
   "duo-extra-aflossen": "Extra aflossen bij DUO",
+  "duo-studeren-stoppen": "Studeren stoppen en DUO",
 } as const satisfies Record<keyof typeof knowledgeDocumentSourceGroups, string>;
 
 export const knowledgeSourceEntries = Object.entries(
@@ -377,6 +441,12 @@ export const knowledgeSourceHierarchy = [
       "duo-berekening-maandbedrag",
       "duo-minder-of-niets-aflossen",
       "duo-extra-betaling-doen",
+      "duo-gift-of-terugbetalen",
+      "duo-rente-als-studiefinanciering-stopt",
+      "duo-studievertraging",
+      "duo-hoelang-recht",
+      "duo-studentenreisproduct-hoelang-recht",
+      "duo-terugbetalingsregels",
     ],
     useFor: "Uitvoeringsregels en publieksuitleg voor studieschuld en terugbetalen.",
   },

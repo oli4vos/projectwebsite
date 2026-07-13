@@ -17,10 +17,15 @@ Dit document legt vast welke bronnen de kennisbank en toekomstige blogcontent al
 | `hypotheker-studieschuld-2026` | Hypotheek afsluiten met studieschuld in 2026? | De Hypotheker | Praktijkbron |
 | `duo-rente-terugbetalers` | Rente voor terugbetalers | DUO | Primaire uitvoeringsbron |
 | `duo-rente-studenten` | Rente voor studenten | DUO | Primaire uitvoeringsbron |
+| `duo-gift-of-terugbetalen` | Gift of terugbetalen | DUO | Primaire uitvoeringsbron |
+| `duo-rente-als-studiefinanciering-stopt` | Rente als uw studiefinanciering stopt | DUO | Primaire uitvoeringsbron |
+| `duo-studievertraging` | Studievertraging | DUO | Primaire uitvoeringsbron |
+| `duo-hoelang-recht` | Hoelang recht | DUO | Primaire uitvoeringsbron |
+| `duo-studentenreisproduct-hoelang-recht` | Hoelang recht – Studentenreisproduct | DUO | Primaire uitvoeringsbron |
+| `duo-terugbetalingsregels` | Terugbetalingsregels | DUO | Primaire uitvoeringsbron |
 | `duo-nieuwe-rentepercentages-2026` | Nieuwe rentepercentages bekend | DUO | Actuele uitvoeringsinformatie |
 | `duo-zo-werkt-terugbetalen` | Zo werkt terugbetalen | DUO | Primaire uitvoeringsbron |
 | `duo-berekening-maandbedrag` | Berekening maandbedrag | DUO | Primaire uitvoeringsbron |
-| `duo-terugbetalingsregels` | Terugbetalingsregels | DUO | Primaire uitvoeringsbron |
 | `duo-minder-of-niets-aflossen` | Wat is er mogelijk? | DUO | Primaire uitvoeringsbron |
 | `duo-aflosvrije-periode` | Aflosvrije periode | DUO | Primaire uitvoeringsbron |
 | `duo-u-studeert-nog` | U studeert nog | DUO | Primaire uitvoeringsbron |
@@ -85,6 +90,20 @@ Dit document legt vast welke bronnen de kennisbank en toekomstige blogcontent al
 - `duo-rente-terugbetalers`
 - `duo-rente-studenten`
 - `duo-nieuwe-rentepercentages-2026`
+- `duo-lenen-studiefinanciering`
+
+### Studeren stoppen en DUO
+
+- `duo-gift-of-terugbetalen`
+- `duo-rente-studenten`
+- `duo-rente-als-studiefinanciering-stopt`
+- `duo-studievertraging`
+- `duo-hoelang-recht`
+- `duo-studentenreisproduct-hoelang-recht`
+- `duo-terugbetalingsregels`
+- `duo-berekening-maandbedrag`
+- `duo-aflosvrije-periode`
+- `duo-u-studeert-nog`
 - `duo-lenen-studiefinanciering`
 
 ### De aanloopfase

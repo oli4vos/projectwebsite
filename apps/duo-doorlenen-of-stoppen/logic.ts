@@ -1,465 +1,326 @@
-import { getDuoBorrowingLimits } from "@/lib/financial-constants";
+import { getAvailableDuoRateYears, getDefaultFinancialYear } from "@/lib/financial-constants";
 import {
-  projectDuoLoan,
-  type DuoLoanProjectionInput,
-  type DuoLoanProjectionResult,
-} from "@/lib/duo";
+  calculateStudyStopScenarios,
+  createEmptyStudyStopValues,
+  createStudyStopDefaultValues,
+  type StudyLevel,
+  type StudyStopCalculationResult,
+  type StudyStopInput,
+  type StudyStopScenarioKey,
+} from "@/lib/duo/studeren-stoppen";
+import type { RepaymentRule } from "@/lib/duo/types";
 import { parseOptionalDecimalInput } from "@/lib/number-input";
 
-export type DuoLoanProjectionFormValues = {
-  currentDebt: string;
-  loanStatus: DuoLoanProjectionLoanStatus;
-  monthlyLoanAmount: string;
-  expectedLastLoanMonth: string;
-  stoppedBorrowingMonth: string;
-  includeMortgageImpact: boolean;
+export type StudyStopFormValues = {
+  calculationMonth: string;
+  studyLevel: StudyLevel;
+  currentLoanDebt: string;
+  currentCollegegeldkredietDebt: string;
+  currentBasisbeursDebt: string;
+  currentAanvullendeBeursDebt: string;
+  currentReisproductDebt: string;
+  monthlyLoan: string;
+  monthlyCollegegeldkrediet: string;
+  monthlyBasisbeurs: string;
+  monthlyAanvullendeBeurs: string;
+  monthlyReisproduct: string;
+  monthsUntilLaterDiploma: string;
+  monthsUntilContinueDiploma: string;
+  remainingDiplomaTermMonths: string;
+  repaymentRule: RepaymentRule;
+  duoRateYear: string;
+  annualStudyInterestRate: string;
+  annualRepaymentInterestRate: string;
+  grossAnnualIncome: string;
+  partnerGrossAnnualIncome: string;
+  hasPartner: boolean;
+  oneTimeExtraRepayment: string;
+  monthlyExtraRepayment: string;
+  aflosvrijeMonths: string;
 };
 
-export type DuoLoanProjectionLoanStatus = "still-borrowing" | "already-stopped";
+export type StudyStopValidationErrors = Partial<Record<keyof StudyStopFormValues, string>>;
 
-export type DuoLoanProjectionValidationErrors = Partial<
-  Record<keyof DuoLoanProjectionFormValues, string>
->;
-
-export type DuoLoanProjectionScenarioKey =
-  | "stop-now"
-  | "keep-borrowing"
-  | "difference";
-
-export type DuoLoanProjectionComparisonRow = {
-  key: DuoLoanProjectionScenarioKey;
+export type StudyStopComparisonRow = {
+  key: StudyStopScenarioKey;
   label: string;
-  debtAtRepaymentStart: number;
-  theoreticalMonthlyPayment: number;
-  totalRepayment: number;
-  mortgageCapacityReduction?: number;
   note: string;
+  debtAtStop: number;
+  debtAtRepaymentStart: number;
+  debtAtDiploma?: number;
+  usedMonthlyPayment: number;
+  totalPaid: number;
+  totalInterest: number;
+  monthsToDebtFree: number;
+  payoffDate: string | null;
+  finalDebt: number;
+  restschuld: number;
 };
 
-export type DuoLoanProjectionComparison = {
-  debtAtRepaymentStartDifference: number;
-  theoreticalMonthlyPaymentDifference: number;
-  totalRepaymentDifference: number;
-  mortgageCapacityReductionDifference?: number;
-  tableRows: DuoLoanProjectionComparisonRow[];
-};
-
-export type DuoLoanProjectionView =
+export type StudyStopView =
   | {
       isValid: false;
-      calculationMonth: string;
-      errors: DuoLoanProjectionValidationErrors;
-      slider: DuoLoanProjectionSliderConfig;
+      errors: StudyStopValidationErrors;
+      year: number;
     }
   | {
       isValid: true;
-      calculationMonth: string;
-      errors: DuoLoanProjectionValidationErrors;
-      input: DuoLoanProjectionInput;
-      stopNow: DuoLoanProjectionResult;
-      keepBorrowing: DuoLoanProjectionResult;
-      comparison: DuoLoanProjectionComparison;
-      slider: DuoLoanProjectionSliderConfig;
-      showMortgageImpact: boolean;
-      loanStatus: DuoLoanProjectionLoanStatus;
-      stoppedBorrowingMonth?: string;
-      effectiveLastLoanMonth: string;
+      errors: StudyStopValidationErrors;
+      year: number;
+      input: StudyStopInput;
+      result: StudyStopCalculationResult;
+      comparisonRows: StudyStopComparisonRow[];
     };
 
-export type DuoLoanProjectionSliderConfig = {
-  min: number;
-  max: number;
-  step: number;
-  sourceUrl: string;
-  notes: string;
-};
+export const repaymentRuleOptions: RepaymentRule[] = [
+  "SF35",
+  "SF15",
+  "SF15_OLD",
+  "SF15_LLLK",
+  "UNKNOWN",
+];
 
-export type DuoLoanProjectionMonthOption = {
-  label: string;
-  value: string;
-  helper: string;
-};
+export const studyLevelOptions: Array<{ label: string; value: StudyLevel; helper: string }> = [
+  {
+    label: "Mbo 3/4",
+    value: "mbo34",
+    helper: "10 jaar diplomatermijn voor prestatiebeurs en reisproduct.",
+  },
+  {
+    label: "Hbo",
+    value: "hbo",
+    helper: "10 jaar diplomatermijn voor prestatiebeurs en reisproduct.",
+  },
+  {
+    label: "Universiteit",
+    value: "university",
+    helper: "10 jaar diplomatermijn voor prestatiebeurs en reisproduct.",
+  },
+];
 
-type YearMonth = {
-  year: number;
-  month: number;
-};
+function normalizeMonthValue(value: string) {
+  return /^(\d{4})-(\d{2})$/.test(value.trim()) ? value.trim() : "";
+}
 
-function roundMoney(value: number) {
-  if (!Number.isFinite(value)) {
-    return 0;
+function parsePositiveOrZero(value: string) {
+  if (value.trim().length === 0) {
+    return undefined;
+  }
+  const parsed = parseOptionalDecimalInput(value);
+  if (parsed === undefined || !Number.isFinite(parsed) || parsed < 0) {
+    return undefined;
+  }
+  return parsed;
+}
+
+function getCurrentDebtTotal(values: StudyStopFormValues) {
+  return (
+    (parsePositiveOrZero(values.currentLoanDebt) ?? 0) +
+    (parsePositiveOrZero(values.currentCollegegeldkredietDebt) ?? 0) +
+    (parsePositiveOrZero(values.currentBasisbeursDebt) ?? 0) +
+    (parsePositiveOrZero(values.currentAanvullendeBeursDebt) ?? 0) +
+    (parsePositiveOrZero(values.currentReisproductDebt) ?? 0)
+  );
+}
+
+function validateMoneyField(
+  values: StudyStopFormValues,
+  field: keyof StudyStopFormValues,
+  label: string,
+  errors: StudyStopValidationErrors,
+) {
+  const value = values[field];
+  if (typeof value !== "string" || value.trim().length === 0) {
+    return;
+  }
+  const parsed = parseOptionalDecimalInput(value);
+  if (parsed === undefined || !Number.isFinite(parsed) || parsed < 0) {
+    errors[field] = `Gebruik 0 of een hoger bedrag voor ${label.toLowerCase()}.`;
+  }
+}
+
+function validateIntegerField(
+  values: StudyStopFormValues,
+  field: keyof StudyStopFormValues,
+  label: string,
+  errors: StudyStopValidationErrors,
+) {
+  const value = values[field];
+  if (typeof value !== "string" || value.trim().length === 0) {
+    return;
+  }
+  const parsed = parseOptionalDecimalInput(value);
+  if (
+    parsed === undefined ||
+    !Number.isFinite(parsed) ||
+    parsed < 0 ||
+    !Number.isInteger(parsed)
+  ) {
+    errors[field] = `Gebruik een heel aantal maanden voor ${label.toLowerCase()}.`;
+  }
+}
+
+export function validateStudyStopForm(values: StudyStopFormValues): StudyStopValidationErrors {
+  const errors: StudyStopValidationErrors = {};
+  const supportedRateYears = new Set(getAvailableDuoRateYears());
+
+  if (values.calculationMonth.trim().length > 0 && !normalizeMonthValue(values.calculationMonth)) {
+    errors.calculationMonth = "Gebruik een maand in de vorm jjjj-mm.";
   }
 
-  return Math.round(value * 100) / 100;
-}
-
-function createCurrentYearMonth(): YearMonth {
-  const now = new Date();
-  return { year: now.getFullYear(), month: now.getMonth() + 1 };
-}
-
-function addMonths(value: YearMonth, months: number): YearMonth {
-  const zeroBasedMonth = value.month - 1 + months;
-  const date = new Date(value.year, zeroBasedMonth, 1);
-  return { year: date.getFullYear(), month: date.getMonth() + 1 };
-}
-
-function parseYearMonth(value: string): YearMonth | null {
-  const match = /^(\d{4})-(\d{2})$/.exec(value);
-  if (!match) {
-    return null;
+  if (!studyLevelOptions.some((option) => option.value === values.studyLevel)) {
+    errors.studyLevel = "Kies een geldige opleidingssoort.";
   }
 
-  const year = Number(match[1]);
-  const month = Number(match[2]);
-  if (!Number.isInteger(year) || !Number.isInteger(month) || month < 1 || month > 12) {
-    return null;
+  if (!repaymentRuleOptions.includes(values.repaymentRule)) {
+    errors.repaymentRule = "Kies een geldige terugbetalingsregel.";
   }
 
-  return { year, month };
-}
+  validateMoneyField(values, "currentLoanDebt", "de rentedragende lening", errors);
+  validateMoneyField(values, "currentCollegegeldkredietDebt", "het collegegeldkrediet", errors);
+  validateMoneyField(values, "currentBasisbeursDebt", "de basisbeurs", errors);
+  validateMoneyField(values, "currentAanvullendeBeursDebt", "de aanvullende beurs", errors);
+  validateMoneyField(values, "currentReisproductDebt", "het studentenreisproduct", errors);
+  validateMoneyField(values, "monthlyLoan", "de maandelijkse lening", errors);
+  validateMoneyField(
+    values,
+    "monthlyCollegegeldkrediet",
+    "het maandelijkse collegegeldkrediet",
+    errors,
+  );
+  validateMoneyField(values, "monthlyBasisbeurs", "de maandelijkse basisbeurs", errors);
+  validateMoneyField(
+    values,
+    "monthlyAanvullendeBeurs",
+    "de maandelijkse aanvullende beurs",
+    errors,
+  );
+  validateMoneyField(values, "monthlyReisproduct", "het maandelijkse reisproduct", errors);
+  validateMoneyField(values, "annualStudyInterestRate", "de studie-rente", errors);
+  validateMoneyField(values, "annualRepaymentInterestRate", "de terugbetalingsrente", errors);
+  validateMoneyField(values, "grossAnnualIncome", "het toetsingsinkomen", errors);
+  validateMoneyField(values, "partnerGrossAnnualIncome", "het partnerinkomen", errors);
+  validateMoneyField(values, "oneTimeExtraRepayment", "de eenmalige extra aflossing", errors);
+  validateMoneyField(values, "monthlyExtraRepayment", "de extra maandaflossing", errors);
 
-function compareYearMonth(left: YearMonth, right: YearMonth) {
-  return (left.year - right.year) * 12 + (left.month - right.month);
-}
+  validateIntegerField(values, "monthsUntilLaterDiploma", "het aantal maanden tot het latere diploma", errors);
+  validateIntegerField(
+    values,
+    "monthsUntilContinueDiploma",
+    "het aantal maanden extra studeren",
+    errors,
+  );
+  validateIntegerField(values, "remainingDiplomaTermMonths", "de diplomatermijn in maanden", errors);
+  validateIntegerField(values, "aflosvrijeMonths", "de aflosvrije periode in maanden", errors);
 
-export function formatYearMonth(value: YearMonth) {
-  return `${value.year}-${String(value.month).padStart(2, "0")}`;
-}
-
-export function getCurrentYearMonth() {
-  return formatYearMonth(createCurrentYearMonth());
-}
-
-export function createFutureLoanMonthOptions(
-  calculationMonth = getCurrentYearMonth(),
-): DuoLoanProjectionMonthOption[] {
-  const parsedCalculationMonth = parseYearMonth(calculationMonth) ?? createCurrentYearMonth();
-  const options = [
-    { loanMonths: 1, label: "Deze maand" },
-    { loanMonths: 3, label: "3 maanden" },
-    { loanMonths: 6, label: "6 maanden" },
-    { loanMonths: 12, label: "12 maanden" },
-    { loanMonths: 24, label: "24 maanden" },
-  ];
-
-  return options.map((option) => ({
-    label: option.label,
-    value: formatYearMonth(addMonths(parsedCalculationMonth, option.loanMonths - 1)),
-    helper:
-      option.loanMonths === 1
-        ? "Alleen de rekenmaand telt mee."
-        : `${option.loanMonths} leenmaanden inclusief de rekenmaand.`,
-  }));
-}
-
-export function createStoppedBorrowingMonthOptions(
-  calculationMonth = getCurrentYearMonth(),
-): DuoLoanProjectionMonthOption[] {
-  const parsedCalculationMonth = parseYearMonth(calculationMonth) ?? createCurrentYearMonth();
-  const options = [
-    { monthsAgo: 0, label: "Deze maand" },
-    { monthsAgo: 1, label: "Vorige maand" },
-    { monthsAgo: 6, label: "6 maanden geleden" },
-    { monthsAgo: 12, label: "12 maanden geleden" },
-  ];
-
-  return options.map((option) => ({
-    label: option.label,
-    value: formatYearMonth(addMonths(parsedCalculationMonth, -option.monthsAgo)),
-    helper:
-      option.monthsAgo === 0
-        ? "Je neemt vanaf nu niets meer op."
-        : `Je bent ${option.label.toLowerCase()} gestopt met opnemen.`,
-  }));
-}
-
-export function getDuoLoanProjectionSliderConfig(): DuoLoanProjectionSliderConfig {
-  const limits = getDuoBorrowingLimits();
-
-  return {
-    min: 0,
-    max: limits.monthlyLoanAmountMax,
-    step: limits.monthlyLoanAmountStep,
-    sourceUrl: limits.sourceUrl,
-    notes: limits.notes,
-  };
-}
-
-export function createDuoLoanProjectionDefaultValues(
-  calculationMonth = getCurrentYearMonth(),
-): DuoLoanProjectionFormValues {
-  const parsedCalculationMonth = parseYearMonth(calculationMonth) ?? createCurrentYearMonth();
-
-  return {
-    currentDebt: "25000",
-    loanStatus: "still-borrowing",
-    monthlyLoanAmount: "300",
-    expectedLastLoanMonth: formatYearMonth(addMonths(parsedCalculationMonth, 11)),
-    stoppedBorrowingMonth: calculationMonth,
-    includeMortgageImpact: false,
-  };
-}
-
-export function createEmptyDuoLoanProjectionValues(): DuoLoanProjectionFormValues {
-  return {
-    currentDebt: "",
-    loanStatus: "still-borrowing",
-    monthlyLoanAmount: "",
-    expectedLastLoanMonth: "",
-    stoppedBorrowingMonth: "",
-    includeMortgageImpact: false,
-  };
-}
-
-export function createDuoLoanProjectionExampleValues(
-  calculationMonth = getCurrentYearMonth(),
-): DuoLoanProjectionFormValues {
-  return createDuoLoanProjectionDefaultValues(calculationMonth);
-}
-
-export function updateDuoLoanProjectionMonthlyLoanAmount(
-  values: DuoLoanProjectionFormValues,
-  nextMonthlyLoanAmount: string,
-): DuoLoanProjectionFormValues {
-  return {
-    ...values,
-    monthlyLoanAmount: nextMonthlyLoanAmount,
-  };
-}
-
-export function updateDuoLoanProjectionLoanStatus(
-  values: DuoLoanProjectionFormValues,
-  loanStatus: DuoLoanProjectionLoanStatus,
-  calculationMonth = getCurrentYearMonth(),
-): DuoLoanProjectionFormValues {
-  const parsedCalculationMonth = parseYearMonth(calculationMonth) ?? createCurrentYearMonth();
-
-  if (loanStatus === "already-stopped") {
-    return {
-      ...values,
-      loanStatus,
-      monthlyLoanAmount: "0",
-      expectedLastLoanMonth: calculationMonth,
-      stoppedBorrowingMonth: values.stoppedBorrowingMonth || calculationMonth,
-    };
-  }
-
-  return {
-    ...values,
-    loanStatus,
-    monthlyLoanAmount: values.monthlyLoanAmount === "0" ? "300" : values.monthlyLoanAmount,
-    expectedLastLoanMonth:
-      values.expectedLastLoanMonth || formatYearMonth(addMonths(parsedCalculationMonth, 11)),
-  };
-}
-
-export function validateDuoLoanProjectionForm(
-  values: DuoLoanProjectionFormValues,
-  calculationMonth = getCurrentYearMonth(),
-): DuoLoanProjectionValidationErrors {
-  const errors: DuoLoanProjectionValidationErrors = {};
-  const currentDebt = parseOptionalDecimalInput(values.currentDebt);
-  const monthlyLoanAmount = parseOptionalDecimalInput(values.monthlyLoanAmount);
-  const lastLoanMonth = parseYearMonth(values.expectedLastLoanMonth);
-  const stoppedBorrowingMonth = parseYearMonth(values.stoppedBorrowingMonth);
-  const parsedCalculationMonth = parseYearMonth(calculationMonth) ?? createCurrentYearMonth();
-  const slider = getDuoLoanProjectionSliderConfig();
-  const isAlreadyStopped = values.loanStatus === "already-stopped";
-
-  if (currentDebt === undefined || !Number.isFinite(currentDebt) || currentDebt < 0) {
-    errors.currentDebt = "Gebruik 0 of een hogere huidige studieschuld.";
-  }
-
-  if (values.loanStatus !== "still-borrowing" && values.loanStatus !== "already-stopped") {
-    errors.loanStatus = "Kies of je nog leent of al gestopt bent.";
-  }
-
-  if (isAlreadyStopped) {
-    if (!stoppedBorrowingMonth) {
-      errors.stoppedBorrowingMonth = "Kies vanaf welke maand je niet meer leent.";
-    } else if (compareYearMonth(stoppedBorrowingMonth, parsedCalculationMonth) > 0) {
-      errors.stoppedBorrowingMonth = "De stopmaand mag niet in de toekomst liggen.";
+  if (values.duoRateYear.trim().length > 0) {
+    const parsedRateYear = Number.parseInt(values.duoRateYear, 10);
+    if (!Number.isInteger(parsedRateYear) || !supportedRateYears.has(parsedRateYear)) {
+      errors.duoRateYear = "Kies een DUO-rentejaar uit de centrale 5-jaarsreeks.";
     }
-  } else {
-    if (
-      monthlyLoanAmount === undefined ||
-      !Number.isFinite(monthlyLoanAmount) ||
-      monthlyLoanAmount < 0 ||
-      monthlyLoanAmount > slider.max
-    ) {
-      errors.monthlyLoanAmount = `Gebruik een maandbedrag tussen 0 en ${slider.max.toLocaleString(
-        "nl-NL",
-        { style: "currency", currency: "EUR" },
-      )}.`;
-    }
+  }
 
-    if (!lastLoanMonth) {
-      errors.expectedLastLoanMonth = "Kies een geldige laatste leenmaand.";
-    } else if (compareYearMonth(lastLoanMonth, parsedCalculationMonth) < 0) {
-      errors.expectedLastLoanMonth =
-        "De laatste leenmaand mag niet vóór de rekenmaand liggen.";
+  if (values.oneTimeExtraRepayment.trim().length > 0) {
+    const parsed = parseOptionalDecimalInput(values.oneTimeExtraRepayment);
+    const currentDebt = getCurrentDebtTotal(values);
+    if (parsed !== undefined && parsed > currentDebt && currentDebt > 0) {
+      errors.oneTimeExtraRepayment =
+        "De eenmalige extra aflossing kan niet hoger zijn dan de huidige openstaande schuld.";
     }
   }
 
   return errors;
 }
 
-export function mapDuoLoanProjectionFormToInput(
-  values: DuoLoanProjectionFormValues,
-  calculationMonth = getCurrentYearMonth(),
-): {
-  input?: DuoLoanProjectionInput;
-  errors: DuoLoanProjectionValidationErrors;
-} {
-  const errors = validateDuoLoanProjectionForm(values, calculationMonth);
-
-  if (Object.keys(errors).length > 0) {
-    return { errors };
-  }
+export function mapStudyStopFormToInput(
+  values: StudyStopFormValues,
+): { input: StudyStopInput; errors: StudyStopValidationErrors } {
+  const errors = validateStudyStopForm(values);
+  const calculationMonth = normalizeMonthValue(values.calculationMonth);
+  const duoRateYear = values.duoRateYear.trim().length > 0 ? Number.parseInt(values.duoRateYear, 10) : undefined;
 
   return {
     errors,
     input: {
-      currentDebt: parseOptionalDecimalInput(values.currentDebt) ?? 0,
-      monthlyLoanAmount:
-        values.loanStatus === "already-stopped"
-          ? 0
-          : (parseOptionalDecimalInput(values.monthlyLoanAmount) ?? 0),
-      expectedLastLoanMonth:
-        values.loanStatus === "already-stopped"
-          ? calculationMonth
-          : values.expectedLastLoanMonth,
-      includeMortgageImpact: values.includeMortgageImpact,
+      calculationMonth: calculationMonth || undefined,
+      studyLevel: values.studyLevel,
+      currentLoanDebt: parsePositiveOrZero(values.currentLoanDebt),
+      currentCollegegeldkredietDebt: parsePositiveOrZero(values.currentCollegegeldkredietDebt),
+      currentBasisbeursDebt: parsePositiveOrZero(values.currentBasisbeursDebt),
+      currentAanvullendeBeursDebt: parsePositiveOrZero(values.currentAanvullendeBeursDebt),
+      currentReisproductDebt: parsePositiveOrZero(values.currentReisproductDebt),
+      monthlyLoan: parsePositiveOrZero(values.monthlyLoan),
+      monthlyCollegegeldkrediet: parsePositiveOrZero(values.monthlyCollegegeldkrediet),
+      monthlyBasisbeurs: parsePositiveOrZero(values.monthlyBasisbeurs),
+      monthlyAanvullendeBeurs: parsePositiveOrZero(values.monthlyAanvullendeBeurs),
+      monthlyReisproduct: parsePositiveOrZero(values.monthlyReisproduct),
+      monthsUntilLaterDiploma: parsePositiveOrZero(values.monthsUntilLaterDiploma),
+      monthsUntilContinueDiploma: parsePositiveOrZero(values.monthsUntilContinueDiploma),
+      remainingDiplomaTermMonths: parsePositiveOrZero(values.remainingDiplomaTermMonths),
+      repaymentRule: values.repaymentRule,
+      duoRateYear: Number.isInteger(duoRateYear ?? NaN) ? duoRateYear : undefined,
+      annualStudyInterestRate: parsePositiveOrZero(values.annualStudyInterestRate),
+      annualRepaymentInterestRate: parsePositiveOrZero(values.annualRepaymentInterestRate),
+      grossAnnualIncome: parsePositiveOrZero(values.grossAnnualIncome),
+      partnerGrossAnnualIncome: parsePositiveOrZero(values.partnerGrossAnnualIncome),
+      hasPartner: values.hasPartner,
+      oneTimeExtraRepayment: parsePositiveOrZero(values.oneTimeExtraRepayment),
+      monthlyExtraRepayment: parsePositiveOrZero(values.monthlyExtraRepayment),
+      aflosvrijeMonths: parsePositiveOrZero(values.aflosvrijeMonths),
     },
   };
 }
 
-function createStopNowInput(
-  input: DuoLoanProjectionInput,
-  calculationMonth: string,
-): DuoLoanProjectionInput {
-  return {
-    ...input,
-    monthlyLoanAmount: 0,
-    expectedLastLoanMonth: calculationMonth,
-    includeMortgageImpact: false,
-  };
+export function buildStudyStopComparisonRows(result: StudyStopCalculationResult): StudyStopComparisonRow[] {
+  return result.scenarios.map((scenario) => {
+    return {
+      key: scenario.key,
+      label: scenario.title,
+      note:
+        scenario.key === "stop-now-no-diploma"
+          ? "Stop nu en haal geen diploma meer."
+          : scenario.key === "stop-now-later-diploma"
+            ? "Stop nu en laat de prestatiebeurs mogelijk later omzetten."
+            : "Doorstuderen tot diploma en daarna pas aflossen.",
+      debtAtStop: scenario.debtAtStop.total,
+      debtAtRepaymentStart: scenario.debtAtRepaymentStart.total,
+      debtAtDiploma: scenario.debtAtDiploma?.total,
+      usedMonthlyPayment: scenario.repayment.usedMonthlyPayment,
+      totalPaid: scenario.repayment.totalPaid,
+      totalInterest: scenario.repayment.totalInterest,
+      monthsToDebtFree: scenario.repayment.monthsToDebtFree,
+      payoffDate: scenario.repayment.payoffDate,
+      finalDebt: scenario.repayment.finalDebt,
+      restschuld: scenario.repayment.restschuld,
+    };
+  });
 }
 
-function createComparison(input: {
-  stopNow: DuoLoanProjectionResult;
-  keepBorrowing: DuoLoanProjectionResult;
-  showMortgageImpact: boolean;
-  loanStatus: DuoLoanProjectionLoanStatus;
-  stoppedBorrowingMonth?: string;
-}): DuoLoanProjectionComparison {
-  const mortgageImpact = input.keepBorrowing.mortgageImpact;
-  const stopMortgageReduction = input.showMortgageImpact
-    ? mortgageImpact?.reductionStopNow
-    : undefined;
-  const keepMortgageReduction = input.showMortgageImpact
-    ? mortgageImpact?.reductionKeepBorrowing
-    : undefined;
-  const mortgageCapacityReductionDifference = input.showMortgageImpact
-    ? mortgageImpact?.difference
-    : undefined;
-  const debtAtRepaymentStartDifference = roundMoney(
-    input.keepBorrowing.debtAtRepaymentStart - input.stopNow.debtAtRepaymentStart,
-  );
-  const theoreticalMonthlyPaymentDifference = roundMoney(
-    input.keepBorrowing.theoreticalMonthlyPayment -
-      input.stopNow.theoreticalMonthlyPayment,
-  );
-  const totalRepaymentDifference = roundMoney(
-    input.keepBorrowing.totalRepayment - input.stopNow.totalRepayment,
-  );
-  const isAlreadyStopped = input.loanStatus === "already-stopped";
+export function createStudyStopView(values: StudyStopFormValues): StudyStopView {
+  const { input, errors } = mapStudyStopFormToInput(values);
+  const year = Number.parseInt(values.calculationMonth.slice(0, 4), 10) || getDefaultFinancialYear();
 
-  return {
-    debtAtRepaymentStartDifference,
-    theoreticalMonthlyPaymentDifference,
-    totalRepaymentDifference,
-    mortgageCapacityReductionDifference,
-    tableRows: [
-      {
-        key: "stop-now",
-        label: isAlreadyStopped ? "Niet meer lenen" : "Nu stoppen met lenen",
-        debtAtRepaymentStart: input.stopNow.debtAtRepaymentStart,
-        theoreticalMonthlyPayment: input.stopNow.theoreticalMonthlyPayment,
-        totalRepayment: input.stopNow.totalRepayment,
-        mortgageCapacityReduction: stopMortgageReduction,
-        note: isAlreadyStopped
-          ? `Geen nieuwe opname; gestopt sinds ${input.stoppedBorrowingMonth ?? "de gekozen maand"}.`
-          : "Geen extra opname vanaf de rekenmaand.",
-      },
-      {
-        key: "keep-borrowing",
-        label: isAlreadyStopped ? "Projectie vanaf huidige schuld" : "Doorlenen tot gekozen maand",
-        debtAtRepaymentStart: input.keepBorrowing.debtAtRepaymentStart,
-        theoreticalMonthlyPayment: input.keepBorrowing.theoreticalMonthlyPayment,
-        totalRepayment: input.keepBorrowing.totalRepayment,
-        mortgageCapacityReduction: keepMortgageReduction,
-        note: isAlreadyStopped
-          ? "Je vult je huidige schuld in; er komt geen nieuwe opname bij."
-          : "Maandelijkse opname loopt door tot en met de laatste leenmaand.",
-      },
-      {
-        key: "difference",
-        label: isAlreadyStopped ? "Extra effect" : "Verschil",
-        debtAtRepaymentStart: debtAtRepaymentStartDifference,
-        theoreticalMonthlyPayment: theoreticalMonthlyPaymentDifference,
-        totalRepayment: totalRepaymentDifference,
-        mortgageCapacityReduction: mortgageCapacityReductionDifference,
-        note: isAlreadyStopped
-          ? "Omdat je niet meer leent, is er geen extra doorleenverschil."
-          : "Extra effect van doorlenen ten opzichte van nu stoppen.",
-      },
-    ],
-  };
-}
-
-export function calculateDuoLoanProjectionView(
-  values: DuoLoanProjectionFormValues,
-  calculationMonth = getCurrentYearMonth(),
-): DuoLoanProjectionView {
-  const mapping = mapDuoLoanProjectionFormToInput(values, calculationMonth);
-  const slider = getDuoLoanProjectionSliderConfig();
-
-  if (!mapping.input) {
+  if (Object.keys(errors).length > 0) {
     return {
       isValid: false,
-      calculationMonth,
-      errors: mapping.errors,
-      slider,
+      errors,
+      year,
     };
   }
 
-  const keepBorrowing = projectDuoLoan(mapping.input, { calculationMonth });
-  const stopNow = projectDuoLoan(createStopNowInput(mapping.input, calculationMonth), {
-    calculationMonth,
-  });
-  const comparison = createComparison({
-    stopNow,
-    keepBorrowing,
-    showMortgageImpact: mapping.input.includeMortgageImpact === true,
-    loanStatus: values.loanStatus,
-    stoppedBorrowingMonth: values.stoppedBorrowingMonth || undefined,
-  });
+  const result = calculateStudyStopScenarios(input);
 
   return {
     isValid: true,
-    calculationMonth,
-    errors: mapping.errors,
-    input: mapping.input,
-    stopNow,
-    keepBorrowing,
-    comparison,
-    slider,
-    showMortgageImpact: mapping.input.includeMortgageImpact === true,
-    loanStatus: values.loanStatus,
-    stoppedBorrowingMonth:
-      values.loanStatus === "already-stopped" ? values.stoppedBorrowingMonth : undefined,
-    effectiveLastLoanMonth: mapping.input.expectedLastLoanMonth,
+    errors,
+    year,
+    input,
+    result,
+    comparisonRows: buildStudyStopComparisonRows(result),
   };
 }
+
+export {
+  createEmptyStudyStopValues,
+  createStudyStopDefaultValues,
+};

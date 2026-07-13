@@ -108,6 +108,7 @@ describe("profile recommendations", () => {
       },
     };
     const slugs = getRecommendedAppSlugsForProfile(profile, { availableSlugs });
+    expect(slugs).toContain("duo-doorlenen-of-stoppen");
     expect(slugs).toContain("duo-maandbedrag");
     expect(slugs).toContain("duo-extra-aflossen");
     expect(slugs).toContain("hypotheek-impact-studieschuld");
@@ -197,7 +198,7 @@ describe("profile recommendations", () => {
     expect(recommendations[0]?.reason).toContain("draagkrachtindicatie");
   });
 
-  it("returns max 3 unique slugs", () => {
+  it("returns max 4 unique slugs", () => {
     const profile: UserProfile = {
       studentDebt: { remainingDebt: 25000 },
       housing: { targetHomePrice: 500000 },
@@ -205,11 +206,11 @@ describe("profile recommendations", () => {
       income: { employmentType: "selfEmployed" },
     };
     const slugs = getRecommendedAppSlugsForProfile(profile, { availableSlugs });
-    expect(slugs.length).toBeLessThanOrEqual(3);
+    expect(slugs.length).toBeLessThanOrEqual(4);
     expect(new Set(slugs).size).toBe(slugs.length);
   });
 
-  it("returns max 3 unique recommendation objects", () => {
+  it("returns max 4 unique recommendation objects", () => {
     const recommendations = getRecommendedAppsForProfile(
       {
         studentDebt: { remainingDebt: 25000 },
@@ -221,7 +222,7 @@ describe("profile recommendations", () => {
     );
 
     const slugs = recommendations.map((item) => item.slug);
-    expect(recommendations.length).toBeLessThanOrEqual(3);
+    expect(recommendations.length).toBeLessThanOrEqual(4);
     expect(new Set(slugs).size).toBe(slugs.length);
   });
 

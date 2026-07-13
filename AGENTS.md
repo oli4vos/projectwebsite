@@ -56,6 +56,38 @@ Alles wat niet meer actief aangeroepen wordt in de zichtbare site blijft wel in 
 - Blijft de bestaande output exact gelijk of expliciet gemotiveerd gewijzigd?
 - Is de wijziging backward-compatible voor bestaande URL's en tools?
 
+## Invoer- en formulier-UX
+
+- Maak invoer in live tools overzichtelijk, rustig en stapsgewijs.
+- Vermijd lange lijsten met velden op één scherm; splits complexe flows op in duidelijke secties of stappen.
+- Toon alleen velden die relevant zijn voor de gemaakte keuzes.
+- Gebruik progressive disclosure voor verdiepende velden en scenario's.
+- Geef elk complex veld een korte toelichting, met waar nuttig een voorbeeld.
+- Gebruik begrijpelijke labels en geen interne DUO-termen zonder uitleg.
+- Vermeld per relevant veld waar de gebruiker het bedrag of de datum in Mijn DUO kan vinden.
+- Toon vóór de berekening een overzichtsscherm met alle ingevulde gegevens.
+- Maak duidelijk welke waarden uit Mijn DUO moeten worden overgenomen.
+- Geef duidelijke foutmeldingen naast het betreffende veld.
+- Laat gebruikers altijd teruggaan zonder invoer te verliezen.
+- Bewaar invoer lokaal volgens het bestaande profiel- en opslagmodel.
+- Maak bedragen, perioden en scenario's visueel goed onderscheidbaar.
+- Zorg dat formulieren goed werken op mobiel en desktop.
+- Gebruik waar mogelijk bestaande centrale formuliercomponenten in plaats van per tool afwijkende formulieren.
+- Houd labels, toetsenbordbediening, focus en foutmeldingen toegankelijk en semantisch correct.
+
+## PDF-functionaliteit
+
+- Voeg op iedere live calculator en relevante resultatenpagina een duidelijke knop toe: `Download uitgebreid PDF-overzicht`.
+- Gebruik één centrale PDF-laag en gedeelde PDF-componenten; bouw niet per tool een losse PDF-implementatie.
+- Laat de PDF dezelfde gevalideerde resultaatdata gebruiken als de webinterface en herbereken niets apart.
+- Houd PDF-data gescheiden van React-UI-componenten.
+- Genereer PDF's bij voorkeur client-side als dat betrouwbaar kan; gebruik alleen server- of serverlessverwerking wanneer dat aantoonbaar nodig is.
+- Voeg geen persoonlijke invoer toe aan logging of externe PDF-diensten.
+- De PDF bevat minimaal een voorblad, gegroepeerde invoer, uitgebreide resultaten, scenariovergelijking, tijdlijn, toelichting per uitkomst, regels en bronnen, aannames en beperkingen, en praktische actiepunten.
+- Zorg voor professioneel A4-ontwerp met duidelijke hoofdstukken, vaste kop- en voettekst, paginanummers, goede witruimte en correcte pagina-afbrekingen.
+- Vermeld per regel of bron de officiële bron, brontitel, URL, geldigheidsdatum en geraadpleegde datum wanneer dat relevant is voor de berekening.
+- Test PDF-data, verplichte secties, consistente uitkomsten, correcte bestandsnaam en de afstemming met de webinterface.
+
 ## UX- en frontendregels
 
 - Gebruikersbegrip en taakvoltooiing gaan voor technische voorkeur of visuele vernieuwing.
@@ -70,6 +102,7 @@ Alles wat niet meer actief aangeroepen wordt in de zichtbare site blijft wel in 
 - Respecteer `prefers-reduced-motion`. Voeg geen essentiële informatie toe die alleen via animatie zichtbaar is.
 - Nieuwe schermen bevatten ook relevante loading-, empty-, error- en disabled states.
 - Verander bestaande gebruikersstromen alleen met een expliciete motivatie en regressietest.
+- Nieuwe of aangepaste formulier- en PDF-flows volgen altijd de centrale componenten en gedeelde data- en formatlaag.
 - Werk bij UX-wijzigingen ook `UX_GUIDELINES.md`, `DESIGN_SYSTEM.md` of `docs/UX_AUDIT_2026-06-13.md` bij wanneer de standaard of status verandert.
 
 ## UX-check voor oplevering
