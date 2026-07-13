@@ -36,6 +36,10 @@ eindhypotheek = min(
 )
 ```
 
+Rentepercentages in de UI en het PDF-rapport worden met twee decimalen getoond.
+Dat is bewust zo gedaan zodat drempels zoals `4,01%` zichtbaar blijven, ook als
+de onderliggende berekening al op exactere waarden rekent.
+
 Eigen geld verhoogt de maximale hypotheek op inkomen niet. Het verlaagt het
 bedrag dat extern gefinancierd moet worden en kan aankoopkosten of een
 financieringstekort opvangen.

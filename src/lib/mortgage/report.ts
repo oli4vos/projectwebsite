@@ -59,7 +59,7 @@ function formatCurrency(value: number, maximumFractionDigits = 0) {
   }).format(Number.isFinite(value) ? value : 0);
 }
 
-function formatPercent(value: number, maximumFractionDigits = 1) {
+function formatPercent(value: number, maximumFractionDigits = 2) {
   return `${new Intl.NumberFormat("nl-NL", {
     minimumFractionDigits: maximumFractionDigits,
     maximumFractionDigits,

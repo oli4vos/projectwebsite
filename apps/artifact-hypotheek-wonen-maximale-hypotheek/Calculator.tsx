@@ -29,8 +29,8 @@ function formatCurrency(value: number, maximumFractionDigits = 0) {
 
 function formatPercent(value: number) {
   return new Intl.NumberFormat("nl-NL", {
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 1,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   }).format(value);
 }
 
@@ -253,6 +253,7 @@ export default function Calculator() {
               onChange={(value) => updateField("annualMortgageRate", value)}
               error={errors.annualMortgageRate}
               suffix="%"
+              hint="Bijv. 4,01%"
               className={mobileFlow.getFieldClassName("annualMortgageRate")}
             />
             <Field
@@ -261,6 +262,7 @@ export default function Calculator() {
               onChange={(value) => updateField("afmStressAnnualRate", value)}
               error={errors.afmStressAnnualRate}
               suffix="%"
+              hint="Bijv. 5,00%"
               className={mobileFlow.getFieldClassName("afmStressAnnualRate")}
             />
             <Field

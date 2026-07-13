@@ -7,7 +7,7 @@ describe("mortgage PDF report", () => {
   const input = {
     grossAnnualHouseholdIncome: 80_000,
     grossAnnualPartnerIncome: 0,
-    annualMortgageRate: 4.5,
+    annualMortgageRate: 4.01,
     fixedRatePeriodMonths: 120,
     mortgageTermYears: 30,
     monthlyDebtPayments: 0,
@@ -49,6 +49,9 @@ describe("mortgage PDF report", () => {
     expect(report.summaryLines.some((line) => line.label === "Impact op leencapaciteit")).toBe(true);
     expect(report.sections.some((section) => section.title === "Inkomens- en verplichtingentabel")).toBe(true);
     expect(report.sections.some((section) => section.title === "Woningwaarde, NHG en eigen middelen")).toBe(true);
+    expect(
+      report.timeline[2].lines.some((line) => line.label === "Werkelijke rente" && line.value === "4,01%"),
+    ).toBe(true);
 
     const ltvStep = report.timeline.find((step) => step.title === "Woningwaarde en LTV toetsen");
     expect(ltvStep?.lines.some(
@@ -84,7 +87,7 @@ describe("mortgage PDF report", () => {
     expect(result.breakdown.testRateUsed).toBe(5);
     expect(result.debug.interestRate).toBe(5);
     expect(report.timeline[2].formula).toContain("max(");
-    expect(report.timeline[3].lines.some((line) => line.value === "5,0%")).toBe(true);
+    expect(report.timeline[3].lines.some((line) => line.value === "5,00%")).toBe(true);
   });
 
   it("creates a stable filename from the final mortgage amount", () => {
