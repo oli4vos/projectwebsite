@@ -682,8 +682,8 @@ export default function DuoDoorlenenOfStoppenCalculator() {
       <DisclosureSection title="Wat betekent de hypotheekoptie?">
         <p className="text-[13px] leading-[1.7] text-[var(--muted)]">
           De hypotheekimpact gebruikt de centrale hypotheeklaag om een DUO-maandtermijn
-          indicatief om te rekenen naar minder leenruimte. De schenking, inkomenstoets
-          en daadwerkelijke acceptatie door een geldverstrekker zitten hier niet in.
+          indicatief om te rekenen naar minder leenruimte. Een echte hypotheekaanvraag,
+          eigen geld, woningwaarde en acceptatie door een geldverstrekker zitten hier niet in.
         </p>
       </DisclosureSection>
     </div>
