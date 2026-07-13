@@ -1,13 +1,8 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { appRegistry } from "@/lib/app-registry";
 import { AppRenderer } from "@/components/AppRenderer";
 import Link from "next/link";
-
-type PageProps = {
-  params: {
-    slug: string;
-  };
-};
 
 export async function generateStaticParams() {
   return appRegistry.map((app) => ({
@@ -15,16 +10,26 @@ export async function generateStaticParams() {
   }));
 }
 
-export async function generateMetadata({ params }: PageProps) {
-  const app = appRegistry.find((a) => a.slug === params.slug);
+type PageProps = {
+  params: Promise<{
+    slug: string;
+  }>;
+};
+
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const app = appRegistry.find((a) => a.slug === slug);
   return {
     title: app ? `${app.title} | GRIP v2` : "Tool | GRIP v2",
     description: app?.description || "Financiële calculator",
   };
 }
 
-export default function V2ToolPage({ params }: PageProps) {
-  const app = appRegistry.find((a) => a.slug === params.slug);
+export default async function V2ToolPage({ params }: PageProps) {
+  const { slug } = await params;
+  const app = appRegistry.find((a) => a.slug === slug);
 
   if (!app) {
     notFound();
@@ -65,10 +70,8 @@ export default function V2ToolPage({ params }: PageProps) {
       <div className="v2-section border-t border-[var(--v2-sage)]/10">
         <div className="v2-container text-center">
           <p className="v2-body-lg mb-4">Meer tools verkennen?</p>
-          <Link href="/v2/apps">
-            <button className="v2-btn v2-btn-secondary">
-              Terug naar alle tools
-            </button>
+          <Link href="/v2/apps" className="v2-btn v2-btn-secondary">
+            Terug naar alle tools
           </Link>
         </div>
       </div>

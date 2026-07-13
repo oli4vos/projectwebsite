@@ -1,4 +1,5 @@
 import "@/styles/v2-organisch.css";
+import type { ReactNode } from "react";
 import { V2Header } from "@/components/v2/V2Header";
 import { V2Footer } from "@/components/v2/V2Footer";
 
@@ -10,7 +11,7 @@ export const metadata = {
 export default function V2Layout({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <div className="v2-root min-h-screen flex flex-col">

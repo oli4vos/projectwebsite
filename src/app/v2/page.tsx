@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { BtnLink } from "@/components/ui";
 
 const scenarios = [
   {
@@ -47,10 +46,8 @@ export default function V2HomePage() {
           <p className="v2-body-lg max-w-2xl mb-8 text-[var(--v2-text-secondary)]">
             Drie vragen die veel starters hebben. Kies een onderwerp en zie wat je schuld voor jou betekent — met jouw eigen cijfers.
           </p>
-          <Link href="#scenarios" className="inline-block">
-            <button className="v2-btn v2-btn-primary">
-              Begin verkennen
-            </button>
+          <Link href="#scenarios" className="v2-btn v2-btn-primary">
+            Begin verkennen
           </Link>
         </div>
       </section>
@@ -96,10 +93,12 @@ export default function V2HomePage() {
           <p className="v2-body-lg text-white/90 mb-8">
             Ontdek alle tools en maak je eigen scenario met je eigen getallen.
           </p>
-          <Link href="/v2/apps">
-            <button className="v2-btn v2-btn-lg" style={{ background: "white", color: "var(--v2-sage)" }}>
-              Naar alle tools
-            </button>
+          <Link
+            href="/v2/apps"
+            className="v2-btn v2-btn-lg"
+            style={{ background: "white", color: "var(--v2-sage)" }}
+          >
+            Naar alle tools
           </Link>
         </div>
       </section>
@@ -114,9 +113,9 @@ export default function V2HomePage() {
             </p>
           </div>
           <div>
-            <p className="v2-eyebrow mb-2">Alleen huidge aannames</p>
+            <p className="v2-eyebrow mb-2">Alleen huidige aannames</p>
             <p className="v2-body-lg mb-4">
-              Alle percentages en normen zijn gebaseerd op actuele wettelijke bepalingen en officiele DUO-informatie.
+              Alle percentages en normen zijn gebaseerd op actuele wettelijke bepalingen en officiële DUO-informatie.
             </p>
           </div>
         </div>
