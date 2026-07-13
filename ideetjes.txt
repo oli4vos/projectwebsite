@@ -28,7 +28,8 @@
 - uiteindelijk ook een API aanbieden zodat mensen de rekentools in hun eigen website kunnen gebruiken als uithangbord.
 - uiteindelijk moeten alle logica lagen herbruikt worden en aangeroepen worden uit de algemene laag, denk bijvoorbeeld aan een jaarrente terugrekenen naar een maandrente.
 - in MD opnemen dat alles wat zichtbaar is voor gebruikers ten alle tijden in het nederlands moet zijn
-
+- verwerk ook dat rentepercentages overal tot 2 cijfers achter de komma kunnen, test dit uitgebreid bij de hypotheek tool, hier is dit heel belangrijk want soms wil je op 4,01 uitkomen bv zodat je net iets meer kan lenen, reken ook altijd op de achtergrond uit of het opsplitsen van leningdelen om op bv 4,01 uit te komen zodat er naar een ander financieringslast percentage gesprongen wordt mogelijk meer leenruimte ontstaat
+- Zet alles op github op private wat nu niet gebruikt wordt voor de website
 
 buiten doelgroep:
 - impact private lease op hypotheek
@@ -48,3 +49,5 @@ Basis ideeen eerste platform:
 
 
 NHG calculator scrapen
+
+Belangrijk dat er altijd gekeken wordt of berekeneingen in een centrale laag gebeuren en nergens in het project dubbel
