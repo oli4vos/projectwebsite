@@ -271,7 +271,7 @@ export default function DuoMaandbedragCalculator() {
         <ResultCard
           label="Wettelijke maandtermijn"
           value={formatCurrency(view.statutoryMonthlyPayment)}
-          note={`${view.termYears} jaar, ${formatPercent(view.annualInterestRate)}% gewogen DUO-rente.`}
+          note={`${view.termYears} jaar, ${formatPercent(view.annualInterestRate)}% gewogen DUO-rente. Dit is je verplichte basis; alles daarboven is extra aflossen.`}
         />
         <ResultCard
           label={view.incomeBased ? "DUO hanteert indicatief" : "Draagkracht"}
@@ -282,7 +282,7 @@ export default function DuoMaandbedragCalculator() {
           }
           note={
             view.incomeBased
-              ? "DUO vergelijkt draagkracht met de wettelijke termijn en gebruikt het laagste bedrag."
+              ? "DUO vergelijkt draagkracht met de wettelijke termijn en gebruikt het laagste bedrag. Het verschil tussen dat bedrag en de wettelijke termijn is geen verplichting maar extra aflossen."
               : "Vul toetsingsinkomen in om een draagkrachtindicatie te zien."
           }
           tone={view.incomeBased ? "warn" : "default"}
@@ -350,7 +350,9 @@ export default function DuoMaandbedragCalculator() {
           </h1>
           <p className="mt-3 text-[15px] leading-[1.7] text-[var(--muted)]">
             Bereken feitelijk welk maandbedrag bij je studieschuld hoort. Met
-            inkomen erbij zie je ook een indicatieve draagkrachtgrens.
+            inkomen erbij zie je ook een indicatieve draagkrachtgrens. Het
+            wettelijke maandbedrag is de verplichte basis; alles daarboven is
+            extra aflossen en dus een keuze.
           </p>
         </>
       }

@@ -398,7 +398,9 @@ export default function DuoExtraAflossenCalculator() {
           </h1>
           <p className="mt-3 text-[15px] leading-[1.7] text-[var(--muted)]">
             Bekijk feitelijk wat een eenmalige of maandelijkse extra DUO-aflossing
-            doet met je maandtermijn, einddatum en rentelast.
+            doet met je maandtermijn, einddatum en rentelast. Je wettelijke
+            maandbedrag blijft de basis; alles daarboven is vrijwillig extra
+            aflossen.
           </p>
         </>
       }
@@ -440,7 +442,8 @@ export default function DuoExtraAflossenCalculator() {
       disclaimer={
         <p className="rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] p-4 text-[12.5px] leading-[1.7] text-[var(--muted)]">
           Puur informatieve DUO-indicatie. Geen advies en geen persoonlijke
-          keuzehulp. Controleer wijzigingen altijd in Mijn DUO.
+          keuzehulp. Het wettelijke maandbedrag is verplicht; extra aflossen
+          is vrijwillig. Controleer wijzigingen altijd in Mijn DUO.
         </p>
       }
     />
