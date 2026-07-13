@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
+  applyExtraRepaymentToDuoDebtPortfolio,
+  calculateDuoDebtPortfolio,
   calculateDuoExtraRepaymentProjection,
   calculateDuoMonthlyPaymentAfterExtraRepayment,
   calculateExtraRepaymentVsInvesting,
@@ -238,5 +240,60 @@ describe("DUO calculations", () => {
     expect(result.futureValueIfInvested).toBeGreaterThan(5000);
     expect(Number.isFinite(result.differenceInvestingVsRepayment)).toBe(true);
     expect(Number.isFinite(result.monthlyPaymentReduction)).toBe(true);
+  });
+
+  it("supports selecting an official historical DUO rate year for a single debt", () => {
+    const currentRate = calculateStatutoryDuoMonthlyPayment({
+      repaymentRule: "SF35",
+      remainingDebt: 30000,
+      duoRateYear: 2026,
+      remainingTermYears: 35,
+    });
+    const historicalRate = calculateStatutoryDuoMonthlyPayment({
+      repaymentRule: "SF35",
+      remainingDebt: 30000,
+      duoRateYear: 2023,
+      remainingTermYears: 35,
+    });
+
+    expect(historicalRate).toBeLessThan(currentRate);
+  });
+
+  it("sums statutory DUO payments across debt parts with different rate years", () => {
+    const portfolio = calculateDuoDebtPortfolio({
+      repaymentRule: "SF35",
+      remainingTermYears: 35,
+      debtParts: [
+        { label: "2024-deel", remainingDebt: 10000, rateYear: 2024 },
+        { label: "2026-deel", remainingDebt: 15000, rateYear: 2026 },
+      ],
+    });
+
+    expect(portfolio.usesDebtParts).toBe(true);
+    expect(portfolio.totalDebt).toBe(25000);
+    expect(portfolio.parts).toHaveLength(2);
+    expect(portfolio.totalStatutoryMonthlyPayment).toBeCloseTo(
+      portfolio.parts[0].statutoryMonthlyPayment + portfolio.parts[1].statutoryMonthlyPayment,
+      2,
+    );
+  });
+
+  it("applies an extra repayment to the highest-rate debt part first", () => {
+    const allocation = applyExtraRepaymentToDuoDebtPortfolio({
+      repaymentRule: "SF35",
+      remainingTermYears: 35,
+      debtParts: [
+        { label: "laag", remainingDebt: 10000, rateYear: 2023 },
+        { label: "hoog", remainingDebt: 8000, rateYear: 2025 },
+      ],
+      extraRepaymentAmount: 3000,
+    });
+
+    const highRatePart = allocation.parts.find((part) => part.label === "hoog");
+    const lowRatePart = allocation.parts.find((part) => part.label === "laag");
+
+    expect(highRatePart?.extraRepaymentApplied).toBe(3000);
+    expect(lowRatePart?.extraRepaymentApplied).toBe(0);
+    expect(allocation.newRemainingDebt).toBe(15000);
   });
 });

@@ -1,21 +1,31 @@
 import {
+  getAvailableDuoRateYears,
   getDefaultFinancialYear,
   getDuoDefaultTermForRule,
-  getDuoRateForRule,
   getFinancialConstants,
 } from "@/lib/financial-constants";
 import {
+  calculateDuoDebtPortfolio,
   calculateDuoExtraRepaymentProjection,
-  calculateStatutoryDuoMonthlyPayment,
+  type DuoDebtPortfolioSummary,
   type DuoExtraRepaymentProjectionResult,
   type ExtraRepaymentStrategy,
   type RepaymentRule,
 } from "@/lib/duo";
+import {
+  createDefaultDuoDebtPartFormValues,
+  type DuoDebtPartFieldErrors,
+  type DuoDebtPartFormValue,
+  validateDuoDebtPartFormValues,
+} from "@/lib/duo/debt-parts-form";
 import { parseOptionalDecimalInput } from "@/lib/number-input";
 
 export type DuoExtraRepaymentFormValues = {
   remainingDebt: string;
   repaymentRule: RepaymentRule;
+  duoRateYear: string;
+  useDebtParts: boolean;
+  debtParts: DuoDebtPartFormValue[];
   currentMonthlyPayment: string;
   oneTimeExtraRepayment: string;
   monthlyExtraRepayment: string;
@@ -23,7 +33,7 @@ export type DuoExtraRepaymentFormValues = {
 };
 
 export type DuoExtraRepaymentErrors = Partial<
-  Record<keyof DuoExtraRepaymentFormValues, string>
+  Record<keyof DuoExtraRepaymentFormValues | "debtParts", string>
 >;
 
 export type DuoExtraRepaymentChartData = {
@@ -37,14 +47,20 @@ export type DuoExtraRepaymentView =
       isValid: false;
       errors: DuoExtraRepaymentErrors;
       year: number;
+      debtPartErrors: Record<string, DuoDebtPartFieldErrors>;
+      debtPartsTotal: number;
     }
   | {
       isValid: true;
       errors: DuoExtraRepaymentErrors;
       year: number;
+      duoRateYear: number;
       annualInterestRate: number;
       termYears: number;
       statutoryMonthlyPayment: number;
+      debtPortfolio: DuoDebtPortfolioSummary;
+      debtPartErrors: Record<string, DuoDebtPartFieldErrors>;
+      debtPartsTotal: number;
       normVersion: string;
       result: DuoExtraRepaymentProjectionResult;
       chart: DuoExtraRepaymentChartData;
@@ -66,10 +82,17 @@ export const repaymentRuleOptions: RepaymentRule[] = [
   "UNKNOWN",
 ];
 
+function getDefaultRateYear() {
+  return getAvailableDuoRateYears(1)[0] ?? getDefaultFinancialYear();
+}
+
 export function createDuoExtraRepaymentDefaultValues(): DuoExtraRepaymentFormValues {
   return {
     remainingDebt: "25000",
     repaymentRule: "SF35",
+    duoRateYear: String(getDefaultRateYear()),
+    useDebtParts: false,
+    debtParts: createDefaultDuoDebtPartFormValues(),
     currentMonthlyPayment: "",
     oneTimeExtraRepayment: "1000",
     monthlyExtraRepayment: "50",
@@ -81,6 +104,9 @@ export function createEmptyDuoExtraRepaymentValues(): DuoExtraRepaymentFormValue
   return {
     remainingDebt: "",
     repaymentRule: "SF35",
+    duoRateYear: String(getDefaultRateYear()),
+    useDebtParts: false,
+    debtParts: createDefaultDuoDebtPartFormValues(),
     currentMonthlyPayment: "",
     oneTimeExtraRepayment: "",
     monthlyExtraRepayment: "",
@@ -101,17 +127,34 @@ export function validateDuoExtraRepaymentForm(
   values: DuoExtraRepaymentFormValues,
 ): DuoExtraRepaymentErrors {
   const errors: DuoExtraRepaymentErrors = {};
+  const supportedRateYears = new Set(getAvailableDuoRateYears());
   const remainingDebt = parseOptionalDecimalInput(values.remainingDebt);
   const currentMonthlyPayment = parseOptionalDecimalInput(values.currentMonthlyPayment);
   const oneTimeExtraRepayment = parseOptionalDecimalInput(values.oneTimeExtraRepayment);
   const monthlyExtraRepayment = parseOptionalDecimalInput(values.monthlyExtraRepayment);
+  const duoRateYear = Number.parseInt(values.duoRateYear, 10);
+  const debtPartsValidation = validateDuoDebtPartFormValues(values.debtParts);
+  const totalDebt = values.useDebtParts
+    ? debtPartsValidation.totalDebt
+    : (parseOptionalDecimalInput(values.remainingDebt) ?? 0);
 
-  if (remainingDebt === undefined || !Number.isFinite(remainingDebt) || remainingDebt < 0) {
+  if (
+    !values.useDebtParts &&
+    (remainingDebt === undefined || !Number.isFinite(remainingDebt) || remainingDebt < 0)
+  ) {
     errors.remainingDebt = "Gebruik 0 of een hogere openstaande studieschuld.";
   }
 
   if (!repaymentRuleOptions.includes(values.repaymentRule)) {
     errors.repaymentRule = "Kies een geldige terugbetalingsregel.";
+  }
+
+  if (!values.useDebtParts) {
+    if (!Number.isInteger(duoRateYear) || !supportedRateYears.has(duoRateYear)) {
+      errors.duoRateYear = "Kies een DUO-rentejaar uit de laatste 5 jaar.";
+    }
+  } else if (debtPartsValidation.sanitizedParts.length === 0) {
+    errors.debtParts = "Voeg minimaal één leningdeel toe met bedrag en rentejaar.";
   }
 
   if (
@@ -139,6 +182,15 @@ export function validateDuoExtraRepaymentForm(
       monthlyExtraRepayment < 0)
   ) {
     errors.monthlyExtraRepayment = "Gebruik 0 of een hoger extra maandbedrag.";
+  }
+
+  if (
+    oneTimeExtraRepayment !== undefined &&
+    totalDebt > 0 &&
+    oneTimeExtraRepayment > totalDebt
+  ) {
+    errors.oneTimeExtraRepayment =
+      "Extra aflossen kan in deze tool niet hoger zijn dan je openstaande schuld.";
   }
 
   return errors;
@@ -173,27 +225,38 @@ export function calculateDuoExtraRepaymentView(
 ): DuoExtraRepaymentView {
   const errors = validateDuoExtraRepaymentForm(values);
   const year = context.year ?? getDefaultFinancialYear();
+  const debtPartsValidation = validateDuoDebtPartFormValues(values.debtParts);
 
   if (Object.keys(errors).length > 0) {
-    return { isValid: false, errors, year };
+    return {
+      isValid: false,
+      errors,
+      year,
+      debtPartErrors: debtPartsValidation.errorsById,
+      debtPartsTotal: debtPartsValidation.totalDebt,
+    };
   }
 
-  const remainingDebt = parseOptionalDecimalInput(values.remainingDebt) ?? 0;
-  const annualInterestRate =
-    context.annualInterestRate ?? getDuoRateForRule(values.repaymentRule, year);
+  const duoRateYear = Number.parseInt(values.duoRateYear, 10) || year;
   const termYears =
     context.remainingTermYears ?? getDuoDefaultTermForRule(values.repaymentRule, year);
-  const statutoryMonthlyPayment = calculateStatutoryDuoMonthlyPayment({
-    remainingDebt,
-    annualInterestRate,
-    remainingTermYears: termYears,
+  const debtPortfolio = calculateDuoDebtPortfolio({
     repaymentRule: values.repaymentRule,
+    remainingDebt: parseOptionalDecimalInput(values.remainingDebt) ?? 0,
+    annualInterestRate: context.annualInterestRate,
+    duoRateYear,
+    remainingTermYears: termYears,
+    debtParts: values.useDebtParts ? debtPartsValidation.sanitizedParts : undefined,
   });
+  const annualInterestRate = debtPortfolio.blendedAnnualInterestRate;
+  const statutoryMonthlyPayment = debtPortfolio.totalStatutoryMonthlyPayment;
   const result = calculateDuoExtraRepaymentProjection({
-    remainingDebt,
-    annualInterestRate,
-    remainingTermYears: termYears,
+    remainingDebt: debtPortfolio.totalDebt,
     repaymentRule: values.repaymentRule,
+    annualInterestRate: context.annualInterestRate,
+    duoRateYear,
+    remainingTermYears: termYears,
+    debtParts: values.useDebtParts ? debtPartsValidation.sanitizedParts : undefined,
     monthlyPayment: parseOptionalDecimalInput(values.currentMonthlyPayment),
     extraRepaymentAmount: parseOptionalDecimalInput(values.oneTimeExtraRepayment),
     extraMonthlyAmount: parseOptionalDecimalInput(values.monthlyExtraRepayment),
@@ -205,9 +268,13 @@ export function calculateDuoExtraRepaymentView(
     isValid: true,
     errors,
     year,
+    duoRateYear,
     annualInterestRate,
     termYears,
     statutoryMonthlyPayment,
+    debtPortfolio,
+    debtPartErrors: debtPartsValidation.errorsById,
+    debtPartsTotal: debtPartsValidation.totalDebt,
     normVersion: getNormVersion(year, context.normVersion),
     result,
     chart: buildChartData(result),

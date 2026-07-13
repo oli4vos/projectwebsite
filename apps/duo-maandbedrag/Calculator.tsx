@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { DuoDebtPartsEditor } from "@/components/duo/DuoDebtPartsEditor";
 import { DisclosureSection } from "@/components/DisclosureSection";
 import { FieldError } from "@/components/forms/FieldError";
 import { ResultCard } from "@/components/ResultCard";
@@ -8,6 +9,10 @@ import { ResultRow } from "@/components/ResultRow";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
 import { getRepaymentRuleLabel } from "@/lib/copy-glossary";
+import {
+  createDuoDebtPartFormValue,
+  type DuoDebtPartFormValue,
+} from "@/lib/duo/debt-parts-form";
 import {
   calculateDuoMonthlyPaymentView,
   createDuoMonthlyPaymentDefaultValues,
@@ -81,6 +86,64 @@ export default function DuoMaandbedragCalculator() {
     setFormValues((current) => ({ ...current, [field]: value }));
   }
 
+  function updateDebtPart(
+    id: string,
+    field: keyof Pick<DuoDebtPartFormValue, "amount" | "rateYear">,
+    value: string,
+  ) {
+    setFormValues((current) => ({
+      ...current,
+      debtParts: current.debtParts.map((part) =>
+        part.id === id ? { ...part, [field]: value } : part,
+      ),
+    }));
+  }
+
+  function addDebtPart() {
+    setFormValues((current) => ({
+      ...current,
+      debtParts: [...current.debtParts, createDuoDebtPartFormValue()],
+    }));
+  }
+
+  function removeDebtPart(id: string) {
+    setFormValues((current) => ({
+      ...current,
+      debtParts:
+        current.debtParts.length > 1
+          ? current.debtParts.filter((part) => part.id !== id)
+          : current.debtParts,
+    }));
+  }
+
+  function toggleDebtParts(enabled: boolean) {
+    setFormValues((current) => {
+      if (!enabled) {
+        return { ...current, useDebtParts: false };
+      }
+
+      const nextParts =
+        current.debtParts.length > 0
+          ? current.debtParts
+          : [createDuoDebtPartFormValue()];
+      const firstPart = nextParts[0];
+
+      return {
+        ...current,
+        useDebtParts: true,
+        debtParts: nextParts.map((part, index) =>
+          index === 0 && part.amount.trim().length === 0 && current.remainingDebt.trim().length > 0
+            ? { ...part, amount: current.remainingDebt }
+            : part,
+        ),
+        duoRateYear:
+          current.duoRateYear.trim().length > 0
+            ? current.duoRateYear
+            : firstPart.rateYear,
+      };
+    });
+  }
+
   const inputs = (
     <div className="space-y-5">
       <MoneyField
@@ -89,7 +152,11 @@ export default function DuoMaandbedragCalculator() {
         value={formValues.remainingDebt}
         error={view.errors.remainingDebt}
         prefix="€"
-        hint="Bedrag bij DUO"
+        hint={
+          formValues.useDebtParts
+            ? "Wordt overschreven door leningdelen"
+            : "Bedrag bij DUO"
+        }
         onChange={(value) => updateField("remainingDebt", value)}
       />
 
@@ -101,7 +168,10 @@ export default function DuoMaandbedragCalculator() {
           id="repaymentRule"
           value={formValues.repaymentRule}
           onChange={(event) =>
-            updateField("repaymentRule", event.target.value as DuoMonthlyPaymentFormValues["repaymentRule"])
+            updateField(
+              "repaymentRule",
+              event.target.value as DuoMonthlyPaymentFormValues["repaymentRule"],
+            )
           }
           className="ring-focus hair h-12 rounded-md border bg-white px-3 text-[15px] text-[var(--ink)] outline-none"
         >
@@ -113,6 +183,43 @@ export default function DuoMaandbedragCalculator() {
         </select>
         <FieldError message={view.errors.repaymentRule} />
       </label>
+
+      {!formValues.useDebtParts ? (
+        <label className="grid gap-2" htmlFor="duoRateYear">
+          <span className="text-[12px] font-medium uppercase tracking-[0.04em] text-[var(--muted)]">
+            DUO-rentejaar
+          </span>
+          <select
+            id="duoRateYear"
+            value={formValues.duoRateYear}
+            onChange={(event) => updateField("duoRateYear", event.target.value)}
+            className="ring-focus hair h-12 rounded-md border bg-white px-3 text-[15px] text-[var(--ink)] outline-none"
+          >
+            {[2026, 2025, 2024, 2023, 2022].map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </select>
+          <p className="text-[12px] leading-[1.5] text-[var(--soft)]">
+            DUO stelt voor terugbetalers elk jaar een nieuw rentepercentage vast
+            dat daarna 5 jaar blijft staan.
+          </p>
+          <FieldError message={view.errors.duoRateYear} />
+        </label>
+      ) : null}
+
+      <DuoDebtPartsEditor
+        enabled={formValues.useDebtParts}
+        parts={formValues.debtParts}
+        totalDebt={view.debtPartsTotal}
+        errorsById={view.debtPartErrors}
+        onToggle={toggleDebtParts}
+        onPartChange={updateDebtPart}
+        onAddPart={addDebtPart}
+        onRemovePart={removeDebtPart}
+      />
+      <FieldError message={view.errors.debtParts} />
 
       <MoneyField
         id="assessmentIncome"
@@ -164,7 +271,7 @@ export default function DuoMaandbedragCalculator() {
         <ResultCard
           label="Wettelijke maandtermijn"
           value={formatCurrency(view.statutoryMonthlyPayment)}
-          note={`${view.termYears} jaar, ${formatPercent(view.annualInterestRate)}% DUO-rente.`}
+          note={`${view.termYears} jaar, ${formatPercent(view.annualInterestRate)}% gewogen DUO-rente.`}
         />
         <ResultCard
           label={view.incomeBased ? "DUO hanteert indicatief" : "Draagkracht"}
@@ -189,13 +296,21 @@ export default function DuoMaandbedragCalculator() {
         <div className="mt-3">
           <ResultRow label="Openstaande schuld" value={formatCurrency(view.remainingDebt)} />
           <ResultRow label="Regeling" value={getRepaymentRuleLabel(view.repaymentRule)} />
-          <ResultRow label="DUO-rente" value={`${formatPercent(view.annualInterestRate)}%`} />
+          <ResultRow label="DUO-rentejaar" value={String(view.duoRateYear)} />
+          <ResultRow label="Gewogen DUO-rente" value={`${formatPercent(view.annualInterestRate)}%`} />
           <ResultRow label="Looptijd" value={`${view.termYears} jaar`} />
           <ResultRow
             label="Wettelijke termijn"
             value={formatCurrency(view.statutoryMonthlyPayment)}
             strong
           />
+          {view.debtPortfolio.usesDebtParts ? (
+            <ResultRow
+              label="Leningdelen"
+              value={`${view.debtPortfolio.parts.length} delen`}
+              sub="Per deel wordt het gekozen rentejaar apart doorgerekend."
+            />
+          ) : null}
           {view.incomeBased ? (
             <>
               <ResultRow
@@ -251,9 +366,26 @@ export default function DuoMaandbedragCalculator() {
                   DUO stelt je draagkracht jaarlijks vast op basis van je inkomen
                   van twee jaar terug. Deze indicatie vervangt die vaststelling niet.
                 </li>
+                <li>
+                  Voor terugbetalers blijft een gekozen DUO-rente doorgaans 5 jaar vaststaan.
+                </li>
                 <li>Bijzondere situaties kunnen in Mijn DUO anders uitpakken.</li>
               </ul>
             </DisclosureSection>
+            {view.debtPortfolio.usesDebtParts ? (
+              <DisclosureSection title="Gebruikte leningdelen">
+                <div className="space-y-2 text-[13px] leading-[1.65] text-[var(--muted)]">
+                  {view.debtPortfolio.parts.map((part) => (
+                    <ResultRow
+                      key={part.key}
+                      label={part.label}
+                      value={formatCurrency(part.remainingDebt)}
+                      sub={`${part.rateYear} • ${formatPercent(part.annualInterestRate)}% • ${formatCurrency(part.statutoryMonthlyPayment)} p/m`}
+                    />
+                  ))}
+                </div>
+              </DisclosureSection>
+            ) : null}
           </div>
         ) : null
       }

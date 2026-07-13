@@ -10,6 +10,8 @@ Het doel van dit bestand:
 - heractivatie voorspelbaar maken;
 - per wijziging traceerbaar houden wat er aan/uit is gezet.
 
+Standaardregel: als een tool, route of flow niet meer actief aangeroepen wordt in de zichtbare site, hoort die niet publiek zichtbaar te blijven. Houd de code dan wel in de codebase, maar zet de manifest- en route-exposure op `hidden-draft` of `uitgeschakeld` en leg de wijziging hier vast.
+
 ## Verplichte werkwijze voor agents
 
 Bij **elke** functionele wijziging (nieuwe feature, flag-toggle, hidden/public wijziging, UX-pad aan/uit):
@@ -36,7 +38,7 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 | Toolbibliotheek + categorie-navigatie | actief | n.v.t. | aan | Homepage en routes draaien publiek | n.v.t. |
 | Financiële kennisbank (`/kennisbank`) | actief | n.v.t. | aan | Centrale studieschuld-kennislaag met DUO-bronnen, hidden oude horizon-/beleggingskaders | n.v.t. |
 | Publieke calculators (app-registry) | actief | `visibility: "public"` | aan | 7 publieke tools in de huidige registry | n.v.t. |
-| Draft tools (concept) | hidden-draft | `visibility: "hidden"` | uit | 155 manifests zijn niet publiek; valideer per tool vóór publicatie | zet manifest op `public` + checks draaien |
+| Draft tools (concept) | hidden-draft | `visibility: "hidden"` | uit | Alle tools en flows die niet meer actief aangeroepen worden blijven hier verborgen totdat er expliciet heractivatie is | zet manifest op `public` + checks draaien |
 | Studieschuld-vs-beleggen | hidden-draft | `visibility: "hidden"` | uit | Bewust uit zichtbare positionering; code behouden voor mogelijke latere heractivatie | alleen heractiveren met nieuwe productbeslissing + copycheck |
 | Volgende euro | hidden-draft | `visibility: "hidden"` | uit | Bewust uit zichtbare positionering; route niet meer gelinkt vanuit publieke UI | alleen heractiveren met nieuwe productbeslissing + copycheck |
 | DUO-maandbedrag | experimenteel | `visibility: "public"` | aan | Nieuwe fase-2-tool voor wettelijke maandtermijn en optionele draagkrachtindicatie | n.v.t. |

@@ -174,6 +174,7 @@ De generator valideert minimaal:
 De browser doet geen filesystem-discovery. Alleen de gegenereerde registry en lazy imports worden gebruikt.
 
 Tools met `"visibility": "hidden"` blijven in de codebase, maar worden niet in de gegenereerde dashboard/route-registry opgenomen.
+Als een tool of flow niet meer actief aangeroepen wordt in de zichtbare site, hoort die ook hidden te blijven totdat er expliciet een heractivatiebesluit is.
 
 ## Architectuur in het kort
 
@@ -206,6 +207,7 @@ Belangrijke centrale rekenlagen:
 De zichtbare site gaat over studieschuld begrijpen. Publieke copy blijft feitelijk en informatief: geen persoonlijk financieel advies, geen beleggingsadvies en geen aflossen-vs-beleggen-route in de zichtbare site.
 
 Verborgen tools blijven in de codebase om later veilig te kunnen heractiveren. `FUNCTIONALITY_STATUS.md` is leidend voor welke tools en flows publiek zichtbaar zijn.
+Inactieve tools worden daarbij standaard uit de publieke registry en navigatie gehouden.
 
 ## Build en deploy
 

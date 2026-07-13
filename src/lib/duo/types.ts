@@ -21,11 +21,40 @@ export type DuoPaymentSource =
 
 export type ExtraRepaymentStrategy = "lowerMonthlyPayment" | "shortenTerm";
 
+export type DuoDebtPartInput = {
+  label?: string;
+  remainingDebt?: number;
+  rateYear?: number;
+  annualInterestRate?: number;
+};
+
+export type DuoDebtPartResolved = {
+  key: string;
+  label: string;
+  remainingDebt: number;
+  rateYear: number;
+  annualInterestRate: number;
+  statutoryMonthlyPayment: number;
+  debtShare: number;
+};
+
+export type DuoDebtPortfolioSummary = {
+  usesDebtParts: boolean;
+  totalDebt: number;
+  totalStatutoryMonthlyPayment: number;
+  blendedAnnualInterestRate: number;
+  rateYearUsed: number;
+  parts: DuoDebtPartResolved[];
+  warnings: string[];
+};
+
 export type DuoRepaymentInput = {
   remainingDebt?: number;
   annualInterestRate?: number;
+  duoRateYear?: number;
   remainingTermYears?: number;
   repaymentRule?: RepaymentRule;
+  debtParts?: DuoDebtPartInput[];
 };
 
 export type DuoIncomeBasedInput = {

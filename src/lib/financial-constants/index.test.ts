@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
   getAvailableFinancialYears,
+  getAvailableDuoRateYears,
   getDefaultFinancialYear,
   getDuoBorrowingLimits,
   getDuoRateForRule,
+  getDuoHistoricalRateYearForRule,
   getFinancialConstants,
   getMortgageFinancingLoadRatio,
   getMortgageFinancingLoadTable,
@@ -25,6 +27,19 @@ describe("financial constants helpers", () => {
 
   it("returns expected DUO rate for SF35 in 2026", () => {
     expect(getDuoRateForRule("SF35", 2026)).toBe(2.33);
+  });
+
+  it("returns the last five official DUO rate years in descending order", () => {
+    expect(getAvailableDuoRateYears()).toEqual([2026, 2025, 2024, 2023, 2022]);
+    expect(getDuoRateForRule("SF35", 2025)).toBe(2.57);
+    expect(getDuoRateForRule("SF15", 2024)).toBe(2.95);
+    expect(getDuoRateForRule("SF35", 2023)).toBe(0.46);
+  });
+
+  it("maps a historical DUO interest rate back to its rate year", () => {
+    expect(getDuoHistoricalRateYearForRule("SF35", 2.33)).toBe(2026);
+    expect(getDuoHistoricalRateYearForRule("SF15", 2.95)).toBe(2024);
+    expect(getDuoHistoricalRateYearForRule("SF35", 9.99)).toBeUndefined();
   });
 
   it("exposes central DUO borrowing limits for tool sliders", () => {

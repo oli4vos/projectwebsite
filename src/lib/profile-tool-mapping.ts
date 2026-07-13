@@ -1,3 +1,4 @@
+import { getDuoHistoricalRateYearForRule } from "@/lib/financial-constants";
 import type {
   ProfileDuoSituation,
   ProfileRepaymentRule,
@@ -113,7 +114,7 @@ type MortgageImpactDefaults = Partial<{
   statutoryMonthlyPayment: string;
   repaymentRule: ProfileRepaymentRule;
   situation: ProfileDuoSituation;
-  duoInterestRate: string;
+  duoRateYear: string;
   remainingTermYears: string;
   desiredHomePrice: string;
   ownMoney: string;
@@ -281,9 +282,16 @@ export function getMortgageImpactDefaultsFromProfile(
     defaults.situation = profile.studentDebt.duoSituation;
   }
 
-  const duoInterestRate = toStringValue(profile.studentDebt?.duoInterestRate);
-  if (duoInterestRate !== undefined) {
-    defaults.duoInterestRate = duoInterestRate;
+  if (profile.studentDebt?.duoInterestRate !== undefined) {
+    const repaymentRule = profile.studentDebt.repaymentRule ?? "SF35";
+    const duoRateYear = getDuoHistoricalRateYearForRule(
+      repaymentRule,
+      profile.studentDebt.duoInterestRate,
+    );
+
+    if (duoRateYear !== undefined) {
+      defaults.duoRateYear = String(duoRateYear);
+    }
   }
 
   const remainingTermYears = toStringValue(profile.studentDebt?.remainingTermYears);

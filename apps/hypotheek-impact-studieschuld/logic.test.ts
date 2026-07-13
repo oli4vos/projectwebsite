@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { DuoDebtPartInput } from "@/lib/duo";
 import {
   calculateAnnuityPayment,
   calculateExtraRepaymentScenario,
@@ -103,6 +104,27 @@ describe("hypotheek-impact-studieschuld logic", () => {
     expect(result.mortgageImpact.principalImpact).toBeGreaterThanOrEqual(0);
     expect(Number.isFinite(result.mortgageImpact.principalImpact)).toBe(true);
     expect(result.remainingStudentDebt).toBe(0);
+  });
+
+  it("supports historical DUO rate years and split debt parts", () => {
+    const duoDebtParts: DuoDebtPartInput[] = [
+      { label: "Deel 1", remainingDebt: 16000, rateYear: 2026 },
+      { label: "Deel 2", remainingDebt: 9000, rateYear: 2024 },
+    ];
+
+    const result = calculateHypotheekImpact({
+      ...baseInput,
+      remainingStudentDebt: 0,
+      duoRateYear: 2026,
+      duoDebtParts,
+      duoInterestRate: undefined,
+    });
+
+    expect(result.debtPortfolio.usesDebtParts).toBe(true);
+    expect(result.debtPortfolio.parts).toHaveLength(2);
+    expect(result.remainingStudentDebt).toBe(25000);
+    expect(result.duoRateUsed).toBeGreaterThan(2.33);
+    expect(result.mortgageImpact.bruteringBaseMonthlyPayment).toBeGreaterThan(0);
   });
 
   it("keeps public mortgage helper facades aligned with the shared mortgage layer", () => {

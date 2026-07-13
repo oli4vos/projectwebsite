@@ -44,6 +44,18 @@ describe("profile tool mapping", () => {
     expect(mapped.mortgageRate).toBe("4.1");
   });
 
+  it("maps mortgage-impact duo rate year from the stored DUO interest rate", () => {
+    const profile: UserProfile = {
+      studentDebt: {
+        repaymentRule: "SF35",
+        duoInterestRate: 2.33,
+      },
+    };
+
+    const mapped = getMortgageImpactDefaultsFromProfile(profile);
+    expect(mapped.duoRateYear).toBe("2026");
+  });
+
   it("maps student-debt-vs-investing defaults and falls back fiscal partner from household", () => {
     const profile: UserProfile = {
       income: {

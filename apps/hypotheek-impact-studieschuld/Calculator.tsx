@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { DuoDebtPartsEditor } from "@/components/duo/DuoDebtPartsEditor";
 import { DisclosureSection } from "@/components/DisclosureSection";
 import { MobileFieldFlowControls } from "@/components/MobileFieldFlowControls";
 import { ResultRow } from "@/components/ResultRow";
@@ -12,7 +13,13 @@ import { useMobileFieldFlow } from "@/hooks/useMobileFieldFlow";
 import { useSubmittedCalculation } from "@/hooks/useSubmittedCalculation";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { getGlossaryExplanation } from "@/lib/copy-glossary";
-import { getFinancialConstants } from "@/lib/financial-constants";
+import { getAvailableDuoRateYears, getFinancialConstants } from "@/lib/financial-constants";
+import {
+  createDuoDebtPartFormValue,
+  createDefaultDuoDebtPartFormValues,
+  type DuoDebtPartFormValue,
+  validateDuoDebtPartFormValues,
+} from "@/lib/duo/debt-parts-form";
 import { parseOptionalDecimalInput } from "@/lib/number-input";
 import {
   createProfilePrefillState,
@@ -22,7 +29,6 @@ import { getMortgageImpactDefaultsFromProfile } from "@/lib/profile-tool-mapping
 import {
   LAST_CHECKED,
   calculateHypotheekImpact,
-  getDefaultDuoRate,
   getDefaultTerm,
   type DuoSituation,
   type HypotheekImpactInput,
@@ -38,7 +44,9 @@ type FormState = {
   actualMonthlyPayment: string;
   statutoryMonthlyPayment: string;
   remainingStudentDebt: string;
-  duoInterestRate: string;
+  duoRateYear: string;
+  useDebtParts: boolean;
+  debtParts: DuoDebtPartFormValue[];
   remainingTermYears: string;
   extraRepayment: string;
   grossIncomeUser: string;
@@ -51,7 +59,11 @@ type FormState = {
   showAdvancedAssumptions: boolean;
 };
 
-type ValidationErrors = Partial<Record<keyof FormState, string>>;
+type ValidationErrors = Partial<Record<keyof FormState | "debtParts", string>>;
+
+function getDefaultDuoRateYear() {
+  return getAvailableDuoRateYears(1)[0] ?? FINANCIAL_CONSTANTS.year;
+}
 
 const exampleValues: FormState = {
   situation: "repaying",
@@ -59,7 +71,9 @@ const exampleValues: FormState = {
   actualMonthlyPayment: "150",
   statutoryMonthlyPayment: "",
   remainingStudentDebt: "22000",
-  duoInterestRate: String(FINANCIAL_CONSTANTS.duo.rates.SF35),
+  duoRateYear: String(getDefaultDuoRateYear()),
+  useDebtParts: false,
+  debtParts: createDefaultDuoDebtPartFormValues(),
   remainingTermYears: String(FINANCIAL_CONSTANTS.duo.defaultTerms.SF35),
   extraRepayment: "",
   grossIncomeUser: "48000",
@@ -78,7 +92,9 @@ const defaultValues: FormState = {
   actualMonthlyPayment: "",
   statutoryMonthlyPayment: "",
   remainingStudentDebt: "",
-  duoInterestRate: "",
+  duoRateYear: String(getDefaultDuoRateYear()),
+  useDebtParts: false,
+  debtParts: createDefaultDuoDebtPartFormValues(),
   remainingTermYears: "",
   extraRepayment: "",
   grossIncomeUser: "",
@@ -196,8 +212,8 @@ function validateForm(values: FormState) {
 
   const actualMonthlyPayment = parseOptionalNumber(values.actualMonthlyPayment);
   const statutoryMonthlyPayment = parseOptionalNumber(values.statutoryMonthlyPayment);
-  const remainingStudentDebt = parseOptionalNumber(values.remainingStudentDebt);
-  const duoInterestRate = parseOptionalNumber(values.duoInterestRate);
+  const remainingStudentDebtInput = parseOptionalNumber(values.remainingStudentDebt);
+  const duoRateYear = Number.parseInt(values.duoRateYear, 10);
   const remainingTermYears = parseOptionalNumber(values.remainingTermYears);
   const extraRepayment = parseOptionalNumber(values.extraRepayment);
   const grossIncomeUser = parseRequiredNumber(values.grossIncomeUser);
@@ -209,6 +225,10 @@ function validateForm(values: FormState) {
   );
   const mortgageRate = parseRequiredNumber(values.mortgageRate);
   const mortgageTermYears = parseRequiredNumber(values.mortgageTermYears);
+  const debtPartsValidation = validateDuoDebtPartFormValues(values.debtParts);
+  const remainingStudentDebt = values.useDebtParts
+    ? debtPartsValidation.totalDebt
+    : remainingStudentDebtInput;
 
   const showActualField =
     values.situation === "repaying" ||
@@ -219,8 +239,9 @@ function validateForm(values: FormState) {
     values.situation === "incomeBasedReduction" ||
     values.situation === "paymentPause" ||
     values.situation === "unknown";
-  const canEstimateFromDebt =
-    remainingStudentDebt !== undefined && Number.isFinite(remainingStudentDebt);
+  const canEstimateFromDebt = values.useDebtParts
+    ? debtPartsValidation.totalDebt > 0
+    : remainingStudentDebt !== undefined && Number.isFinite(remainingStudentDebt);
 
   if (showActualField) {
     if (
@@ -243,6 +264,7 @@ function validateForm(values: FormState) {
   }
 
   if (
+    !values.useDebtParts &&
     remainingStudentDebt !== undefined &&
     (!Number.isFinite(remainingStudentDebt) || remainingStudentDebt < 0)
   ) {
@@ -250,11 +272,13 @@ function validateForm(values: FormState) {
       "Gebruik 0 of een hogere resterende studieschuld.";
   }
 
-  if (
-    duoInterestRate !== undefined &&
-    (!Number.isFinite(duoInterestRate) || duoInterestRate < 0)
-  ) {
-    errors.duoInterestRate = "Gebruik 0% of een hoger DUO-rentepercentage.";
+  if (!values.useDebtParts) {
+    const supportedRateYears = new Set(getAvailableDuoRateYears());
+    if (!Number.isInteger(duoRateYear) || !supportedRateYears.has(duoRateYear)) {
+      errors.duoRateYear = "Kies een DUO-rentejaar uit de laatste 5 jaar.";
+    }
+  } else if (debtPartsValidation.sanitizedParts.length === 0) {
+    errors.debtParts = "Voeg minimaal één leningdeel toe met bedrag en rentejaar.";
   }
 
   if (
@@ -346,7 +370,9 @@ function validateForm(values: FormState) {
   if (
     extraRepayment !== undefined &&
     extraRepayment > 0 &&
-    remainingStudentDebt === undefined
+    (remainingStudentDebt === undefined ||
+      !Number.isFinite(remainingStudentDebt) ||
+      remainingStudentDebt <= 0)
   ) {
     errors.extraRepayment =
       "Vul ook je resterende studieschuld in om extra aflossen te kunnen schatten.";
@@ -369,7 +395,8 @@ function validateForm(values: FormState) {
           actualMonthlyPayment,
           statutoryMonthlyPayment,
           remainingStudentDebt,
-          duoInterestRate,
+          duoRateYear: Number.parseInt(values.duoRateYear, 10) || getDefaultDuoRateYear(),
+          duoDebtParts: values.useDebtParts ? debtPartsValidation.sanitizedParts : undefined,
           remainingTermYears,
           extraRepayment,
           grossIncomeUser,
@@ -385,6 +412,8 @@ function validateForm(values: FormState) {
   return {
     errors,
     parsedValues,
+    debtPartErrors: debtPartsValidation.errorsById,
+    debtPartsTotal: debtPartsValidation.totalDebt,
   };
 }
 
@@ -465,11 +494,15 @@ function CalculatorContent({
   const validation = validateForm(formValues);
   const errors = Object.fromEntries(
     Object.entries(validation.errors).filter(([field]) => {
+      if (field === "debtParts") {
+        return formValues.useDebtParts;
+      }
+
       const value = formValues[field as keyof FormState];
       return typeof value === "string" ? value.trim().length > 0 : Boolean(value);
     }),
   ) as ValidationErrors;
-  const { parsedValues } = validation;
+  const { parsedValues, debtPartErrors, debtPartsTotal } = validation;
   const submittedValidation = submittedValues ? validateForm(submittedValues) : null;
   const result = submittedValidation?.parsedValues
     ? calculateHypotheekImpact(submittedValidation.parsedValues)
@@ -484,7 +517,6 @@ function CalculatorContent({
     formValues.situation === "incomeBasedReduction" ||
     formValues.situation === "paymentPause" ||
     formValues.situation === "unknown";
-  const usedDefaultDuoRate = formValues.duoInterestRate.trim().length === 0;
   const usedDefaultTerm = formValues.remainingTermYears.trim().length === 0;
   const mobileFieldOrder = [
     "situation",
@@ -492,7 +524,7 @@ function CalculatorContent({
     ...(showActualField ? ["actualMonthlyPayment"] : []),
     ...(showStatutoryField ? ["statutoryMonthlyPayment"] : []),
     "remainingStudentDebt",
-    "duoInterestRate",
+    "duoRateYear",
     "remainingTermYears",
     "extraRepayment",
     "grossIncomeUser",
@@ -510,7 +542,7 @@ function CalculatorContent({
     ...(showActualField ? ["actualMonthlyPayment"] : []),
     ...(showStatutoryField ? ["statutoryMonthlyPayment"] : []),
     "remainingStudentDebt",
-    "duoInterestRate",
+    "duoRateYear",
     "remainingTermYears",
     "extraRepayment",
   ];
@@ -529,7 +561,7 @@ function CalculatorContent({
       actualMonthlyPayment: errors.actualMonthlyPayment,
       statutoryMonthlyPayment: errors.statutoryMonthlyPayment,
       remainingStudentDebt: errors.remainingStudentDebt,
-      duoInterestRate: errors.duoInterestRate,
+      duoRateYear: errors.duoRateYear,
       remainingTermYears: errors.remainingTermYears,
       extraRepayment: errors.extraRepayment,
       grossIncomeUser: errors.grossIncomeUser,
@@ -546,6 +578,64 @@ function CalculatorContent({
       ...current,
       [field]: value,
     }));
+  }
+
+  function updateDebtPart(
+    id: string,
+    field: keyof Pick<DuoDebtPartFormValue, "amount" | "rateYear">,
+    value: string,
+  ) {
+    setFormValues((current) => ({
+      ...current,
+      debtParts: current.debtParts.map((part) =>
+        part.id === id ? { ...part, [field]: value } : part,
+      ),
+    }));
+  }
+
+  function addDebtPart() {
+    setFormValues((current) => ({
+      ...current,
+      debtParts: [...current.debtParts, createDuoDebtPartFormValue()],
+    }));
+  }
+
+  function removeDebtPart(id: string) {
+    setFormValues((current) => ({
+      ...current,
+      debtParts:
+        current.debtParts.length > 1
+          ? current.debtParts.filter((part) => part.id !== id)
+          : current.debtParts,
+    }));
+  }
+
+  function toggleDebtParts(enabled: boolean) {
+    setFormValues((current) => {
+      if (!enabled) {
+        return { ...current, useDebtParts: false };
+      }
+
+      const nextParts =
+        current.debtParts.length > 0
+          ? current.debtParts
+          : [createDuoDebtPartFormValue()];
+      const firstPart = nextParts[0];
+
+      return {
+        ...current,
+        useDebtParts: true,
+        debtParts: nextParts.map((part, index) =>
+          index === 0 && part.amount.trim().length === 0 && current.remainingStudentDebt.trim().length > 0
+            ? { ...part, amount: current.remainingStudentDebt }
+            : part,
+        ),
+        duoRateYear:
+          current.duoRateYear.trim().length > 0
+            ? current.duoRateYear
+            : firstPart.rateYear,
+      };
+    });
   }
 
   function applyProfileValues() {
@@ -780,32 +870,52 @@ function CalculatorContent({
                 className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
               />
               <p className="text-[12px] leading-[1.5] text-[var(--soft)]">
-                Nodig voor schattingen, brutering én het scenario extra aflossen.
+                {formValues.useDebtParts
+                  ? "Wordt overschreven door de som van je leningdelen hieronder."
+                  : "Nodig voor schattingen, brutering én het scenario extra aflossen."}
               </p>
               <FieldError message={errors.remainingStudentDebt} />
             </label>
 
-            <label className={mobileFlow.getFieldClassName("duoInterestRate")}>
-              <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-                DUO-rentepercentage
-              </span>
-              <input
-                inputMode="decimal"
-                value={formValues.duoInterestRate}
-                onChange={(event) => updateField("duoInterestRate", event.target.value)}
-                onKeyDown={mobileFlow.handleEnterAdvance(
-                  "duoInterestRate",
-                  Boolean(errors.duoInterestRate),
-                )}
-                aria-invalid={Boolean(errors.duoInterestRate)}
-                placeholder={String(getDefaultDuoRate(formValues.repaymentRule))}
-                className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-              />
-              <p className="text-[12px] leading-[1.5] text-[var(--soft)]">
-                Laat leeg om de standaard 2026-rente voor {ruleLabels[formValues.repaymentRule]} te gebruiken.
-              </p>
-              <FieldError message={errors.duoInterestRate} />
-            </label>
+            {!formValues.useDebtParts ? (
+              <label className={mobileFlow.getFieldClassName("duoRateYear")}>
+                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                  DUO-rentejaar
+                </span>
+                <select
+                  value={formValues.duoRateYear}
+                  onChange={(event) => updateField("duoRateYear", event.target.value)}
+                  onKeyDown={mobileFlow.handleEnterAdvance(
+                    "duoRateYear",
+                    Boolean(errors.duoRateYear),
+                  )}
+                  aria-invalid={Boolean(errors.duoRateYear)}
+                  className="ring-focus hair h-12 rounded-md border bg-white px-4 text-[15px] text-[var(--ink)] outline-none"
+                >
+                  {getAvailableDuoRateYears().map((year) => (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-[12px] leading-[1.5] text-[var(--soft)]">
+                  DUO stelt voor terugbetalers elk jaar opnieuw een rente vast; die blijft daarna 5 jaar staan.
+                </p>
+                <FieldError message={errors.duoRateYear} />
+              </label>
+            ) : null}
+
+            <DuoDebtPartsEditor
+              enabled={formValues.useDebtParts}
+              parts={formValues.debtParts}
+              totalDebt={debtPartsTotal}
+              errorsById={debtPartErrors}
+              onToggle={toggleDebtParts}
+              onPartChange={updateDebtPart}
+              onAddPart={addDebtPart}
+              onRemovePart={removeDebtPart}
+            />
+            <FieldError message={errors.debtParts} />
 
             <label className={mobileFlow.getFieldClassName("remainingTermYears")}>
               <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
@@ -1203,26 +1313,45 @@ function CalculatorContent({
               <ResultRow
                 label="Geschat wettelijk maandbedrag"
                 value={formatCurrency(result.duoPayment.estimatedStatutoryPayment)}
-                sub={`Gebaseerd op schuld, rente en looptijd onder ${ruleLabels[formValues.repaymentRule]}`}
+                sub={`Gebaseerd op schuld, rentejaar en looptijd onder ${ruleLabels[formValues.repaymentRule]}`}
                 breakdownLabel="Wettelijke annuïteit"
                 breakdown={
                   <AmountBreakdown
                     items={[
                       <span key="1">
-                        Resterende schuld:{" "}
-                        {formatCurrency(parsedValues?.remainingStudentDebt ?? 0)}.
+                        Resterende schuld: {formatCurrency(result.remainingStudentDebt)}.
                       </span>,
                       <span key="2">
-                        DUO-rente: {formatDecimal(parsedValues?.duoInterestRate ?? 0)}%.
+                        Gewogen DUO-rente: {formatDecimal(result.duoRateUsed)}%.
                       </span>,
                       <span key="3">
-                        Looptijd: {formatMonthsAndYears((parsedValues?.remainingTermYears ?? 0) * 12)}.
+                        Resterende looptijd: {formatMonthsAndYears(result.duoTermYearsUsed * 12)}.
                       </span>,
                       <span key="4">
                         Dit is de annuïteit die naar nul aflost over de resterende looptijd.
                       </span>,
+                      ...(result.debtPortfolio.usesDebtParts
+                        ? [
+                            <span key="5">
+                              Je schuld is hier opgesplitst in {result.debtPortfolio.parts.length} leningdelen met elk een eigen DUO-rentejaar.
+                            </span>,
+                          ]
+                        : []),
                     ]}
                   />
+                }
+              />
+              <ResultRow
+                label="DUO-rentebasis"
+                value={
+                  result.debtPortfolio.usesDebtParts
+                    ? `${result.debtPortfolio.parts.length} leningdelen`
+                    : String(result.debtPortfolio.rateYearUsed)
+                }
+                sub={
+                  result.debtPortfolio.usesDebtParts
+                    ? `Gewogen rente ${formatDecimal(result.duoRateUsed)}% over meerdere rentejaren.`
+                    : `Gekozen DUO-rentejaar ${result.debtPortfolio.rateYearUsed}.`
                 }
               />
             </div>
@@ -1991,12 +2120,18 @@ function CalculatorContent({
               {formatDecimal(FINANCIAL_CONSTANTS.mortgage.defaultMortgageRate)}%
               rente en {FINANCIAL_CONSTANTS.mortgage.defaultMortgageTermYears} jaar.
             </p>
-            {usedDefaultDuoRate ? (
+            {formValues.useDebtParts ? (
               <p>
-                DUO-rente niet ingevuld: de tool gebruikt daarom het standaardtarief
-                voor {ruleLabels[formValues.repaymentRule]}.
+                Verdiepingslaag actief: ieder leningdeel gebruikt zijn eigen
+                gekozen DUO-rentejaar. De tool rekent daarna met een gewogen rente
+                en een optelsom van wettelijke maandbedragen.
               </p>
-            ) : null}
+            ) : (
+              <p>
+                Gekozen DUO-rentejaar: {formValues.duoRateYear}. De tool haalt
+                daarbij centraal het bijbehorende terugbetaaltarief op voor {ruleLabels[formValues.repaymentRule]}.
+              </p>
+            )}
             {usedDefaultTerm ? (
               <p>
                 Resterende looptijd niet ingevuld: de tool gebruikt daarom de

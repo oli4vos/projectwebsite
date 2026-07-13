@@ -3,6 +3,13 @@ import {
   FINANCIAL_CONSTANTS_BY_YEAR,
 } from "@/lib/financial-constants/years";
 import {
+  DUO_RATE_HISTORY_META,
+  getAvailableDuoRateYears,
+  getDuoHistoricalRateForRule,
+  getDuoHistoricalRateYearForRule,
+  isSupportedDuoRateYear,
+} from "@/lib/financial-constants/duo-rate-history";
+import {
   getMortgageFinancingLoadPercentage,
   getMortgageFinancingLoadTable,
 } from "@/lib/financial-constants/mortgage-financing-load";
@@ -41,6 +48,10 @@ export function getFinancialConstants(year?: number): AnnualFinancialConstants {
 }
 
 export function getDuoRateForRule(rule: RepaymentRuleKey, year?: number) {
+  if (year !== undefined && isSupportedDuoRateYear(year)) {
+    return getDuoHistoricalRateForRule(rule, year);
+  }
+
   const constants = getFinancialConstants(year);
   return constants.duo.rates[rule] ?? constants.duo.rates.UNKNOWN;
 }
@@ -63,6 +74,10 @@ export function getDuoIncomeBasedRuleForRepaymentRule(
 
 export function getDuoBorrowingLimits(year?: number) {
   return getFinancialConstants(year).duo.borrowingLimits;
+}
+
+export function getDuoRateHistoryMeta() {
+  return DUO_RATE_HISTORY_META;
 }
 
 export function getStudentDebtGrossUpFactor(
@@ -117,3 +132,5 @@ export type {
   SourceTier,
 } from "@/lib/financial-constants/types";
 export { getMortgageFinancingLoadTable };
+export { getAvailableDuoRateYears };
+export { getDuoHistoricalRateYearForRule };

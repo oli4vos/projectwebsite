@@ -7,12 +7,15 @@ import {
   getStudentDebtGrossUpFactor,
 } from "@/lib/financial-constants";
 import {
+  calculateDuoDebtPortfolio,
   calculateIndicativeIncomeBasedMonthlyPayment,
   calculateDuoMonthlyPaymentAfterExtraRepayment as calculateDuoMonthlyPaymentAfterExtraRepaymentCentral,
   calculateExtraRepaymentPayoffImpact,
   determineRelevantDuoPayment as determineRelevantDuoPaymentCentral,
   sanitizeDuoMoney,
   sanitizeDuoPercent,
+  type DuoDebtPartInput,
+  type DuoDebtPortfolioSummary,
   type DuoSituation as CentralDuoSituation,
   type ExtraRepaymentPayoffImpactResult,
   type DuoPaymentSource as CentralDuoPaymentSource,
@@ -131,6 +134,8 @@ export type HypotheekImpactInput = {
   statutoryMonthlyPayment?: number;
   remainingStudentDebt?: number;
   duoInterestRate?: number;
+  duoRateYear?: number;
+  duoDebtParts?: DuoDebtPartInput[];
   remainingTermYears?: number;
   extraRepayment?: number;
   grossIncomeUser: number;
@@ -149,6 +154,7 @@ export type HypotheekImpactResult = {
   grossIncomeTotal: number;
   incomeCapacity: IncomeCapacitySummary;
   duoMandatoryPayment: DuoMandatoryPaymentSummary;
+  debtPortfolio: DuoDebtPortfolioSummary;
   debtToIncomeRatio?: number;
   housingTarget?: HousingTargetSummary;
   duoRateUsed: number;
@@ -198,15 +204,6 @@ function safeRatio(numerator: number, denominator: number) {
   }
 
   return roundRatio(numerator / denominator);
-}
-
-function getEffectiveDuoRate(input: {
-  repaymentRule: RepaymentRule;
-  duoInterestRate?: number;
-}) {
-  return input.duoInterestRate === undefined
-    ? getDefaultDuoRate(input.repaymentRule)
-    : sanitizePercent(input.duoInterestRate);
 }
 
 function getEffectiveDuoTerm(input: {
@@ -281,6 +278,8 @@ export function determineRelevantDuoPayment(
     | "statutoryMonthlyPayment"
     | "remainingStudentDebt"
     | "duoInterestRate"
+    | "duoRateYear"
+    | "duoDebtParts"
     | "remainingTermYears"
   >,
 ): RelevantDuoPaymentResult {
@@ -291,6 +290,8 @@ export function determineRelevantDuoPayment(
     statutoryMonthlyPayment: input.statutoryMonthlyPayment,
     remainingDebt: input.remainingStudentDebt,
     annualInterestRate: input.duoInterestRate,
+    duoRateYear: input.duoRateYear,
+    debtParts: input.duoDebtParts,
     remainingTermYears: input.remainingTermYears,
   });
 
@@ -315,6 +316,8 @@ export function calculateMortgageImpact(
     | "statutoryMonthlyPayment"
     | "remainingStudentDebt"
     | "duoInterestRate"
+    | "duoRateYear"
+    | "duoDebtParts"
     | "remainingTermYears"
     | "mortgageRate"
     | "mortgageTermYears"
@@ -363,14 +366,24 @@ export function calculateExtraRepaymentScenario(
     | "repaymentRule"
     | "remainingStudentDebt"
     | "duoInterestRate"
+    | "duoRateYear"
+    | "duoDebtParts"
     | "remainingTermYears"
     | "extraRepayment"
     | "mortgageRate"
     | "mortgageTermYears"
   >,
 ): ExtraRepaymentScenarioResult {
-  const remainingStudentDebt = sanitizeOptionalMoney(input.remainingStudentDebt) ?? 0;
-  const duoRate = getEffectiveDuoRate(input);
+  const debtPortfolio = calculateDuoDebtPortfolio({
+    repaymentRule: input.repaymentRule,
+    remainingDebt: input.remainingStudentDebt,
+    annualInterestRate: input.duoInterestRate,
+    duoRateYear: input.duoRateYear,
+    remainingTermYears: input.remainingTermYears,
+    debtParts: input.duoDebtParts,
+  });
+  const remainingStudentDebt = debtPortfolio.totalDebt;
+  const duoRate = debtPortfolio.blendedAnnualInterestRate;
   const duoTermYears = getEffectiveDuoTerm(input);
   const mortgageRate = sanitizePercent(input.mortgageRate);
   const mortgageTermYears = sanitizeYears(input.mortgageTermYears, 30);
@@ -379,6 +392,8 @@ export function calculateExtraRepaymentScenario(
     repaymentRule: input.repaymentRule,
     remainingDebt: remainingStudentDebt,
     annualInterestRate: duoRate,
+    duoRateYear: input.duoRateYear,
+    debtParts: input.duoDebtParts,
     remainingTermYears: duoTermYears,
     extraRepaymentAmount: extraRepaymentInput,
   });
@@ -401,6 +416,8 @@ export function calculateExtraRepaymentScenario(
     repaymentRule: input.repaymentRule,
     remainingDebt: remainingStudentDebt,
     annualInterestRate: duoRate,
+    duoRateYear: input.duoRateYear,
+    debtParts: input.duoDebtParts,
     remainingTermYears: duoTermYears,
     monthlyPayment: oldEstimatedMonthlyPayment,
     extraRepaymentAmount: extraRepaymentInput,
@@ -410,6 +427,8 @@ export function calculateExtraRepaymentScenario(
     repaymentRule: input.repaymentRule,
     remainingDebt: remainingStudentDebt,
     annualInterestRate: duoRate,
+    duoRateYear: input.duoRateYear,
+    debtParts: input.duoDebtParts,
     remainingTermYears: duoTermYears,
     monthlyPayment: oldEstimatedMonthlyPayment,
     extraRepaymentAmount: extraRepaymentInput,
@@ -473,17 +492,28 @@ export function calculateHypotheekImpact(
   const grossIncomeUser = sanitizeMoney(input.grossIncomeUser);
   const grossIncomePartner = sanitizeMoney(input.grossIncomePartner);
   const grossIncomeTotal = roundMoney(grossIncomeUser + grossIncomePartner);
-  const remainingStudentDebt = sanitizeOptionalMoney(input.remainingStudentDebt) ?? 0;
+  const debtPortfolio = calculateDuoDebtPortfolio({
+    repaymentRule: input.repaymentRule,
+    remainingDebt: input.remainingStudentDebt,
+    annualInterestRate: input.duoInterestRate,
+    duoRateYear: input.duoRateYear,
+    remainingTermYears: input.remainingTermYears,
+    debtParts: input.duoDebtParts,
+  });
+  const remainingStudentDebt = debtPortfolio.totalDebt;
   const desiredHomePrice = sanitizeOptionalMoney(input.desiredHomePrice);
   const ownMoney = sanitizeOptionalMoney(input.ownMoney) ?? 0;
   const maxMortgageWithoutStudentDebt = sanitizeOptionalMoney(
     input.maxMortgageWithoutStudentDebt,
   );
-  const duoRateUsed = getEffectiveDuoRate(input);
+  const duoRateUsed = debtPortfolio.blendedAnnualInterestRate;
   const duoTermYearsUsed = getEffectiveDuoTerm(input);
   const duoPayment = determineRelevantDuoPayment({
     ...input,
     duoInterestRate: duoRateUsed,
+    duoRateYear: input.duoRateYear,
+    duoDebtParts: input.duoDebtParts,
+    remainingStudentDebt,
     remainingTermYears: duoTermYearsUsed,
   });
   const duoMandatoryBase = calculateIndicativeIncomeBasedMonthlyPayment({
@@ -503,11 +533,17 @@ export function calculateHypotheekImpact(
   const mortgageImpact = calculateMortgageImpact({
     ...input,
     duoInterestRate: duoRateUsed,
+    duoRateYear: input.duoRateYear,
+    duoDebtParts: input.duoDebtParts,
+    remainingStudentDebt,
     remainingTermYears: duoTermYearsUsed,
   });
   const extraRepaymentScenario = calculateExtraRepaymentScenario({
     ...input,
     duoInterestRate: duoRateUsed,
+    duoRateYear: input.duoRateYear,
+    duoDebtParts: input.duoDebtParts,
+    remainingStudentDebt,
     remainingTermYears: duoTermYearsUsed,
   });
   const debtToIncomeRatio =
@@ -579,6 +615,9 @@ export function calculateHypotheekImpact(
   const assumptions = [
     `Bedragen en aannames gecontroleerd op ${LAST_CHECKED}.`,
     `Voor ${input.repaymentRule === "UNKNOWN" ? "de onbekende terugbetalingsregel" : input.repaymentRule} rekenen we standaard met ${duoRateUsed.toFixed(2).replace(".", ",")}% DUO-rente en ${duoTermYearsUsed} jaar als je geen eigen waarden invult.`,
+    ...(debtPortfolio.usesDebtParts
+      ? ["Opgesplitste leningdelen rekenen we per deel door met het gekozen rentejaar; daarna tellen we de wettelijke DUO-termijnen bij elkaar op."]
+      : []),
     "De hoofdconclusie gebruikt netto DUO-last -> brutering -> indicatieve annuïtaire hypotheekimpact, niet alleen een grove jaarfactor.",
     "DUO-verplichting is indicatief benaderd als het laagste van wettelijk maandbedrag en draagkracht op basis van inkomen.",
   ];
@@ -611,6 +650,7 @@ export function calculateHypotheekImpact(
       remainingChoiceBudgetMonthly,
       warnings: duoMandatoryBase.warnings,
     },
+    debtPortfolio,
     debtToIncomeRatio,
     housingTarget,
     duoRateUsed,

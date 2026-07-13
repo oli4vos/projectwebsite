@@ -1,4 +1,6 @@
 export {
+  applyExtraRepaymentToDuoDebtPortfolio,
+  calculateDuoDebtPortfolio,
   calculateIndicativeIncomeBasedMonthlyPayment,
   calculateDuoMonthlyPaymentAfterExtraRepayment,
   calculateDuoExtraRepaymentProjection,
@@ -17,6 +19,9 @@ export type {
   DuoLoanProjectionContext,
   DuoExtraRepaymentProjectionInput,
   DuoExtraRepaymentProjectionResult,
+  DuoDebtPartInput,
+  DuoDebtPartResolved,
+  DuoDebtPortfolioSummary,
   DuoLoanProjectionInput,
   DuoLoanProjectionMortgageImpact,
   DuoLoanProjectionResult,
