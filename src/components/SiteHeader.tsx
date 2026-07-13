@@ -59,9 +59,18 @@ export function SiteHeader() {
             ) : null}
           </nav>
 
-          <BtnLink href="/#route" kind="primary" size="sm" className="hidden md:inline-flex">
-            Begin bij stap 1
-          </BtnLink>
+          <div className="hidden md:flex items-center gap-2">
+            <Link
+              href="/v2"
+              className="text-[11px] px-2 py-1 rounded text-[var(--muted)] hover:text-[var(--ink)] transition"
+              title="Probeer de nieuwe design versie"
+            >
+              v2 →
+            </Link>
+            <BtnLink href="/#route" kind="primary" size="sm">
+              Begin bij stap 1
+            </BtnLink>
+          </div>
         </div>
 
         <nav
