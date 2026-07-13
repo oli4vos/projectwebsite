@@ -8,6 +8,7 @@ import { ResultCard } from "@/components/ResultCard";
 import { ResultRow } from "@/components/ResultRow";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
+import { ToolNextSteps } from "@/components/tool/ToolNextSteps";
 import { useMobileFieldFlow } from "@/hooks/useMobileFieldFlow";
 import {
   calculateDuoLoanProjectionView,
@@ -633,6 +634,25 @@ export default function DuoDoorlenenOfStoppenCalculator() {
           </p>
         )}
       </section>
+
+      <ToolNextSteps
+        title="Van leenfase naar woonruimte"
+        description="Je weet nu wat doorlenen of stoppen met je studieschuld doet. Bereken daarna wat die schuld betekent voor je hypotheekruimte, of ga meteen door naar de maximale hypotheektool."
+        primary={{
+          href: "/apps/hypotheek-impact-studieschuld",
+          label: "Bekijk hypotheekimpact",
+        }}
+        secondary={[
+          {
+            href: "/apps/artifact-hypotheek-wonen-maximale-hypotheek",
+            label: "Bereken maximale hypotheek",
+          },
+          {
+            href: "/apps/duo-extra-aflossen",
+            label: "Vergelijk extra aflossen",
+          },
+        ]}
+      />
     </div>
   ) : (
     <section id="tool-result-summary" className="rounded-xl border hair bg-white p-5 shadow-paper">

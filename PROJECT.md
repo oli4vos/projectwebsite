@@ -302,6 +302,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - gebruikt centrale DUO-projectie: rente per maand eerst over de openstaande schuld, daarna de maandelijkse opname.
   - vergelijkt “nu stoppen” met “doorlenen tot de gekozen laatste leenmaand”.
   - toont schuld bij start aflossen, theoretische DUO-maandtermijn, totaal terugbetalen en optioneel hypotheekimpact.
+  - toont nu ook een expliciete vervolgstap naar hypotheekimpact en maximale hypotheek, zodat de route van studieschuld naar woonruimte duidelijker is.
 - `[public]` `apps/duo-maandbedrag`
   - beta-tool voor wettelijke DUO-maandtermijn en optionele draagkrachtindicatie.
   - gebruikt centrale DUO-berekeningen en centrale DUO-rente/looptijdconstants.

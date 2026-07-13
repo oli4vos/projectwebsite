@@ -46,6 +46,7 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 | Centrale tax/DUO/pension/constants lagen | actief | n.v.t. | aan | Hergebruikt door meerdere tools | n.v.t. |
 | Submit-driven calculatorflow | actief | n.v.t. | aan | Patroon beschikbaar via `CalculatorShell` + submitlogica | n.v.t. |
 | DUO-impact in maximale-hypotheektool | actief | n.v.t. | aan | Kernuitkomst toont rechtsboven de indicatieve daling van de leencapaciteit | n.v.t. |
+| Doorstap vanaf DUO-doorlenen-of-stoppen | actief | n.v.t. | aan | Resultaat toont directe vervolgstap naar hypotheekimpact en maximale hypotheek | n.v.t. |
 | Chart-standaardisatie (jaar/euro/tooltips) | actief | n.v.t. | aan | Centrale charthelpers/componenten | n.v.t. |
 | Profielfunctie (`/profiel`, prefillpad) | uitgeschakeld | `NEXT_PUBLIC_ENABLE_PROFILE` | `false` | UI/CTA's verborgen, code blijft intact | zet op `1` en valideer profiel + tools |
 | Kennisniveaufunctionaliteit | uitgeschakeld | `NEXT_PUBLIC_ENABLE_KNOWLEDGE_LEVEL` | `false` | Bewust niet zichtbaar in productieflow | zet op `1` en valideer homepage/toolhints |
@@ -59,6 +60,7 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 
 | Datum | Commit | Wijziging | Impact |
 |---|---|---|---|
+| 2026-07-13 | `pending` | DUO-doorlenen-of-stoppen toont directe vervolgstap naar hypotheekimpact en maximale hypotheek | DUO / studieschuld / woonroute |
 | 2026-07-13 | `cc39fb9` | DUO-renteselectie op laatste 5 jaar, debt-parts editor en hypotheek-prefill op historisch DUO-rentejaar toegevoegd | DUO / studieschuld / hypotheek-impact |
 | 2026-07-05 | `pending` | Nieuwe publieke beta-tool `DUO doorlenen of stoppen` toegevoegd met centrale leenfaseprojectie | DUO / studieschuld / leenfase |
 | 2026-07-05 | `pending` | Site herpositioneerd naar “studieschuld begrijpen” met drie fases: opbouw, maandbedrag, wonen | Homepage / kennisbank / navigatie |
