@@ -196,6 +196,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `src/lib/profile-prefill.ts`: gedeelde helper voor consistente tool-prefill-flow
 - `src/hooks/useUserPreferences.ts`: sync-hook voor lokale kennisniveauvoorkeur
 - `src/lib/financial-constants/`: centrale jaarlijkse aannames/variabelen + helpers
+- `src/lib/financial-constants/duo-rate-history.ts`: centrale 5-jaars DUO-rentegeschiedenis voor terugbetalers en rentejaar-herleiding
 - `src/lib/chart-utils.ts`: centrale format/tick helpers voor grafieken (hele jaren + eurolabels)
 - `src/lib/knowledge-base.ts`: centrale kennisbankcontent; zichtbare topics zijn nu studieschuldartikelen, oude horizon-/beleggingskaders blijven hidden
 - `src/lib/number-input.ts`: centrale parser voor numerieke invoer; komma wordt als decimaalpunt behandeld
