@@ -137,9 +137,12 @@ test("losse DUO-tools tonen simpele scenario-uitkomst en schuldenvrije datum", a
   test.skip(!testInfo.project.name.startsWith("desktop"), "Desktopinteractie controleren");
 
   await page.goto("/apps/duo-leenbedrag-impact", { waitUntil: "networkidle" });
+  await expect(page.getByLabel("Lening per maand slider")).toBeVisible();
+  await page.getByLabel("Lening per maand slider").fill("250");
   await page.getByRole("button", { name: "Voorbeeld invullen" }).first().click();
   await page.getByRole("button", { name: "Bereken impact" }).first().click();
 
   await expect(page.getByRole("heading", { name: "Ik studeer al: impact nieuw leenbedrag per maand" })).toBeVisible();
   await expect(page.getByText("Schuldenvrij rond")).toBeVisible();
+  await expect(page.getByText("Totaal betalen incl. rente")).toBeVisible();
 });

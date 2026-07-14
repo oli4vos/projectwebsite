@@ -771,6 +771,12 @@ export function buildStudyStopPdfReport(
           label: "Schuld bij aanvang terugbetaling",
           value: formatCurrency(scenario.debtAtRepaymentStart, 0),
         },
+        {
+          label: "Totaal betaald incl. rente",
+          value: formatCurrency(scenario.totalPaid, 0),
+          note: `Vanaf start terugbetalen, maximaal ${scenario.repaymentTermYears} jaar.`,
+        },
+        { label: "Rente in aflosfase", value: formatCurrency(scenario.totalInterest, 0) },
         { label: "Schuldenvrij", value: scenario.payoffDate ?? "n.v.t." },
       ],
       note: scenario.note,

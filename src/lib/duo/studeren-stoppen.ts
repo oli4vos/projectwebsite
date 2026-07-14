@@ -148,6 +148,9 @@ export type StudyStopCalculationResult = {
     secondaryLabel: string;
     secondaryAmount: number;
     debtAtRepaymentStart: number;
+    totalPaid: number;
+    totalInterest: number;
+    repaymentTermYears: number;
     payoffDate: string | null;
     note: string;
   }>;
@@ -996,7 +999,7 @@ function summarizeScenario(
   };
 }
 
-function buildFocusScenarios(scenarios: StudyStopScenarioResult[]) {
+function buildFocusScenarios(scenarios: StudyStopScenarioResult[], repaymentTermYears: number) {
   const stopNow = scenarios.find((scenario) => scenario.key === "stop-now-no-diploma") ?? scenarios[0];
   const continueToDiploma =
     scenarios.find((scenario) => scenario.key === "continue-to-diploma") ?? scenarios[scenarios.length - 1];
@@ -1021,6 +1024,9 @@ function buildFocusScenarios(scenarios: StudyStopScenarioResult[]) {
       secondaryLabel: "Altijd terug te betalen",
       secondaryAmount: continueToDiploma?.debtAtStop.alwaysRepayable ?? 0,
       debtAtRepaymentStart: continueToDiploma?.debtAtRepaymentStart.total ?? 0,
+      totalPaid: continueToDiploma?.repayment.totalPaid ?? 0,
+      totalInterest: continueToDiploma?.repayment.totalInterest ?? 0,
+      repaymentTermYears,
       payoffDate: continueToDiploma?.repayment.payoffDate ?? null,
       note: "Gebruik bij een nieuwe studie huidige schuld 0 en vul je maandelijkse lening, collegegeldkrediet en beursdelen in.",
     },
@@ -1033,6 +1039,9 @@ function buildFocusScenarios(scenarios: StudyStopScenarioResult[]) {
       secondaryLabel: "Totale schuld bij stoppen",
       secondaryAmount: stopNow?.debtAtStop.total ?? 0,
       debtAtRepaymentStart: stopNow?.debtAtRepaymentStart.total ?? 0,
+      totalPaid: stopNow?.repayment.totalPaid ?? 0,
+      totalInterest: stopNow?.repayment.totalInterest ?? 0,
+      repaymentTermYears,
       payoffDate: stopNow?.repayment.payoffDate ?? null,
       note: "Dit is het bedrag dat niet als gift wordt omgezet als je geen diploma binnen de diplomatermijn haalt.",
     },
@@ -1045,6 +1054,9 @@ function buildFocusScenarios(scenarios: StudyStopScenarioResult[]) {
       secondaryLabel: "Verschil eindschuld totaal",
       secondaryAmount: extraDebtAtStop,
       debtAtRepaymentStart: continueToDiploma?.debtAtRepaymentStart.total ?? 0,
+      totalPaid: continueToDiploma?.repayment.totalPaid ?? 0,
+      totalInterest: continueToDiploma?.repayment.totalInterest ?? 0,
+      repaymentTermYears,
       payoffDate: continueToDiploma?.repayment.payoffDate ?? null,
       note: "Pas je maandelijkse lening aan en bereken opnieuw om te zien wat dat doet met je eindschuld.",
     },
@@ -1069,12 +1081,13 @@ export function calculateStudyStopScenarios(
   const currentStates = createBaseComponents(input);
   const monthlyStudyAdditions = createMonthlyStudyAdditions(input);
   const currentBalances = getSnapshot(currentStates);
+  const remainingTermYears = resolveRemainingTermYears(repaymentRule, duoRateYear);
   const statutoryMonthlyPayment = calculateStatutoryDuoMonthlyPayment({
     remainingDebt: currentBalances.total,
     repaymentRule,
     annualInterestRate: annualRepaymentInterestRate,
     duoRateYear,
-    remainingTermYears: resolveRemainingTermYears(repaymentRule, duoRateYear),
+    remainingTermYears,
   });
   const incomeBasedMonthlyPayment =
     input.grossAnnualIncome !== undefined || input.partnerGrossAnnualIncome !== undefined
@@ -1096,7 +1109,7 @@ export function calculateStudyStopScenarios(
     annualRepaymentInterestRate,
     repaymentRule,
     duoRateYear,
-    remainingTermYears: resolveRemainingTermYears(repaymentRule, duoRateYear),
+    remainingTermYears,
     currentStates,
     monthlyStudyAdditions,
     remainingDiplomaTermMonths,
@@ -1118,7 +1131,7 @@ export function calculateStudyStopScenarios(
     annualRepaymentInterestRate,
     repaymentRule,
     duoRateYear,
-    remainingTermYears: resolveRemainingTermYears(repaymentRule, duoRateYear),
+    remainingTermYears,
     currentStates,
     monthlyStudyAdditions,
     remainingDiplomaTermMonths,
@@ -1140,7 +1153,7 @@ export function calculateStudyStopScenarios(
     annualRepaymentInterestRate,
     repaymentRule,
     duoRateYear,
-    remainingTermYears: resolveRemainingTermYears(repaymentRule, duoRateYear),
+    remainingTermYears,
     currentStates,
     monthlyStudyAdditions,
     remainingDiplomaTermMonths,
@@ -1200,7 +1213,7 @@ export function calculateStudyStopScenarios(
     statutoryMonthlyPayment: roundMoney(statutoryMonthlyPayment),
     ruleVersion: STUDY_STOP_ENGINE_VERSION,
     scenarios,
-    focusScenarios: buildFocusScenarios(scenarios),
+    focusScenarios: buildFocusScenarios(scenarios, remainingTermYears),
     warnings: [
       "Dit model gebruikt jouw ingevoerde My DUO-bedragen als uitgangspunt. Het is geen DUO-beschikking.",
       "De prestatiebeurs kan alleen een gift worden als de toepasselijke diplomatermijn en voorwaarden zijn gehaald.",

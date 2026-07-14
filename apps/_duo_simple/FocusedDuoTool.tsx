@@ -9,7 +9,6 @@ import { CalculatorShell } from "@/components/tool/CalculatorShell";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
 import { useMobileFieldFlow } from "@/hooks/useMobileFieldFlow";
 import { useSubmittedCalculation } from "@/hooks/useSubmittedCalculation";
-import { getRepaymentRuleLabel } from "@/lib/copy-glossary";
 import { formatDuoRateYearLabel, getAvailableDuoRateYears } from "@/lib/financial-constants";
 import { downloadStudyStopPdfReport } from "../duo-doorlenen-of-stoppen/report";
 import {
@@ -26,6 +25,7 @@ type ToolCopy = {
   intro: string;
   primaryLabel: string;
   fields: Array<keyof SimpleDuoValues>;
+  advancedFields?: Array<keyof SimpleDuoValues>;
   helper: string;
 };
 
@@ -44,7 +44,6 @@ const modeCopy: Record<SimpleDuoToolMode, ToolCopy> = {
       "monthlyBasisbeurs",
       "monthlyAanvullendeBeurs",
       "monthlyReisproduct",
-      "repaymentRule",
       "duoRateYear",
     ],
     helper:
@@ -63,7 +62,6 @@ const modeCopy: Record<SimpleDuoToolMode, ToolCopy> = {
       "currentBasisbeursDebt",
       "currentAanvullendeBeursDebt",
       "currentReisproductDebt",
-      "repaymentRule",
       "duoRateYear",
     ],
     helper:
@@ -73,27 +71,25 @@ const modeCopy: Record<SimpleDuoToolMode, ToolCopy> = {
     eyebrow: "Tijdens je studie",
     title: "Wat doet een nieuw leenbedrag per maand?",
     intro:
-      "Vul je huidige schuld, je nieuwe maandbedrag en de resterende studieduur in. De tool toont de extra schuld die altijd terugbetaald moet worden.",
+      "Begin met alleen het bedrag dat je per maand wilt lenen. Daarna kun je de resterende studieduur, huidige schuld en collegegeldkrediet verder specificeren.",
     primaryLabel: "Bereken impact",
-    fields: [
-      "calculationMonth",
+    fields: ["monthlyLoan"],
+    advancedFields: [
       "monthsUntilDiploma",
       "currentLoanDebt",
       "currentCollegegeldkredietDebt",
-      "currentBasisbeursDebt",
-      "currentAanvullendeBeursDebt",
-      "currentReisproductDebt",
-      "monthlyLoan",
       "monthlyCollegegeldkrediet",
-      "repaymentRule",
       "duoRateYear",
     ],
     helper:
-      "Pas alleen het maandbedrag aan en bereken opnieuw om het verschil te zien.",
+      "De snelle berekening gebruikt standaard 36 maanden en SF35. Open verder specificeren als je preciezer wilt rekenen.",
   },
 };
 
-const repaymentRules = ["SF35", "SF15", "SF15_OLD", "SF15_LLLK", "UNKNOWN"] as const;
+/*
+ * Deliberately no repayment-rule selector in the simple tools: these three tools show SF35,
+ * because the user question is explicitly about aflossen vanaf terugbetalen in 35 jaar.
+ */
 
 function formatCurrency(value: number, maximumFractionDigits = 0) {
   return new Intl.NumberFormat("nl-NL", {
@@ -157,6 +153,57 @@ function Field({
         <FieldError message={error} />
       </div>
     </label>
+  );
+}
+
+function MonthlyLoanSliderField({
+  value,
+  error,
+  onChange,
+  onEnter,
+  className,
+}: {
+  value: string;
+  error?: string;
+  onChange: (value: string) => void;
+  onEnter?: (event: KeyboardEvent) => void;
+  className?: string;
+}) {
+  const numericValue = Number.parseFloat(value);
+  const safeValue = Number.isFinite(numericValue) ? Math.min(Math.max(numericValue, 0), 1000) : 0;
+
+  return (
+    <div className={`grid gap-3 ${className ?? ""}`.trim()}>
+      <Field
+        id="monthlyLoan"
+        label="Lening per maand"
+        value={value}
+        error={error}
+        hint="Sleep of typ je bedrag"
+        prefix="€"
+        type="number"
+        onChange={onChange}
+        onEnter={onEnter}
+      />
+      <label className="grid gap-2" htmlFor="monthlyLoanSlider">
+        <span className="flex items-center justify-between gap-3 text-[12px] text-[var(--soft)]">
+          <span>€0</span>
+          <span className="font-mono text-[13px] text-[var(--muted)]">{formatCurrency(safeValue, 0)} per maand</span>
+          <span>€1.000</span>
+        </span>
+        <input
+          id="monthlyLoanSlider"
+          type="range"
+          min="0"
+          max="1000"
+          step="25"
+          value={safeValue}
+          onChange={(event) => onChange(event.target.value)}
+          className="ring-focus h-10 w-full accent-[var(--accent)]"
+          aria-label="Lening per maand slider"
+        />
+      </label>
+    </div>
   );
 }
 
@@ -276,6 +323,64 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
     }
   }
 
+  function renderField(field: keyof SimpleDuoValues, useMobileClass = true) {
+    const fieldClassName = useMobileClass ? mobileFlow.getFieldClassName(field) : undefined;
+
+    if (field === "duoRateYear") {
+      return (
+        <Select
+          key={field}
+          id={field}
+          label={fieldLabel(field)}
+          value={formValues[field]}
+          error={currentView.isValid ? undefined : currentView.errors[field]}
+          options={getAvailableDuoRateYears().map((year) => ({
+            label: formatDuoRateYearLabel(year, "SF35"),
+            value: String(year),
+          }))}
+          onChange={(value) => updateField(field, value)}
+          className={fieldClassName}
+        />
+      );
+    }
+
+    if (field === "monthlyLoan" && mode === "monthly-impact") {
+      return (
+        <MonthlyLoanSliderField
+          key={field}
+          value={formValues[field]}
+          error={currentView.isValid ? undefined : currentView.errors[field]}
+          onChange={(value) => updateField(field, value)}
+          onEnter={mobileFlow.handleEnterAdvance(field, false)}
+          className={fieldClassName}
+        />
+      );
+    }
+
+    return (
+      <Field
+        key={field}
+        id={field}
+        label={fieldLabel(field)}
+        value={formValues[field]}
+        error={currentView.isValid ? undefined : currentView.errors[field]}
+        hint={fieldHint(field)}
+        prefix={field.includes("Debt") || field.startsWith("monthly") ? "€" : undefined}
+        suffix={field === "monthsUntilDiploma" ? "maanden" : undefined}
+        type={field === "calculationMonth" ? "month" : "number"}
+        onChange={(value) => updateField(field, value)}
+        onEnter={mobileFlow.handleEnterAdvance(field, false)}
+        className={fieldClassName}
+      />
+    );
+  }
+
+  const selectedScenario = submittedView?.isValid
+    ? mode === "stop-cost"
+      ? submittedView.result.scenarios[0]
+      : submittedView.result.scenarios[2]
+    : undefined;
+
   const result = submittedView?.isValid ? (
     <div className="space-y-5">
       <section id="tool-result-summary" className="rounded-xl border hair bg-white p-5 shadow-paper space-y-4">
@@ -296,14 +401,23 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
             value={formatCurrency(submittedView.focusScenario.primaryAmount)}
           />
           <ResultCard
-            label={submittedView.focusScenario.secondaryLabel}
-            value={formatCurrency(submittedView.focusScenario.secondaryAmount)}
+            label="Totaal betalen incl. rente"
+            value={formatCurrency(submittedView.focusScenario.totalPaid)}
+            note={`Berekend vanaf start terugbetalen met SF35 over maximaal ${submittedView.focusScenario.repaymentTermYears} jaar.`}
           />
         </div>
         <div className="rounded-lg border hair bg-[var(--paper-soft)] px-4">
           <ResultRow
-            label="Schuld bij start terugbetaling"
+            label="Eindschuld bij start terugbetaling"
             value={formatCurrency(submittedView.focusScenario.debtAtRepaymentStart)}
+          />
+          <ResultRow
+            label={submittedView.focusScenario.secondaryLabel}
+            value={formatCurrency(submittedView.focusScenario.secondaryAmount)}
+          />
+          <ResultRow
+            label="Rente in aflosfase"
+            value={formatCurrency(submittedView.focusScenario.totalInterest)}
           />
           <ResultRow
             label="Schuldenvrij rond"
@@ -317,6 +431,19 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
                 : submittedView.result.scenarios[2].debtAtStop.alwaysRepayable,
             )}
           />
+          {mode === "stop-cost" && selectedScenario ? (
+            <>
+              <ResultRow label="Basisbeurs blijft schuld" value={formatCurrency(selectedScenario.debtAtStop.basisbeurs)} />
+              <ResultRow
+                label="Aanvullende beurs blijft schuld"
+                value={formatCurrency(selectedScenario.debtAtStop.aanvullendeBeurs)}
+              />
+              <ResultRow
+                label="Studentenreisproduct blijft schuld"
+                value={formatCurrency(selectedScenario.debtAtStop.reisproduct)}
+              />
+            </>
+          ) : null}
         </div>
         <p className="text-[13px] leading-[1.7] text-[var(--soft)]">
           {submittedView.focusScenario.note}
@@ -381,60 +508,17 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
       }
       inputs={
         <div className="space-y-4">
-          {copy.fields.map((field) => {
-            if (field === "repaymentRule") {
-              return (
-                <Select
-                  key={field}
-                  id={field}
-                  label={fieldLabel(field)}
-                  value={formValues[field]}
-                  error={currentView.isValid ? undefined : currentView.errors[field]}
-                  options={repaymentRules.map((rule) => ({
-                    label: getRepaymentRuleLabel(rule),
-                    value: rule,
-                  }))}
-                  onChange={(value) => updateField(field, value as SimpleDuoValues["repaymentRule"])}
-                  className={mobileFlow.getFieldClassName(field)}
-                />
-              );
-            }
-
-            if (field === "duoRateYear") {
-              return (
-                <Select
-                  key={field}
-                  id={field}
-                  label={fieldLabel(field)}
-                  value={formValues[field]}
-                  error={currentView.isValid ? undefined : currentView.errors[field]}
-                  options={getAvailableDuoRateYears().map((year) => ({
-                    label: formatDuoRateYearLabel(year, formValues.repaymentRule),
-                    value: String(year),
-                  }))}
-                  onChange={(value) => updateField(field, value)}
-                  className={mobileFlow.getFieldClassName(field)}
-                />
-              );
-            }
-
-            return (
-              <Field
-                key={field}
-                id={field}
-                label={fieldLabel(field)}
-                value={formValues[field]}
-                error={currentView.isValid ? undefined : currentView.errors[field]}
-                hint={fieldHint(field)}
-                prefix={field.includes("Debt") || field.startsWith("monthly") ? "€" : undefined}
-                suffix={field === "monthsUntilDiploma" ? "maanden" : undefined}
-                type={field === "calculationMonth" ? "month" : "number"}
-                onChange={(value) => updateField(field, value)}
-                onEnter={mobileFlow.handleEnterAdvance(field, false)}
-                className={mobileFlow.getFieldClassName(field)}
-              />
-            );
-          })}
+          {copy.fields.map((field) => renderField(field))}
+          {copy.advancedFields ? (
+            <details className="rounded-lg border hair bg-[var(--paper-soft)] p-4">
+              <summary className="cursor-pointer text-[13px] font-medium text-[var(--ink)]">
+                Verder specificeren
+              </summary>
+              <div className="mt-4 grid gap-4">
+                {copy.advancedFields.map((field) => renderField(field, false))}
+              </div>
+            </details>
+          ) : null}
           <MobileFieldFlowControls
             current={mobileFlow.activeIndex + 1}
             total={mobileFlow.total}

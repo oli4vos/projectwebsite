@@ -22,6 +22,13 @@ describe("duo-leenbedrag-impact", () => {
     if (view.isValid) {
       expect(view.focusScenario.key).toBe("change-monthly-loan-impact");
       expect(view.focusScenario.primaryAmount).toBeGreaterThanOrEqual(2400);
+      expect(view.result.repaymentRule).toBe("SF35");
+      expect(view.focusScenario.repaymentTermYears).toBe(35);
+      expect(view.focusScenario.debtAtRepaymentStart).toBeGreaterThan(0);
+      expect(view.focusScenario.totalPaid).toBeGreaterThanOrEqual(
+        view.focusScenario.debtAtRepaymentStart,
+      );
+      expect(view.focusScenario.totalInterest).toBeGreaterThanOrEqual(0);
     }
   });
 });
