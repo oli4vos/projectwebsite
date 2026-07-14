@@ -291,6 +291,49 @@ function ScenarioSummaryCard({
   );
 }
 
+function FocusScenarioCards({ result }: { result: StudyStopCalculationResult }) {
+  return (
+    <section className="rounded-xl border hair bg-white p-5 shadow-paper space-y-4">
+      <div className="space-y-1">
+        <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
+          Jouw drie vragen
+        </div>
+        <h3 className="text-[18px] font-semibold tracking-[-0.02em] text-[var(--ink)]">
+          Schuldscenario&apos;s
+        </h3>
+      </div>
+      <div className="grid gap-3 xl:grid-cols-3">
+        {result.focusScenarios.map((scenario) => (
+          <article key={scenario.key} className="rounded-lg border hair bg-[var(--paper-soft)] p-4">
+            <div className="space-y-2">
+              <h4 className="text-[15px] font-semibold leading-snug text-[var(--ink)]">
+                {scenario.title}
+              </h4>
+              <p className="text-[12px] leading-[1.6] text-[var(--soft)]">{scenario.description}</p>
+            </div>
+            <div className="mt-4 space-y-2">
+              <ResultRow
+                label={scenario.primaryLabel}
+                value={formatCurrency(scenario.primaryAmount)}
+              />
+              <ResultRow
+                label={scenario.secondaryLabel}
+                value={formatCurrency(scenario.secondaryAmount)}
+              />
+              <ResultRow
+                label="Schuld start aflossen"
+                value={formatCurrency(scenario.debtAtRepaymentStart)}
+              />
+              <ResultRow label="Schuldenvrij rond" value={scenario.payoffDate ?? "n.v.t."} />
+            </div>
+            <p className="mt-4 text-[12px] leading-[1.6] text-[var(--soft)]">{scenario.note}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export default function DuoDoorlenenOfStoppenCalculator() {
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
   const { formValues, setFormValues, submittedValues, submit, reset } =
@@ -415,6 +458,8 @@ export default function DuoDoorlenenOfStoppenCalculator() {
           </ToolActionButton>
         </div>
       </section>
+
+      <FocusScenarioCards result={submittedView.result} />
 
       <ScenarioSummaryCard
         result={submittedView.result}
@@ -1008,10 +1053,10 @@ export default function DuoDoorlenenOfStoppenCalculator() {
             Studeren stoppen en DUO
           </h2>
           <p className="mt-3 max-w-[60ch] text-[14px] leading-[1.7] text-[var(--ink-2)]">
-            Bekijk wat nu stoppen, later alsnog een diploma halen of doorstuderen tot diploma
-            financieel betekent. De berekening houdt lening, collegegeldkrediet, basisbeurs,
-            aanvullende beurs en studentenreisproduct apart bij en toont per scenario wanneer je
-            schuldvrij bent.
+            Bekijk wat je schuld wordt als je begint met lenen, wat stoppen kost door het
+            wegvallen van de prestatiebeurs, en wat een nieuw maandbedrag doet met je eindschuld
+            terwijl je al studeert. De berekening houdt lening, collegegeldkrediet, basisbeurs,
+            aanvullende beurs en studentenreisproduct apart bij.
           </p>
         </>
       }

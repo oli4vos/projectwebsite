@@ -77,6 +77,36 @@ describe("studeren-stoppen engine", () => {
     expect(continueToDiploma.debtAtStop.total).toBeGreaterThanOrEqual(0);
   });
 
+  it("builds the three user-facing focus scenarios from the same central scenario data", () => {
+    const result = calculateStudyStopScenarios({
+      ...BASE_INPUT,
+      monthlyLoan: 300,
+      monthlyCollegegeldkrediet: 25,
+      monthlyBasisbeurs: 100,
+      monthlyAanvullendeBeurs: 50,
+      monthlyReisproduct: 10,
+    });
+
+    const [startBorrowing, stopCost, monthlyImpact] = result.focusScenarios;
+    const stopNow = result.scenarios.find((scenario) => scenario.key === "stop-now-no-diploma");
+    const continueToDiploma = result.scenarios.find((scenario) => scenario.key === "continue-to-diploma");
+
+    expect(result.focusScenarios.map((scenario) => scenario.key)).toEqual([
+      "start-study-borrowing",
+      "stop-performance-grant-cost",
+      "change-monthly-loan-impact",
+    ]);
+    expect(startBorrowing?.primaryAmount).toBe(continueToDiploma?.debtAtStop.total);
+    expect(stopCost?.primaryAmount).toBe(stopNow?.debtAtStop.prestatiebeurs);
+    expect(monthlyImpact?.primaryAmount).toBe(
+      Math.round(
+        ((continueToDiploma?.debtAtStop.alwaysRepayable ?? 0) -
+          (stopNow?.debtAtStop.alwaysRepayable ?? 0)) *
+          100,
+      ) / 100,
+    );
+  });
+
   it("keeps interest running during an aflosvrije period", () => {
     const withoutAflosvrij = calculateStudyStopScenarios({
       ...BASE_INPUT,

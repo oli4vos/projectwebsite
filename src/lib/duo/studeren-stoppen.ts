@@ -26,6 +26,11 @@ export type StudyStopScenarioKey =
   | "stop-now-later-diploma"
   | "continue-to-diploma";
 
+export type StudyStopFocusScenarioKey =
+  | "start-study-borrowing"
+  | "stop-performance-grant-cost"
+  | "change-monthly-loan-impact";
+
 export type StudyStopInput = {
   calculationMonth?: string;
   studyLevel?: StudyLevel;
@@ -134,6 +139,18 @@ export type StudyStopCalculationResult = {
   incomeBasedMonthlyPayment?: DuoIncomeBasedMonthlyPaymentResult;
   statutoryMonthlyPayment: number;
   scenarios: StudyStopScenarioResult[];
+  focusScenarios: Array<{
+    key: StudyStopFocusScenarioKey;
+    title: string;
+    description: string;
+    primaryLabel: string;
+    primaryAmount: number;
+    secondaryLabel: string;
+    secondaryAmount: number;
+    debtAtRepaymentStart: number;
+    payoffDate: string | null;
+    note: string;
+  }>;
   warnings: string[];
   assumptions: string[];
   sources: Array<{
@@ -979,6 +996,61 @@ function summarizeScenario(
   };
 }
 
+function buildFocusScenarios(scenarios: StudyStopScenarioResult[]) {
+  const stopNow = scenarios.find((scenario) => scenario.key === "stop-now-no-diploma") ?? scenarios[0];
+  const continueToDiploma =
+    scenarios.find((scenario) => scenario.key === "continue-to-diploma") ?? scenarios[scenarios.length - 1];
+
+  const extraDebtAtStop = roundMoney(
+    Math.max((continueToDiploma?.debtAtStop.total ?? 0) - (stopNow?.debtAtStop.total ?? 0), 0),
+  );
+  const extraAlwaysRepayable = roundMoney(
+    Math.max(
+      (continueToDiploma?.debtAtStop.alwaysRepayable ?? 0) - (stopNow?.debtAtStop.alwaysRepayable ?? 0),
+      0,
+    ),
+  );
+
+  return [
+    {
+      key: "start-study-borrowing" as const,
+      title: "Ik begin met studeren en ga lenen",
+      description: "Laat zien wat je schuld wordt als je vanaf nu leent tot je geplande diploma.",
+      primaryLabel: "Verwachte eindschuld",
+      primaryAmount: continueToDiploma?.debtAtStop.total ?? 0,
+      secondaryLabel: "Altijd terug te betalen",
+      secondaryAmount: continueToDiploma?.debtAtStop.alwaysRepayable ?? 0,
+      debtAtRepaymentStart: continueToDiploma?.debtAtRepaymentStart.total ?? 0,
+      payoffDate: continueToDiploma?.repayment.payoffDate ?? null,
+      note: "Gebruik bij een nieuwe studie huidige schuld 0 en vul je maandelijkse lening, collegegeldkrediet en beursdelen in.",
+    },
+    {
+      key: "stop-performance-grant-cost" as const,
+      title: "Wat kost stoppen door wegvallen prestatiebeurs?",
+      description: "Maakt zichtbaar welk deel basisbeurs, aanvullende beurs en reisproduct schuld blijft zonder diploma.",
+      primaryLabel: "Prestatiebeurs die schuld blijft",
+      primaryAmount: stopNow?.debtAtStop.prestatiebeurs ?? 0,
+      secondaryLabel: "Totale schuld bij stoppen",
+      secondaryAmount: stopNow?.debtAtStop.total ?? 0,
+      debtAtRepaymentStart: stopNow?.debtAtRepaymentStart.total ?? 0,
+      payoffDate: stopNow?.repayment.payoffDate ?? null,
+      note: "Dit is het bedrag dat niet als gift wordt omgezet als je geen diploma binnen de diplomatermijn haalt.",
+    },
+    {
+      key: "change-monthly-loan-impact" as const,
+      title: "Ik studeer al: impact nieuw leenbedrag per maand",
+      description: "Vergelijkt direct stoppen met doorgaan tot diploma op basis van de ingevulde maandbedragen.",
+      primaryLabel: "Extra altijd terug te betalen",
+      primaryAmount: extraAlwaysRepayable,
+      secondaryLabel: "Verschil eindschuld totaal",
+      secondaryAmount: extraDebtAtStop,
+      debtAtRepaymentStart: continueToDiploma?.debtAtRepaymentStart.total ?? 0,
+      payoffDate: continueToDiploma?.repayment.payoffDate ?? null,
+      note: "Pas je maandelijkse lening aan en bereken opnieuw om te zien wat dat doet met je eindschuld.",
+    },
+  ];
+}
+
 export function calculateStudyStopScenarios(
   input: StudyStopInput,
 ): StudyStopCalculationResult {
@@ -1128,6 +1200,7 @@ export function calculateStudyStopScenarios(
     statutoryMonthlyPayment: roundMoney(statutoryMonthlyPayment),
     ruleVersion: STUDY_STOP_ENGINE_VERSION,
     scenarios,
+    focusScenarios: buildFocusScenarios(scenarios),
     warnings: [
       "Dit model gebruikt jouw ingevoerde My DUO-bedragen als uitgangspunt. Het is geen DUO-beschikking.",
       "De prestatiebeurs kan alleen een gift worden als de toepasselijke diplomatermijn en voorwaarden zijn gehaald.",

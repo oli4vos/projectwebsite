@@ -73,6 +73,13 @@ type PdfReportScenario = {
   timeline: StudyStopCalculationResult["scenarios"][number]["timeline"];
 };
 
+type PdfFocusScenario = {
+  title: string;
+  description: string;
+  metrics: PdfLineItem[];
+  note: string;
+};
+
 export type StudyStopPdfReport = {
   title: string;
   subtitle: string;
@@ -83,6 +90,7 @@ export type StudyStopPdfReport = {
   disclaimer: string;
   inputSections: PdfSection[];
   summarySections: PdfSection[];
+  focusScenarios: PdfFocusScenario[];
   scenarioComparison: PdfScenarioComparisonRow[];
   scenarios: PdfReportScenario[];
   rules: string[];
@@ -573,6 +581,24 @@ function renderStudyStopPdfDocument(doc: PdfDocument, report: StudyStopPdfReport
 
   ensureSpace(220);
   y += SECTION_GAP;
+  y = renderSectionTitle(doc, "Jouw drie vragen", "De belangrijkste scenario's in gewone taal.", y);
+  report.focusScenarios.forEach((scenario) => {
+    const requiredHeight =
+      58 +
+      scenario.metrics.length * 30 +
+      doc.splitTextToSize(scenario.description, pageWidth - PAGE_MARGIN * 2 - 16).length * 12 +
+      doc.splitTextToSize(scenario.note, pageWidth - PAGE_MARGIN * 2 - 16).length * 12;
+    ensureSpace(requiredHeight);
+    y += renderParagraph(doc, scenario.title, y) + 4;
+    y += renderParagraph(doc, scenario.description, y) + 4;
+    scenario.metrics.forEach((metric) => {
+      y += renderLineItem(doc, metric.label, metric.value, metric.note, y) + 4;
+    });
+    y += renderParagraph(doc, scenario.note, y) + 8;
+  });
+
+  ensureSpace(220);
+  y += SECTION_GAP;
   y = renderSectionTitle(doc, "Scenariovergelijking", "De drie scenario's naast elkaar.", y);
   y += renderScenarioComparisonTable(doc, report, y) + 8;
 
@@ -735,6 +761,20 @@ export function buildStudyStopPdfReport(
         ],
       },
     ],
+    focusScenarios: result.focusScenarios.map((scenario) => ({
+      title: scenario.title,
+      description: scenario.description,
+      metrics: [
+        { label: scenario.primaryLabel, value: formatCurrency(scenario.primaryAmount, 0) },
+        { label: scenario.secondaryLabel, value: formatCurrency(scenario.secondaryAmount, 0) },
+        {
+          label: "Schuld bij aanvang terugbetaling",
+          value: formatCurrency(scenario.debtAtRepaymentStart, 0),
+        },
+        { label: "Schuldenvrij", value: scenario.payoffDate ?? "n.v.t." },
+      ],
+      note: scenario.note,
+    })),
     scenarioComparison: result.scenarios.map((scenario) => ({
       label: scenario.title,
       note:

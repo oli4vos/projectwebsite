@@ -38,7 +38,7 @@ export const appRegistry = [
   {
     "slug": "duo-doorlenen-of-stoppen",
     "title": "Studeren stoppen en DUO",
-    "description": "Vergelijk nu stoppen, later alsnog een diploma halen of doorstuderen tot diploma en zie wat dat doet met je studieschuld.",
+    "description": "Vergelijk starten met lenen, stoppen door wegvallende prestatiebeurs en een nieuw maandbedrag tijdens je studie.",
     "type": "frontend",
     "category": "Schulden",
     "tags": [
@@ -54,7 +54,7 @@ export const appRegistry = [
       "studentDebt.remainingDebt",
       "studentDebt.repaymentRule"
     ],
-    "reasonHint": "Handig als je wilt zien wat stoppen, doorstuderen of later een diploma halen doet met je DUO-schuld.",
+    "reasonHint": "Handig als je wilt zien wat beginnen met lenen, stoppen of meer/minder lenen per maand doet met je DUO-schuld.",
     "assumptionsUsed": [
       "duo"
     ],
