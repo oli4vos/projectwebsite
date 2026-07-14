@@ -95,7 +95,7 @@ export const knowledgeTopics: KnowledgeTopic[] = [
       "Een algemeen rentepercentage gebruiken zonder je eigen terugbetalingsregel te controleren.",
       "Rentevaste periode verwarren met de totale looptijd van je schuld.",
     ],
-    relatedTools: ["duo-doorlenen-of-stoppen", "duo-maandbedrag"],
+    relatedTools: ["duo-schuld-bij-starten-lenen", "duo-maandbedrag"],
     sourceIds: [
       "duo-rente-terugbetalers",
       "duo-rente-studenten",
@@ -121,7 +121,7 @@ export const knowledgeTopics: KnowledgeTopic[] = [
       "Vergeten dat de aflosfase meestal pas op 1 januari na de aanloopfase start.",
       "Geen planning maken voor het moment waarop de verplichte betaling begint.",
     ],
-    relatedTools: ["duo-doorlenen-of-stoppen", "duo-maandbedrag"],
+    relatedTools: ["duo-stoppen-kosten-prestatiebeurs", "duo-maandbedrag"],
     sourceIds: [
       "duo-eerder-extra-aflossen",
       "duo-u-studeert-nog",
@@ -146,7 +146,7 @@ export const knowledgeTopics: KnowledgeTopic[] = [
       "Niet controleren of DUO automatisch of op aanvraag rekening houdt met inkomen.",
       "Vergeten dat minder aflossen kan betekenen dat de schuld langer blijft staan.",
     ],
-    relatedTools: ["duo-doorlenen-of-stoppen", "duo-maandbedrag", "duo-extra-aflossen"],
+    relatedTools: ["duo-leenbedrag-impact", "duo-maandbedrag", "duo-extra-aflossen"],
     sourceIds: [
       "duo-berekening-maandbedrag",
       "duo-minder-of-niets-aflossen",
@@ -172,7 +172,7 @@ export const knowledgeTopics: KnowledgeTopic[] = [
       "Kwijtschelding als zekerheid behandelen zonder je eigen voorwaarden te controleren.",
       "Alleen naar totale schuld kijken en niet naar het verloop van rente en betalingen.",
     ],
-    relatedTools: ["duo-doorlenen-of-stoppen", "duo-maandbedrag", "duo-extra-aflossen"],
+    relatedTools: ["duo-leenbedrag-impact", "duo-maandbedrag", "duo-extra-aflossen"],
     sourceIds: [
       "duo-zo-werkt-terugbetalen",
       "duo-minder-of-niets-aflossen",

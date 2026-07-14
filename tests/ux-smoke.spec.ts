@@ -122,7 +122,9 @@ test("DUO-tools tonen de uitgebreide PDF-download", async ({ page }, testInfo) =
   test.skip(!testInfo.project.name.startsWith("desktop"), "Desktopinteractie controleren");
 
   for (const route of [
-    "/apps/duo-doorlenen-of-stoppen",
+    "/apps/duo-schuld-bij-starten-lenen",
+    "/apps/duo-stoppen-kosten-prestatiebeurs",
+    "/apps/duo-leenbedrag-impact",
     "/apps/duo-maandbedrag",
     "/apps/duo-extra-aflossen",
   ]) {
@@ -131,13 +133,13 @@ test("DUO-tools tonen de uitgebreide PDF-download", async ({ page }, testInfo) =
   }
 });
 
-test("stopscenario toont de drie scenario's en schuldenvrije datum", async ({ page }, testInfo) => {
+test("losse DUO-tools tonen simpele scenario-uitkomst en schuldenvrije datum", async ({ page }, testInfo) => {
   test.skip(!testInfo.project.name.startsWith("desktop"), "Desktopinteractie controleren");
 
-  await page.goto("/apps/duo-doorlenen-of-stoppen", { waitUntil: "networkidle" });
+  await page.goto("/apps/duo-leenbedrag-impact", { waitUntil: "networkidle" });
   await page.getByRole("button", { name: "Voorbeeld invullen" }).first().click();
-  await page.getByRole("button", { name: "Bereken scenario's" }).first().click();
+  await page.getByRole("button", { name: "Bereken impact" }).first().click();
 
-  await expect(page.getByRole("heading", { name: "Scenariovergelijking" })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Doorstuderen tot diploma" }).first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Ik studeer al: impact nieuw leenbedrag per maand" })).toBeVisible();
+  await expect(page.getByText("Schuldenvrij rond")).toBeVisible();
 });

@@ -9,7 +9,8 @@ const routeSteps = [
     title: "Wat wordt mijn schuld?",
     body: "Bekijk wat je tijdens je studie opbouwt en welke rente daarbij hoort.",
     links: [
-      { href: "/apps/duo-doorlenen-of-stoppen", label: "Doorlenen of stoppen" },
+      { href: "/apps/duo-schuld-bij-starten-lenen", label: "Starten met lenen" },
+      { href: "/apps/duo-leenbedrag-impact", label: "Impact leenbedrag" },
       { href: "/kennisbank", label: "Lees hoe DUO-rente werkt" },
     ],
   },

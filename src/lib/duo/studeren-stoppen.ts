@@ -830,7 +830,7 @@ function simulateScenario(input: {
   for (let month = 1; month <= monthsToRepaymentStart; month += 1) {
     const currentMonth = addMonths(input.calculationMonth, month);
     const openingDebt = getSnapshot(currentStates).total;
-    if (openingDebt <= 0) {
+    if (openingDebt <= 0 && month > input.stopMonths) {
       break;
     }
 

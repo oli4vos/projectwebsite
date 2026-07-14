@@ -14,13 +14,6 @@ export const appComponents: Record<string, AppCalculatorComponent> = {
       </div>
     ),
   }),
-  "duo-doorlenen-of-stoppen": dynamic(() => import("../../apps/duo-doorlenen-of-stoppen/Calculator"), {
-    loading: () => (
-      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
-        Rekentool laden...
-      </div>
-    ),
-  }),
   "duo-extra-aflossen": dynamic(() => import("../../apps/duo-extra-aflossen/Calculator"), {
     loading: () => (
       <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
@@ -28,7 +21,28 @@ export const appComponents: Record<string, AppCalculatorComponent> = {
       </div>
     ),
   }),
+  "duo-leenbedrag-impact": dynamic(() => import("../../apps/duo-leenbedrag-impact/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
   "duo-maandbedrag": dynamic(() => import("../../apps/duo-maandbedrag/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "duo-schuld-bij-starten-lenen": dynamic(() => import("../../apps/duo-schuld-bij-starten-lenen/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
+  "duo-stoppen-kosten-prestatiebeurs": dynamic(() => import("../../apps/duo-stoppen-kosten-prestatiebeurs/Calculator"), {
     loading: () => (
       <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
         Rekentool laden...

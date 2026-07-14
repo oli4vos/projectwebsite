@@ -36,39 +36,6 @@ export const appRegistry = [
     "entry": "Calculator.tsx"
   },
   {
-    "slug": "duo-doorlenen-of-stoppen",
-    "title": "Studeren stoppen en DUO",
-    "description": "Vergelijk starten met lenen, stoppen door wegvallende prestatiebeurs en een nieuw maandbedrag tijdens je studie.",
-    "type": "frontend",
-    "category": "Schulden",
-    "tags": [
-      "DUO",
-      "studieschuld",
-      "diploma",
-      "prestatiebeurs",
-      "scenario"
-    ],
-    "status": "beta",
-    "visibility": "public",
-    "requiredProfileFields": [
-      "studentDebt.remainingDebt",
-      "studentDebt.repaymentRule"
-    ],
-    "reasonHint": "Handig als je wilt zien wat beginnen met lenen, stoppen of meer/minder lenen per maand doet met je DUO-schuld.",
-    "assumptionsUsed": [
-      "duo"
-    ],
-    "calculationDomains": [
-      "studentDebt",
-      "cashflow"
-    ],
-    "riskLevel": "medium",
-    "disclaimerType": "duoIndicative",
-    "outputType": "scenarioComparison",
-    "version": "1.0.0",
-    "entry": "Calculator.tsx"
-  },
-  {
     "slug": "duo-extra-aflossen",
     "title": "Wat doet extra aflossen?",
     "description": "Bekijk feitelijk wat een extra DUO-aflossing doet met maandtermijn, looptijd en rentelast.",
@@ -103,6 +70,35 @@ export const appRegistry = [
     "entry": "Calculator.tsx"
   },
   {
+    "slug": "duo-leenbedrag-impact",
+    "title": "Impact van mijn leenbedrag",
+    "description": "Bereken simpel wat een nieuw leenbedrag per maand doet met je eindschuld terwijl je al studeert.",
+    "type": "frontend",
+    "category": "Schulden",
+    "tags": [
+      "DUO",
+      "leenbedrag",
+      "eindschuld",
+      "studieschuld"
+    ],
+    "status": "beta",
+    "visibility": "public",
+    "requiredProfileFields": [],
+    "reasonHint": "Handig als je al studeert en wilt zien wat meer of minder lenen per maand doet.",
+    "assumptionsUsed": [
+      "duo"
+    ],
+    "calculationDomains": [
+      "studentDebt",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "duoIndicative",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
     "slug": "duo-maandbedrag",
     "title": "Wat wordt mijn DUO-maandbedrag?",
     "description": "Bereken je wettelijke DUO-maandtermijn en bekijk optioneel een draagkrachtindicatie.",
@@ -123,6 +119,64 @@ export const appRegistry = [
       "income.householdType"
     ],
     "reasonHint": "Handig als je wilt begrijpen welk DUO-maandbedrag bij je schuld hoort.",
+    "assumptionsUsed": [
+      "duo"
+    ],
+    "calculationDomains": [
+      "studentDebt",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "duoIndicative",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "duo-schuld-bij-starten-lenen",
+    "title": "Wat wordt mijn studieschuld?",
+    "description": "Bereken simpel wat je schuld wordt als je nu begint met studeren en per maand gaat lenen.",
+    "type": "frontend",
+    "category": "Schulden",
+    "tags": [
+      "DUO",
+      "studieschuld",
+      "lenen",
+      "student"
+    ],
+    "status": "beta",
+    "visibility": "public",
+    "requiredProfileFields": [],
+    "reasonHint": "Handig als je wilt weten wat je schuld wordt voordat je begint met lenen.",
+    "assumptionsUsed": [
+      "duo"
+    ],
+    "calculationDomains": [
+      "studentDebt",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "duoIndicative",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "duo-stoppen-kosten-prestatiebeurs",
+    "title": "Wat kost stoppen met studeren?",
+    "description": "Bereken wat stoppen kost door basisbeurs, aanvullende beurs en studentenreisproduct die geen gift worden.",
+    "type": "frontend",
+    "category": "Schulden",
+    "tags": [
+      "DUO",
+      "stoppen",
+      "prestatiebeurs",
+      "studieschuld"
+    ],
+    "status": "beta",
+    "visibility": "public",
+    "requiredProfileFields": [],
+    "reasonHint": "Handig als je wilt weten welk prestatiebeursbedrag schuld blijft als je stopt zonder diploma.",
     "assumptionsUsed": [
       "duo"
     ],

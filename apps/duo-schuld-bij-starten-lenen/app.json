@@ -1,0 +1,19 @@
+{
+  "slug": "duo-schuld-bij-starten-lenen",
+  "title": "Wat wordt mijn studieschuld?",
+  "description": "Bereken simpel wat je schuld wordt als je nu begint met studeren en per maand gaat lenen.",
+  "type": "frontend",
+  "category": "Schulden",
+  "tags": ["DUO", "studieschuld", "lenen", "student"],
+  "status": "beta",
+  "visibility": "public",
+  "requiredProfileFields": [],
+  "reasonHint": "Handig als je wilt weten wat je schuld wordt voordat je begint met lenen.",
+  "assumptionsUsed": ["duo"],
+  "calculationDomains": ["studentDebt", "cashflow"],
+  "riskLevel": "medium",
+  "disclaimerType": "duoIndicative",
+  "outputType": "singleResult",
+  "version": "1.0.0",
+  "entry": "Calculator.tsx"
+}

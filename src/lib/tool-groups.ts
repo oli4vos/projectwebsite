@@ -10,9 +10,11 @@ export type ToolGroup = {
 export const toolGroups: ToolGroup[] = [
   {
     title: "Studieschuld",
-    description: "Begin hier: stoppen, schuldopbouw, maandbedrag en wat DUO voor je keuzes betekent.",
+    description: "Begin hier: schuldopbouw, stoppen, leenbedrag, maandbedrag en wat DUO voor je keuzes betekent.",
     slugs: [
-      "duo-doorlenen-of-stoppen",
+      "duo-schuld-bij-starten-lenen",
+      "duo-stoppen-kosten-prestatiebeurs",
+      "duo-leenbedrag-impact",
       "duo-maandbedrag",
       "duo-extra-aflossen",
       "schulden-volgorde",
@@ -47,7 +49,9 @@ const categoryToGroupTitle: Record<string, string> = {
 
 const preferredSlugsByCategory: Record<string, string[]> = {
   Schulden: [
-    "duo-doorlenen-of-stoppen",
+    "duo-schuld-bij-starten-lenen",
+    "duo-stoppen-kosten-prestatiebeurs",
+    "duo-leenbedrag-impact",
     "duo-maandbedrag",
     "duo-extra-aflossen",
     "hypotheek-impact-studieschuld",
@@ -78,7 +82,7 @@ export function getGroupAnchorForCategory(category: string) {
 }
 
 export function getCategoryFallbackToolHref(category: string, apps: AppManifest[]) {
-  const preferred = preferredSlugsByCategory[category] ?? ["duo-doorlenen-of-stoppen"];
+  const preferred = preferredSlugsByCategory[category] ?? ["duo-schuld-bij-starten-lenen"];
   const match = preferred.find((slug) => apps.some((app) => app.slug === slug));
-  return `/apps/${match ?? "duo-doorlenen-of-stoppen"}`;
+  return `/apps/${match ?? "duo-schuld-bij-starten-lenen"}`;
 }

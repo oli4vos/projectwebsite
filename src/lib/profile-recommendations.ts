@@ -27,8 +27,12 @@ const generalReasonsBySlug: Record<string, string> = {
     "Handig als je eerst wilt begrijpen welk DUO-maandbedrag bij je schuld hoort.",
   "duo-extra-aflossen":
     "Handig als je wilt zien wat extra aflossen bij DUO verandert in maandlast en looptijd.",
-  "duo-doorlenen-of-stoppen":
-    "Handig als je wilt zien wat stoppen met studeren, doorstuderen of later een diploma halen met je DUO-schuld doet.",
+  "duo-schuld-bij-starten-lenen":
+    "Handig als je wilt weten wat je schuld wordt als je begint met lenen.",
+  "duo-stoppen-kosten-prestatiebeurs":
+    "Handig als je wilt weten wat stoppen kost door je prestatiebeurs.",
+  "duo-leenbedrag-impact":
+    "Handig als je wilt zien wat een nieuw maandbedrag doet met je eindschuld.",
   "hypotheek-impact-studieschuld":
     "Handig als je wilt weten welk DUO-bedrag kan meetellen bij je hypotheekruimte.",
   "artifact-hypotheek-wonen-maximale-hypotheek":
@@ -179,9 +183,9 @@ export function getRecommendedAppsForProfile(
 
   if (hasPositiveNumber(safeProfile.studentDebt?.remainingDebt)) {
     recommendations.push({
-      slug: "duo-doorlenen-of-stoppen",
+      slug: "duo-leenbedrag-impact",
       specificReason:
-        "Omdat je studieschuld hebt ingevuld en wilt zien wat stoppen, doorstuderen of later een diploma halen betekent.",
+        "Omdat je studieschuld hebt ingevuld en wilt zien wat een nieuw maandbedrag met je eindschuld doet.",
     });
     recommendations.push({
       slug: "duo-maandbedrag",

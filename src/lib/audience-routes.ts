@@ -44,7 +44,9 @@ export const audienceRoutes: AudienceRoute[] = [
       "Eerst grip op DUO, daarna pas wonen en familiehulp.",
     groups: ["Studieschuld", "Wonen"],
     primaryToolSlugs: [
-      "duo-doorlenen-of-stoppen",
+      "duo-schuld-bij-starten-lenen",
+      "duo-stoppen-kosten-prestatiebeurs",
+      "duo-leenbedrag-impact",
       "duo-maandbedrag",
       "duo-extra-aflossen",
       "hypotheek-impact-studieschuld",
@@ -64,7 +66,7 @@ export const audienceRoutes: AudienceRoute[] = [
       "hypotheek-impact-studieschuld",
       "artifact-hypotheek-wonen-maximale-hypotheek",
       "familiehulp-eerste-woning",
-      "duo-doorlenen-of-stoppen",
+      "duo-leenbedrag-impact",
     ],
   },
   {

@@ -108,7 +108,7 @@ describe("profile recommendations", () => {
       },
     };
     const slugs = getRecommendedAppSlugsForProfile(profile, { availableSlugs });
-    expect(slugs).toContain("duo-doorlenen-of-stoppen");
+    expect(slugs).toContain("duo-leenbedrag-impact");
     expect(slugs).toContain("duo-maandbedrag");
     expect(slugs).toContain("duo-extra-aflossen");
     expect(slugs).toContain("hypotheek-impact-studieschuld");

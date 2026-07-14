@@ -77,6 +77,26 @@ describe("studeren-stoppen engine", () => {
     expect(continueToDiploma.debtAtStop.total).toBeGreaterThanOrEqual(0);
   });
 
+  it("accrues new borrowing when a student starts with no existing debt", () => {
+    const result = calculateStudyStopScenarios({
+      ...BASE_INPUT,
+      currentLoanDebt: 0,
+      currentCollegegeldkredietDebt: 0,
+      currentBasisbeursDebt: 0,
+      currentAanvullendeBeursDebt: 0,
+      currentReisproductDebt: 0,
+      monthlyLoan: 300,
+      monthlyCollegegeldkrediet: 25,
+      monthlyBasisbeurs: 0,
+      monthlyAanvullendeBeurs: 0,
+      monthlyReisproduct: 0,
+      monthsUntilContinueDiploma: 12,
+    });
+
+    expect(result.scenarios[2].debtAtStop.alwaysRepayable).toBe(3900);
+    expect(result.focusScenarios[0].primaryAmount).toBeGreaterThan(0);
+  });
+
   it("builds the three user-facing focus scenarios from the same central scenario data", () => {
     const result = calculateStudyStopScenarios({
       ...BASE_INPUT,

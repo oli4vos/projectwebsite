@@ -81,7 +81,9 @@ describe("audience routes", () => {
 
   it("returns route apps in configured order", () => {
     const apps = [
-      app("duo-doorlenen-of-stoppen", "Doorlenen"),
+      app("duo-schuld-bij-starten-lenen", "Starten"),
+      app("duo-stoppen-kosten-prestatiebeurs", "Stoppen"),
+      app("duo-leenbedrag-impact", "Leenbedrag"),
       app("duo-extra-aflossen", "Extra aflossen"),
       app("duo-maandbedrag", "Maandbedrag"),
       app("familiehulp-eerste-woning", "Familiehulp"),
@@ -90,7 +92,9 @@ describe("audience routes", () => {
     ];
 
     expect(getAudienceRouteApps("starter-studieschuld", apps).map((item) => item.slug)).toEqual([
-      "duo-doorlenen-of-stoppen",
+      "duo-schuld-bij-starten-lenen",
+      "duo-stoppen-kosten-prestatiebeurs",
+      "duo-leenbedrag-impact",
       "duo-maandbedrag",
       "duo-extra-aflossen",
       "hypotheek-impact-studieschuld",
@@ -100,7 +104,7 @@ describe("audience routes", () => {
       "hypotheek-impact-studieschuld",
       "artifact-hypotheek-wonen-maximale-hypotheek",
       "familiehulp-eerste-woning",
-      "duo-doorlenen-of-stoppen",
+      "duo-leenbedrag-impact",
     ]);
   });
 
