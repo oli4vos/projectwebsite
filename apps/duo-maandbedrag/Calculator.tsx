@@ -10,6 +10,10 @@ import { CalculatorShell } from "@/components/tool/CalculatorShell";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
 import { getRepaymentRuleLabel } from "@/lib/copy-glossary";
 import {
+  formatDuoRateYearLabel,
+  getAvailableDuoRateYears,
+} from "@/lib/financial-constants";
+import {
   createDuoDebtPartFormValue,
   type DuoDebtPartFormValue,
 } from "@/lib/duo/debt-parts-form";
@@ -210,15 +214,14 @@ export default function DuoMaandbedragCalculator() {
             onChange={(event) => updateField("duoRateYear", event.target.value)}
             className="ring-focus hair h-12 rounded-md border bg-white px-3 text-[15px] text-[var(--ink)] outline-none"
           >
-            {[2026, 2025, 2024, 2023, 2022].map((year) => (
+            {getAvailableDuoRateYears().map((year) => (
               <option key={year} value={year}>
-                {year}
+                {formatDuoRateYearLabel(year, formValues.repaymentRule)}
               </option>
             ))}
           </select>
           <p className="text-[12px] leading-[1.5] text-[var(--soft)]">
-            DUO stelt voor terugbetalers elk jaar een nieuw rentepercentage vast
-            dat daarna 5 jaar blijft staan.
+            Selecteer het jaar of herken het aan het percentage, bijvoorbeeld 2026 — 2,33%.
           </p>
           <FieldError message={view.errors.duoRateYear} />
         </label>
@@ -229,6 +232,7 @@ export default function DuoMaandbedragCalculator() {
         parts={formValues.debtParts}
         totalDebt={view.debtPartsTotal}
         errorsById={view.debtPartErrors}
+        repaymentRule={formValues.repaymentRule}
         onToggle={toggleDebtParts}
         onPartChange={updateDebtPart}
         onAddPart={addDebtPart}

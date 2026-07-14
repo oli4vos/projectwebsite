@@ -7,6 +7,7 @@ import {
   getAvailableDuoRateYears,
   getDuoHistoricalRateForRule,
   getDuoHistoricalRateYearForRule,
+  formatDuoRateYearLabel,
   isSupportedDuoRateYear,
 } from "@/lib/financial-constants/duo-rate-history";
 import {
@@ -134,3 +135,4 @@ export type {
 export { getMortgageFinancingLoadTable };
 export { getAvailableDuoRateYears };
 export { getDuoHistoricalRateYearForRule };
+export { formatDuoRateYearLabel };

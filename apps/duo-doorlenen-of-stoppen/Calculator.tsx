@@ -9,6 +9,10 @@ import { ResultRow } from "@/components/ResultRow";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
 import { getRepaymentRuleLabel } from "@/lib/copy-glossary";
+import {
+  formatDuoRateYearLabel,
+  getAvailableDuoRateYears,
+} from "@/lib/financial-constants";
 import { useMobileFieldFlow } from "@/hooks/useMobileFieldFlow";
 import { useSubmittedCalculation } from "@/hooks/useSubmittedCalculation";
 import type { StudyStopCalculationResult } from "@/lib/duo/studeren-stoppen";
@@ -845,15 +849,16 @@ export default function DuoDoorlenenOfStoppenCalculator() {
           onChange={(value) => updateField("repaymentRule", value as StudyStopFormValues["repaymentRule"])}
           className={mobileFlow.getFieldClassName("repaymentRule")}
         />
-        <TextField
+        <SelectField
           id="duoRateYear"
           label="DUO-rentejaar"
           value={formValues.duoRateYear}
           error={currentView.isValid ? undefined : currentView.errors.duoRateYear}
-          hint="Laatste 5 jaar"
-          type="number"
-          step="1"
-          min="0"
+          hint="Kies op jaar of percentage"
+          options={getAvailableDuoRateYears().map((year) => ({
+            label: formatDuoRateYearLabel(year, formValues.repaymentRule),
+            value: String(year),
+          }))}
           onChange={(value) => updateField("duoRateYear", value)}
           onEnter={mobileFlow.handleEnterAdvance("duoRateYear", false)}
           className={mobileFlow.getFieldClassName("duoRateYear")}

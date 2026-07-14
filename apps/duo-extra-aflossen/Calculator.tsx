@@ -11,7 +11,10 @@ import { ResultRow } from "@/components/ResultRow";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
 import { getRepaymentRuleLabel } from "@/lib/copy-glossary";
-import { getAvailableDuoRateYears } from "@/lib/financial-constants";
+import {
+  formatDuoRateYearLabel,
+  getAvailableDuoRateYears,
+} from "@/lib/financial-constants";
 import {
   createDuoDebtPartFormValue,
   type DuoDebtPartFormValue,
@@ -209,12 +212,12 @@ export default function DuoExtraAflossenCalculator() {
           >
             {getAvailableDuoRateYears().map((year) => (
               <option key={year} value={year}>
-                {year}
+                {formatDuoRateYearLabel(year, formValues.repaymentRule)}
               </option>
             ))}
           </select>
           <p className="text-[12px] leading-[1.5] text-[var(--soft)]">
-            DUO zet voor terugbetalers ieder jaar een rente vast die daarna 5 jaar blijft gelden.
+            Selecteer het jaar of herken het aan het percentage, bijvoorbeeld 2026 — 2,33%.
           </p>
           <FieldError message={view.errors.duoRateYear} />
         </label>
@@ -225,6 +228,7 @@ export default function DuoExtraAflossenCalculator() {
         parts={formValues.debtParts}
         totalDebt={view.debtPartsTotal}
         errorsById={view.debtPartErrors}
+        repaymentRule={formValues.repaymentRule}
         onToggle={toggleDebtParts}
         onPartChange={updateDebtPart}
         onAddPart={addDebtPart}

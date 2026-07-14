@@ -3,11 +3,15 @@
 import { DisclosureSection } from "@/components/DisclosureSection";
 import { FieldError } from "@/components/forms/FieldError";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
-import { getAvailableDuoRateYears } from "@/lib/financial-constants";
+import {
+  formatDuoRateYearLabel,
+  getAvailableDuoRateYears,
+} from "@/lib/financial-constants";
 import type {
   DuoDebtPartFieldErrors,
   DuoDebtPartFormValue,
 } from "@/lib/duo/debt-parts-form";
+import type { RepaymentRuleKey } from "@/lib/financial-constants";
 
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("nl-NL", {
@@ -23,6 +27,7 @@ type DuoDebtPartsEditorProps = {
   parts: DuoDebtPartFormValue[];
   totalDebt: number;
   errorsById: Record<string, DuoDebtPartFieldErrors>;
+  repaymentRule?: RepaymentRuleKey;
   onToggle: (enabled: boolean) => void;
   onPartChange: (
     id: string,
@@ -38,6 +43,7 @@ export function DuoDebtPartsEditor({
   parts,
   totalDebt,
   errorsById,
+  repaymentRule = "UNKNOWN",
   onToggle,
   onPartChange,
   onAddPart,
@@ -132,7 +138,7 @@ export function DuoDebtPartsEditor({
                       >
                         {availableRateYears.map((year) => (
                           <option key={year} value={year}>
-                            {year}
+                            {formatDuoRateYearLabel(year, repaymentRule)}
                           </option>
                         ))}
                       </select>

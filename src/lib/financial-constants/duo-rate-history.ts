@@ -107,3 +107,13 @@ export function getDuoHistoricalRateYearForRule(
     return sanitizeRate(historicalRate) === safeRate;
   });
 }
+
+export function formatDuoRateYearLabel(year: number, rule: RepaymentRuleKey = "UNKNOWN") {
+  const rate = getDuoHistoricalRateForRule(rule, year);
+  const formattedRate = new Intl.NumberFormat("nl-NL", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(rate);
+
+  return `${year} — ${formattedRate}%`;
+}

@@ -13,7 +13,11 @@ import { useMobileFieldFlow } from "@/hooks/useMobileFieldFlow";
 import { useSubmittedCalculation } from "@/hooks/useSubmittedCalculation";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { getGlossaryExplanation } from "@/lib/copy-glossary";
-import { getAvailableDuoRateYears, getFinancialConstants } from "@/lib/financial-constants";
+import {
+  formatDuoRateYearLabel,
+  getAvailableDuoRateYears,
+  getFinancialConstants,
+} from "@/lib/financial-constants";
 import {
   createDuoDebtPartFormValue,
   createDefaultDuoDebtPartFormValues,
@@ -894,12 +898,12 @@ function CalculatorContent({
                 >
                   {getAvailableDuoRateYears().map((year) => (
                     <option key={year} value={year}>
-                      {year}
+                      {formatDuoRateYearLabel(year, formValues.repaymentRule)}
                     </option>
                   ))}
                 </select>
                 <p className="text-[12px] leading-[1.5] text-[var(--soft)]">
-                  DUO stelt voor terugbetalers elk jaar opnieuw een rente vast; die blijft daarna 5 jaar staan.
+                  Kies op jaar of percentage, bijvoorbeeld 2026 — 2,33%.
                 </p>
                 <FieldError message={errors.duoRateYear} />
               </label>

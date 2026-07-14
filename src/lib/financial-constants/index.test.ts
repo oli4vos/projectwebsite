@@ -6,6 +6,7 @@ import {
   getDuoBorrowingLimits,
   getDuoRateForRule,
   getDuoHistoricalRateYearForRule,
+  formatDuoRateYearLabel,
   getFinancialConstants,
   getMortgageFinancingLoadRatio,
   getMortgageFinancingLoadTable,
@@ -40,6 +41,11 @@ describe("financial constants helpers", () => {
     expect(getDuoHistoricalRateYearForRule("SF35", 2.33)).toBe(2026);
     expect(getDuoHistoricalRateYearForRule("SF15", 2.95)).toBe(2024);
     expect(getDuoHistoricalRateYearForRule("SF35", 9.99)).toBeUndefined();
+  });
+
+  it("formats rate-year labels with the visible percentage", () => {
+    expect(formatDuoRateYearLabel(2026, "SF35")).toBe("2026 — 2,33%");
+    expect(formatDuoRateYearLabel(2024, "SF15")).toBe("2024 — 2,95%");
   });
 
   it("exposes central DUO borrowing limits for tool sliders", () => {
