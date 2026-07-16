@@ -124,6 +124,7 @@ function SelectField({
 
 export default function Calculator() {
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
+  const [showLoanSplit, setShowLoanSplit] = useState(false);
   const { formValues, setFormValues, submittedValues, submit, hasDirtyChanges, reset } =
     useSubmittedCalculation<MortgageFormState>(defaultValues);
   const formValidation = validateMortgageForm(formValues);
@@ -131,6 +132,7 @@ export default function Calculator() {
   const result = submittedValidation?.parsed
     ? calculateMortgageScenario(submittedValues as MortgageFormState)
     : null;
+  const loanPartSplit = result?.breakdown.loanPartSplit ?? null;
   const mobileFlow = useMobileFieldFlow([
     "grossAnnualHouseholdIncome",
     "grossAnnualPartnerIncome",
@@ -527,6 +529,101 @@ export default function Calculator() {
                 .{" "}
                 Betrouwbaarheid: <span className="font-medium text-white">{result.confidence}</span>.
               </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <ToolActionButton
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setShowLoanSplit((current) => !current)}
+                  aria-expanded={showLoanSplit}
+                  aria-controls="mortgage-loan-split"
+                >
+                  {showLoanSplit ? "Verberg verdeling" : "Laat zien"}
+                </ToolActionButton>
+              </div>
+              {showLoanSplit ? (
+                <div
+                  id="mortgage-loan-split"
+                  className="mt-4 rounded-[1rem] border border-white/15 bg-white/5 p-4 text-white/90"
+                >
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <h3 className="text-[14px] font-semibold tracking-[-0.01em] text-white">
+                        Verdeling in twee leningdelen
+                      </h3>
+                      <p className="mt-1 text-[12.5px] leading-6 text-white/70">
+                        Leningdeel A rekent met de door jou ingevulde hypotheekrente. Leningdeel B
+                        wordt apart getoetst met 5% rekenrente voor een rentevaste periode korter
+                        dan 10 jaar.
+                      </p>
+                    </div>
+                    <div className="rounded-full border border-white/15 px-3 py-1 text-[11px] uppercase tracking-[0.12em] text-white/65">
+                      {loanPartSplit?.hasUsefulSplit ? "indicatieve split" : "geen extra split"}
+                    </div>
+                  </div>
+
+                  {loanPartSplit?.hasUsefulSplit && loanPartSplit.shortFixedPart ? (
+                    <div className="mt-4 grid gap-3 md:grid-cols-2">
+                      <div className="rounded-[14px] border border-white/12 bg-white/6 p-4">
+                        <div className="text-[11px] uppercase tracking-[0.12em] text-white/55">
+                          {loanPartSplit.regularPart.label}
+                        </div>
+                        <div className="mt-1 text-[15px] font-medium text-white">
+                          {loanPartSplit.regularPart.explanation}
+                        </div>
+                        <div className="mt-3 grid gap-2 text-[13px] leading-6 text-white/80">
+                          <div>Bedrag: {formatCurrency(loanPartSplit.regularPart.amount)}</div>
+                          <div>Rente: {formatPercent(loanPartSplit.regularPart.interestRate, 3)}</div>
+                          <div>
+                            Rekenrente: {formatPercent(loanPartSplit.regularPart.calculationRate, 3)}
+                          </div>
+                          <div>
+                            Maandlast: {formatCurrency(loanPartSplit.regularPart.monthlyPayment)}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="rounded-[14px] border border-white/12 bg-white/6 p-4">
+                        <div className="text-[11px] uppercase tracking-[0.12em] text-white/55">
+                          {loanPartSplit.shortFixedPart.label}
+                        </div>
+                        <div className="mt-1 text-[15px] font-medium text-white">
+                          {loanPartSplit.shortFixedPart.explanation}
+                        </div>
+                        <div className="mt-3 grid gap-2 text-[13px] leading-6 text-white/80">
+                          <div>Bedrag: {formatCurrency(loanPartSplit.shortFixedPart.amount)}</div>
+                          <div>Rente: {formatPercent(loanPartSplit.shortFixedPart.interestRate, 3)}</div>
+                          <div>
+                            Rekenrente: {formatPercent(loanPartSplit.shortFixedPart.calculationRate, 3)}
+                          </div>
+                          <div>
+                            Maandlast: {formatCurrency(loanPartSplit.shortFixedPart.monthlyPayment)}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="mt-4 rounded-[14px] border border-white/12 bg-white/6 p-4 text-[13px] leading-6 text-white/75">
+                      Er is op basis van deze invoer geen extra of zinvolle verdeling in twee
+                      leningdelen gevonden.
+                    </div>
+                  )}
+
+                  {loanPartSplit ? (
+                    <div className="mt-4 grid gap-2 text-[13px] leading-6 text-white/80">
+                      <div>Totaal maximale hypotheek: {formatCurrency(loanPartSplit.totalMortgage)}</div>
+                      <div>Totaal maandlast: {formatCurrency(loanPartSplit.totalMonthlyPayment)}</div>
+                      <div>{loanPartSplit.explanation}</div>
+                      <div className="text-white/65">
+                        Leningdeel B wordt hier aangeduid als rentevaste periode korter dan 10 jaar /
+                        toetsrente 5%.
+                      </div>
+                      <div className="text-white/65">
+                        Deze weergave is indicatief. Bankacceptatie en feitelijke productvoorwaarden
+                        kunnen afwijken.
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
             </>
           )}
         </div>
