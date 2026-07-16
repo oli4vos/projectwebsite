@@ -10,30 +10,6 @@ export type MortgagePresentValueInput = {
   years: number;
 };
 
-export type MortgageLoanPartId = "regular" | "shortFixed";
-
-export type MortgageLoanPartFixedRatePeriod = "10y-or-longer" | "shorter-than-10y";
-
-export type MortgageLoanPart = {
-  id: MortgageLoanPartId;
-  label: string;
-  amount: number;
-  interestRate: number;
-  calculationRate: number;
-  fixedRatePeriod: MortgageLoanPartFixedRatePeriod;
-  monthlyPayment: number;
-  explanation: string;
-};
-
-export type MortgageLoanPartSplit = {
-  totalMortgage: number;
-  regularPart: MortgageLoanPart;
-  shortFixedPart: MortgageLoanPart | null;
-  totalMonthlyPayment: number;
-  hasUsefulSplit: boolean;
-  explanation: string;
-};
-
 export type MortgageMonthlyObligationCapacityReductionInput = {
   monthlyPayment: number;
   annualMortgageRate?: number;
@@ -209,7 +185,6 @@ export type MortgageMaxMortgageBreakdown = {
   ownFunds: number;
   requiredOwnFunds: number;
   higherMortgageOpportunity?: MortgageRateOpportunity;
-  loanPartSplit?: MortgageLoanPartSplit;
 };
 
 export type MortgageRateOpportunity = {

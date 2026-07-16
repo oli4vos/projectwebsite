@@ -7,7 +7,6 @@ import {
   getStudentDebtGrossUpFactor,
 } from "@/lib/financial-constants";
 import { calculateAnnuityPayment } from "@/lib/mortgage/annuity";
-import { calculateMortgageLoanPartSplit } from "@/lib/mortgage/loan-split";
 import type {
   MortgageMaxMortgageBreakdown,
   MortgageMaxMortgageDebug,
@@ -791,8 +790,6 @@ export function calculateIndicativeMaxMortgage(
     assumptions,
     breakdown,
   };
-
-  result.breakdown.loanPartSplit = calculateMortgageLoanPartSplit(result);
 
   return result;
 }
