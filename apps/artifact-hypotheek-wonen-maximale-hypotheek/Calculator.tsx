@@ -124,7 +124,7 @@ function SelectField({
 
 export default function Calculator() {
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
-  const [showLoanSplit, setShowLoanSplit] = useState(false);
+  const [hiddenLoanSplitSignature, setHiddenLoanSplitSignature] = useState<string | null>(null);
   const { formValues, setFormValues, submittedValues, submit, hasDirtyChanges, reset } =
     useSubmittedCalculation<MortgageFormState>(defaultValues);
   const formValidation = validateMortgageForm(formValues);
@@ -133,6 +133,17 @@ export default function Calculator() {
     ? calculateMortgageScenario(submittedValues as MortgageFormState)
     : null;
   const loanPartSplit = result?.breakdown.loanPartSplit ?? null;
+  const hasUsefulLoanSplit = Boolean(loanPartSplit?.hasUsefulSplit);
+  const loanSplitSignature = result
+    ? [
+        result.finalMaxMortgage,
+        loanPartSplit?.totalMortgage ?? 0,
+        loanPartSplit?.regularPart.amount ?? 0,
+        loanPartSplit?.shortFixedPart?.amount ?? 0,
+        hasUsefulLoanSplit ? 1 : 0,
+      ].join(":")
+    : null;
+  const showLoanSplit = hasUsefulLoanSplit && hiddenLoanSplitSignature !== loanSplitSignature;
   const mobileFlow = useMobileFieldFlow([
     "grossAnnualHouseholdIncome",
     "grossAnnualPartnerIncome",
@@ -503,6 +514,16 @@ export default function Calculator() {
                   tone={result.breakdown.higherMortgageOpportunity ? "pos" : "default"}
                 />
                 <ResultCard
+                  label="Tweede leningdeel"
+                  value={hasUsefulLoanSplit ? "Beschikbaar" : "Geen extra split"}
+                  note={
+                    hasUsefulLoanSplit
+                      ? "Klik op Laat zien om de verdeling in twee leningdelen te bekijken."
+                      : "Er is geen extra ruimte gevonden om de hypotheek zinvol in twee leningdelen op te splitsen."
+                  }
+                  tone={hasUsefulLoanSplit ? "pos" : "default"}
+                />
+                <ResultCard
                   label="Benodigde eigen middelen"
                   value={formatCurrency(result.breakdown.requiredOwnFunds)}
                   tone={result.breakdown.requiredOwnFunds > 0 ? "warn" : "pos"}
@@ -533,7 +554,14 @@ export default function Calculator() {
                 <ToolActionButton
                   type="button"
                   variant="secondary"
-                  onClick={() => setShowLoanSplit((current) => !current)}
+                  onClick={() => {
+                    if (showLoanSplit) {
+                      setHiddenLoanSplitSignature(loanSplitSignature);
+                      return;
+                    }
+
+                    setHiddenLoanSplitSignature(null);
+                  }}
                   aria-expanded={showLoanSplit}
                   aria-controls="mortgage-loan-split"
                 >

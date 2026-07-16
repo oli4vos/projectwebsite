@@ -263,6 +263,9 @@ describe("calculateIndicativeMaxMortgage", () => {
       result.finalMaxMortgage,
     );
     expect(result.breakdown.higherMortgageOpportunity?.increaseInMaxMortgage).toBeGreaterThan(0);
+    expect(result.breakdown.loanPartSplit?.hasUsefulSplit).toBe(true);
+    expect(result.breakdown.loanPartSplit?.shortFixedPart?.calculationRate).toBe(5);
+    expect(result.breakdown.loanPartSplit?.totalMortgage).toBeGreaterThan(result.finalMaxMortgage);
   });
 
   it("keeps the higher-rate check silent when collateral already limits the result", () => {
