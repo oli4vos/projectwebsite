@@ -522,6 +522,15 @@ export function buildMortgagePdfReport(
     },
     { label: "Bruto maandlast", value: formatCurrency(result.monthlyPaymentGross, 2) },
     {
+      label: "Hogere hypotheek bij andere toetsrente",
+      value: result.breakdown.higherMortgageOpportunity
+        ? `Ja, ${formatCurrency(result.breakdown.higherMortgageOpportunity.increaseInMaxMortgage, 2)} hoger`
+        : "Nee",
+      note: result.breakdown.higherMortgageOpportunity
+        ? `Alternatieve toetsrente ${formatPercent(result.breakdown.higherMortgageOpportunity.alternativeTestRate, 3)}; alternatieve einduitkomst ${formatCurrency(result.breakdown.higherMortgageOpportunity.alternativeFinalMaxMortgage, 2)}.`
+        : "Geen hogere uitkomst binnen de officiële financieringslasttabelbanden.",
+    },
+    {
       label: "Impact op leencapaciteit",
       value: formatCurrency(studentLoanImpactOnLeencapaciteit, 2),
       note:
@@ -574,6 +583,34 @@ export function buildMortgagePdfReport(
         { label: "Toegepaste extra leenruimte op inkomen voor energiebesparende maatregelen", value: formatCurrency(result.breakdown.energySavingAllowance, 2) },
       ],
     },
+    ...(result.breakdown.higherMortgageOpportunity
+      ? [
+          {
+            title: "Alternatieve toetsrente",
+            subtitle:
+              "Alleen zichtbaar wanneer een hogere toetsrente binnen de officiële tabel daadwerkelijk meer hypotheek oplevert.",
+            paragraphs: [result.breakdown.higherMortgageOpportunity.note],
+            lines: [
+              {
+                label: "Huidige toetsrente",
+                value: formatPercent(result.breakdown.higherMortgageOpportunity.referenceTestRate, 3),
+              },
+              {
+                label: "Alternatieve toetsrente",
+                value: formatPercent(result.breakdown.higherMortgageOpportunity.alternativeTestRate, 3),
+              },
+              {
+                label: "Hogere hypotheek mogelijk",
+                value: `Ja, ${formatCurrency(result.breakdown.higherMortgageOpportunity.increaseInMaxMortgage, 2)} extra`,
+              },
+              {
+                label: "Alternatieve einduitkomst",
+                value: formatCurrency(result.breakdown.higherMortgageOpportunity.alternativeFinalMaxMortgage, 2),
+              },
+            ],
+          },
+        ]
+      : []),
     {
       title: "Woningwaarde, NHG en eigen middelen",
       lines: [

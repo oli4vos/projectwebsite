@@ -27,10 +27,10 @@ function formatCurrency(value: number, maximumFractionDigits = 0) {
   }).format(value);
 }
 
-function formatPercent(value: number) {
+function formatPercent(value: number, maximumFractionDigits = 2) {
   return new Intl.NumberFormat("nl-NL", {
     minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    maximumFractionDigits,
   }).format(value);
 }
 
@@ -487,6 +487,20 @@ export default function Calculator() {
                   value={result.maxHomeBudget === null ? "n.v.t." : formatCurrency(result.maxHomeBudget)}
                 />
                 <ResultCard
+                  label="Hogere hypotheek bij andere toetsrente"
+                  value={
+                    result.breakdown.higherMortgageOpportunity
+                      ? `+ ${formatCurrency(result.breakdown.higherMortgageOpportunity.increaseInMaxMortgage)}`
+                      : "Geen hogere uitkomst"
+                  }
+                  note={
+                    result.breakdown.higherMortgageOpportunity
+                      ? `Bij ${formatPercent(result.breakdown.higherMortgageOpportunity.alternativeTestRate, 3)} toetsrente kom je indicatief uit op ${formatCurrency(result.breakdown.higherMortgageOpportunity.alternativeFinalMaxMortgage)}.`
+                      : "Geen hogere uitkomst binnen de officiële financieringslasttabelbanden."
+                  }
+                  tone={result.breakdown.higherMortgageOpportunity ? "pos" : "default"}
+                />
+                <ResultCard
                   label="Benodigde eigen middelen"
                   value={formatCurrency(result.breakdown.requiredOwnFunds)}
                   tone={result.breakdown.requiredOwnFunds > 0 ? "warn" : "pos"}
@@ -573,6 +587,52 @@ export default function Calculator() {
                 label="Studentenlening brutering"
                 value={formatCurrency(result.breakdown.studentLoanMonthlyImpact)}
                 breakdown={<div>De centrale hypotheeklaag brutert de DUO-maandlast voor toetsing.</div>}
+              />
+              <ResultRow
+                label="Hogere hypotheek bij andere toetsrente"
+                value={
+                  result.breakdown.higherMortgageOpportunity
+                    ? `+ ${formatCurrency(result.breakdown.higherMortgageOpportunity.increaseInMaxMortgage)}`
+                    : "geen hogere uitkomst"
+                }
+                breakdown={
+                  result.breakdown.higherMortgageOpportunity ? (
+                    <>
+                      <div>
+                        Huidige toetsrente:{" "}
+                        {formatPercent(result.breakdown.higherMortgageOpportunity.referenceTestRate, 3)}
+                      </div>
+                      <div>
+                        Alternatieve toetsrente:{" "}
+                        {formatPercent(result.breakdown.higherMortgageOpportunity.alternativeTestRate, 3)}
+                      </div>
+                      <div>
+                        Financieringslastpercentage alternatief:{" "}
+                        {formatPercent(
+                          result.breakdown.higherMortgageOpportunity.alternativeAnnualHousingCostRatio,
+                        )}
+                      </div>
+                      <div>
+                        Alternatieve maximale hypotheek op inkomen:{" "}
+                        {formatCurrency(
+                          result.breakdown.higherMortgageOpportunity.alternativeMaxMortgageByIncome,
+                        )}
+                      </div>
+                      <div>
+                        Alternatieve einduitkomst:{" "}
+                        {formatCurrency(
+                          result.breakdown.higherMortgageOpportunity.alternativeFinalMaxMortgage,
+                        )}
+                      </div>
+                      <div>{result.breakdown.higherMortgageOpportunity.note}</div>
+                    </>
+                  ) : (
+                    <div>Geen hogere uitkomst binnen de officiële financieringslasttabelbanden.</div>
+                  )
+                }
+                breakdownLabel="Toon rentevergelijking"
+                strong={Boolean(result.breakdown.higherMortgageOpportunity)}
+                accent={Boolean(result.breakdown.higherMortgageOpportunity)}
               />
             </DisclosureSection>
 

@@ -246,4 +246,39 @@ describe("calculateIndicativeMaxMortgage", () => {
     expect(result.breakdown.maxMortgageByIncome).toBe(result.maxMortgageByIncome);
     expect(result.breakdown.maxMortgageByLtv).toBe(result.maxMortgageByCollateral);
   });
+
+  it("flags a higher mortgage when a higher official rate band increases the final result", () => {
+    const result = calculateIndicativeMaxMortgage({
+      grossAnnualHouseholdIncome: 80_000,
+      annualMortgageRate: 4.99,
+      mortgageTermYears: 30,
+    });
+
+    expect(result.breakdown.higherMortgageOpportunity).toBeDefined();
+    expect(result.breakdown.higherMortgageOpportunity?.higherMortgagePossible).toBe(true);
+    expect(result.breakdown.higherMortgageOpportunity?.alternativeTestRate).toBeGreaterThan(
+      result.breakdown.higherMortgageOpportunity?.referenceTestRate ?? 0,
+    );
+    expect(result.breakdown.higherMortgageOpportunity?.alternativeFinalMaxMortgage).toBeGreaterThan(
+      result.finalMaxMortgage,
+    );
+    expect(result.breakdown.higherMortgageOpportunity?.increaseInMaxMortgage).toBeGreaterThan(0);
+  });
+
+  it("keeps the higher-rate check silent when collateral already limits the result", () => {
+    const result = calculateIndicativeMaxMortgage({
+      grossAnnualHouseholdIncome: 120_000,
+      annualMortgageRate: 4,
+      mortgageTermYears: 30,
+      property: {
+        propertyValue: 300_000,
+        ltvPercentage: 100,
+        purchasePrice: 325_000,
+        marketValue: 300_000,
+      },
+      ownFunds: 60_000,
+    });
+
+    expect(result.breakdown.higherMortgageOpportunity).toBeUndefined();
+  });
 });

@@ -184,6 +184,19 @@ export type MortgageMaxMortgageBreakdown = {
   energySavingAllowance: number;
   ownFunds: number;
   requiredOwnFunds: number;
+  higherMortgageOpportunity?: MortgageRateOpportunity;
+};
+
+export type MortgageRateOpportunity = {
+  higherMortgagePossible: boolean;
+  referenceTestRate: number;
+  alternativeTestRate: number;
+  alternativeAnnualHousingCostRatio: number;
+  alternativeMaxMortgageByIncome: number;
+  referenceFinalMaxMortgage: number;
+  alternativeFinalMaxMortgage: number;
+  increaseInMaxMortgage: number;
+  note: string;
 };
 
 export type MortgageMaxMortgageDebug = {

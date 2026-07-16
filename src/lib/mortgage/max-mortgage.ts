@@ -15,6 +15,7 @@ import type {
   MortgageMaxMortgageLimitingFactor,
   MortgageMaxMortgagePropertyInput,
   MortgageMaxMortgageResult,
+  MortgageRateOpportunity,
   MortgageMaxMortgageStudentLoanInput,
   MortgageMaxMortgageWarning,
   MortgageMaxMortgageWarningSeverity,
@@ -171,6 +172,30 @@ function resolveMortgageRate(
   };
 }
 
+function buildHigherMortgageRateCandidates(
+  currentRate: number,
+  rateBands: ReadonlyArray<{ maxRate: number | null }>,
+) {
+  const candidates: number[] = [];
+  let previousMaxRate = 0;
+
+  for (let index = 0; index < rateBands.length; index += 1) {
+    const candidateRate =
+      index === 0 ? 0.001 : Number((previousMaxRate + 0.001).toFixed(3));
+
+    if (candidateRate > currentRate) {
+      candidates.push(candidateRate);
+    }
+
+    const bandMaxRate = rateBands[index].maxRate;
+    if (bandMaxRate !== null) {
+      previousMaxRate = bandMaxRate;
+    }
+  }
+
+  return candidates;
+}
+
 function calculateStudentLoanMonthlyImpact(
   studentLoan: MortgageMaxMortgageStudentLoanInput | undefined,
   studentDebtMonthlyPayment: number,
@@ -259,6 +284,109 @@ function calculateLiabilityMonthlyImpact(
   }, 0);
 
   return roundMonthlyMoney(monthlyFinancialObligations + liabilitiesImpact);
+}
+
+function calculateHigherMortgageOpportunity(
+  input: MortgageMaxMortgageInput,
+  normYear: number,
+  financialConstants: ReturnType<typeof getFinancialConstants>,
+  financingLoadTable: ReturnType<typeof getMortgageFinancingLoadTable>,
+  householdIncome: number,
+  mortgageTermYears: number,
+  currentTestRate: number,
+  maxMortgageByCollateral: number | null,
+  maxMortgageByNhg: number | undefined,
+  currentFinalMaxMortgage: number,
+  energyLabelAllowance: number,
+  energySavingAllowance: number,
+  financingLoadSource: "input" | "official_table" | "fallback",
+) {
+  if (financingLoadSource !== "official_table") {
+    return undefined;
+  }
+
+  const candidates = buildHigherMortgageRateCandidates(
+    currentTestRate,
+    financingLoadTable.rateBands,
+  );
+
+  let best: MortgageRateOpportunity | undefined;
+
+  for (const candidateRate of candidates) {
+    const candidateWarnings: MortgageMaxMortgageWarning[] = [];
+    const candidateAnnualHousingCostRatio = sanitizePercent(
+      getMortgageFinancingLoadRatio({
+        annualIncome: householdIncome,
+        mortgageRate: candidateRate,
+        ageYears: input.borrowerAgeYears,
+        year: normYear,
+      }) ??
+        getIndicativeIncomeHousingCostRatio(normYear) ??
+        financialConstants.mortgage.indicativeIncomeHousingCostRatio,
+    );
+    const candidateMonthlyHousingBudgetBeforeLiabilities = roundMonthlyMoney(
+      (householdIncome * candidateAnnualHousingCostRatio) / 100 / 12,
+    );
+    const candidateStudentLoanMonthlyImpact = calculateStudentLoanMonthlyImpact(
+      input.studentLoan,
+      input.studentDebtMonthlyPayment ?? 0,
+      input.studentDebtNormativeMonthlyPayment ?? 0,
+      input.studentDebtRegime ?? "unknown",
+      candidateRate,
+      candidateWarnings,
+    );
+    const candidateMonthlyLiabilityImpact = roundMonthlyMoney(
+      candidateStudentLoanMonthlyImpact + calculateLiabilityMonthlyImpact(input, candidateWarnings),
+    );
+    const candidateMonthlyHousingBudgetAfterLiabilities = roundMonthlyMoney(
+      Math.max(
+        candidateMonthlyHousingBudgetBeforeLiabilities - candidateMonthlyLiabilityImpact,
+        0,
+      ),
+    );
+    const candidateAnnuityFactor = calculateAnnuityFactor({
+      annualRate: candidateRate,
+      years: mortgageTermYears,
+    });
+    const candidateMaxMortgageByIncome = roundMoney(
+      candidateMonthlyHousingBudgetAfterLiabilities * candidateAnnuityFactor +
+        energyLabelAllowance +
+        energySavingAllowance,
+    );
+    const candidateFinalMaxMortgage = roundMoney(
+      Math.min(
+        candidateMaxMortgageByIncome,
+        maxMortgageByCollateral ?? Number.POSITIVE_INFINITY,
+        maxMortgageByNhg ?? Number.POSITIVE_INFINITY,
+      ),
+    );
+
+    if (candidateFinalMaxMortgage <= currentFinalMaxMortgage) {
+      continue;
+    }
+
+    if (
+      best === undefined ||
+      candidateFinalMaxMortgage > best.alternativeFinalMaxMortgage
+    ) {
+      best = {
+        higherMortgagePossible: true,
+        referenceTestRate: currentTestRate,
+        alternativeTestRate: candidateRate,
+        alternativeAnnualHousingCostRatio: candidateAnnualHousingCostRatio,
+        alternativeMaxMortgageByIncome: candidateMaxMortgageByIncome,
+        referenceFinalMaxMortgage: currentFinalMaxMortgage,
+        alternativeFinalMaxMortgage: candidateFinalMaxMortgage,
+        increaseInMaxMortgage: roundMoney(
+          candidateFinalMaxMortgage - currentFinalMaxMortgage,
+        ),
+        note:
+          "Een hogere toetsrente schuift je in een gunstiger financieringslastband en levert indicatief meer hypotheek op.",
+      };
+    }
+  }
+
+  return best;
 }
 
 function calculateEnergyLabelAllowance(property: MortgageMaxMortgagePropertyInput | undefined) {
@@ -565,6 +693,22 @@ export function calculateIndicativeMaxMortgage(
       ? roundMoney(Math.max(maxMortgageFinal + ownFunds - buyerCostsEstimate - renovationAmount, 0))
       : null;
 
+  const higherMortgageOpportunity = calculateHigherMortgageOpportunity(
+    input,
+    normYear,
+    financialConstants,
+    financingLoadTable,
+    householdIncome,
+    mortgageTermYears,
+    mortgageRateResolution.testRateUsed,
+    maxMortgageByCollateral ?? null,
+    maxMortgageByNhg,
+    maxMortgageFinal,
+    energyLabelAllowance,
+    energySavingAllowance,
+    financingLoadSource,
+  );
+
   const debug: MortgageMaxMortgageDebug = {
     toetsinkomen: roundMoney(householdIncome),
     primaryIncome: roundMoney(input.grossAnnualHouseholdIncome),
@@ -618,6 +762,7 @@ export function calculateIndicativeMaxMortgage(
     energySavingAllowance,
     ownFunds,
     requiredOwnFunds,
+    higherMortgageOpportunity,
   };
 
   const confidence: MortgageMaxMortgageResult["confidence"] =
