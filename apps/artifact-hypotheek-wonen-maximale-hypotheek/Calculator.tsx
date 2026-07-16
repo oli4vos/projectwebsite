@@ -124,7 +124,6 @@ function SelectField({
 
 export default function Calculator() {
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
-  const [showHigherMortgageOpportunity, setShowHigherMortgageOpportunity] = useState(false);
   const { formValues, setFormValues, submittedValues, submit, hasDirtyChanges, reset } =
     useSubmittedCalculation<MortgageFormState>(defaultValues);
   const formValidation = validateMortgageForm(formValues);
@@ -528,65 +527,6 @@ export default function Calculator() {
                 .{" "}
                 Betrouwbaarheid: <span className="font-medium text-white">{result.confidence}</span>.
               </p>
-              <div className="mt-4 flex flex-wrap gap-2">
-                <ToolActionButton
-                  type="button"
-                  variant="secondary"
-                  onClick={() => setShowHigherMortgageOpportunity((current) => !current)}
-                  aria-expanded={showHigherMortgageOpportunity}
-                  aria-controls="mortgage-rate-opportunity"
-                >
-                  {showHigherMortgageOpportunity ? "Verberg toelichting" : "Laat zien"}
-                </ToolActionButton>
-              </div>
-              {showHigherMortgageOpportunity ? (
-                <div
-                  id="mortgage-rate-opportunity"
-                  className="mt-4 rounded-[1rem] border border-white/15 bg-white/5 p-4 text-white/90"
-                >
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div>
-                      <h3 className="text-[14px] font-semibold tracking-[-0.01em] text-white">
-                        Toelichting op hogere toetsrente
-                      </h3>
-                      <p className="mt-1 text-[12.5px] leading-6 text-white/70">
-                        Hier zie je waarom een andere toetsrente soms meer leenruimte geeft, zonder
-                        dat de hypotheekberekening zelf verandert.
-                      </p>
-                    </div>
-                    <div className="rounded-full border border-white/15 px-3 py-1 text-[11px] uppercase tracking-[0.12em] text-white/65">
-                      {result.breakdown.higherMortgageOpportunity ? "toelichting beschikbaar" : "geen extra ruimte"}
-                    </div>
-                  </div>
-
-                  {result.breakdown.higherMortgageOpportunity ? (
-                    <div className="mt-4 grid gap-2 text-[13px] leading-6 text-white/80">
-                      <div>
-                        Huidige toetsrente:{" "}
-                        {formatPercent(result.breakdown.higherMortgageOpportunity.referenceTestRate, 3)}
-                      </div>
-                      <div>
-                        Alternatieve toetsrente:{" "}
-                        {formatPercent(result.breakdown.higherMortgageOpportunity.alternativeTestRate, 3)}
-                      </div>
-                      <div>
-                        Extra hypotheekruimte:{" "}
-                        {formatCurrency(result.breakdown.higherMortgageOpportunity.increaseInMaxMortgage)}
-                      </div>
-                      <div>
-                        Alternatieve uitkomst:{" "}
-                        {formatCurrency(result.breakdown.higherMortgageOpportunity.alternativeFinalMaxMortgage)}
-                      </div>
-                      <div>{result.breakdown.higherMortgageOpportunity.note}</div>
-                    </div>
-                  ) : (
-                    <div className="mt-4 rounded-[14px] border border-white/12 bg-white/6 p-4 text-[13px] leading-6 text-white/75">
-                      Er is op basis van deze invoer geen extra toelichting op een hogere toetsrente
-                      beschikbaar.
-                    </div>
-                  )}
-                </div>
-              ) : null}
             </>
           )}
         </div>

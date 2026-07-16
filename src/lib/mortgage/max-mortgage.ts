@@ -772,7 +772,7 @@ export function calculateIndicativeMaxMortgage(
         ? "medium"
         : "high";
 
-  const result: MortgageMaxMortgageResult = {
+  return {
     normYear,
     maxMortgageByIncome,
     maxMortgageByCollateral: maxMortgageByCollateral ?? null,
@@ -790,6 +790,4 @@ export function calculateIndicativeMaxMortgage(
     assumptions,
     breakdown,
   };
-
-  return result;
 }
