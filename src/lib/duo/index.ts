@@ -15,6 +15,14 @@ export {
   sanitizeDuoPercent,
 } from "@/lib/duo/calculations";
 export { projectDuoLoan } from "@/lib/duo/project-duo-loan";
+export { determineDuoMortgageAssessmentPayment } from "@/lib/duo/mortgage-assessment";
+export type {
+  DuoMortgageAssessmentBasis,
+  DuoMortgageAssessmentInput,
+  DuoMortgageAssessmentResult,
+  DuoMortgageAssessmentSituation,
+  DuoMortgageAssessmentUncertainty,
+} from "@/lib/duo/mortgage-assessment";
 export type {
   DuoLoanProjectionContext,
   DuoExtraRepaymentProjectionInput,
