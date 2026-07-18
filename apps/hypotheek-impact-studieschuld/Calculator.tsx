@@ -5,6 +5,7 @@ import { DuoDebtPartsEditor } from "@/components/duo/DuoDebtPartsEditor";
 import { DisclosureSection } from "@/components/DisclosureSection";
 import { FieldError } from "@/components/forms/FieldError";
 import { MobileFieldFlowControls } from "@/components/MobileFieldFlowControls";
+import { MortgageRateReferenceLink } from "@/components/mortgage/MortgageRateReferenceLink";
 import { ResultRow } from "@/components/ResultRow";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
@@ -828,6 +829,9 @@ function CalculatorContent({
               />
               <FieldError message={errors.mortgageRate} />
             </label>
+            <div className={mobileFlow.getFieldClassName("mortgageRate")}>
+              <MortgageRateReferenceLink compact />
+            </div>
 
             <label className={mobileFlow.getFieldClassName("mortgageTermYears")}>
               <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">

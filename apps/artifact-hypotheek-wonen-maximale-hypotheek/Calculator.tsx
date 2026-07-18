@@ -4,6 +4,7 @@ import { useState } from "react";
 import { DisclosureSection } from "@/components/DisclosureSection";
 import { FieldError } from "@/components/forms/FieldError";
 import { MobileFieldFlowControls } from "@/components/MobileFieldFlowControls";
+import { MortgageRateReferenceLink } from "@/components/mortgage/MortgageRateReferenceLink";
 import { ResultCard } from "@/components/ResultCard";
 import { ResultRow } from "@/components/ResultRow";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
@@ -256,6 +257,9 @@ export default function Calculator() {
               hint="Bijv. 4,01%"
               className={mobileFlow.getFieldClassName("annualMortgageRate")}
             />
+            <div className={mobileFlow.getFieldClassName("annualMortgageRate")}>
+              <MortgageRateReferenceLink compact />
+            </div>
             <Field
               label="Toetsrente bij rentevast korter dan 10 jaar"
               value={formValues.afmStressAnnualRate}
