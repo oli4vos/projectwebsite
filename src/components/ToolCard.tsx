@@ -27,10 +27,11 @@ export function ToolCard({
   return (
     <Link
       href={href}
-      className={`group relative flex h-full w-full flex-col overflow-hidden rounded-xl border hair bg-white text-left transition duration-200 hover:bg-[var(--paper-soft)] focus-visible:shadow-paper focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 active:translate-y-px ${
+      className={`surface-panel touch-link group relative flex h-full w-full flex-col overflow-hidden text-left focus-visible:shadow-paper focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 ${
         dense ? "p-5" : "p-6"
       }`}
     >
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-[var(--accent-soft)] opacity-0 transition group-hover:opacity-100" />
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <CategoryDot cat={cat} />
@@ -51,7 +52,7 @@ export function ToolCard({
         {title}
       </h3>
 
-      <p className="mt-2 line-clamp-3 text-[13.5px] leading-[1.55] text-[var(--muted)]">
+      <p className="mt-2 line-clamp-3 text-[13.5px] leading-[1.6] text-[var(--muted)]">
         <GlossaryText text={blurb} />
       </p>
 
@@ -61,15 +62,15 @@ export function ToolCard({
             <div className="text-[12px] font-medium text-[var(--soft)]">{statLabel}</div>
             <div className="mt-1 font-mono text-[18px] tabular">{stat}</div>
           </div>
-          <span className="text-[13px] font-medium text-[var(--ink)] opacity-80 transition group-hover:translate-x-0.5 group-hover:opacity-100 group-focus-visible:translate-x-0.5 group-focus-visible:opacity-100">
-            Openen →
+          <span className="rounded-md bg-[var(--paper-soft)] px-2.5 py-1 text-[13px] font-medium text-[var(--ink)] opacity-90 transition group-hover:bg-[var(--deep)] group-hover:text-white group-focus-visible:bg-[var(--deep)] group-focus-visible:text-white">
+            Openen
           </span>
         </div>
       ) : (
         <div className="mt-auto flex items-center justify-between pt-6">
           <span className="text-[12px] text-[var(--soft)]">Scenario en uitleg</span>
-          <span className="text-[13px] font-medium text-[var(--ink)] opacity-80 transition group-hover:translate-x-0.5 group-hover:opacity-100 group-focus-visible:translate-x-0.5 group-focus-visible:opacity-100">
-            Openen →
+          <span className="rounded-md bg-[var(--paper-soft)] px-2.5 py-1 text-[13px] font-medium text-[var(--ink)] opacity-90 transition group-hover:bg-[var(--deep)] group-hover:text-white group-focus-visible:bg-[var(--deep)] group-focus-visible:text-white">
+            Openen
           </span>
         </div>
       )}

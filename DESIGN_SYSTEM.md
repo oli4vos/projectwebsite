@@ -10,6 +10,7 @@ De bron van waarheid voor tokens is `src/app/globals.css`.
 
 - Pagina: `--paper` en `--paper-soft`.
 - Oppervlak: `--card`.
+- Surface utility: `.surface-panel`, `.surface-panel-strong`, `.surface-subtle`, `.result-panel` en `.field-shell`.
 - Tekst: `--ink`, `--ink-2`, `--muted`, `--soft`.
 - Lijnen: `--hair`, `--hair-2`.
 - Primair donker: `--deep`.
@@ -42,6 +43,7 @@ Gebruik maximaal één accentkleur per scherm. Positief, negatief en waarschuwin
 - Groot: `--radius-lg` of expliciet 1.5rem voor hoofdpanelen.
 - `shadow-paper` voor subtiele elevatie; `shadow-paper-lg` alleen voor primaire resultaatpanelen.
 - Een kaart is alleen nodig wanneer grouping of elevatie betekenis heeft.
+- Hoofdpanelen gebruiken bij voorkeur `.surface-panel`; lichte toelichting gebruikt `.surface-subtle`; primaire uitkomst gebruikt `.surface-panel-strong` of `.result-panel`.
 
 ## Componenten
 
@@ -68,6 +70,7 @@ Gebruik maximaal één accentkleur per scherm. Positief, negatief en waarschuwin
 - Getallen gebruiken monospace en tabular figures.
 - Controls en labels hebben `min-width: 0` om overflow te voorkomen.
 - Checkboxlabels zijn volledig klikbaar.
+- Gebruik `.field-shell` voor invoeroppervlakken zodat focus, border en achtergrond consistent blijven.
 
 ### CalculatorShell
 
@@ -97,6 +100,7 @@ Gebruik maximaal één accentkleur per scherm. Positief, negatief en waarschuwin
 - Gebruik gewone taal vóór technische details.
 - Positieve en negatieve kleur krijgen altijd een tekstlabel.
 - Grafieken gebruiken centrale formatting uit `src/lib/chart-utils.ts`.
+- Resultaatkaarten starten met een hoofdconclusie en gebruiken daarna details via `ResultRow` of disclosure.
 
 ## States
 

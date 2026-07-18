@@ -11,7 +11,7 @@ type ResultCardProps = {
 };
 
 const toneStyles: Record<ResultCardTone, { card: string; value: string }> = {
-  default: { card: "border-[var(--hair)] bg-white", value: "text-[var(--ink)]" },
+  default: { card: "border-[var(--hair)] bg-white/86", value: "text-[var(--ink)]" },
   pos: {
     card: "border-[oklch(85%_0.05_155)] bg-[var(--pos-soft)]",
     value: "text-[oklch(34%_0.09_155)]",
@@ -30,11 +30,11 @@ export function ResultCard({ label, value, note, tone = "default" }: ResultCardP
   const styles = toneStyles[tone];
 
   return (
-    <article className={`rounded-[14px] border p-5 shadow-paper ${styles.card}`}>
+    <article className={`result-panel border p-5 ${styles.card}`}>
       <p className="text-[13.5px] font-medium text-[var(--muted)]">
         <GlossaryText text={label} />
       </p>
-      <p className={`mt-2 font-mono text-2xl font-semibold tracking-tight tabular sm:text-[1.7rem] ${styles.value}`}>
+      <p className={`mt-2 font-mono text-2xl font-semibold tracking-normal tabular sm:text-[1.7rem] ${styles.value}`}>
         {value}
       </p>
       {note ? (

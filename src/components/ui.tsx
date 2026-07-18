@@ -38,7 +38,7 @@ export function Pill({
   tone?: PillTone;
 }) {
   const map: Record<PillTone, string> = {
-    default: "border hair bg-white text-[var(--muted)]",
+    default: "border hair bg-[rgba(255,255,255,0.72)] text-[var(--muted)]",
     pos: "border-transparent bg-[var(--pos-soft)] text-[oklch(38%_0.09_155)]",
     neg: "border-transparent bg-[var(--neg-soft)] text-[oklch(38%_0.12_30)]",
     accent: "border-transparent bg-[var(--accent-soft)] text-[oklch(38%_0.09_245)]",
@@ -47,9 +47,7 @@ export function Pill({
   };
 
   return (
-    <span
-      className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-[12px] font-medium ${map[tone]}`}
-    >
+    <span className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-[12px] font-medium ${map[tone]}`}>
       {children}
     </span>
   );
@@ -67,13 +65,13 @@ function btnClassName(kind: BtnKind, size: BtnSize, full?: boolean, className?: 
 
   const kinds: Record<BtnKind, string> = {
     primary:
-      "bg-[var(--deep)] text-white hover:bg-[var(--ink-2)] hover:text-white visited:text-white",
-    ghost: "bg-transparent text-[var(--ink)] hover:bg-[var(--paper-soft)]",
-    outline: "border hair bg-white text-[var(--ink)] hover:border-[var(--hair-2)] hover:bg-[var(--paper-soft)]",
-    accent: "bg-[var(--accent)] text-white hover:brightness-110",
+      "bg-[var(--deep)] text-white shadow-[0_14px_34px_-28px_rgba(22,22,22,0.7)] hover:bg-[var(--ink-2)] hover:text-white visited:text-white",
+    ghost: "bg-transparent text-[var(--ink)] hover:bg-white/70",
+    outline: "border hair bg-white/76 text-[var(--ink)] shadow-[inset_0_1px_0_rgba(255,255,255,0.75)] hover:border-[var(--accent-line)] hover:bg-white",
+    accent: "bg-[var(--accent)] text-white shadow-[0_14px_34px_-28px_rgba(72,105,155,0.75)] hover:brightness-105",
   };
 
-  return `inline-flex items-center justify-center gap-2 rounded-[10px] font-medium tracking-[-0.005em] transition duration-150 focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-50 disabled:active:translate-y-0 ${sizes[size]} ${kinds[kind]} ${
+  return `touch-link inline-flex items-center justify-center gap-2 rounded-[10px] font-medium tracking-[-0.005em] transition duration-150 focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:active:translate-y-0 ${sizes[size]} ${kinds[kind]} ${
     full ? "w-full" : ""
   } ${className ?? ""}`;
 }

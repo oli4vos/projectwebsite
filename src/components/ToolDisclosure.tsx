@@ -14,9 +14,9 @@ export function ToolDisclosure({
   return (
     <details
       open={defaultOpen}
-      className="rounded-xl border hair bg-white shadow-paper"
+      className="surface-panel overflow-hidden"
     >
-      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 marker:content-none">
+      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 marker:content-none focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-[-2px]">
         <div className="min-w-0">
           <h3 className="font-serif text-[clamp(1.1rem,1rem+0.5vw,1.35rem)] tracking-[-0.02em] text-[var(--ink)]">
             {title}
@@ -27,7 +27,7 @@ export function ToolDisclosure({
             </p>
           ) : null}
         </div>
-        <span className="shrink-0 text-[12px] text-[var(--soft)]">
+        <span className="shrink-0 rounded-md border border-[var(--hair)] bg-white/72 px-2 py-1 text-[12px] text-[var(--soft)]">
           Open / sluit
         </span>
       </summary>

@@ -56,6 +56,14 @@ Dit document is de UX-standaard voor alle publieke pagina's en rekentools.
 - Scheid contractuele lasten, netto-effect en aannames wanneer die begrippen kunnen worden verward.
 - Toon een bruikbare lege status voordat een berekening is uitgevoerd.
 - Verberg details achter disclosures, maar verstop geen essentiële waarschuwing.
+- Houd schermresultaat en PDF-inhoud inhoudelijk gelijk: het scherm mag compacter tonen, maar mag geen ander resultaatmodel of andere berekening introduceren.
+
+## Visuele rust
+
+- Gebruik één primaire surface per taak: dashboardkaart, invoerpaneel of resultaatpaneel.
+- Vermijd losse kaartstapeling binnen kaartstapeling; gebruik `surface-subtle`, borders of witruimte voor secundaire groepen.
+- CTA's staan dicht bij de taak waarop ze betrekking hebben en concurreren niet met PDF- of resetacties.
+- In mobiele flows is het formulier leidend; resultaat en verdieping volgen na submit.
 
 ## Fouten en herstel
 

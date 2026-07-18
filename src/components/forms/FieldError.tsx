@@ -8,7 +8,7 @@ export function FieldError({ message }: FieldErrorProps) {
   }
 
   return (
-    <p role="alert" className="text-sm text-red-700">
+    <p role="alert" className="rounded-md bg-[var(--neg-soft)] px-2.5 py-1.5 text-[13px] font-medium leading-snug text-[oklch(35%_0.13_28)]">
       {message}
     </p>
   );

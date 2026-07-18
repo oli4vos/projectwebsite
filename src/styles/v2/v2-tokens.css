@@ -7,16 +7,16 @@
    ============================================================ */
 .v2-root {
   /* Kleur */
-  --v2-paper: #f5f2ec;          /* warm crème */
-  --v2-ink: #1b1a20;            /* bijna-zwart */
-  --v2-ink-soft: #504e56;       /* secundaire tekst */
+  --v2-paper: #f7f5f0;          /* warm neutraal */
+  --v2-ink: #171717;            /* bijna-zwart */
+  --v2-ink-soft: #55534e;       /* secundaire tekst */
   --v2-line: rgba(27, 26, 32, 0.16);   /* hairlines */
   --v2-line-strong: rgba(27, 26, 32, 0.35);
-  --v2-coral: #e8615a;          /* primaire actie — iets gedempt */
+  --v2-coral: #48699b;          /* primaire actie — gedempt blauw */
   --v2-coral-ink: #ffffff;
-  --v2-blue: #3a55b4;           /* links / info — gedempt blauw */
-  --v2-lime: #e9f3c2;           /* zachte highlight-tint */
-  --v2-white: #fdfcf9;
+  --v2-blue: #48699b;           /* links / info */
+  --v2-lime: #e8e2d4;           /* zachte highlight-tint */
+  --v2-white: #ffffff;
   --v2-pos: #2c7a4b;
   --v2-neg: #c23a3a;
   --v2-warn: #a06a00;
@@ -40,10 +40,10 @@
 
   /* Vorm — rustig, met net iets meer karakter dan legacy */
   --v2-border: 1px solid var(--v2-line-strong);
-  --v2-radius-card: 12px;
+  --v2-radius-card: 24px;
   --v2-radius-pill: 999px;
   --v2-radius-input: 8px;
-  --v2-shadow-card: 0 1px 2px rgba(27, 26, 32, 0.06), 0 4px 12px rgba(27, 26, 32, 0.05);
+  --v2-shadow-card: 0 1px 0 rgba(35, 34, 31, 0.04), 0 18px 42px -32px rgba(40, 48, 64, 0.24);
   --v2-shadow-btn: none;
   --v2-shadow-btn-hover: none;
 

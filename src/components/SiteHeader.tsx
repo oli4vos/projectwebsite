@@ -15,10 +15,10 @@ const navItems = [
 ] as const;
 
 function navClassName(active: boolean) {
-  return `inline-flex min-h-11 shrink-0 items-center rounded-lg px-3 py-2 text-[13px] transition focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 ${
+  return `touch-link inline-flex min-h-11 shrink-0 items-center rounded-lg px-3 py-2 text-[13px] font-medium focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 ${
     active
       ? "bg-white text-[var(--ink)] shadow-paper"
-      : "text-[var(--muted)] hover:bg-white hover:text-[var(--ink)]"
+      : "text-[var(--muted)] hover:bg-white/76 hover:text-[var(--ink)]"
   }`;
 }
 
@@ -26,7 +26,7 @@ export function SiteHeader() {
   const pathname = usePathname();
 
   return (
-    <header className="hair-b sticky top-0 z-20 bg-[rgba(246,246,244,0.88)] backdrop-blur-md">
+    <header className="hair-b sticky top-0 z-20 bg-[rgba(247,245,240,0.88)] backdrop-blur-md">
       <div className="page-shell py-3">
         <div className="flex min-w-0 items-center justify-between gap-3">
           <Link

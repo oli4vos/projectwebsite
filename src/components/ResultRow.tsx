@@ -52,11 +52,8 @@ export function ResultRow({
         </div>
       </div>
       {breakdown ? (
-        <details
-          className="mt-2 rounded-lg border border-[var(--hair)] bg-[var(--paper-soft)]/55 px-3 py-2"
-          open={defaultBreakdownOpen}
-        >
-          <summary className="cursor-pointer list-none text-[12px] font-medium text-[var(--soft)] marker:content-none">
+        <details className="surface-subtle mt-2 px-3 py-2" open={defaultBreakdownOpen}>
+          <summary className="min-h-9 cursor-pointer list-none text-[12px] font-medium text-[var(--soft)] marker:content-none focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2">
             {breakdownLabel}
           </summary>
           <div className="mt-2 space-y-1.5 text-[12px] leading-[1.6] text-[var(--muted)]">
