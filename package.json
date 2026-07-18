@@ -5,6 +5,9 @@
   "scripts": {
     "create:tool": "node scripts/create-tool.mjs",
     "generate:apps": "node scripts/generate-app-registry.mjs",
+    "generate:source-overview": "tsx scripts/generate-source-overview.ts",
+    "validate:source-data": "tsx scripts/validate-source-data.ts",
+    "check:source-freshness": "tsx scripts/check-source-freshness.ts",
     "update:mortgage-financing-load-table": "node scripts/update-mortgage-financing-load-table.mjs",
     "import:artifact-tools": "node scripts/import-artifact-staging-to-apps.mjs",
     "browser:compare": "tsx scripts/hypotheek-browser-compare.ts",
@@ -15,7 +18,7 @@
     "start": "next start",
     "test": "vitest run",
     "test:ux": "playwright test",
-    "check": "npm run generate:apps && git diff --exit-code src/lib/app-registry.ts src/lib/app-components.tsx && npm run test && npm run lint && npm run typecheck && npm run build",
+    "check": "npm run generate:apps && git diff --exit-code src/lib/app-registry.ts src/lib/app-components.tsx && npm run validate:source-data && npm run generate:source-overview && git diff --exit-code docs/source-data-overview.md && npm run check:source-freshness && npm run test && npm run lint && npm run typecheck && npm run build",
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit"
   },

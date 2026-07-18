@@ -15,6 +15,21 @@ import {
   getMortgageFinancingLoadPercentage,
   getMortgageFinancingLoadTable,
 } from "@/lib/financial-constants/mortgage-financing-load";
+export {
+  SOURCE_DATA_REFERENCE_DATE,
+  SOURCE_DATASET_REGISTRY,
+  getActiveDataset,
+  getDatasetForDate,
+  getDatasetFreshness,
+  getSourceReferences,
+  listDatasets,
+  validateDatasetRegistry,
+  validateSourceDatasetMeta,
+} from "@/lib/financial-constants/source-datasets";
+export type {
+  SourceValidationIssue,
+  SourceValidationResult,
+} from "@/lib/financial-constants/source-datasets";
 import type {
   AnnualFinancialConstants,
   GrossUpFactorBand,
@@ -167,6 +182,15 @@ export type {
   MortgageNhgRules,
   RepaymentRuleKey,
   SourceTier,
+  SourceDataset,
+  SourceDatasetFamily,
+  SourceDatasetMeta,
+  SourceDatasetMethodologyType,
+  SourceDatasetSourceType,
+  SourceDatasetStatus,
+  SourceFreshness,
+  SourceFreshnessStatus,
+  SourceReference,
 } from "@/lib/financial-constants/types";
 export { getMortgageFinancingLoadTable };
 export { getAvailableDuoRateYears };

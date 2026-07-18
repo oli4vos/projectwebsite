@@ -9,6 +9,105 @@ export type SourceTier =
   | "indicatieve-benadering"
   | "projectaanname";
 
+export type SourceDatasetStatus = "active" | "future" | "expired" | "archived";
+
+export type SourceDatasetSourceType =
+  | "law"
+  | "official-execution"
+  | "supervisor"
+  | "norm-publication"
+  | "provider-data"
+  | "secondary-source"
+  | "project-assumption";
+
+export type SourceDatasetMethodologyType =
+  | "official-norm"
+  | "provider-value"
+  | "secondary-source"
+  | "project-assumption";
+
+export type SourceDatasetMetaBase = {
+  id: string;
+  title: string;
+  year?: number;
+  version: string;
+  effectiveFrom: string;
+  effectiveTo?: string;
+  publishedAt?: string;
+  retrievedAt: string;
+  lastVerifiedAt: string;
+  nextReviewAt: string;
+  sourceName: string;
+  sourceUrl: string;
+  sourceType: SourceDatasetSourceType;
+  methodology: string;
+  methodologyType: SourceDatasetMethodologyType;
+  notes?: string;
+  supersedes?: string;
+  checksum?: string;
+  status: SourceDatasetStatus;
+};
+
+export type SourceDatasetMeta =
+  | (SourceDatasetMetaBase & { recordType: "dataset" })
+  | (SourceDatasetMetaBase & {
+      recordType: "provider-value";
+      providerName: string;
+      providerScenario: string;
+    });
+
+export type SourceDatasetFamily =
+  | "mortgage-financing-load"
+  | "mortgage-nhg"
+  | "mortgage-ltv"
+  | "mortgage-energy-loan-space"
+  | "mortgage-afm-test-rate"
+  | "duo-rate-year"
+  | "duo-borrowing-limits"
+  | "allowance-signal-rules"
+  | "mortgage-provider-rate";
+
+export type SourceDataset<TData = unknown> = {
+  family: SourceDatasetFamily;
+  scenario: string;
+  meta: SourceDatasetMeta;
+  data: TData;
+  usedBy: readonly string[];
+};
+
+export type SourceFreshnessStatus =
+  | "fresh"
+  | "review-due"
+  | "stale"
+  | "expired"
+  | "future"
+  | "archived";
+
+export type SourceFreshness = {
+  status: SourceFreshnessStatus;
+  checkedAt: string;
+  message?: string;
+  daysUntilReview?: number;
+  daysSinceLastVerified?: number;
+};
+
+export type SourceReference = {
+  label: string;
+  sourceName: string;
+  sourceUrl: string;
+  sourceType: SourceDatasetSourceType;
+  referenceDate: string;
+  year?: number;
+  effectiveFrom: string;
+  effectiveTo?: string;
+  methodology: string;
+  methodologyType: SourceDatasetMethodologyType;
+  freshnessStatus: SourceFreshnessStatus;
+  warning?: string;
+  datasetId: string;
+  version: string;
+};
+
 export type AssumptionMeta = {
   sourceLabel: string;
   lastChecked: string;
