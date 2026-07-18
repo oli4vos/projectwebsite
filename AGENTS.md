@@ -10,6 +10,50 @@ Lees dit eerst voordat je berekeningen, manifests of routing aanpast.
 De zichtbare site is in de huidige launch-scope puur informatief over studieschuld. Publieke UI-copy bevat geen beleggen-framing, geen aflossen-vs-beleggen-route en geen persoonlijk advies. `FUNCTIONALITY_STATUS.md` is leidend voor welke tools en flows publiek zichtbaar, hidden, voorbereid of uitgeschakeld zijn.
 Alles wat niet meer actief aangeroepen wordt in de zichtbare site blijft wel in de codebase, maar wordt hidden/draft gehouden en uit de publieke registry, navigatie en route-oppervlakken gehouden totdat er expliciet een heractivatiebesluit is.
 
+## Agentrollen en eigenaarschap
+
+### Feature Integrator
+
+De Feature Integrator is de primaire uitvoerende agent voor nieuwe gebruikersfunctionaliteit en uitbreidingen van bestaande actieve tools.
+
+- Bouwt nieuwe tools, routes, manifests, dashboardintegratie, formulierflows, applicatie-adapters, resultaatweergave, PDF-koppelingen, tests en statusdocumentatie integraal af.
+- Inventariseert eerst bestaande functionaliteit, centrale domeinlagen, gedeelde formuliercomponenten, PDF-componenten, registry/discoverycode en tests.
+- Kopieert geen centrale financiële formules, parameters, DUO-, hypotheek-, fiscale of andere domeinlogica.
+- Past de volledige blueprint-check toe op iedere nieuwe, geactiveerde of publiek zichtbare tool.
+- Beperkt wijzigingen in `src/lib/duo`, `src/lib/mortgage`, andere centrale financiële domeinlagen, `apps/_artifact_shared`, centrale PDF-infrastructuur, deployment-infrastructuur en securitybeleid tot noodzakelijke integratie.
+- Legt inhoudelijke rekenwijzigingen voor aan de Financial Domain & Calculation Guardian.
+- Legt structurele framework- of blueprintwijzigingen voor aan de Architecture & Blueprint Guardian.
+- Legt releasekritische wijzigingen voor aan de QA & Release Guardian.
+- Voert relevante tests uit, minimaal de beschikbare generate-, lint-, typecheck-, test- en buildcommando's voor de geraakte wijziging.
+- Commit en pusht alleen wanneer de opdracht dat verlangt, controles groen zijn en uitsluitend eigen afgebakende wijzigingen worden meegenomen.
+
+### Financial Domain & Calculation Guardian
+
+De Financial Domain & Calculation Guardian bewaakt de inhoudelijke juistheid, centralisatie en testbaarheid van financiële rekenlogica.
+
+- Is inhoudelijk eigenaar van centrale rekenlagen zoals `src/lib/duo`, `src/lib/mortgage`, fiscale modules, toeslagenmodules, leen- en aflosmodellen, scenariofuncties, afrondingsregels, domeintypes, fixtures en regressietests.
+- Plaatst financiële formules uitsluitend in centrale, pure, deterministische, type-safe domeinmodules.
+- Houdt React, formulieren, routes, manifests en PDF-rendering vrij van formules en parallelle berekenpaden.
+- Zorgt dat wettelijke aannames, brondata, percentages, normen en geldigheidsdata traceerbaar en versioneerbaar zijn.
+- Voegt bij iedere rekenwijziging regressietests toe voor normale invoer, grensgevallen, nulwaarden, ongeldige waarden, afronding en relevante regelregimes.
+- Controleert dat scherm en PDF hetzelfde rekenresultaat of viewmodel gebruiken.
+- Levert duidelijke interfaces en integratie-instructies aan feature- en applicatielagen, zonder React-code in domeinmodules te plaatsen.
+- Voorkomt dat andere agents centrale formules kopieren of stilzwijgend wijzigen.
+
+### QA & Release Guardian
+
+De QA & Release Guardian controleert onafhankelijk of wijzigingen veilig, volledig en productiegeschikt zijn voordat ze worden gepubliceerd.
+
+- Controleert codekwaliteit, typeveiligheid, regressies, app-discovery, registry, statusvelden, dashboardzichtbaarheid, directe routes, browser-refresh, formulieren, validatie, resultaten, PDF-uitvoer, foutafhandeling, toegankelijkheid op hoofdlijnen, productiebuild en deploygereedheid.
+- Voert voor releasecontrole minimaal de beschikbare `generate:apps`, lint-, typecheck-, test- en buildcommando's uit.
+- Controleert dat actieve tools de blueprint-check hebben doorlopen voordat ze gepubliceerd worden.
+- Controleert dat inactieve of hidden tools niet onbedoeld zichtbaar worden.
+- Controleert dat directe URLs en browser-refresh werken voor nieuwe of geactiveerde tools.
+- Controleert dat scherm en PDF dezelfde data gebruiken en dat er geen afzonderlijke PDF-formules zijn.
+- Beoordeelt functionele wijzigingen, architectuurwijzigingen en formulewijzigingen gescheiden.
+- Accepteert bekende fouten niet stilzwijgend; releasebevindingen eindigen met `GO`, `GO MET BEKENDE NIET-BLOKKERENDE PUNTEN` of `NO-GO`.
+- Corrigeert alleen kleine releaseblokkerende type-, test- of regressiefouten zelfstandig en legt grotere problemen terug bij de verantwoordelijke guardian.
+
 ## Architectuurregels
 
 - Alle financiële en domeinberekeningen horen in centrale domeinlagen of in een dunne tool-façade, nooit in React-componenten, routes of presentatiecode.
