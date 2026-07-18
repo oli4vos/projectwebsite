@@ -118,6 +118,56 @@ test("DUO-impact staat rechtsboven in de hypotheekuitkomst", async ({ page }, te
   expect(duoBox?.x ?? 0).toBeGreaterThan(incomeBox?.x ?? 0);
 });
 
+test("maximale hypotheek toont rentelink en salarisverhogingsanalyse", async ({
+  page,
+}, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "Desktopinteractie controleren");
+
+  await page.goto("/apps/artifact-hypotheek-wonen-maximale-hypotheek", {
+    waitUntil: "networkidle",
+  });
+
+  const rateLink = page.getByRole("link", {
+    name: /Bekijk actuele hypotheekrentes ter inspiratie/,
+  });
+  await expect(rateLink).toBeVisible();
+  await expect(rateLink).toHaveAttribute(
+    "href",
+    "https://www.geld.nl/hypotheek/hypotheekrente",
+  );
+  await expect(rateLink).toHaveAttribute("target", "_blank");
+  await expect(rateLink).toHaveAttribute("rel", "noopener noreferrer");
+
+  const rateInput = page.getByRole("textbox", { name: /Hypotheekrente/ });
+  await rateInput.fill("4,2");
+  await expect(rateInput).toHaveValue("4,2");
+
+  await page.getByRole("button", { name: "Voorbeeld invullen" }).click();
+  await page.getByRole("button", { name: "Bereken maximale hypotheek" }).click();
+  await expect(page.locator("#tool-result-summary").getByText("Einduitkomst")).toBeVisible();
+
+  await page
+    .getByText("Wat doet een salarisverhoging met mijn leenruimte?")
+    .click();
+  await expect(page.getByText("Huidig bruto jaarinkomen")).toBeVisible();
+
+  await page.getByLabel("Nieuw bruto jaarinkomen slider").fill("81200");
+  const newIncomeInput = page.getByRole("textbox", {
+    name: /Nieuw bruto jaarinkomen/,
+  });
+  await expect(newIncomeInput).toHaveValue("81200");
+  await expect(page.getByText("+ EUR 100 bruto per maand")).toBeVisible();
+
+  await newIncomeInput.fill("100000");
+  await expect(page.getByText("buiten het praktische sliderbereik")).toBeVisible();
+  await expect(page.getByText("Gekozen nieuw inkomen")).toBeVisible();
+
+  await page.getByRole("button", { name: "Wis invoer" }).click();
+  await expect(
+    page.getByText("Wat doet een salarisverhoging met mijn leenruimte?"),
+  ).toHaveCount(0);
+});
+
 test("DUO-tools tonen de uitgebreide PDF-download", async ({ page }, testInfo) => {
   test.skip(!testInfo.project.name.startsWith("desktop"), "Desktopinteractie controleren");
 
