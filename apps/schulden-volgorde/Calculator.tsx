@@ -45,6 +45,18 @@ const defaultValues: FormState = {
   ],
 };
 
+const exampleValues: FormState = {
+  extraAmount: "2500",
+  debts: [
+    { kind: "bnpl", amount: "750", interestRate: "0" },
+    { kind: "creditCard", amount: "1800", interestRate: "18" },
+    { kind: "personalLoan", amount: "5500", interestRate: "8,9" },
+    { kind: "duo", amount: "15000", interestRate: "2,33" },
+    { kind: "mortgage", amount: "250000", interestRate: "4,0" },
+    { kind: "other", amount: "", interestRate: "" },
+  ],
+};
+
 const kindLabels: Record<DebtKind, string> = {
   bnpl: "Achteraf betalen",
   creditCard: "Creditcard",
@@ -179,6 +191,17 @@ export default function Calculator() {
             <GlossaryText text="Zet achteraf betalen, creditcard, DUO en hypotheek in een logische volgorde voor extra aflossen." />
           </p>
         </>
+      }
+      startActions={
+        <div className="flex flex-wrap gap-2">
+          <ToolActionButton
+            type="button"
+            variant="secondary"
+            onClick={() => setValues(exampleValues)}
+          >
+            Voorbeeld invullen
+          </ToolActionButton>
+        </div>
       }
       inputs={
         <form

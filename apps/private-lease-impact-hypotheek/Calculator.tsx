@@ -18,6 +18,12 @@ const defaultValues: FormState = {
   debtToMortgageFactor: "4,5",
 };
 
+const exampleValues: FormState = {
+  maxMortgageWithoutLease: "360000",
+  monthlyLeaseCost: "450",
+  debtToMortgageFactor: "4,5",
+};
+
 function parseOptionalDecimal(value: string) {
   const normalized = value.replace(",", ".").trim();
   if (!normalized) return undefined;
@@ -64,6 +70,17 @@ export default function Calculator() {
             hypotheekruimte.
           </p>
         </>
+      }
+      startActions={
+        <div className="flex flex-wrap gap-2">
+          <ToolActionButton
+            type="button"
+            variant="secondary"
+            onClick={() => setValues(exampleValues)}
+          >
+            Voorbeeld invullen
+          </ToolActionButton>
+        </div>
       }
       inputs={
         <form
@@ -170,4 +187,3 @@ export default function Calculator() {
     />
   );
 }
-

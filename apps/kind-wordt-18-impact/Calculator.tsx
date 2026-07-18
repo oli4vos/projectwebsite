@@ -29,6 +29,15 @@ const defaultValues: FormState = {
   childContributionMonthly: "",
 };
 
+const exampleValues: FormState = {
+  childBenefitMonthly: "292",
+  childBudgetMonthly: "240",
+  healthInsuranceMonthly: "126",
+  healthAllowanceMonthly: "90",
+  studyCostsMonthly: "500",
+  childContributionMonthly: "40",
+};
+
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("nl-NL", {
     style: "currency",
@@ -160,6 +169,17 @@ export default function Calculator() {
             <GlossaryText text="Bekijk wat kinderbijslag, kindgebonden budget, zorgverzekering, zorgtoeslag en studiekosten samen doen met je maandruimte." />
           </p>
         </>
+      }
+      startActions={
+        <div className="flex flex-wrap gap-2">
+          <ToolActionButton
+            type="button"
+            variant="secondary"
+            onClick={() => setValues(exampleValues)}
+          >
+            Voorbeeld invullen
+          </ToolActionButton>
+        </div>
       }
       inputs={
         <form

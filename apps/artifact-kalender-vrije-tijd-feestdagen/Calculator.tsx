@@ -23,6 +23,11 @@ const defaultValues: FormState = {
   includeLiberationDay: true,
 };
 
+const exampleValues: FormState = {
+  year: "2027",
+  includeLiberationDay: false,
+};
+
 function validateForm(values: FormState) {
   const errors: ValidationErrors = {};
   const parsedYear = parseOptionalDecimalInput(values.year);
@@ -82,6 +87,17 @@ export default function Calculator() {
             Bekijk Nederlandse feestdagen voor een gekozen jaar.
           </p>
         </>
+      }
+      startActions={
+        <div className="flex flex-wrap gap-2">
+          <ToolActionButton
+            type="button"
+            variant="secondary"
+            onClick={() => setFormValues(exampleValues)}
+          >
+            Voorbeeld invullen
+          </ToolActionButton>
+        </div>
       }
       inputs={
         <form

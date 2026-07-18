@@ -37,6 +37,17 @@ const defaultValues: FormState = {
   feeCurrencyMode: "target",
 };
 
+const exampleValues: FormState = {
+  amount: "1250",
+  fromCurrency: "EUR",
+  toCurrency: "USD",
+  useManualRate: false,
+  rateOverride: "",
+  feePercent: "0,5",
+  fixedFee: "2,5",
+  feeCurrencyMode: "target",
+};
+
 function parseNumberField(value: string): number | null {
   const normalized = value.trim().replace(",", ".");
   if (!normalized) {
@@ -155,6 +166,17 @@ export default function Calculator() {
             Reken valuta om met optionele handmatige koers, percentagekosten en vaste kosten.
           </p>
         </>
+      }
+      startActions={
+        <div className="flex flex-wrap gap-2">
+          <ToolActionButton
+            type="button"
+            variant="secondary"
+            onClick={() => setFormValues(exampleValues)}
+          >
+            Voorbeeld invullen
+          </ToolActionButton>
+        </div>
       }
       inputs={
         <form

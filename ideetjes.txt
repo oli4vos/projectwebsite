@@ -30,6 +30,8 @@
 - in MD opnemen dat alles wat zichtbaar is voor gebruikers ten alle tijden in het nederlands moet zijn
 - verwerk ook dat rentepercentages overal tot 2 cijfers achter de komma kunnen, test dit uitgebreid bij de hypotheek tool, hier is dit heel belangrijk want soms wil je op 4,01 uitkomen bv zodat je net iets meer kan lenen, reken ook altijd op de achtergrond uit of het opsplitsen van leningdelen om op bv 4,01 uit te komen zodat er naar een ander financieringslast percentage gesprongen wordt mogelijk meer leenruimte ontstaat
 - Zet alles op github op private wat nu niet gebruikt wordt voor de website
+- linken naar de huidige hypotheekrente voor 10 jaar annuitair gemiddeld genomen bij de grootbanken, zodat dit naast het in te vullen veld staat als indicatie en een bronverwijzing
+- meer leenruimte slider door salarisverhoging, handig voor je salarisonderhandeling, soms kan een klein verschil je net in een gunstigere klassen plaatsen
 
 buiten doelgroep:
 - impact private lease op hypotheek

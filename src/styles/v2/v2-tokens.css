@@ -1,0 +1,79 @@
+/* ============================================================
+   GRIP v2 — Design tokens (middenweg: rustig-redactioneel met
+   een vleug wazmetjou-karakter)
+   Scope: alles onder .v2-root, raakt legacy-ontwerp niet.
+   Fonts laden (in v2 layout):
+   <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+   ============================================================ */
+.v2-root {
+  /* Kleur */
+  --v2-paper: #f5f2ec;          /* warm crème */
+  --v2-ink: #1b1a20;            /* bijna-zwart */
+  --v2-ink-soft: #504e56;       /* secundaire tekst */
+  --v2-line: rgba(27, 26, 32, 0.16);   /* hairlines */
+  --v2-line-strong: rgba(27, 26, 32, 0.35);
+  --v2-coral: #e8615a;          /* primaire actie — iets gedempt */
+  --v2-coral-ink: #ffffff;
+  --v2-blue: #3a55b4;           /* links / info — gedempt blauw */
+  --v2-lime: #e9f3c2;           /* zachte highlight-tint */
+  --v2-white: #fdfcf9;
+  --v2-pos: #2c7a4b;
+  --v2-neg: #c23a3a;
+  --v2-warn: #a06a00;
+
+  /* Typografie */
+  --v2-font-display: "Source Serif 4", "Georgia", serif;
+  --v2-font-body: "Space Grotesk", "Helvetica Neue", sans-serif;
+  --v2-text-xs: 0.75rem;
+  --v2-text-sm: 0.875rem;
+  --v2-text-base: 1.0625rem;
+  --v2-text-lg: 1.25rem;
+  --v2-text-xl: 1.625rem;
+  --v2-text-2xl: 2.25rem;
+  --v2-text-hero: clamp(2.75rem, 6vw, 4.25rem);
+  --v2-leading: 1.65;
+  --v2-tracking-label: 0.1em;
+
+  /* Spacing (8px-grid) */
+  --v2-s1: 0.25rem; --v2-s2: 0.5rem; --v2-s3: 0.75rem; --v2-s4: 1rem;
+  --v2-s5: 1.5rem; --v2-s6: 2rem; --v2-s7: 3rem; --v2-s8: 4rem; --v2-s9: 6rem;
+
+  /* Vorm — rustig, met net iets meer karakter dan legacy */
+  --v2-border: 1px solid var(--v2-line-strong);
+  --v2-radius-card: 12px;
+  --v2-radius-pill: 999px;
+  --v2-radius-input: 8px;
+  --v2-shadow-card: 0 1px 2px rgba(27, 26, 32, 0.06), 0 4px 12px rgba(27, 26, 32, 0.05);
+  --v2-shadow-btn: none;
+  --v2-shadow-btn-hover: none;
+
+  /* Layout */
+  --v2-container: 72rem;
+  --v2-touch: 44px;
+
+  /* Basis */
+  background-color: var(--v2-paper);
+  color: var(--v2-ink);
+  font-family: var(--v2-font-body);
+  font-size: var(--v2-text-base);
+  line-height: var(--v2-leading);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Cijfers altijd tabulair (uit bestaand GRIP-designsysteem) */
+.v2-root .v2-num { font-variant-numeric: tabular-nums; }
+
+/* Focus: duidelijk zichtbaar */
+.v2-root :focus-visible {
+  outline: 3px solid var(--v2-blue);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v2-root *, .v2-root *::before, .v2-root *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

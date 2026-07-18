@@ -31,6 +31,16 @@ const defaultValues: FormState = {
   stressRateIncrease: "2",
 };
 
+const exampleValues: FormState = {
+  monthlyRent: "1250",
+  purchasePrice: "350000",
+  ownFunds: "25000",
+  mortgageRate: "4",
+  mortgageTermYears: "30",
+  monthlyOwnerCosts: "180",
+  stressRateIncrease: "2",
+};
+
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("nl-NL", {
     style: "currency",
@@ -195,6 +205,17 @@ export default function Calculator() {
             <GlossaryText text="Vergelijk huur met kopen op maandlasten, eigen geld en een eenvoudige rente-stresstest." />
           </p>
         </>
+      }
+      startActions={
+        <div className="flex flex-wrap gap-2">
+          <ToolActionButton
+            type="button"
+            variant="secondary"
+            onClick={() => setValues(exampleValues)}
+          >
+            Voorbeeld invullen
+          </ToolActionButton>
+        </div>
       }
       inputs={
         <form

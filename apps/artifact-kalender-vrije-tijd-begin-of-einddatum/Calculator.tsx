@@ -32,6 +32,15 @@ const defaultValues: FormState = {
   days: "",
 };
 
+const exampleValues: FormState = {
+  mode: "endFromStart",
+  knownDate: "2026-01-15",
+  years: "1",
+  months: "2",
+  weeks: "1",
+  days: "3",
+};
+
 function parseNonNegativeWhole(value: string, field: keyof FormState, errors: ValidationErrors) {
   if (value.trim().length === 0) {
     return 0;
@@ -110,6 +119,17 @@ export default function Calculator() {
             Reken een start- of einddatum uit op basis van jaren, maanden, weken en dagen.
           </p>
         </>
+      }
+      startActions={
+        <div className="flex flex-wrap gap-2">
+          <ToolActionButton
+            type="button"
+            variant="secondary"
+            onClick={() => setFormValues(exampleValues)}
+          >
+            Voorbeeld invullen
+          </ToolActionButton>
+        </div>
       }
       inputs={
         <form

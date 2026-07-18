@@ -24,6 +24,12 @@ const defaultValues: FormState = {
   includeEndDate: false,
 };
 
+const exampleValues: FormState = {
+  startDate: "2026-01-15",
+  endDate: "2026-03-01",
+  includeEndDate: true,
+};
+
 function validateForm(values: FormState) {
   const errors: ValidationErrors = {};
   const startDate = parseIsoDateInput(values.startDate);
@@ -89,6 +95,17 @@ export default function Calculator() {
             Bereken de periode tussen twee datums in kalenderdagen, weken en jaren/maanden/dagen.
           </p>
         </>
+      }
+      startActions={
+        <div className="flex flex-wrap gap-2">
+          <ToolActionButton
+            type="button"
+            variant="secondary"
+            onClick={() => setFormValues(exampleValues)}
+          >
+            Voorbeeld invullen
+          </ToolActionButton>
+        </div>
       }
       inputs={
         <form

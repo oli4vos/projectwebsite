@@ -20,6 +20,10 @@ const defaultValues: FormState = {
   date: "",
 };
 
+const exampleValues: FormState = {
+  date: "2026-07-18",
+};
+
 function validateForm(values: FormState) {
   const errors: ValidationErrors = {};
   const date = parseIsoDateInput(values.date);
@@ -65,6 +69,17 @@ export default function Calculator() {
             Zie direct op welke weekdag een datum valt.
           </p>
         </>
+      }
+      startActions={
+        <div className="flex flex-wrap gap-2">
+          <ToolActionButton
+            type="button"
+            variant="secondary"
+            onClick={() => setFormValues(exampleValues)}
+          >
+            Voorbeeld invullen
+          </ToolActionButton>
+        </div>
       }
       inputs={
         <form

@@ -27,6 +27,11 @@ const defaultValues: FormState = {
   region: "midden",
 };
 
+const exampleValues: FormState = {
+  schoolYear: "2025-2026",
+  region: "noord",
+};
+
 const regions: SchoolHolidayRegion[] = ["noord", "midden", "zuid"];
 
 function validateForm(values: FormState) {
@@ -94,6 +99,17 @@ export default function Calculator() {
             interne dataset.
           </p>
         </>
+      }
+      startActions={
+        <div className="flex flex-wrap gap-2">
+          <ToolActionButton
+            type="button"
+            variant="secondary"
+            onClick={() => setFormValues(exampleValues)}
+          >
+            Voorbeeld invullen
+          </ToolActionButton>
+        </div>
       }
       inputs={
         <form

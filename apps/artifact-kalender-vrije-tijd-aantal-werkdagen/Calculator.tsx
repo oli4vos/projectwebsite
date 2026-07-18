@@ -56,6 +56,21 @@ const defaultValues: FormState = {
   sunday: false,
 };
 
+const exampleValues: FormState = {
+  startDate: "2026-01-05",
+  endDate: "2026-01-30",
+  includeEndDate: true,
+  excludeDutchHolidays: true,
+  includeLiberationDay: true,
+  monday: true,
+  tuesday: true,
+  wednesday: true,
+  thursday: true,
+  friday: true,
+  saturday: false,
+  sunday: false,
+};
+
 const weekdayFields: Array<{ key: WeekdayFieldKey; label: string; value: IsoWeekday }> = [
   { key: "monday", label: "maandag", value: 1 },
   { key: "tuesday", label: "dinsdag", value: 2 },
@@ -152,6 +167,17 @@ export default function Calculator() {
             feestdagen mee te nemen of uit te sluiten.
           </p>
         </>
+      }
+      startActions={
+        <div className="flex flex-wrap gap-2">
+          <ToolActionButton
+            type="button"
+            variant="secondary"
+            onClick={() => setFormValues(exampleValues)}
+          >
+            Voorbeeld invullen
+          </ToolActionButton>
+        </div>
       }
       inputs={
         <form

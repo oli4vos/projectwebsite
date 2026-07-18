@@ -29,6 +29,13 @@ const defaultValues: FormState = {
   includeToday: false,
 };
 
+const exampleValues: FormState = {
+  startDate: "2026-07-18",
+  targetWeekday: "1",
+  direction: "next",
+  includeToday: false,
+};
+
 function validateForm(values: FormState) {
   const errors: ValidationErrors = {};
   const startDate = parseIsoDateInput(values.startDate);
@@ -94,6 +101,17 @@ export default function Calculator() {
             Vind snel de eerstvolgende of vorige datum voor een gekozen weekdag.
           </p>
         </>
+      }
+      startActions={
+        <div className="flex flex-wrap gap-2">
+          <ToolActionButton
+            type="button"
+            variant="secondary"
+            onClick={() => setFormValues(exampleValues)}
+          >
+            Voorbeeld invullen
+          </ToolActionButton>
+        </div>
       }
       inputs={
         <form
