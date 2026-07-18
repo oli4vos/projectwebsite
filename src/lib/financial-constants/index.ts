@@ -26,10 +26,21 @@ export {
   validateDatasetRegistry,
   validateSourceDatasetMeta,
 } from "@/lib/financial-constants/source-datasets";
+export {
+  validateFinancialInputLimit,
+  validateFinancialInputLimits,
+} from "@/lib/financial-constants/input-limits";
 export type {
   SourceValidationIssue,
   SourceValidationResult,
 } from "@/lib/financial-constants/source-datasets";
+export type {
+  FinancialInputLimit,
+  FinancialInputLimitKind,
+  FinancialInputLimitSeverity,
+  FinancialInputLimitValidationResult,
+  FinancialInputLimitValidationStatus,
+} from "@/lib/financial-constants/input-limits";
 import type {
   AnnualFinancialConstants,
   GrossUpFactorBand,

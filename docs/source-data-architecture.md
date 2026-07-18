@@ -104,3 +104,9 @@ Open migraties:
 - Banktarieven als handmatig beheerde providerwaardes, zonder scraper.
 - Toeslagenscanregels pas na volledige normalisatie en tests.
 - Projectaannames in hypotheekengine explicieter labelen wanneer ze publiek gaan sturen.
+
+## Nieuwe Domeinfamilies
+
+- `mortgage-provider-rate` is gereserveerd voor handmatig gereviewde provider-rentes. De centrale validatie controleert providerrecords, vergelijkbare scenario's, HTTPS-bronnen, datumvelden en plausibele rentebandbreedtes. Deze familie wordt pas actief geregistreerd wanneer volledige grootbankrecords beschikbaar zijn.
+- `allowance-signal-rules` is gereserveerd voor toeslagensignalen. De familie blijft signal-only totdat officiele regels, grenzen, uitzonderingen en regressiescenario's volledig zijn genormaliseerd.
+- Inputlimieten staan los van datasets in `src/lib/financial-constants/input-limits.ts`. Een praktische slidergrens is geen wettelijke of providermaximumgrens en mag een invoer niet stil wijzigen.

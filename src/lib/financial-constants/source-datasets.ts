@@ -213,6 +213,106 @@ function validateFinancingLoadData(data: typeof MORTGAGE_FINANCING_LOAD_DATA) {
   return issues;
 }
 
+function validateMortgageProviderRateDataset(data: unknown) {
+  const issues: string[] = [];
+  const candidate = data as {
+    providers?: Array<{
+      providerId?: string;
+      annualRatePercent?: number;
+      mortgageType?: string;
+      fixedRatePeriodYears?: number;
+      ltvClass?: string;
+      hasNhg?: boolean;
+      sourceUrl?: string;
+      retrievedAt?: string;
+      lastVerifiedAt?: string;
+      status?: string;
+    }>;
+  };
+
+  if (!Array.isArray(candidate.providers) || candidate.providers.length === 0) {
+    issues.push("Provider-rentedataset mist providerrecords.");
+    return issues;
+  }
+
+  for (const record of candidate.providers) {
+    if (!record.providerId) {
+      issues.push("Provider-renterecord mist providerId.");
+    }
+    if (record.annualRatePercent !== undefined && (record.annualRatePercent < 0 || record.annualRatePercent > 20)) {
+      issues.push("Provider-rente valt buiten de verwachte bandbreedte.");
+    }
+    if (record.sourceUrl === undefined || !record.sourceUrl.startsWith("https://")) {
+      issues.push("Provider-renterecord mist een https-bron-URL.");
+    }
+    if (record.retrievedAt !== undefined && !parseDate(record.retrievedAt)) {
+      issues.push("Provider-renterecord heeft een ongeldige retrievedAt-datum.");
+    }
+    if (record.lastVerifiedAt !== undefined && !parseDate(record.lastVerifiedAt)) {
+      issues.push("Provider-renterecord heeft een ongeldige lastVerifiedAt-datum.");
+    }
+    if (record.mortgageType === "unknown" || record.ltvClass === "unknown") {
+      issues.push("Provider-renterecord is niet als vergelijkbaar scenario genormaliseerd.");
+    }
+    if (record.status === "valid" && record.annualRatePercent === undefined) {
+      issues.push("Geldig provider-renterecord mist een rentepercentage.");
+    }
+  }
+
+  return issues;
+}
+
+function validateAllowanceSignalRulesDataset(data: unknown) {
+  const issues: string[] = [];
+  const candidate = data as {
+    year?: number;
+    healthcare?: Record<string, unknown>;
+    rent?: Record<string, unknown>;
+    childBudget?: Record<string, unknown>;
+    childcare?: Record<string, unknown>;
+  };
+
+  if (!Number.isInteger(candidate.year) || (candidate.year as number) < 2000 || (candidate.year as number) > 2100) {
+    issues.push("Toeslagensignaaldataset heeft een ongeldig jaar.");
+  }
+
+  for (const [sectionName, section] of Object.entries({
+    healthcare: candidate.healthcare,
+    rent: candidate.rent,
+    childBudget: candidate.childBudget,
+    childcare: candidate.childcare,
+  })) {
+    if (!section) {
+      issues.push(`Toeslagensignaaldataset mist sectie ${sectionName}.`);
+      continue;
+    }
+
+    for (const [key, value] of Object.entries(section)) {
+      if (key.endsWith("Url")) {
+        if (typeof value !== "string" || !value.startsWith("https://")) {
+          issues.push(`Toeslagensectie ${sectionName} mist een https-URL voor ${key}.`);
+        }
+        continue;
+      }
+      if (typeof value === "number" && value < 0) {
+        issues.push(`Toeslagensectie ${sectionName} bevat een negatieve grenswaarde.`);
+      }
+    }
+  }
+
+  const maxIncomeSingle = candidate.healthcare?.maxIncomeSingle;
+  const maxIncomeWithPartner = candidate.healthcare?.maxIncomeWithPartner;
+  if (
+    typeof maxIncomeSingle === "number" &&
+    typeof maxIncomeWithPartner === "number" &&
+    maxIncomeWithPartner < maxIncomeSingle
+  ) {
+    issues.push("Zorgtoeslag partner-inkomensgrens ligt onder de alleenstaande grens.");
+  }
+
+  return issues;
+}
+
 function validateDatasetSpecificBounds(dataset: SourceDataset) {
   const issues: string[] = [];
 
@@ -280,8 +380,9 @@ function validateDatasetSpecificBounds(dataset: SourceDataset) {
       break;
     }
     case "allowance-signal-rules":
+      return validateAllowanceSignalRulesDataset(dataset.data);
     case "mortgage-provider-rate":
-      break;
+      return validateMortgageProviderRateDataset(dataset.data);
   }
 
   return issues;

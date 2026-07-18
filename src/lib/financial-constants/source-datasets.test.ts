@@ -178,6 +178,83 @@ describe("source dataset registry", () => {
     expect(result.errors.some((issue) => issue.message.includes("NHG"))).toBe(true);
   });
 
+  it("validates mortgage provider-rate datasets before they can be registered", () => {
+    const providerDataset: SourceDataset = {
+      family: "mortgage-provider-rate",
+      scenario: "10y-annuity-100-market-value-no-nhg",
+      meta: {
+        ...validMeta,
+        id: "test-provider-rates",
+        sourceType: "provider-data",
+        methodologyType: "provider-value",
+        nextReviewAt: "2026-07-24",
+      },
+      data: {
+        providers: [
+          {
+            providerId: "abn-amro",
+            annualRatePercent: 99,
+            mortgageType: "unknown",
+            fixedRatePeriodYears: 10,
+            ltvClass: "unknown",
+            hasNhg: false,
+            sourceUrl: "http://example.com/provider",
+            retrievedAt: "2026-07-18",
+            lastVerifiedAt: "2026-07-18",
+            status: "valid",
+          },
+        ],
+      },
+      usedBy: ["test-tool"],
+    };
+
+    const result = validateDatasetRegistry([providerDataset]);
+
+    expect(result.ok).toBe(false);
+    expect(result.errors.map((issue) => issue.message)).toEqual(
+      expect.arrayContaining([
+        "Provider-rente valt buiten de verwachte bandbreedte.",
+        "Provider-renterecord mist een https-bron-URL.",
+        "Provider-renterecord is niet als vergelijkbaar scenario genormaliseerd.",
+      ]),
+    );
+  });
+
+  it("validates allowance signal datasets structurally while they remain signal-only", () => {
+    const allowanceDataset: SourceDataset = {
+      family: "allowance-signal-rules",
+      scenario: "signal-only",
+      meta: {
+        ...validMeta,
+        id: "test-allowance-signals",
+        sourceType: "official-execution",
+        methodologyType: "official-norm",
+      },
+      data: {
+        year: 2026,
+        healthcare: {
+          maxIncomeSingle: 50_000,
+          maxIncomeWithPartner: 40_000,
+          officialCalculationUrl: "http://example.com/toeslagen",
+        },
+        rent: { officialCalculationUrl: "https://example.com/toeslagen" },
+        childBudget: { officialCalculationUrl: "https://example.com/toeslagen" },
+        childcare: { officialCalculationUrl: "https://example.com/toeslagen" },
+      },
+      usedBy: ["test-tool"],
+    };
+
+    const result = validateDatasetRegistry([allowanceDataset]);
+
+    expect(result.ok).toBe(false);
+    expect(result.errors.map((issue) => issue.message)).toEqual(
+      expect.arrayContaining([
+        "Toeslagensectie healthcare mist een https-URL voor officialCalculationUrl.",
+        "Zorgtoeslag partner-inkomensgrens ligt onder de alleenstaande grens.",
+      ]),
+    );
+  });
+
   it("generates a source inventory from the registry", () => {
     const markdown = buildSourceDataOverviewMarkdown(SOURCE_DATASET_REGISTRY);
 
