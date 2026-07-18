@@ -49,6 +49,7 @@ export function SalaryBorrowingPowerExplorer({
 }: SalaryBorrowingPowerExplorerProps) {
   const numericInputId = useId();
   const sliderInputId = useId();
+  const sliderHintId = useId();
   const fieldErrorId = useId();
   const [draft, setDraft] = useState<{
     submittedScenarioKey: string;
@@ -140,9 +141,11 @@ export function SalaryBorrowingPowerExplorer({
                 value={viewModel.slider.value}
                 onChange={(event) => updateNewGrossAnnualIncome(event.target.value)}
                 aria-label="Nieuw bruto jaarinkomen slider"
+                aria-describedby={sliderHintId}
+                aria-valuetext={`${formatCurrency(viewModel.slider.value)} bruto jaarinkomen`}
                 className="ring-focus w-full accent-[var(--accent)]"
               />
-              <span className="block text-[12px] leading-5 text-[var(--soft)]">
+              <span id={sliderHintId} className="block text-[12px] leading-5 text-[var(--soft)]">
                 Sliderbereik: {formatCurrency(viewModel.slider.min)} tot{" "}
                 {formatCurrency(viewModel.slider.max)}. Het exacte veld hierboven accepteert
                 ook geldige bedragen buiten dit praktische bereik.
@@ -170,7 +173,7 @@ export function SalaryBorrowingPowerExplorer({
                 </div>
               </div>
               <div className="rounded-lg border border-[var(--hair)] bg-[var(--paper-soft)] px-3 py-3">
-                <div className="text-[12px] text-[var(--muted)]">Salarisstijging</div>
+                <div className="text-[12px] text-[var(--muted)]">Inkomensverschil</div>
                 <div className="mt-1 font-mono text-[16px] tabular text-[var(--ink)]">
                   {formatPercent(viewModel.percentageIncrease)}%
                 </div>
@@ -188,7 +191,7 @@ export function SalaryBorrowingPowerExplorer({
               </div>
               <div className="rounded-lg border border-[var(--hair)] px-3 py-3">
                 <div className="text-[12px] text-[var(--muted)]">
-                  Extra leenruimte gekozen inkomen
+                  Verschil leenruimte gekozen inkomen
                 </div>
                 <div className="mt-1 font-mono text-[17px] tabular text-[var(--ink)]">
                   {formatCurrency(customScenario?.additionalBorrowingPower ?? 0)}
@@ -221,7 +224,7 @@ export function SalaryBorrowingPowerExplorer({
                       Maximale hypotheek
                     </th>
                     <th scope="col" className="border-b border-[var(--hair)] px-3 py-2">
-                      Extra ruimte
+                      Verschil leenruimte
                     </th>
                   </tr>
                 </thead>
@@ -255,13 +258,13 @@ export function SalaryBorrowingPowerExplorer({
                 beoordeelt je volledige dossier en kan inkomen anders behandelen.
               </p>
               <p>
-                Deze berekening laat zien wat een hoger inkomen binnen dezelfde indicatieve
+                Deze berekening laat zien wat een ander inkomen binnen dezelfde indicatieve
                 rekenmethode doet. Het is geen toezegging dat een aanbieder dit inkomen accepteert.
               </p>
               {viewModel.result.warnings.includes("custom-income-below-current-income") ? (
                 <p>
-                  Het gekozen inkomen ligt lager dan je huidige ingediende inkomen; de extra
-                  leenruimte kan daardoor negatief zijn.
+                  Het gekozen inkomen ligt lager dan je huidige ingediende inkomen; het verschil
+                  in leenruimte kan daardoor negatief zijn.
                 </p>
               ) : null}
             </div>

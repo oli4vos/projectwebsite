@@ -142,6 +142,29 @@ test("maximale hypotheek toont rentelink en salarisverhogingsanalyse", async ({
   await rateInput.fill("4,2");
   await expect(rateInput).toHaveValue("4,2");
 
+  await page.goto("/apps/hypotheek-impact-studieschuld", {
+    waitUntil: "networkidle",
+  });
+  const impactRateLink = page.getByRole("link", {
+    name: /Bekijk actuele hypotheekrentes ter inspiratie/,
+  });
+  await expect(impactRateLink).toBeVisible();
+  await expect(impactRateLink).toHaveAttribute(
+    "href",
+    "https://www.geld.nl/hypotheek/hypotheekrente",
+  );
+  await expect(impactRateLink).toHaveAttribute("target", "_blank");
+  await expect(impactRateLink).toHaveAttribute("rel", "noopener noreferrer");
+  const impactRateInput = page.getByRole("textbox", {
+    name: /Hypotheekrentepercentage/,
+  });
+  await impactRateInput.fill("4,3");
+  await expect(impactRateInput).toHaveValue("4,3");
+
+  await page.goto("/apps/artifact-hypotheek-wonen-maximale-hypotheek", {
+    waitUntil: "networkidle",
+  });
+
   await page.getByRole("button", { name: "Voorbeeld invullen" }).click();
   await page.getByRole("button", { name: "Bereken maximale hypotheek" }).click();
   await expect(page.locator("#tool-result-summary").getByText("Einduitkomst")).toBeVisible();
@@ -161,6 +184,19 @@ test("maximale hypotheek toont rentelink en salarisverhogingsanalyse", async ({
   await newIncomeInput.fill("100000");
   await expect(page.getByText("buiten het praktische sliderbereik")).toBeVisible();
   await expect(page.getByText("Gekozen nieuw inkomen")).toBeVisible();
+  await expect(page.getByText("Verschil leenruimte gekozen inkomen")).toBeVisible();
+
+  await newIncomeInput.fill("70000");
+  await expect(page.getByText("Inkomensverschil")).toBeVisible();
+  await expect(
+    page.getByRole("columnheader", { name: "Verschil leenruimte" }),
+  ).toBeVisible();
+  await expect(page.getByText("het verschil in leenruimte kan daardoor negatief zijn")).toBeVisible();
+
+  await page.getByRole("textbox", { name: /^Bruto jaarinkomen/ }).fill("90000");
+  await expect(
+    page.getByText("Deze analyse gebruikt nog je laatst berekende hypotheekscenario"),
+  ).toBeVisible();
 
   await page.getByRole("button", { name: "Wis invoer" }).click();
   await expect(
