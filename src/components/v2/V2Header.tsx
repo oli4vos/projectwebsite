@@ -2,12 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { VersionSwitcher } from "@/components/VersionSwitcher";
+import { ENABLE_PROFILE } from "@/lib/feature-flags";
 
 const navItems = [
   { href: "/v2", label: "Home" },
   { href: "/v2/apps", label: "Tools" },
-  { href: "/kennisbank", label: "Kennisbank" },
-  { href: "/variabelen", label: "Aannames" },
+  { href: "/v2/kennisbank", label: "Kennisbank" },
+  { href: "/v2/variabelen", label: "Aannames" },
+  { href: "/v2/over", label: "Over" },
 ] as const;
 
 function isActive(pathname: string, href: string) {
@@ -40,9 +43,17 @@ export function V2Header() {
           ))}
         </nav>
 
-        <Link href="/v2/apps" className="v2-btn v2-btn--dark v2-btn--sm shrink-0">
-          Alle tools
-        </Link>
+        <div className="flex items-center gap-2">
+          <VersionSwitcher currentVersion="v2" />
+          {ENABLE_PROFILE ? (
+            <Link href="/v2/profiel" className="v2-btn v2-btn--sm shrink-0">
+              Profiel
+            </Link>
+          ) : null}
+          <Link href="/v2/apps" className="v2-btn v2-btn--dark v2-btn--sm shrink-0">
+            Alle tools
+          </Link>
+        </div>
       </div>
     </header>
   );

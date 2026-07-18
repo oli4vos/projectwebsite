@@ -11,8 +11,10 @@ export function V2Footer() {
         <div className="flex flex-wrap gap-x-5 gap-y-2 text-[var(--v2-ink)]">
           <Link href="/v2">Home</Link>
           <Link href="/v2/apps">Tools</Link>
-          <Link href="/kennisbank">Kennisbank</Link>
-          <Link href="/variabelen">Aannames</Link>
+          <Link href="/v2/kennisbank">Kennisbank</Link>
+          <Link href="/v2/variabelen">Aannames</Link>
+          <Link href="/v2/over">Over</Link>
+          <Link href="/v2/profiel">Profiel</Link>
         </div>
         <p className="text-[12px] text-[var(--v2-ink-soft)]">
           Geen advies. Gebruik de uitkomsten als scenario-inzicht en controleer
