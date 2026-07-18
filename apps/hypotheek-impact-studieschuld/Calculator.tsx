@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { DuoDebtPartsEditor } from "@/components/duo/DuoDebtPartsEditor";
 import { DisclosureSection } from "@/components/DisclosureSection";
 import { FieldError } from "@/components/forms/FieldError";
@@ -45,6 +45,7 @@ import {
   type DuoSituation,
   type RepaymentRule,
 } from "./logic";
+import { downloadHypotheekImpactPdfReport } from "./report";
 
 const FINANCIAL_CONSTANTS = getFinancialConstants(2026);
 
@@ -168,6 +169,9 @@ function CalculatorContent({
   hasRelevantProfileValues,
   profilePatch,
 }: CalculatorContentProps) {
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
+  const [pdfError, setPdfError] = useState("");
+  const [pdfStatus, setPdfStatus] = useState("");
   const {
     formValues,
     setFormValues,
@@ -326,6 +330,8 @@ function CalculatorContent({
   }
 
   function applyProfileValues() {
+    setPdfError("");
+    setPdfStatus("");
     setValues(
       mergeProfilePatchIntoValues(formValues, profilePatch),
       "Profielwaarden geladen. Klik op Bereken om de uitkomst te zien.",
@@ -333,10 +339,14 @@ function CalculatorContent({
   }
 
   function applyExampleValues() {
+    setPdfError("");
+    setPdfStatus("");
     setValues(exampleValues, "Voorbeeldwaarden geladen. Klik op Bereken om de uitkomst te zien.");
   }
 
   function clearAllInputs() {
+    setPdfError("");
+    setPdfStatus("");
     reset("Alle invoervelden zijn gewist. Vul opnieuw in of laad voorbeeldwaarden.");
   }
 
@@ -348,9 +358,32 @@ function CalculatorContent({
   }
 
   function handleCalculate() {
+    setPdfError("");
+    setPdfStatus("");
     submit();
     if (parsedValues) {
       goToResult();
+    }
+  }
+
+  async function handleDownloadPdf() {
+    if (!submittedValidation?.parsedValues || !result || isDownloadingPdf) {
+      return;
+    }
+
+    setIsDownloadingPdf(true);
+    setPdfError("");
+    setPdfStatus("");
+    try {
+      await downloadHypotheekImpactPdfReport(
+        submittedValidation.parsedValues,
+        result,
+      );
+      setPdfStatus("PDF-overzicht gemaakt met de laatst berekende invoer.");
+    } catch {
+      setPdfError("PDF maken lukt niet. Probeer het opnieuw na een nieuwe berekening.");
+    } finally {
+      setIsDownloadingPdf(false);
     }
   }
 
@@ -906,6 +939,26 @@ function CalculatorContent({
                   Impact op leencapaciteit: {formatCurrency(result.mortgageImpact.principalImpact)} minder leencapaciteit.
                 </li>
               </ul>
+              <div className="mt-5 flex flex-wrap items-center gap-3">
+                <ToolActionButton
+                  type="button"
+                  variant="accent"
+                  onClick={handleDownloadPdf}
+                  disabled={isDownloadingPdf}
+                >
+                  {isDownloadingPdf ? "PDF wordt gemaakt..." : "Download uitgebreid PDF-overzicht"}
+                </ToolActionButton>
+                {pdfStatus ? (
+                  <span className="text-[12.5px] leading-[1.5] text-white/70">
+                    {pdfStatus}
+                  </span>
+                ) : null}
+              </div>
+              {pdfError ? (
+                <p className="mt-3 rounded-xl border border-white/15 bg-white/8 px-4 py-3 text-[13px] leading-[1.6] text-white/82">
+                  {pdfError}
+                </p>
+              ) : null}
               <p className="mt-3 max-w-[58ch] text-[13px] leading-[1.65] text-white/72">
                 Indicatief verplicht DUO-bedrag op basis van inkomen en wettelijk
                 maandbedrag: {formatCurrency(result.duoMandatoryPayment.requiredMonthlyPayment)} p/m.

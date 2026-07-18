@@ -133,6 +133,66 @@ test("DUO-tools tonen de uitgebreide PDF-download", async ({ page }, testInfo) =
   }
 });
 
+test("hypotheek-impact maakt een PDF vanuit de laatst berekende invoer", async ({
+  page,
+}, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "Desktopinteractie controleren");
+
+  await page.goto("/apps/hypotheek-impact-studieschuld", {
+    waitUntil: "networkidle",
+  });
+
+  const pdfButton = page.getByRole("button", {
+    name: "Download uitgebreid PDF-overzicht",
+  });
+  await expect(pdfButton).toHaveCount(0);
+
+  await page.getByRole("button", { name: "Start met voorbeeldwaarden" }).click();
+  await page.getByRole("button", { name: "Bereken", exact: true }).click();
+  await expect(pdfButton).toBeVisible();
+  await expect(page.getByText("Verplicht DUO-bedrag:")).toBeVisible();
+
+  const downloadPromise = page.waitForEvent("download");
+  await pdfButton.click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toMatch(
+    /^hypotheek-impact-studieschuld-\d{4}-\d{2}\.pdf$/,
+  );
+  await expect(
+    page.getByText("PDF-overzicht gemaakt met de laatst berekende invoer."),
+  ).toBeVisible();
+
+  await page.getByRole("button", { name: "Wis invoer" }).click();
+  await expect(pdfButton).toHaveCount(0);
+  await expect(
+    page.getByText("PDF-overzicht gemaakt met de laatst berekende invoer."),
+  ).toHaveCount(0);
+});
+
+test("v2 routes houden mobiele breedtes zonder horizontale overflow", async ({
+  page,
+}) => {
+  for (const route of ["/v2", "/v2/apps"]) {
+    for (const width of [320, 375, 390, 430]) {
+      await page.setViewportSize({ width, height: 844 });
+      await page.goto(route, { waitUntil: "networkidle" });
+
+      const audit = await page.evaluate(() => ({
+        bodyWidth: document.body.scrollWidth,
+        documentWidth: document.documentElement.scrollWidth,
+        viewportWidth: document.documentElement.clientWidth,
+      }));
+
+      expect(audit.documentWidth, `${route} document @ ${width}px`).toBeLessThanOrEqual(
+        audit.viewportWidth + 1,
+      );
+      expect(audit.bodyWidth, `${route} body @ ${width}px`).toBeLessThanOrEqual(
+        audit.viewportWidth + 1,
+      );
+    }
+  }
+});
+
 test("dashboard toont publieke toolkaarten met centrale surface-stijl", async ({ page }, testInfo) => {
   test.skip(!testInfo.project.name.startsWith("desktop"), "Desktop dashboardstijl controleren");
 

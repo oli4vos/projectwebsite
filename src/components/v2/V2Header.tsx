@@ -26,12 +26,15 @@ export function V2Header() {
 
   return (
     <header className="v2-header">
-      <div className="mx-auto flex w-full max-w-[72rem] items-center justify-between gap-4">
-        <Link href="/v2" className="v2-logo">
+      <div className="mx-auto flex w-full max-w-[72rem] min-w-0 flex-wrap items-center justify-between gap-3">
+        <Link href="/v2" className="v2-logo shrink-0">
           Grip <span className="v2-logo-tld">v2</span>
         </Link>
 
-        <nav aria-label="Hoofdnavigatie" className="v2-nav flex flex-wrap justify-center">
+        <nav
+          aria-label="Hoofdnavigatie"
+          className="v2-nav order-3 flex w-full min-w-0 flex-wrap justify-start md:order-none md:w-auto md:justify-center"
+        >
           {navItems.map((item) => (
             <Link
               key={item.href}
@@ -43,7 +46,7 @@ export function V2Header() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 flex-wrap items-center justify-end gap-2">
           <VersionSwitcher currentVersion="v2" />
           {ENABLE_PROFILE ? (
             <Link href="/v2/profiel" className="v2-btn v2-btn--sm shrink-0">
