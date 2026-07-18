@@ -524,6 +524,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - Compensatie-pechgeneratie centraal modelleren als studieschuldcontext, niet als losse ad-hoc toolformule.
 - Kennisbank uitbreiden met korte feitelijke artikelen over rente, aanloopfase, draagkracht, extra aflossen, hypotheekimpact en onzekerheden.
 - Hypotheekimpact en maximale hypotheek technisch blijven koppelen via centrale `src/lib/duo/`, `src/lib/mortgage/` en `src/lib/financial-constants/`.
+- Maximale hypotheek toont actuele-rente-orientatie alleen via de centrale externe linkconfig; de gebruiker vult hypotheekrente altijd zelf in. De salarisverhogingsanalyse gebruikt de bestaande centrale hypotheekengine en blijft voorlopig scherm-only totdat het PDF-report-viewmodel wordt uitgebreid.
 - Browserautomatisering voor externe hypotheekcalculators alleen gebruiken als validatie-/vergelijkingshulp, niet als normbron.
 - Voor nieuwe tools dezelfde modulevorm aanhouden onder `apps/`: hidden-first, manifest compleet, centrale logica, tests en daarna pas public.
 - CI controleert expliciet dat `src/lib/app-registry.ts` en `src/lib/app-components.tsx` na `generate:apps` geen diff hebben.

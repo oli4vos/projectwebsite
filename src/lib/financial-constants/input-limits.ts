@@ -38,6 +38,33 @@ export type FinancialInputLimitValidationResult = {
   messages: string[];
 };
 
+export const MORTGAGE_SALARY_BORROWING_POWER_LIMITS = {
+  newGrossAnnualIncome: {
+    id: "mortgageSalaryNewGrossAnnualIncome",
+    label: "Nieuw bruto jaarinkomen",
+    kind: "technical-absolute",
+    min: 0,
+    max: 250_000,
+    step: 100,
+    unit: "eur",
+    severity: "blocking",
+    note:
+      "Ruim technisch invoerbereik voor salarisverhogingsscenario's. De praktische slider mag smaller zijn, maar geldige numerieke invoer binnen deze grens wordt niet stil aangepast.",
+  },
+  practicalSliderIncreasePercent: {
+    id: "mortgageSalaryPracticalSliderIncreasePercent",
+    label: "Praktisch sliderbereik salarisstijging",
+    kind: "practical-slider",
+    min: 0,
+    max: 20,
+    step: 1,
+    unit: "percent",
+    severity: "warning",
+    note:
+      "De slider loopt standaard van het huidige inkomen tot ongeveer twintig procent hoger; het numerieke veld blijft leidend.",
+  },
+} as const satisfies Record<string, FinancialInputLimit>;
+
 function isFiniteNumber(value: number) {
   return Number.isFinite(value);
 }

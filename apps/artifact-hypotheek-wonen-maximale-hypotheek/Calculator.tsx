@@ -19,6 +19,7 @@ import {
   type MortgageFormState,
 } from "./logic";
 import { downloadMortgagePdfReport } from "./report";
+import { SalaryBorrowingPowerExplorer } from "./SalaryBorrowingPowerExplorer";
 
 function formatCurrency(value: number, maximumFractionDigits = 0) {
   return new Intl.NumberFormat("nl-NL", {
@@ -132,6 +133,7 @@ export default function Calculator() {
   const result = submittedValidation?.parsed
     ? calculateMortgageScenario(submittedValues as MortgageFormState)
     : null;
+  const submittedScenarioKey = submittedValues ? JSON.stringify(submittedValues) : "";
   const mobileFlow = useMobileFieldFlow([
     "grossAnnualHouseholdIncome",
     "grossAnnualPartnerIncome",
@@ -538,6 +540,17 @@ export default function Calculator() {
       details={
         result ? (
           <div className="space-y-4">
+            {submittedValidation?.parsed ? (
+              <SalaryBorrowingPowerExplorer
+                baseInput={submittedValidation.parsed}
+                hasDirtyMainInput={hasDirtyChanges}
+                defaultNewGrossAnnualIncome={String(
+                  submittedValidation.parsed.grossAnnualHouseholdIncome,
+                )}
+                submittedScenarioKey={submittedScenarioKey}
+              />
+            ) : null}
+
             <DisclosureSection title="Berekening per bedrag" subtitle="Hier zie je welke limiet het eindbedrag bepaalt.">
               <ResultRow
                 label="Maximale hypotheek op inkomen"

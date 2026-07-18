@@ -49,6 +49,7 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 | Centrale tax/DUO/pension/constants lagen | actief | n.v.t. | aan | Hergebruikt door meerdere tools | n.v.t. |
 | Submit-driven calculatorflow | actief | n.v.t. | aan | Patroon beschikbaar via `CalculatorShell` + submitlogica | n.v.t. |
 | DUO-impact in maximale-hypotheektool | actief | n.v.t. | aan | Kernuitkomst toont rechtsboven de indicatieve daling van de leencapaciteit | n.v.t. |
+| Hypotheekrentelink en salarisverhogingsanalyse | actief | centrale linkconfig + salarisadapter | aan | Maximale-hypotheekflow toont externe inspiratielink bij renteveld en vervolganalyse voor extra leenruimte via centrale hypotheekengine; PDF-uitbreiding blijft vervolgwerk | n.v.t. |
 | Doorstap vanaf DUO-doorlenen-of-stoppen | actief | n.v.t. | aan | Resultaat toont scenariovergelijking, schuldenvrije datum en uitgebreide PDF | n.v.t. |
 | Chart-standaardisatie (jaar/euro/tooltips) | actief | n.v.t. | aan | Centrale charthelpers/componenten | n.v.t. |
 | Profielfunctie (`/profiel`, prefillpad) | uitgeschakeld | `NEXT_PUBLIC_ENABLE_PROFILE` | `false` | UI/CTA's verborgen, code blijft intact | zet op `1` en valideer profiel + tools |
@@ -63,6 +64,7 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 
 | Datum | Commit | Wijziging | Impact |
 |---|---|---|---|
+| 2026-07-19 | `pending` | Externe hypotheekrentelink toegevoegd bij publieke rentevelden en salarisverhogingsanalyse geïntegreerd in maximale-hypotheekflow via centrale hypotheekengine | Maximale hypotheek / hypotheekrente / salaris |
 | 2026-07-18 | `pending` | Calculatorarchitectuur en blueprint-check gedocumenteerd; statusmatrix afgestemd op huidige publieke registry zonder manifestwijzigingen | Architectuur / statusdocumentatie |
 | 2026-07-13 | `pending` | DUO-maandbedrag en DUO-extra-aflossen krijgen uitgebreide PDF-overzichten vanuit dezelfde centrale DUO-rekendata | DUO / studieschuld / PDF |
 | 2026-07-13 | `pending` | DUO-doorlenen-of-stoppen omgebouwd naar stopscenario-tool met prestatiebeurs, diplomatermijn, schuldenvrij-datum en uitgebreide PDF-export | DUO / studieschuld / scenario's |
@@ -86,3 +88,4 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 - Private-lease impacttool inhoudelijk valideren voordat deze publiek wordt.
 - Begrippen-uitleg verder uitrollen naar losse vrije calculatorcopy buiten gedeelde componenten.
 - Scenario-heropenflow uitbreiden naar extra tools zodra scenario-opslag daar wordt geactiveerd.
+- Salarisverhogingsanalyse opnemen in het maximale-hypotheek-PDF-rapport zodra er een gedeeld report-viewmodel is, zonder aparte PDF-berekening.
