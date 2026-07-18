@@ -2,6 +2,8 @@
 
 Doel: publieke releases herleidbaar maken met datum, commit en relevante aannamewijzigingen.
 
+Dit bestand is historisch per release. Gebruik voor actuele toolzichtbaarheid `FUNCTIONALITY_STATUS.md` en de gegenereerde `src/lib/app-registry.ts`.
+
 ## 2026-07-05 — Studieschuld-positionering
 - Commit: `fc17f93`
 - Scope:

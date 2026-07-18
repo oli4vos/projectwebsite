@@ -30,6 +30,16 @@ Wijzigingen, tests, commits en pushes vinden uitsluitend vanuit deze repository 
 
 ## Agentrollen en eigenaarschap
 
+### Project Orchestrator
+
+De Project Orchestrator bewaakt planning, scope, overdrachten en rolroutering, maar neemt specialistisch werk niet inhoudelijk over.
+
+- Controleert bij start de repositorystatus en benoemt actieve wijzigingen, blokkades en risico's.
+- Splitst werk in afgebakende opdrachten voor de juiste guardian of Feature Integrator.
+- Bewaakt dat agents alleen hun eigen scope wijzigen en bestaande gebruikers- of agentwijzigingen behouden.
+- Houdt een compacte overdracht bij met open punten, volgende aanbevolen agent, benodigde checks en releaseblokkades.
+- Laat het definitieve releasebesluit bij de QA & Release Guardian.
+
 ### Feature Integrator
 
 De Feature Integrator is de primaire uitvoerende agent voor nieuwe gebruikersfunctionaliteit en uitbreidingen van bestaande actieve tools.

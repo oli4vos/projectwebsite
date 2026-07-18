@@ -105,14 +105,14 @@ Dit contract is optioneel. Het mag geen verplicht framework voor iedere eenvoudi
 Inventarisatie op basis van de huidige repository:
 
 - `useSubmittedCalculation` + `CalculatorShell`: submit-driven maatwerktools en enkele hidden/direct calculators.
-- `ArtifactCalculator`: gedeelde configuratierenderer voor artifact-tools, met labels, strict profile configs, parsing, validatie en resultaatrendering in een groot bestand.
+- `ArtifactCalculator`: gedeelde configuratierenderer voor artifact-tools. Pure types en input/parsing/format-adapters staan in aparte `_artifact_shared` modules; labels, strict profile configs, validatie en resultaatrendering zitten nog grotendeels in de renderer.
 - `FocusedDuoTool`: gedeelde eenvoudige DUO-presentatielaag voor meerdere korte DUO-tools.
 - Losse maatwerkcalculators: tools met eigen formulier, profielprefill, scenarioresultaten en soms PDF.
 
 Belangrijke probleemgebieden:
 
-- `apps/hypotheek-impact-studieschuld/Calculator.tsx` bevat defaults, voorbeeldwaarden, profielprefill, parsing, validatie, mapping, submitorkestratie, resultaatweergave en PDF-actie in een groot component.
-- `apps/_artifact_shared/ArtifactCalculator.tsx` combineert generieke types, labels, veldconfiguraties, parsing, validatie, formulierrendering en resultaatrendering in een groot gedeeld bestand.
+- `apps/hypotheek-impact-studieschuld/Calculator.tsx` gebruikt inmiddels een pure `form.ts` voor defaults, labels, parsing, validatie en mapping, maar bevat nog veel resultaatweergave, submitorkestratie, profielprefill en PDF-actie.
+- `apps/_artifact_shared/ArtifactCalculator.tsx` is nog steeds groot: tool-/domeinlabels, strict profile configs, validatie, formulierrendering en resultaatrendering staan nog samen. Verdere splitsing moet per verantwoordelijkheid gebeuren, niet op regeltelling.
 
 ## Actieve versus inactieve tools
 
@@ -193,6 +193,16 @@ Een afwijking van de blueprint mag alleen tijdelijk en expliciet:
 - plan een vervolg om de afwijking te verwijderen of te centraliseren.
 
 Functionele bugs die tijdens een architectuurrefactor worden gevonden, worden apart beoordeeld. Financiele logica verandert alleen met expliciete onderbouwing en tests.
+
+## Agentverantwoordelijkheden
+
+- Project Orchestrator: bewaakt scope, overdracht, blokkades en volgende agent, maar neemt specialistisch werk niet over.
+- Feature Integrator: bouwt of activeert tools volgens blueprint en houdt zichtbaarheid, manifest, route, formulier, resultaat en PDF integraal consistent.
+- Financial Domain & Calculation Guardian: beheert centrale formules, regels, constants, bronmetadata en regressietests.
+- Form UX & PDF Guardian: bewaakt formulierflow, foutmeldingen, progressive disclosure en scherm/PDF-gelijkheid.
+- DevOps, Security & Performance Guardian: bewaakt static hosting, dependencies, secrets, runtimekosten, securitychecks en build/deploybaarheid.
+- Sources & Regulations Guardian: bewaakt primaire bronnen, geldigheidsdata, regelinterpretaties en bronaanduidingen.
+- QA & Release Guardian: geeft het definitieve releasebesluit na registry-, route-, test-, build-, zichtbaarheid-, PDF- en regressiecontrole.
 
 ## Relatie tussen scherm en PDF
 

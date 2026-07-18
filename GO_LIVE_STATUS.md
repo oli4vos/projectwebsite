@@ -2,6 +2,8 @@
 
 Dit bestand is een append-only log voor releasegereedheid. Voeg per release een nieuw blok toe met datum, referentiecommit en status per checklistpunt. Oude blokken blijven staan als historie.
 
+Actuele toolzichtbaarheid staat niet in dit historische log maar in `FUNCTIONALITY_STATUS.md` en de gegenereerde `src/lib/app-registry.ts`.
+
 ## 2026-07-05 — Studieschuld-positionering live
 
 Referentie commit: `fc17f93`
