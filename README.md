@@ -9,9 +9,11 @@ Deze lijst komt overeen met de actuele publieke `app.json`-manifests (`visibilit
 | Slug | Titel | Status | Categorie |
 |---|---|---|---|
 | `artifact-hypotheek-wonen-maximale-hypotheek` | Maximale hypotheek | `active` | Hypotheek |
-| `duo-doorlenen-of-stoppen` | DUO doorlenen of stoppen | `beta` | Schulden |
 | `duo-extra-aflossen` | Wat doet extra aflossen? | `beta` | Schulden |
+| `duo-leenbedrag-impact` | Impact van mijn leenbedrag | `beta` | Schulden |
 | `duo-maandbedrag` | Wat wordt mijn DUO-maandbedrag? | `beta` | Schulden |
+| `duo-schuld-bij-starten-lenen` | Wat wordt mijn studieschuld? | `beta` | Schulden |
+| `duo-stoppen-kosten-prestatiebeurs` | Wat kost stoppen met studeren? | `beta` | Schulden |
 | `familiehulp-eerste-woning` | Lenen of schenken voor eerste woning | `beta` | Studieschuld & wonen |
 | `hypotheek-impact-studieschuld` | Hypotheek-impact studieschuld | `beta` | Hypotheek |
 | `schulden-volgorde` | Welke schuld eerst? | `beta` | Schulden |
@@ -196,6 +198,7 @@ Belangrijke centrale rekenlagen:
 | `PROJECT.md` | Actuele architectuur, productrichting, zichtbaarheid en technische context. |
 | `AGENTS.md` | Verplichte regels voor agents en engineers, vooral centrale rekenlagen en UX-checks. |
 | `CONTRIBUTING.md` | Lokale workflow, checks en opleverregels voor wijzigingen. |
+| `docs/calculator-architecture.md` | Laagmodel, calculatorcontract, actieve scope en blueprint voor activatie/publicatie. |
 | `FUNCTIONALITY_STATUS.md` | Single source of truth voor actief, hidden, voorbereid en uitgeschakeld gedrag. |
 | `UX_GUIDELINES.md` | UX-regels voor calculators, formulieren, mobiele flow en toegankelijkheid. |
 | `DESIGN_SYSTEM.md` | Design tokens, componentconventies en visuele patronen. |

@@ -10,6 +10,24 @@ Lees dit eerst voordat je berekeningen, manifests of routing aanpast.
 De zichtbare site is in de huidige launch-scope puur informatief over studieschuld. Publieke UI-copy bevat geen beleggen-framing, geen aflossen-vs-beleggen-route en geen persoonlijk advies. `FUNCTIONALITY_STATUS.md` is leidend voor welke tools en flows publiek zichtbaar, hidden, voorbereid of uitgeschakeld zijn.
 Alles wat niet meer actief aangeroepen wordt in de zichtbare site blijft wel in de codebase, maar wordt hidden/draft gehouden en uit de publieke registry, navigatie en route-oppervlakken gehouden totdat er expliciet een heractivatiebesluit is.
 
+## Vaste repositoryregel
+
+Alle Codex-agents en engineers werken voor de Project Site uitsluitend in deze repository:
+
+```text
+/Users/oliviervos/Library/Mobile Documents/com~apple~CloudDocs/AA Ondernemen/Project website
+```
+
+Iedere agent navigeert bij aanvang naar deze directory en controleert minimaal:
+
+```bash
+pwd
+git rev-parse --show-toplevel
+git status --short
+```
+
+Wijzigingen, tests, commits en pushes vinden uitsluitend vanuit deze repository plaats. Gebruik geen alternatieve clones, tijdelijke kopieen, bovenliggende directories of nieuw aangemaakte repositories. Bestaande wijzigingen van andere agents of gebruikers worden niet verwijderd, overschreven of teruggedraaid. Destructieve Git-commando's zoals `git reset --hard`, `git clean -fd`, `git checkout -- .` en `git restore .` zijn niet toegestaan zonder expliciete opdracht; force-push is niet toegestaan.
+
 ## Agentrollen en eigenaarschap
 
 ### Feature Integrator
@@ -54,6 +72,46 @@ De QA & Release Guardian controleert onafhankelijk of wijzigingen veilig, volled
 - Accepteert bekende fouten niet stilzwijgend; releasebevindingen eindigen met `GO`, `GO MET BEKENDE NIET-BLOKKERENDE PUNTEN` of `NO-GO`.
 - Corrigeert alleen kleine releaseblokkerende type-, test- of regressiefouten zelfstandig en legt grotere problemen terug bij de verantwoordelijke guardian.
 
+### DevOps, Security & Performance Guardian
+
+De DevOps, Security & Performance Guardian bewaakt dat de Project Site goedkoop, veilig, snel, observeerbaar en betrouwbaar gebouwd en gedeployd kan worden.
+
+- Houdt static hosting de default. Serverless, edge, databases, queues, cronjobs en externe runtimes worden alleen toegevoegd wanneer de tool dat aantoonbaar nodig heeft.
+- Bewaakt minimale infrastructuur, minimale runtime dependencies, pinning of bewuste versiekeuzes, reproduceerbare `npm ci`-installaties en CI die registry-generatie, lint, typecheck, tests en build afdwingt.
+- Controleert dat secrets nooit in broncode, manifests, generated files, logs, clientbundles of publieke environment variables belanden. Secrets horen uitsluitend in environment variables zonder `NEXT_PUBLIC_` wanneer ze niet browser-safe zijn.
+- Beoordeelt Type A-tools als pure frontend/static tools: geen geheime serverdata, geen onnodige backend, geen willekeurige externe scripts, veilige lokale opslag, lazy-loading waar passend en geen onnodige externe API-afhankelijkheid.
+- Beoordeelt Type B-tools als backendtools: afgebakende API, server-side inputvalidatie, passende auth/autorisatie, rate limiting waar misbruik mogelijk is, veilige CORS, time-outs, minimale rechten, observeerbaarheid en foutmeldingen zonder gevoelige details.
+- Controleert securityrisico's rond XSS, injectie, open redirects, SSRF, file uploads, server-side uitvoering, logging, dataretentie, externe APIs, dependencies en foutafhandeling.
+- Controleert performance op initial bundle size, lazy-loading, onnodige client components, zware of dubbele dependencies, caching, static generation, assets, buildtijd, onnodige API-calls en grote client-side datasets.
+- Voert geen micro-optimalisaties of deploymentcomplexiteit door zonder meetbaar voordeel, kosteninschatting, rollbackpad en expliciete motivatie.
+- Rapporteert bij oplevering infrastructuurwijzigingen, kostenimpact, security- en performancebevindingen, gewijzigde environment variables, CI-resultaten, deployrisico's, rollbackinstructies en resterende punten.
+- Migreert inactieve tools niet proactief. Een inactieve Type B-tool moet vóór activatie volledig aan de actuele security- en deploymentblueprint voldoen.
+
+### Form UX & PDF Guardian
+
+De Form UX & PDF Guardian bewaakt consistente, begrijpelijke, toegankelijke en overzichtelijke invoerflows en hoogwaardige PDF-uitvoer voor actieve tools.
+
+- Controleert formulierstructuur, stapsgewijze invoer, progressive disclosure, labels, hulpiteksten, foutmeldingen, defaults, voorbeeldwaarden, resetgedrag, resultaatpresentatie, responsiviteit en toetsenbordbediening.
+- Controleert dat formulieren alleen noodzakelijke vragen tonen, details pas openen wanneer relevant, waarden niet onverwacht verliezen en belangrijke aannames vóór submit of in de directe context zichtbaar zijn.
+- Controleert dat relevante DUO-velden verwijzen naar Mijn DUO of andere primaire gegevensbronnen en dat eenheden voor euro's, percentages en looptijden consistent zijn.
+- Hergebruikt gedeelde formuliercomponenten en centrale format-/parsinghelpers; plaatst geen tool-specifieke uitzonderingen in generieke componenten wanneer configuratie of een kleine adapter volstaat.
+- Controleert dat iedere relevante actieve tool een duidelijke PDF-actie heeft en dat PDF-output dezelfde gevalideerde invoer, domeinberekening, resultaatmodellen, toelichtingen en bronmetadata gebruikt als het scherm.
+- Houdt PDF-rendering vrij van nieuwe berekeningen en controleert titel, datum, samenvatting, invoer, scenario's, resultaten, toelichting, aannames, waarschuwingen, bronverwijzingen, disclaimer en paginering.
+- Test of beoordeelt bij formulier- en PDF-wijzigingen minimaal veldweergave, conditionele velden, validatie, submit, reset, voorbeeldwaarden, profiel-prefill, mobiele layout, PDF-inhoud, scherm/PDF-gelijkheid, lange teksten en grote getallen.
+- Wijzigt geen financiële formules; inhoudelijke rekenwijzigingen gaan naar de Financial Domain & Calculation Guardian.
+
+### Sources & Regulations Guardian
+
+De Sources & Regulations Guardian bewaakt primaire bronnen, regelgeving, uitvoeringspraktijk en geldigheidsdata voor actieve tools en geplande activaties.
+
+- Controleert bij wijziglijke waarden altijd primaire bronnen: wet- en regelgeving, officiële bekendmakingen, DUO, Belastingdienst, Rijksoverheid, AFM, NHG of andere bevoegde instanties.
+- Legt per regel vast: bron, publicatie- of geldigheidsdatum, ingangsdatum, eventuele einddatum, doelgroep, uitzonderingen, overgangsrecht, onzekerheden, implementatie-impact en benodigde tests.
+- Maakt expliciet onderscheid tussen wettelijke verplichting, uitvoeringsbeleid, marktpraktijk, vuistregel, projectkeuze en interpretatie of aanname.
+- Markeert jaarlijkse of periodiek wijziglijke waarden zoals DUO-rente, draagkrachtnormen, hypotheeknormen, AFM-toetsrente, NHG-grenzen, fiscale percentages en toeslaggrenzen als dateerbaar en bronbaar.
+- Past geen complexe centrale formule aan; genormaliseerde regels, grensgevallen en bronverwijzingen gaan naar de Financial Domain & Calculation Guardian.
+- Levert bronlabels, gebruikersuitleg, waarschuwingen, benodigde invoervelden en PDF-bronvermelding aan de Feature Integrator en Form UX & PDF Guardian.
+- Gebruikt commerciële calculators alleen als vergelijkingsmateriaal voor UX of marktpraktijk, nooit als primaire juridische of rekenkundige bron.
+
 ## Architectuurregels
 
 - Alle financiële en domeinberekeningen horen in centrale domeinlagen of in een dunne tool-façade, nooit in React-componenten, routes of presentatiecode.
@@ -83,6 +141,53 @@ De QA & Release Guardian controleert onafhankelijk of wijzigingen veilig, volled
 3. Voeg alleen een dunne façade toe in de tool als de UI die nodig heeft.
 4. Voeg unit tests toe voor normale input, grenswaarden, nulwaarden, ongeldige input en regressie.
 5. Bewaar uitvoer- en foutteksten in de laag waar de gebruiker ze ziet, maar houd formules zelf buiten de presentatie.
+
+## Blueprint-check voor nieuwe en geactiveerde tools
+
+Deze check is verplicht bij een nieuwe tool, gekopieerde tool, experimentele tool die actief wordt, inactieve tool die opnieuw wordt geactiveerd, dashboardzichtbaarheid, publieke publicatie, statuswijziging naar actief of een nieuwe route waarmee bezoekers de tool kunnen gebruiken. Een tool mag niet actief of publiek worden gemaakt voordat de volledige blueprint-check is afgerond.
+
+Controleer minimaal:
+
+- De tool staat in een eigen directory onder `apps/<slug>`.
+- Het manifest is aanwezig en geldig.
+- De toolstatus is expliciet vastgelegd.
+- Registry, auto-discovery en dashboardzichtbaarheid zijn correct.
+- De `Calculator.tsx` is een dunne façade.
+- React-componenten bevatten geen financiële formules.
+- De tool gebruikt de bestaande centrale domeinlagen.
+- Er is geen gekopieerde DUO-, hypotheek-, fiscale of andere centrale rekenlogica.
+- Formulierinput wordt expliciet gemapt naar domeininput.
+- Parsing, validatie, berekening en resultaatframing zijn gescheiden.
+- Bestaande gedeelde formuliercomponenten worden gebruikt waar dat passend is.
+- Er wordt geen parallelle utility- of calculatorlaag toegevoegd.
+- Tool-specifieke uitzonderingen staan niet in generieke renderers.
+- Progressive disclosure en de centrale formulier-UX-regels worden gevolgd.
+- Validatiefouten en foutmeldingen zijn duidelijk.
+- Scherm en PDF gebruiken hetzelfde berekenpad.
+- PDF-output gebruikt dezelfde resultaatdata of hetzelfde viewmodel als het scherm.
+- Er bestaan geen afzonderlijke PDF-formules.
+- Relevante bronnen en toelichtingen worden centraal en consistent gebruikt.
+- De tool heeft relevante unit- en regressietests.
+- De tool werkt via het dashboard.
+- De tool werkt via de directe URL.
+- Browser-refresh op de directe URL werkt.
+- De productiebuild werkt.
+- Inactieve tools worden niet onbedoeld zichtbaar.
+- Secrets staan niet in broncode of manifests.
+- Er is geen ongecontroleerde server-side code execution.
+- Inputvalidatie en eventuele rate limiting zijn passend geregeld.
+- Logging en foutafhandeling voldoen aan de repositoryregels.
+- Type A-tools blijven statisch exporteerbaar en krijgen geen backend, secret of externe API-afhankelijkheid zonder aantoonbare noodzaak.
+- Type B-tools hebben een afgebakende API, servervalidatie, auth/autorisatie waar nodig, veilige CORS, rate limiting bij misbruikrisico, time-outs, minimale rechten en basislogging zonder gevoelige data.
+- Nieuwe dependencies, externe scripts en grote datasets zijn gemotiveerd, clientbundel-impact is beoordeeld en lazy-loading is toegepast waar passend.
+- CI/deploy blijft goedkoop en simpel: `npm run generate:apps`, generated-file diff-check waar relevant, lint, typecheck, tests en build blijven groen voordat een tool publiek wordt.
+- Hostingwijzigingen beschrijven noodzaak, kostenimpact, securityrisico's, benodigde environment variables en rollbackpad.
+- `FUNCTIONALITY_STATUS.md` of de bestaande statusdocumentatie is bijgewerkt.
+- De blueprint-check is uitgevoerd vóór activatie of publicatie.
+
+Een inactieve of experimentele tool hoeft niet direct volledig naar de actuele blueprint te worden gemigreerd. Zodra deze tool wordt geactiveerd, gepubliceerd of zichtbaar gemaakt, is de volledige blueprint-check verplicht en moeten alle relevante afwijkingen vóór activatie worden opgelost.
+
+Toekomstige Codex-agents controleren bij het invoeren of activeren van een tool niet alleen of de tool technisch werkt, maar ook of deze architectonisch aan de blueprint voldoet.
 
 ## Correct versus fout
 

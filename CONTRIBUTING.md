@@ -13,10 +13,11 @@ npm run dev
 ## Voor iedere wijziging
 
 1. Lees `AGENTS.md`.
-2. Zoek bestaande centrale berekeningslogica en gedeelde componenten.
-3. Controleer `FUNCTIONALITY_STATUS.md` voor flags en zichtbaarheid.
-4. Houd de wijziging klein en backward-compatible voor bestaande routes.
-5. Controleer bij zichtbare copy of die past binnen de huidige positionering: feitelijk, geen advies en geen beleggen-framing in de publieke UI.
+2. Lees `docs/calculator-architecture.md` bij calculator-, app-, manifest-, PDF- of toolactivatiewijzigingen.
+3. Zoek bestaande centrale berekeningslogica en gedeelde componenten.
+4. Controleer `FUNCTIONALITY_STATUS.md` voor flags en zichtbaarheid.
+5. Houd de wijziging klein en backward-compatible voor bestaande routes.
+6. Controleer bij zichtbare copy of die past binnen de huidige positionering: feitelijk, geen advies en geen beleggen-framing in de publieke UI.
 
 ## Berekeningen
 
@@ -40,7 +41,7 @@ npm run create:tool <slug>
 npm run generate:apps
 ```
 
-Nieuwe tools blijven standaard hidden totdat manifest, copy, logica, tests en responsive flow compleet zijn.
+Nieuwe tools blijven standaard hidden totdat manifest, copy, logica, tests, responsive flow en de blueprint-check uit `AGENTS.md` compleet zijn. Een hidden, draft of experimentele tool mag pas publiek of dashboardzichtbaar worden nadat de volledige calculatorblueprint uit `docs/calculator-architecture.md` is gecontroleerd.
 
 ## Verplichte controles
 
@@ -64,8 +65,10 @@ Voor een brede wijziging heeft `npm run check` de voorkeur.
 ## Reviewchecklist
 
 - Geen gedupliceerde formule of business rule.
+- `Calculator.tsx` is een dunne facade; parsing, validatie, mapping, berekening, scherm-viewmodel en PDF-data zijn gescheiden waar de tool complex genoeg is.
 - Tests dekken het gewijzigde gedrag.
 - Registry is opnieuw gegenereerd en schoon.
+- Inactieve tools zijn niet onbedoeld publiek zichtbaar geworden.
 - Eén `h1` per pagina en logische kopvolgorde.
 - Geen horizontale scroll op mobiel.
 - Primaire flow werkt met toetsenbord en touch.

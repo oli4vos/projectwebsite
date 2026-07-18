@@ -13,3 +13,7 @@ export function parseOptionalDecimalInput(value: string | undefined | null): num
   const parsed = Number(normalized);
   return Number.isFinite(parsed) ? parsed : undefined;
 }
+
+export function parseRequiredDecimalInput(value: string | undefined | null): number {
+  return parseOptionalDecimalInput(value) ?? Number.NaN;
+}

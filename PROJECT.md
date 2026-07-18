@@ -92,14 +92,16 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - functioneel uitgezet;
   - technisch in code behouden voor snelle heractivatie.
 - De publieke app-registry is nu gericht op studieschuld en wonen:
-  - `duo-doorlenen-of-stoppen`
   - `duo-maandbedrag`
   - `duo-extra-aflossen`
+  - `duo-leenbedrag-impact`
+  - `duo-schuld-bij-starten-lenen`
+  - `duo-stoppen-kosten-prestatiebeurs`
   - `hypotheek-impact-studieschuld`
   - `artifact-hypotheek-wonen-maximale-hypotheek`
   - `schulden-volgorde`
   - `familiehulp-eerste-woning`
-- `studieschuld-vs-beleggen` en `volgende-euro` blijven technisch aanwezig maar zijn hidden.
+- `duo-doorlenen-of-stoppen`, `studieschuld-vs-beleggen` en `volgende-euro` blijven technisch aanwezig maar zijn hidden.
 
 ## Centrale berekeningslaag
 
@@ -297,12 +299,6 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 
 ### Publieke tools
 
-- `[public]` `apps/duo-doorlenen-of-stoppen`
-  - beta-tool voor studenten/starters die willen zien wat nu stoppen, later alsnog een diploma halen of doorstuderen tot diploma betekent voor hun DUO-schuld.
-  - gebruikt centrale DUO-projectie met afzonderlijke tracking van lening, collegegeldkrediet, basisbeurs, aanvullende beurs en studentenreisproduct.
-  - vergelijkt de scenario's “nu stoppen en geen diploma”, “nu stoppen en later alsnog diploma” en “doorstuderen tot diploma”.
-  - toont schuld op stopmoment, schuld bij start terugbetaling, indicatief maandbedrag, schuldenvrije datum en maandelijkse tijdlijn.
-  - biedt een uitgebreide PDF-download op dezelfde centrale uitkomstdata.
 - `[public]` `apps/duo-maandbedrag`
   - beta-tool voor wettelijke DUO-maandtermijn en optionele draagkrachtindicatie.
   - gebruikt centrale DUO-berekeningen en centrale DUO-rente/looptijdconstants.
@@ -311,6 +307,15 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - beta-tool voor extra aflossen bij DUO.
   - toont feitelijk effect op maandtermijn, looptijd, rentelast en afloscurve zonder beleggingsvergelijking.
   - biedt een uitgebreide PDF-download op dezelfde centrale uitkomstdata.
+- `[public]` `apps/duo-leenbedrag-impact`
+  - beta-tool voor de impact van een nieuw leenbedrag per maand op de eindschuld.
+  - gebruikt centrale DUO-leenfaseberekeningen.
+- `[public]` `apps/duo-schuld-bij-starten-lenen`
+  - beta-tool voor de verwachte studieschuld bij starten met studeren en maandelijks lenen.
+  - gebruikt centrale DUO-leenfaseberekeningen.
+- `[public]` `apps/duo-stoppen-kosten-prestatiebeurs`
+  - beta-tool voor prestatiebeursbedragen die schuld blijven bij stoppen zonder diploma.
+  - gebruikt centrale DUO-regels voor prestatiebeurscomponenten.
 - `[public]` `apps/hypotheek-impact-studieschuld`
   - indicatieve tool voor de impact van een DUO-maandlast op hypotheekruimte.
   - rekent primair via relevante DUO-maandlast -> brutering -> annuïtaire hypotheekimpact.
@@ -328,6 +333,9 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 
 ### Verborgen tools (bewust uit positionering)
 
+- `[hidden]` `apps/duo-doorlenen-of-stoppen`
+  - technisch aanwezig, maar het manifest staat nu op `visibility: "hidden"` en de tool zit niet in de gegenereerde publieke registry.
+  - heractivatie vereist manifestwijziging, `npm run generate:apps`, groene checks en de volledige blueprint-check.
 - `[hidden]` `apps/studieschuld-vs-beleggen`
   - technisch aanwezig maar bewust uit de zichtbare site gehaald.
   - reden: huidige positionering is informatief over studieschuld, niet aflossen-vs-beleggen of vermogensallocatie.
