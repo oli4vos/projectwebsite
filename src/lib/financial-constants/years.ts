@@ -9,11 +9,11 @@ export const FINANCIAL_CONSTANTS_BY_YEAR: Record<number, AnnualFinancialConstant
       duo: {
         meta: {
           sourceLabel: "DUO rente bij DUO",
-          lastChecked: "2026-05-18",
+          lastChecked: "2026-07-18",
           status: "definitief",
           sourceUrl: "https://duo.nl/particulier/studieschuld-terugbetalen/terugbetalingsregels.jsp",
           sourceTier: "overheidsuitleg",
-          notes: "DUO-rente volgt de officiële vaststelling via https://www.duo.nl/particulier/rente/rente-voor-terugbetalers.jsp; draagkrachtvrijstellingen en -percentages berusten op de studiefinanciering-regelgeving.",
+          notes: "DUO-rente volgt de officiële vaststelling via https://www.duo.nl/particulier/rente/rente-voor-terugbetalers.jsp. Voor terugbetalers hangt toepassing af van de persoonlijke rentevaste periode in Mijn DUO. Draagkrachtvrijstellingen en -percentages berusten op de studiefinanciering-regelgeving en hebben nog exactere bronmetadata per bedrag nodig.",
         },
         rates: {
           SF35: 2.33,

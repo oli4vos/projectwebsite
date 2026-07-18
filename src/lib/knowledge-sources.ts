@@ -17,6 +17,7 @@ export const knowledgeSources = {
     description:
       "De wettelijke regeling waarin de maximale hypotheek ten opzichte van inkomen en woningwaarde wordt vastgesteld. Bevat de basis voor LTI, LTV, financieringslastpercentages en uitzonderingen.",
     url: "https://zoek.officielebekendmakingen.nl/stcrt-2025-36471.html",
+    lastChecked: "2026-07-18",
   },
   "nibud-advies-hypotheeknormen-2026": {
     title: "Advies hypotheeknormen 2026",
@@ -26,6 +27,7 @@ export const knowledgeSources = {
     description:
       "Adviesrapport waarop de jaarlijkse hypotheeknormen worden gebaseerd. Bevat uitleg over financieringslastpercentages, inkomensgroepen, rente, huishoudbudgetten en wijzigingen voor 2026.",
     url: "https://www.nibud.nl/onderzoeksrapporten/rapport-advies-hypotheeknormen-2026-2025/",
+    lastChecked: "2026-07-18",
   },
   "volkshuisvesting-leennormen-hypotheek": {
     title: "Leennormen voor hypotheken",
@@ -35,6 +37,7 @@ export const knowledgeSources = {
     description:
       "Publieke uitleg over de Tijdelijke regeling hypothecair krediet en de werking van leennormen voor hypotheken.",
     url: "https://www.volkshuisvestingnederland.nl/onderwerpen/huren-en-wonen/tijdelijke-regeling-hypothecair-krediet",
+    lastChecked: "2026-07-18",
   },
   "afm-hypothecair-krediet": {
     title: "Hypothecair krediet",
@@ -44,6 +47,7 @@ export const knowledgeSources = {
     description:
       "AFM-pagina over hypothecair krediet, waaronder de toetsrente voor hypotheken met een rentevaste periode korter dan tien jaar.",
     url: "https://www.afm.nl/nl-nl/sector/themas/dienstverlening-aan-consumenten/financiele-producten/hypothecair-krediet",
+    lastChecked: "2026-07-18",
   },
   "afm-toetsrente-q3-2026": {
     title: "Toetsrente hypotheken derde kwartaal 2026 is 5%",
@@ -53,6 +57,7 @@ export const knowledgeSources = {
     description:
       "AFM-publicatie waarin staat dat de toetsrente voor het derde kwartaal van 2026 5% bedraagt. Relevant bij rentevaste perioden korter dan tien jaar.",
     url: "https://www.afm.nl/nl-nl/sector/actueel/2026/jun/sb-toetstrente-q3-2026",
+    lastChecked: "2026-07-18",
   },
   "rijksoverheid-studieschuld-hypotheek": {
     title: "Hoe zwaar telt mijn studieschuld mee voor mijn hypotheek?",
@@ -62,6 +67,7 @@ export const knowledgeSources = {
     description:
       "Uitleg van de Rijksoverheid over hoe een studieschuld meeweegt bij het bepalen van de maximale hypotheek en waarom extra aflossen de hypotheekruimte kan verhogen.",
     url: "https://www.rijksoverheid.nl/onderwerpen/huis-kopen/vraag-en-antwoord/hoe-zwaar-telt-mijn-studieschuld-mee-voor-mijn-hypotheek",
+    lastChecked: "2026-07-18",
   },
   "rijksoverheid-leennormen-2026": {
     title: "Leennormen 2026: hypotheek kan iets omhoog door verwachte loonstijging",
@@ -71,6 +77,7 @@ export const knowledgeSources = {
     description:
       "Nieuwsbericht over de hypotheeknormen voor 2026, waaronder de rol van loonstijging, energielabels en extra leenruimte.",
     url: "https://www.rijksoverheid.nl/actueel/nieuws/2025/10/31/leennormen-2026-hypotheek-kan-iets-omhoog-door-verwachte-loonstijging",
+    lastChecked: "2026-07-18",
   },
   "afm-consumenten-hypotheek-betalen": {
     title: "Kun je de hypotheek betalen?",
@@ -98,7 +105,7 @@ export const knowledgeSources = {
     description:
       "DUO-uitleg over rentepercentages voor terugbetalers, rentevaste perioden en de koppeling met terugbetalingsregels.",
     url: "https://www.duo.nl/particulier/rente/rente-voor-terugbetalers.jsp",
-    lastChecked: "2026-07-05",
+    lastChecked: "2026-07-18",
   },
   "duo-rente-studenten": {
     title: "Rente voor studenten",
@@ -108,7 +115,7 @@ export const knowledgeSources = {
     description:
       "DUO-uitleg over rente tijdens de studie en actuele rentepercentages voor studenten per terugbetalingsregel.",
     url: "https://www.duo.nl/particulier/rente/rente-voor-studenten.jsp",
-    lastChecked: "2026-07-05",
+    lastChecked: "2026-07-18",
   },
   "duo-gift-of-terugbetalen": {
     title: "Gift of terugbetalen",
@@ -178,7 +185,7 @@ export const knowledgeSources = {
     description:
       "DUO-nieuwsbericht met de rentepercentages voor 2026 voor SF35 en SF15.",
     url: "https://www.duo.nl/particulier/home/actueel/nieuwe-rentepercentages.jsp",
-    lastChecked: "2026-07-05",
+    lastChecked: "2026-07-18",
   },
   "duo-zo-werkt-terugbetalen": {
     title: "Zo werkt terugbetalen",

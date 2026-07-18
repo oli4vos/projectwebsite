@@ -3,12 +3,12 @@ import { DEFAULT_FINANCIAL_YEAR } from "@/lib/financial-constants/years";
 
 export const DUO_RATE_HISTORY_META: AssumptionMeta = {
   sourceLabel: "DUO rente voor terugbetalers",
-  lastChecked: "2026-07-13",
+  lastChecked: "2026-07-18",
   status: "definitief",
   sourceUrl: "https://www.duo.nl/particulier/rente/rente-voor-terugbetalers.jsp",
   sourceTier: "overheidsuitleg",
   notes:
-    "DUO publiceert jaarlijks nieuwe rentepercentages. Voor terugbetalers blijft een gekozen rente daarna vijf jaar vaststaan. Deze tabel bevat de laatste vijf rentejaren voor SF35, SF15, SF15-oud en levenlanglerenkrediet.",
+    "DUO publiceert jaarlijks nieuwe rentepercentages. Voor terugbetalers geldt een nieuw rentejaar alleen als hun persoonlijke rentevaste periode afloopt; daarna blijft de rente vijf jaar vaststaan. Deze tabel bevat de laatste vijf rentejaren voor SF35, SF15, SF15-oud en levenlanglerenkrediet.",
 };
 
 type DuoRateHistoryEntry = Record<RepaymentRuleKey, number>;

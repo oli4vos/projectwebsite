@@ -136,14 +136,14 @@ Dit document legt vast welke bronnen de kennisbank en toekomstige blogcontent al
 
 Gebruik deze volgorde:
 
-1. Wet / regeling
-2. Normadvies
-3. Toezichthouder
-4. Overheidsuitleg
-5. Primaire DUO-uitvoering voor studieschuld- en terugbetaalregels
-6. Praktijkbronnen
+1. Wet- en regelgeving.
+2. Officiële overheidswebsites.
+3. DUO, Belastingdienst, Rijksoverheid, AFM, NHG en andere bevoegde instanties.
+4. Officiële uitvoeringsdocumentatie.
+5. Erkende technische normen.
+6. Betrouwbare secundaire toelichtingen.
 
-Voor rekentools zijn wet, normadvies, toezichthouder en primaire uitvoeringsbronnen leidend. Praktijkbronnen zijn alleen aanvullende uitleg en nooit normbron.
+Voor rekentools zijn wet, normadvies, toezichthouder en primaire uitvoeringsbronnen leidend. Praktijkbronnen zijn alleen aanvullende uitleg en nooit normbron. Leg per regel vast of het gaat om wettelijke verplichting, uitvoeringsbeleid, marktpraktijk, vuistregel, projectkeuze of interpretatie.
 
 ## 4. Vergelijkingsbronnen buiten het bronregister
 
