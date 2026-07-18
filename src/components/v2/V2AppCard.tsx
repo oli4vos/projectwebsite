@@ -30,7 +30,7 @@ export function V2AppCard({ app }: V2AppCardProps) {
         {app.tags.slice(0, 4).map((tag) => (
           <span
             key={tag}
-            className="rounded-full border border-[var(--v2-line)] bg-[var(--v2-paper)] px-2.5 py-1 text-[11px] font-medium text-[var(--v2-ink-soft)]"
+            className="rounded-md border border-[var(--v2-line)] bg-[var(--v2-paper)] px-2.5 py-1 text-[11px] font-medium text-[var(--v2-ink-soft)]"
           >
             {tag}
           </span>

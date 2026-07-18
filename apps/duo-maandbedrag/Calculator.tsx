@@ -62,7 +62,7 @@ function MoneyField({ id, label, value, error, prefix, hint, onChange }: FieldPr
         </span>
         {hint ? <span className="text-right text-[11px] text-[var(--soft)]">{hint}</span> : null}
       </span>
-      <span className="hair flex min-h-12 items-center rounded-md border bg-white px-3">
+      <span className="field-shell flex min-h-12 items-center px-3">
         {prefix ? <span className="mr-2 text-[var(--muted)]">{prefix}</span> : null}
         <input
           id={String(id)}
@@ -192,7 +192,7 @@ export default function DuoMaandbedragCalculator() {
               event.target.value as DuoMonthlyPaymentFormValues["repaymentRule"],
             )
           }
-          className="ring-focus hair h-12 rounded-md border bg-white px-3 text-[15px] text-[var(--ink)] outline-none"
+          className="field-shell ring-focus h-12 px-3 text-[15px] text-[var(--ink)] outline-none"
         >
           {repaymentRuleOptions.map((option) => (
             <option key={option} value={option}>
@@ -212,7 +212,7 @@ export default function DuoMaandbedragCalculator() {
             id="duoRateYear"
             value={formValues.duoRateYear}
             onChange={(event) => updateField("duoRateYear", event.target.value)}
-            className="ring-focus hair h-12 rounded-md border bg-white px-3 text-[15px] text-[var(--ink)] outline-none"
+            className="field-shell ring-focus h-12 px-3 text-[15px] text-[var(--ink)] outline-none"
           >
             {getAvailableDuoRateYears().map((year) => (
               <option key={year} value={year}>
@@ -260,7 +260,7 @@ export default function DuoMaandbedragCalculator() {
           onChange={(event) =>
             updateField("householdSituation", event.target.value as DuoHouseholdSituation)
           }
-          className="ring-focus hair h-12 rounded-md border bg-white px-3 text-[15px] text-[var(--ink)] outline-none"
+          className="field-shell ring-focus h-12 px-3 text-[15px] text-[var(--ink)] outline-none"
         >
           <option value="single">Alleenstaand</option>
           <option value="partner">Met partner of alleenstaande ouder</option>
@@ -318,7 +318,7 @@ export default function DuoMaandbedragCalculator() {
         />
       </div>
 
-      <section className="rounded-xl border hair bg-white p-5 shadow-paper">
+      <section className="surface-panel p-5">
         <h2 className="text-lg font-semibold tracking-tight text-[var(--ink)]">
           Berekening
         </h2>
@@ -359,7 +359,7 @@ export default function DuoMaandbedragCalculator() {
       </section>
     </div>
   ) : (
-    <section id="tool-result-summary" className="rounded-xl border hair bg-white p-5 shadow-paper">
+    <section id="tool-result-summary" className="surface-panel p-5">
       <h2 className="text-lg font-semibold tracking-tight text-[var(--ink)]">
         Vul je studieschuld in
       </h2>
@@ -421,7 +421,7 @@ export default function DuoMaandbedragCalculator() {
         ) : null
       }
       disclaimer={
-        <p className="rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] p-4 text-[12.5px] leading-[1.7] text-[var(--muted)]">
+        <p className="surface-subtle p-4 text-[12.5px] leading-[1.7] text-[var(--muted)]">
           Puur informatieve DUO-indicatie. Geen advies. Jij bepaalt wat je met
           deze informatie doet.
         </p>

@@ -356,7 +356,7 @@ function CalculatorContent({
 
   return (
     <CalculatorShell>
-      <section className="order-1 min-w-0 rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
+      <section className="surface-panel order-1 min-w-0 p-6">
         <div>
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
             Rekentool v2
@@ -380,13 +380,13 @@ function CalculatorContent({
           </p>
         </div>
 
-        <div className="mt-6 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
+        <div className="surface-subtle mt-6 px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
           Deze tool geeft een indicatie. Een hypotheekverstrekker of adviseur rekent
           met actuele normen, acceptatiebeleid en jouw volledige situatie.
         </div>
 
         {hasRelevantProfileValues ? (
-          <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--hair)] bg-white px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
+          <div className="surface-subtle mt-4 flex flex-wrap items-center gap-3 px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
             <span>Profielwaarden gevonden in deze browser.</span>
             <ToolActionButton type="button" onClick={applyExampleValues} variant="secondary" size="sm">
               Start met voorbeeldwaarden
@@ -400,7 +400,7 @@ function CalculatorContent({
           </div>
         ) : null}
         {!hasRelevantProfileValues ? (
-          <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--hair)] bg-white px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
+          <div className="surface-subtle mt-4 flex flex-wrap items-center gap-3 px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
             <span>Start leeg en vul snel een voorbeeldscenario in.</span>
             <ToolActionButton type="button" onClick={applyExampleValues} variant="secondary" size="sm">
               Start met voorbeeldwaarden
@@ -873,7 +873,7 @@ function CalculatorContent({
       </section>
 
       <section className="order-2 min-w-0 space-y-5">
-        <div id="tool-result-summary" className="rounded-[1.5rem] bg-[var(--deep)] p-6 text-white shadow-paper-lg">
+        <div id="tool-result-summary" className="surface-panel-strong p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="text-[11px] uppercase tracking-[0.12em] text-white/55">
               Bovenaan samengevat
@@ -963,7 +963,7 @@ function CalculatorContent({
           subtitle="Hieronder zie je ook de gebruikte aannames en waar je op moet letten in de praktijk."
         >
           <div className="space-y-5">
-        <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
+        <div className="surface-panel p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h3 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
               Hoe komen we aan het DUO-bedrag?
@@ -1046,7 +1046,7 @@ function CalculatorContent({
           <InfoList items={result?.duoPayment.warnings ?? []} tone="warning" />
         </div>
 
-        <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
+        <div className="surface-panel p-6">
           <h3 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
             Verplicht DUO-bedrag vs keuzebedrag
           </h3>

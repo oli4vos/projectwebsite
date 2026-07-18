@@ -133,7 +133,7 @@ function Field({
         </span>
         {hint ? <span className="text-right text-[11px] leading-snug text-[var(--soft)]">{hint}</span> : null}
       </span>
-      <span className="hair flex min-h-12 items-center rounded-md border bg-white px-3">
+      <span className="field-shell flex min-h-12 items-center px-3">
         {prefix ? <span className="mr-2 text-[var(--muted)]">{prefix}</span> : null}
         <input
           id={String(id)}
@@ -229,7 +229,7 @@ function Select({
       <span className="text-[12px] font-medium uppercase tracking-[0.04em] text-[var(--muted)]">
         {label}
       </span>
-      <span className="hair flex min-h-12 items-center rounded-md border bg-white px-3">
+      <span className="field-shell flex min-h-12 items-center px-3">
         <select
           id={String(id)}
           value={value}
@@ -383,7 +383,7 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
 
   const result = submittedView?.isValid ? (
     <div className="space-y-5">
-      <section id="tool-result-summary" className="rounded-xl border hair bg-white p-5 shadow-paper space-y-4">
+      <section id="tool-result-summary" className="surface-panel space-y-4 p-5">
         <div className="space-y-1">
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
             Uitkomst
@@ -406,7 +406,7 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
             note={`Berekend vanaf start terugbetalen met SF35 over maximaal ${submittedView.focusScenario.repaymentTermYears} jaar.`}
           />
         </div>
-        <div className="rounded-lg border hair bg-[var(--paper-soft)] px-4">
+        <div className="surface-subtle px-4">
           <ResultRow
             label="Eindschuld bij start terugbetaling"
             value={formatCurrency(submittedView.focusScenario.debtAtRepaymentStart)}
@@ -459,7 +459,7 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
       </section>
     </div>
   ) : (
-    <section id="tool-result-summary" className="rounded-xl border hair bg-white p-5 shadow-paper space-y-4">
+    <section id="tool-result-summary" className="surface-panel space-y-4 p-5">
       <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
         Nog niet berekend
       </div>
@@ -510,7 +510,7 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
         <div className="space-y-4">
           {copy.fields.map((field) => renderField(field))}
           {copy.advancedFields ? (
-            <details className="rounded-lg border hair bg-[var(--paper-soft)] p-4">
+            <details className="surface-subtle p-4">
               <summary className="cursor-pointer text-[13px] font-medium text-[var(--ink)]">
                 Verder specificeren
               </summary>

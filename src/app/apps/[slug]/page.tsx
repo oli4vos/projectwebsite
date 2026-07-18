@@ -84,7 +84,7 @@ export default async function AppDetailPage({ params }: AppDetailPageProps) {
           ← Terug naar dashboard
         </Link>
 
-        <section className="hair-b mt-5 pb-8">
+        <section className="mt-5 pb-8">
           <div className="max-w-4xl">
             <div className="flex items-center gap-2 text-[12px] tabular text-[var(--muted)]">
               <span>Rekentools</span>
@@ -119,7 +119,7 @@ export default async function AppDetailPage({ params }: AppDetailPageProps) {
         </section>
 
         <section className="mt-6">
-          <details className="rounded-[1.5rem] border hair bg-white p-5 shadow-paper [&_summary::-webkit-details-marker]:hidden">
+          <details className="surface-panel p-5 [&_summary::-webkit-details-marker]:hidden">
             <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-lg text-[13px] font-medium text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2">
               Toolcontext en aannames
               <span className="text-[var(--muted)]">Uitklappen</span>

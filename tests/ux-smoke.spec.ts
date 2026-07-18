@@ -133,6 +133,23 @@ test("DUO-tools tonen de uitgebreide PDF-download", async ({ page }, testInfo) =
   }
 });
 
+test("dashboard toont publieke toolkaarten met centrale surface-stijl", async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "Desktop dashboardstijl controleren");
+
+  await page.goto("/", { waitUntil: "networkidle" });
+
+  const cards = page.locator('a[href^="/apps/"]').filter({ hasText: "Openen" });
+  await expect(cards.first()).toBeVisible();
+
+  const cardClass = await cards.first().getAttribute("class");
+  expect(cardClass).toContain("surface-panel");
+  const uniqueToolRoutes = await cards.evaluateAll((links) => [
+    ...new Set(links.map((link) => link.getAttribute("href")).filter(Boolean)),
+  ]);
+  expect(uniqueToolRoutes).toHaveLength(9);
+  await expect(page.getByText("Waarom dit rustig blijft")).toBeVisible();
+});
+
 test("losse DUO-tools tonen simpele scenario-uitkomst en schuldenvrije datum", async ({ page }, testInfo) => {
   test.skip(!testInfo.project.name.startsWith("desktop"), "Desktopinteractie controleren");
 

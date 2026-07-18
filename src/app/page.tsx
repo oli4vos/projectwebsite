@@ -38,13 +38,14 @@ export default async function HomePage() {
     <>
       <SiteHeader />
       <main id="main-content" className="page-shell min-h-[100dvh] pb-10 pt-8 lg:pb-14">
-        <section className="hair-b pb-10 pt-2">
-          <div className="max-w-3xl">
-            <div className="text-[13px] font-medium text-[var(--muted)]">
+        <section className="pb-10 pt-2">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1.08fr)_minmax(19rem,0.72fr)] lg:items-end">
+            <div className="max-w-3xl">
+            <div className="section-label">
               Voor starters met een studieschuld
             </div>
             <h1
-              className="text-fluid-h1 mt-4 font-serif tracking-[-0.03em] text-[var(--ink)]"
+              className="text-fluid-h1 mt-4 max-w-[13ch] font-serif tracking-[-0.03em] text-[var(--ink)]"
               style={{ textWrap: "balance" }}
             >
               Eerst grip op je studieschuld.
@@ -63,9 +64,27 @@ export default async function HomePage() {
               ermee doet, bepaal jij.
             </p>
           </div>
+            <aside className="surface-panel p-5">
+              <div className="section-label">Waarom dit rustig blijft</div>
+              <div className="trust-strip mt-5">
+                <div>
+                  <div className="font-mono text-[22px] tabular text-[var(--ink)]">9</div>
+                  <p className="text-[12.5px] leading-5 text-[var(--muted)]">publieke tools, bewust beperkt</p>
+                </div>
+                <div>
+                  <div className="font-mono text-[22px] tabular text-[var(--ink)]">DUO</div>
+                  <p className="text-[12.5px] leading-5 text-[var(--muted)]">velden verwijzen naar primaire gegevens</p>
+                </div>
+                <div>
+                  <div className="font-mono text-[22px] tabular text-[var(--ink)]">PDF</div>
+                  <p className="text-[12.5px] leading-5 text-[var(--muted)]">rapporten volgen dezelfde uitkomstdata</p>
+                </div>
+              </div>
+            </aside>
+          </div>
         </section>
 
-        <section id="route" className="hair-b py-10">
+        <section id="route" className="py-10">
           <div className="max-w-2xl">
             <h2 className="font-serif text-fluid-h2 tracking-[-0.02em] text-[var(--ink)]">
               Het stappenplan
@@ -75,13 +94,13 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <div className="mt-7 grid gap-4 lg:grid-cols-3">
+          <div className="mt-7 grid gap-4 lg:grid-cols-[1.1fr_0.95fr_1.05fr]">
             {routeSteps.map((step, index) => (
               <article
                 key={step.title}
-                className="flex min-h-full flex-col rounded-xl border hair bg-white p-5 shadow-paper"
+                className="surface-panel flex min-h-full flex-col p-5"
               >
-                <div className="text-[13px] font-medium text-[var(--muted)]">
+                <div className="section-label">
                   Stap {index + 1}
                 </div>
                 <h3 className="mt-3 font-serif text-[1.25rem] tracking-[-0.02em] text-[var(--ink)]">

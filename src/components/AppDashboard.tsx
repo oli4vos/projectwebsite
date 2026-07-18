@@ -110,8 +110,8 @@ export function AppDashboard({ apps }: AppDashboardProps) {
     <div className="space-y-8">
       <KnowledgeLevelSelector />
 
-      <section id="apps" className="rounded-xl border hair bg-white p-6 shadow-paper">
-        <div className="text-[13px] font-medium text-[var(--muted)]">Alle tools</div>
+      <section id="apps" className="surface-panel p-6">
+        <div className="section-label">Alle tools</div>
         <h2 className="mt-2 font-serif text-[clamp(1.35rem,1.1rem+1vw,1.9rem)] tracking-[-0.02em] text-[var(--ink)]">
           Kies je volgende vraag
         </h2>
@@ -119,24 +119,24 @@ export function AppDashboard({ apps }: AppDashboardProps) {
           Gebruik het stappenplan hierboven als startpunt, of kies hier direct
           een tool. Uitleg en details staan standaard rustig opgeborgen.
         </p>
-        <div className="mt-4 flex flex-wrap gap-2">
+        <div className="mt-5 flex flex-wrap gap-2">
           {visibleAudienceRoutes.map((preset) => (
             <button
               key={preset.id}
               type="button"
               onClick={() => applyAudienceFilter(preset.id)}
-              className={`min-h-11 rounded-full border px-3 py-2 text-[12px] transition focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 active:translate-y-px ${
+              className={`touch-link min-h-11 rounded-full border px-3 py-2 text-[12px] font-medium focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 ${
                 activeAudience === preset.id
                   ? "border-[var(--ink)] bg-[var(--deep)] text-white"
-                  : "border-[var(--hair)] bg-white text-[var(--ink)] hover:bg-[var(--paper-soft)]"
+                  : "border-[var(--hair)] bg-white/78 text-[var(--ink)] hover:bg-white"
               }`}
             >
               {preset.label}
             </button>
           ))}
         </div>
-        <div className="mt-4 rounded-xl border hair bg-[var(--paper)] p-4">
-          <div className="text-[12px] font-medium text-[var(--soft)]">Jouw volgende vraag</div>
+        <div className="surface-subtle mt-5 p-4">
+          <div className="section-label">Jouw volgende vraag</div>
           <p className="mt-2 text-[14px] font-medium leading-[1.55] text-[var(--ink)]">
             {activeAudiencePreset.userQuestion}
           </p>
@@ -152,14 +152,14 @@ export function AppDashboard({ apps }: AppDashboardProps) {
                 <Link
                   key={app.slug}
                   href={`/apps/${app.slug}`}
-                  className="group rounded-lg border hair bg-white p-3 transition hover:-translate-y-px hover:shadow-paper focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 active:translate-y-0"
+                  className="touch-link group rounded-lg border hair bg-white/82 p-3 focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
                 >
                   <div className="text-[11px] font-medium text-[var(--soft)]">Startpunt</div>
                   <div className="mt-1 text-[13px] font-medium leading-[1.35] text-[var(--ink)]">
                     {app.title}
                   </div>
                   <div className="mt-2 text-[12px] text-[var(--muted)] transition group-hover:text-[var(--ink)]">
-                    Open tool →
+                    Open tool
                   </div>
                 </Link>
               ))}
@@ -178,7 +178,7 @@ export function AppDashboard({ apps }: AppDashboardProps) {
           <section
             id={toAnchorId(group.title, "groep")}
             key={group.title}
-            className="rounded-xl border hair bg-white p-6 shadow-paper"
+            className="surface-panel p-6"
           >
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
@@ -193,7 +193,7 @@ export function AppDashboard({ apps }: AppDashboardProps) {
                 {group.apps.length} {group.apps.length === 1 ? "tool" : "tools"}
               </span>
             </div>
-            <div className="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            <div className="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-[1fr_1fr_1.08fr]">
               {group.apps.map((app) => (
                 <AppCard key={app.slug} app={app} />
               ))}
@@ -211,7 +211,7 @@ export function AppDashboard({ apps }: AppDashboardProps) {
       {artifactApps.length > 0 ? (
         <section
           id="apps-artifacts"
-          className="rounded-xl border hair bg-white p-6 shadow-paper"
+          className="surface-panel p-6"
         >
           <div className="text-[13px] font-medium text-[var(--muted)]">Aparte categorie</div>
           <h4 className="mt-2 font-serif text-[clamp(1.2rem,1.05rem+0.7vw,1.5rem)] tracking-[-0.015em] text-[var(--ink)]">
@@ -225,7 +225,7 @@ export function AppDashboard({ apps }: AppDashboardProps) {
             {artifactGroups.map((group) => (
               <section
                 key={group.category}
-                className="rounded-xl border border-[var(--hair)] bg-[var(--paper)]/45 p-4"
+                className="surface-subtle p-4"
               >
                 <div className="text-[12px] font-medium text-[var(--soft)]">Artifact-categorie</div>
                 <h5 className="mt-1 font-serif text-[1.05rem] tracking-[-0.01em] text-[var(--ink)]">
@@ -244,7 +244,7 @@ export function AppDashboard({ apps }: AppDashboardProps) {
 
       <section
         id="aannames"
-        className={`grid gap-4 rounded-xl border hair bg-white p-6 shadow-paper ${
+        className={`surface-panel grid gap-4 p-6 ${
           ENABLE_PROFILE ? "md:grid-cols-2" : ""
         }`}
       >
