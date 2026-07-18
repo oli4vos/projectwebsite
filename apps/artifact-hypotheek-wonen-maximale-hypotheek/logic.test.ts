@@ -3,9 +3,11 @@ import { describe, expect, it } from "vitest";
 import {
   buildMortgageCalculationInput,
   calculateMortgageScenario,
+  defaultValues,
   validateMortgageForm,
   exampleValues,
 } from "./logic";
+import { getMortgageAfmTestRateForQuarter } from "@/lib/financial-constants";
 
 describe("maximale hypotheek app logic", () => {
   it("maps form values to the central mortgage input", () => {
@@ -16,6 +18,17 @@ describe("maximale hypotheek app logic", () => {
     expect(input.fixedRatePeriodMonths).toBe(120);
     expect(input.property?.purchasePrice).toBe(350000);
     expect(input.studentLoan?.hasStudentLoan).toBe(true);
+  });
+
+  it("uses the central AFM test-rate default in form defaults and mapping fallback", () => {
+    const centralAfmRate = getMortgageAfmTestRateForQuarter("2026-Q3", 2026).rate;
+    const input = buildMortgageCalculationInput({
+      ...exampleValues,
+      afmStressAnnualRate: "",
+    });
+
+    expect(defaultValues.afmStressAnnualRate).toBe(String(centralAfmRate));
+    expect(input.afmStressAnnualRate).toBe(centralAfmRate);
   });
 
   it("validates missing required fields", () => {

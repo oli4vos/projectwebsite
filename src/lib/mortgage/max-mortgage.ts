@@ -2,9 +2,14 @@ import {
   getDefaultFinancialYear,
   getFinancialConstants,
   getIndicativeIncomeHousingCostRatio,
+  getMortgageAfmTestRateForQuarter,
+  getMortgageEnergyRules,
   getMortgageFinancingLoadRatio,
   getMortgageFinancingLoadTable,
+  getMortgageLtvRules,
+  getMortgageNhgRules,
   getStudentDebtGrossUpFactor,
+  type MortgageEnergyLabelKey,
 } from "@/lib/financial-constants";
 import { calculateAnnuityPayment } from "@/lib/mortgage/annuity";
 import type {
@@ -21,43 +26,8 @@ import type {
   MortgageMaxMortgageWarningSeverity,
 } from "@/lib/mortgage/types";
 
-const DEFAULT_NHG_STANDARD_LIMIT = 470_000;
-const DEFAULT_NHG_WITH_ENERGY_LIMIT = 498_200;
 const DEFAULT_BUYER_COST_RATE = 0.04;
-const DEFAULT_ENERGY_SAVING_ALLOWANCE_CAP_RATIO = 0.06;
 const DEFAULT_CREDIT_LIMIT_FACTOR = 0.01;
-
-const ENERGY_LABEL_PURCHASE_ALLOWANCES: Readonly<Record<string, number>> = {
-  G: 0,
-  F: 0,
-  E: 0,
-  D: 5_000,
-  C: 5_000,
-  B: 10_000,
-  A: 10_000,
-  "A+": 20_000,
-  "A++": 20_000,
-  "A+++": 25_000,
-  "A++++": 30_000,
-  APLUSGUARANTEE: 40_000,
-  unknown: 0,
-};
-
-const ENERGY_SAVING_MEASURE_ALLOWANCES: Readonly<Record<string, number>> = {
-  G: 20_000,
-  F: 20_000,
-  E: 20_000,
-  D: 15_000,
-  C: 15_000,
-  B: 10_000,
-  A: 10_000,
-  "A+": 10_000,
-  "A++": 10_000,
-  "A+++": 0,
-  "A++++": 0,
-  APLUSGUARANTEE: 0,
-  unknown: 0,
-};
 
 function safeFinite(value: number, fallback = 0) {
   return Number.isFinite(value) ? value : fallback;
@@ -118,7 +88,10 @@ function pushWarning(
   warnings.push({ code, severity, message });
 }
 
-function normalizeEnergyLabel(value?: MortgageMaxMortgagePropertyInput["energyLabel"]) {
+function normalizeEnergyLabel(
+  value: MortgageMaxMortgagePropertyInput["energyLabel"] | undefined,
+  normYear: number,
+): MortgageEnergyLabelKey {
   if (!value) {
     return "unknown";
   }
@@ -129,7 +102,10 @@ function normalizeEnergyLabel(value?: MortgageMaxMortgagePropertyInput["energyLa
     return "APLUSGUARANTEE";
   }
 
-  return normalized in ENERGY_LABEL_PURCHASE_ALLOWANCES ? normalized : "unknown";
+  const energyRules = getMortgageEnergyRules(normYear);
+  return normalized in energyRules.purchaseAllowances
+    ? (normalized as MortgageEnergyLabelKey)
+    : "unknown";
 }
 
 function resolveHouseholdIncome(input: MortgageMaxMortgageInput) {
@@ -148,13 +124,15 @@ function resolveHouseholdIncome(input: MortgageMaxMortgageInput) {
 function resolveMortgageRate(
   input: MortgageMaxMortgageInput,
   defaultMortgageRate: number,
+  normYear: number,
 ) {
   const annualMortgageRate =
     input.annualMortgageRate === undefined || input.annualMortgageRate === null
       ? sanitizePercent(defaultMortgageRate)
       : sanitizePercent(input.annualMortgageRate);
   const fixedRatePeriodMonths = sanitizeMonths(input.fixedRatePeriodMonths ?? 0);
-  const afmStressAnnualRate = sanitizePercent(input.afmStressAnnualRate ?? annualMortgageRate);
+  const afmTestRate = getMortgageAfmTestRateForQuarter(undefined, normYear);
+  const afmStressAnnualRate = sanitizePercent(input.afmStressAnnualRate ?? afmTestRate.rate);
 
   if (fixedRatePeriodMonths > 0 && fixedRatePeriodMonths < 120) {
     const testRateUsed = Math.max(annualMortgageRate, afmStressAnnualRate);
@@ -162,6 +140,7 @@ function resolveMortgageRate(
       annualMortgageRate,
       testRateUsed,
       testRateSource: testRateUsed > annualMortgageRate ? ("afm_stress_rate" as const) : ("input" as const),
+      afmTestRate,
     };
   }
 
@@ -169,6 +148,7 @@ function resolveMortgageRate(
     annualMortgageRate,
     testRateUsed: annualMortgageRate,
     testRateSource: "input" as const,
+    afmTestRate,
   };
 }
 
@@ -389,18 +369,25 @@ function calculateHigherMortgageOpportunity(
   return best;
 }
 
-function calculateEnergyLabelAllowance(property: MortgageMaxMortgagePropertyInput | undefined) {
-  const normalized = normalizeEnergyLabel(property?.energyLabel);
-  return ENERGY_LABEL_PURCHASE_ALLOWANCES[normalized] ?? 0;
+function calculateEnergyLabelAllowance(
+  property: MortgageMaxMortgagePropertyInput | undefined,
+  normYear: number,
+) {
+  const energyRules = getMortgageEnergyRules(normYear);
+  const normalized = normalizeEnergyLabel(property?.energyLabel, normYear);
+  return energyRules.purchaseAllowances[normalized] ?? 0;
 }
 
 function calculateEnergySavingAllowance(
   property: MortgageMaxMortgagePropertyInput | undefined,
   marketValue: number,
+  normYear: number,
 ) {
+  const energyRules = getMortgageEnergyRules(normYear);
+  const ltvRules = getMortgageLtvRules(normYear);
   const energySavingMeasuresAmount = sanitizeMoney(property?.energySavingMeasuresAmount ?? 0);
-  const normalized = normalizeEnergyLabel(property?.energyLabel);
-  const labelMaximum = ENERGY_SAVING_MEASURE_ALLOWANCES[normalized] ?? 0;
+  const normalized = normalizeEnergyLabel(property?.energyLabel, normYear);
+  const labelMaximum = energyRules.energySavingMeasureAllowances[normalized] ?? 0;
 
   if (energySavingMeasuresAmount <= 0 || marketValue <= 0 || labelMaximum <= 0) {
     return 0;
@@ -410,7 +397,7 @@ function calculateEnergySavingAllowance(
     Math.min(
       energySavingMeasuresAmount,
       labelMaximum,
-      marketValue * DEFAULT_ENERGY_SAVING_ALLOWANCE_CAP_RATIO,
+      marketValue * ltvRules.energySavingMeasuresAllowanceCapRatio,
     ),
   );
 }
@@ -430,13 +417,15 @@ function calculateNhgLimit(
   input: MortgageMaxMortgageInput,
   purchasePrice: number,
   energySavingAllowance: number,
+  normYear: number,
 ) {
   if (!input.property?.nhgRequested) {
     return undefined;
   }
 
-  const standardLimit = sanitizeMoney(input.nhgStandardLimit ?? DEFAULT_NHG_STANDARD_LIMIT);
-  const energyLimit = sanitizeMoney(input.nhgWithEnergyLimit ?? DEFAULT_NHG_WITH_ENERGY_LIMIT);
+  const nhgRules = getMortgageNhgRules(normYear);
+  const standardLimit = sanitizeMoney(input.nhgStandardLimit ?? nhgRules.standardLimit);
+  const energyLimit = sanitizeMoney(input.nhgWithEnergyLimit ?? nhgRules.withEnergyMeasuresLimit);
   const relevantCosts = purchasePrice + sanitizeMoney(input.property?.renovationAmount ?? 0);
 
   if (relevantCosts <= standardLimit) {
@@ -510,7 +499,11 @@ export function calculateIndicativeMaxMortgage(
   const mortgageRateResolution = resolveMortgageRate(
     input,
     financialConstants.mortgage.defaultMortgageRate,
+    normYear,
   );
+  const nhgRules = getMortgageNhgRules(normYear);
+  const ltvRules = getMortgageLtvRules(normYear);
+  const energyRules = getMortgageEnergyRules(normYear);
 
   pushWarning(
     warnings,
@@ -520,6 +513,12 @@ export function calculateIndicativeMaxMortgage(
   );
   assumptions.push(
     `Gebaseerd op normjaar ${normYear}; de gebruikte tabelversie en eventuele fallback worden afzonderlijk vastgelegd.`,
+  );
+  assumptions.push(
+    `NHG, LTV, AFM-toetsrente en energiebedragen komen uit centrale constants voor ${normYear}.`,
+  );
+  assumptions.push(
+    `Studieschuldbrutering is gemarkeerd als ${financialConstants.mortgage.meta.sourceTier}; dit is geen wettelijke tabel.`,
   );
 
   const { householdIncome, partnerIncome } = resolveHouseholdIncome(input);
@@ -613,9 +612,9 @@ export function calculateIndicativeMaxMortgage(
   );
   const marketValue = sanitizeMoney(property?.marketValue ?? propertyValue);
   const purchasePrice = sanitizeMoney(property?.purchasePrice ?? propertyValue);
-  const ltvPercentage = sanitizePercent(property?.ltvPercentage ?? 100);
-  const energyLabelAllowance = calculateEnergyLabelAllowance(property);
-  const energySavingAllowance = calculateEnergySavingAllowance(property, marketValue);
+  const ltvPercentage = sanitizePercent(property?.ltvPercentage ?? ltvRules.baseMaxLtvPercent);
+  const energyLabelAllowance = calculateEnergyLabelAllowance(property, normYear);
+  const energySavingAllowance = calculateEnergySavingAllowance(property, marketValue, normYear);
   const maxMortgageByIncome = roundMoney(
     baseMaxMortgageByIncome + energyLabelAllowance + energySavingAllowance,
   );
@@ -626,7 +625,7 @@ export function calculateIndicativeMaxMortgage(
     baseMaxMortgageByLtv,
     energySavingAllowance,
   );
-  const maxMortgageByNhg = calculateNhgLimit(input, purchasePrice, energySavingAllowance);
+  const maxMortgageByNhg = calculateNhgLimit(input, purchasePrice, energySavingAllowance, normYear);
 
   const limits = [maxMortgageByIncome];
   if (maxMortgageByCollateral !== undefined) {
@@ -743,6 +742,22 @@ export function calculateIndicativeMaxMortgage(
       financingLoadSource === "official_table" ? financingLoadTable.sourceUrl : undefined,
     financingLoadAgeGroup:
       financingLoadSource === "official_table" ? financingLoadTable.ageGroup : undefined,
+    afmTestRateQuarter:
+      mortgageRateResolution.testRateSource === "afm_stress_rate"
+        ? mortgageRateResolution.afmTestRate.quarter
+        : undefined,
+    afmTestRateValidFrom:
+      mortgageRateResolution.testRateSource === "afm_stress_rate"
+        ? mortgageRateResolution.afmTestRate.meta.validFrom
+        : undefined,
+    afmTestRateValidUntil:
+      mortgageRateResolution.testRateSource === "afm_stress_rate"
+        ? mortgageRateResolution.afmTestRate.meta.validUntil
+        : undefined,
+    afmTestRateSourceUrl:
+      mortgageRateResolution.testRateSource === "afm_stress_rate"
+        ? mortgageRateResolution.afmTestRate.meta.sourceUrl ?? undefined
+        : undefined,
     monthlyHousingBudgetBeforeLiabilities,
     monthlyLiabilityImpact,
     studentLoanMonthlyImpact,
@@ -754,10 +769,20 @@ export function calculateIndicativeMaxMortgage(
     purchasePrice,
     marketValue,
     ltvPercentage,
+    baseMaxLtvPercentage: ltvRules.baseMaxLtvPercent,
+    energySavingMeasuresMaxLtvPercentage: ltvRules.energySavingMeasuresMaxLtvPercent,
+    energySavingMeasuresAllowanceCapRatio: ltvRules.energySavingMeasuresAllowanceCapRatio,
+    energyRulesSourceUrl: energyRules.meta.sourceUrl,
     baseMaxMortgageByLtv,
     maxMortgageByIncome,
     maxMortgageByLtv: maxMortgageByCollateral ?? 0,
     maxMortgageByNhg,
+    nhgStandardLimit: sanitizeMoney(input.nhgStandardLimit ?? nhgRules.standardLimit),
+    nhgWithEnergyMeasuresLimit: sanitizeMoney(
+      input.nhgWithEnergyLimit ?? nhgRules.withEnergyMeasuresLimit,
+    ),
+    nhgGuaranteeFeePercent: nhgRules.guaranteeFeePercent,
+    nhgSourceUrl: nhgRules.meta.sourceUrl,
     buyerCostsEstimate,
     energySavingAllowance,
     ownFunds,

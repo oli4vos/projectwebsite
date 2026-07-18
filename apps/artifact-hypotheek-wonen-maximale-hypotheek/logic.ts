@@ -1,7 +1,11 @@
 import { calculateIndicativeMaxMortgage, type MortgageMaxMortgageInput, type MortgageMaxMortgageResult } from "@/lib/mortgage";
+import { getMortgageAfmTestRateForQuarter } from "@/lib/financial-constants";
 import { parseOptionalDecimalInput } from "@/lib/number-input";
 
 type MortgageEnergyLabel = NonNullable<NonNullable<MortgageMaxMortgageInput["property"]>["energyLabel"]>;
+
+const DEFAULT_AFM_TEST_RATE = getMortgageAfmTestRateForQuarter("2026-Q3", 2026).rate;
+const DEFAULT_AFM_TEST_RATE_INPUT = String(DEFAULT_AFM_TEST_RATE);
 
 export type MortgageFormState = {
   grossAnnualHouseholdIncome: string;
@@ -44,7 +48,7 @@ export const exampleValues: MortgageFormState = {
   energyLabel: "A",
   energySavingMeasuresAmount: "0",
   renovationAmount: "0",
-  afmStressAnnualRate: "5",
+  afmStressAnnualRate: DEFAULT_AFM_TEST_RATE_INPUT,
 };
 
 export const defaultValues: MortgageFormState = {
@@ -65,7 +69,7 @@ export const defaultValues: MortgageFormState = {
   energyLabel: "unknown",
   energySavingMeasuresAmount: "",
   renovationAmount: "",
-  afmStressAnnualRate: "5",
+  afmStressAnnualRate: DEFAULT_AFM_TEST_RATE_INPUT,
 };
 
 function asPositiveNumber(value: string | undefined) {
@@ -178,7 +182,7 @@ export function buildMortgageCalculationInput(values: MortgageFormState): Mortga
       energySavingMeasuresAmount: asPositiveNumber(values.energySavingMeasuresAmount),
       renovationAmount: asPositiveNumber(values.renovationAmount),
     },
-    afmStressAnnualRate: asPositiveNumber(values.afmStressAnnualRate) ?? 5,
+    afmStressAnnualRate: asPositiveNumber(values.afmStressAnnualRate) ?? DEFAULT_AFM_TEST_RATE,
   };
 }
 

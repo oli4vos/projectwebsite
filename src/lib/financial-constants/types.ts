@@ -16,6 +16,13 @@ export type AssumptionMeta = {
   notes?: string;
   sourceUrl: string | null;
   sourceTier: SourceTier;
+  publishedAt?: string;
+  validFrom?: string;
+  validUntil?: string;
+  appliesTo?: string;
+  unit?: string;
+  ruleType?: "wet" | "uitvoeringsbeleid" | "marktpraktijk" | "projectaanname" | "interpretatie";
+  uncertainties?: string;
 };
 
 export type GrossUpFactorBand = {
@@ -23,6 +30,47 @@ export type GrossUpFactorBand = {
   maxRate: number | null;
   factor: number;
   label: string;
+};
+
+export type MortgageEnergyLabelKey =
+  | "G"
+  | "F"
+  | "E"
+  | "D"
+  | "C"
+  | "B"
+  | "A"
+  | "A+"
+  | "A++"
+  | "A+++"
+  | "A++++"
+  | "APLUSGUARANTEE"
+  | "unknown";
+
+export type MortgageNhgRules = {
+  meta: AssumptionMeta;
+  standardLimit: number;
+  withEnergyMeasuresLimit: number;
+  guaranteeFeePercent: number;
+};
+
+export type MortgageLtvRules = {
+  meta: AssumptionMeta;
+  baseMaxLtvPercent: number;
+  energySavingMeasuresMaxLtvPercent: number;
+  energySavingMeasuresAllowanceCapRatio: number;
+};
+
+export type MortgageEnergyRules = {
+  meta: AssumptionMeta;
+  purchaseAllowances: Record<MortgageEnergyLabelKey, number>;
+  energySavingMeasureAllowances: Record<MortgageEnergyLabelKey, number>;
+};
+
+export type MortgageAfmTestRate = {
+  meta: AssumptionMeta;
+  quarter: string;
+  rate: number;
 };
 
 export type MortgageFinancingLoadAgeGroup = "beforeAow" | "fromAow";
@@ -102,6 +150,11 @@ export type AnnualFinancialConstants = {
     defaultMortgageTermYears: number;
     indicativeIncomeHousingCostRatio: number;
     studentDebtGrossUpFactors: GrossUpFactorBand[];
+    nhg: MortgageNhgRules;
+    ltv: MortgageLtvRules;
+    energy: MortgageEnergyRules;
+    afmTestRates: MortgageAfmTestRate[];
+    defaultAfmTestRateQuarter: string;
   };
   box1: {
     meta: AssumptionMeta;

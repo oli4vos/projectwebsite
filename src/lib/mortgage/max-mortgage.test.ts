@@ -165,6 +165,67 @@ describe("calculateIndicativeMaxMortgage", () => {
     expect(result.debug.interestRate).toBe(5);
     expect(result.breakdown.financingLoadTableYear).toBe(2026);
     expect(result.breakdown.financingLoadTableVersion).toContain("2026");
+    expect(result.breakdown.afmTestRateQuarter).toBe("2026-Q3");
+    expect(result.breakdown.afmTestRateValidFrom).toBe("2026-07-01");
+    expect(result.breakdown.afmTestRateValidUntil).toBe("2026-09-30");
+  });
+
+  it("falls back to the central AFM test rate when short fixed-rate input omits a stress rate", () => {
+    const result = calculateIndicativeMaxMortgage({
+      grossAnnualHouseholdIncome: 60_000,
+      annualMortgageRate: 3.8,
+      fixedRatePeriodMonths: 60,
+      mortgageTermYears: 30,
+    });
+
+    expect(result.breakdown.testRateUsed).toBe(5);
+    expect(result.breakdown.testRateSource).toBe("afm_stress_rate");
+    expect(result.breakdown.afmTestRateQuarter).toBe("2026-Q3");
+  });
+
+  it("keeps central NHG limits and energy metadata in the result breakdown", () => {
+    const result = calculateIndicativeMaxMortgage({
+      grossAnnualHouseholdIncome: 120_000,
+      annualMortgageRate: 4.5,
+      mortgageTermYears: 30,
+      property: {
+        propertyValue: 498_200,
+        marketValue: 498_200,
+        purchasePrice: 498_200,
+        ltvPercentage: 100,
+        energyLabel: "A++++",
+        energySavingMeasuresAmount: 28_200,
+        nhgRequested: true,
+      },
+    });
+
+    expect(result.breakdown.nhgStandardLimit).toBe(470_000);
+    expect(result.breakdown.nhgWithEnergyMeasuresLimit).toBe(498_200);
+    expect(result.breakdown.nhgGuaranteeFeePercent).toBe(0.4);
+    expect(result.breakdown.baseMaxLtvPercentage).toBe(100);
+    expect(result.breakdown.energySavingMeasuresMaxLtvPercentage).toBe(106);
+    expect(result.breakdown.energySavingMeasuresAllowanceCapRatio).toBe(0.06);
+    expect(result.breakdown.energyLabelAllowance).toBe(30_000);
+    expect(result.breakdown.energySavingAllowance).toBe(0);
+    expect(result.breakdown.maxMortgageByNhg).toBe(470_000);
+
+    const withEligibleMeasures = calculateIndicativeMaxMortgage({
+      grossAnnualHouseholdIncome: 120_000,
+      annualMortgageRate: 4.5,
+      mortgageTermYears: 30,
+      property: {
+        propertyValue: 498_200,
+        marketValue: 498_200,
+        purchasePrice: 498_200,
+        ltvPercentage: 100,
+        energyLabel: "G",
+        energySavingMeasuresAmount: 28_200,
+        nhgRequested: true,
+      },
+    });
+
+    expect(withEligibleMeasures.breakdown.energySavingAllowance).toBe(20_000);
+    expect(withEligibleMeasures.breakdown.maxMortgageByNhg).toBe(498_200);
   });
 
   it("tracks student-loan impacts separately from generic obligations", () => {

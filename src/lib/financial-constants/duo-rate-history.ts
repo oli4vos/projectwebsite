@@ -13,6 +13,20 @@ export const DUO_RATE_HISTORY_META: AssumptionMeta = {
 
 type DuoRateHistoryEntry = Record<RepaymentRuleKey, number>;
 
+export type DuoRateYearMetadata = {
+  year: number;
+  validFrom: string;
+  validUntil: string;
+  rateFixedUntilForNewPeriod?: string;
+  publishedAt?: string;
+  appliesWhen: string;
+  sourceUrl: string;
+  sourceTier: AssumptionMeta["sourceTier"];
+  status: AssumptionMeta["status"];
+  lastChecked: string;
+  notes?: string;
+};
+
 const UNKNOWN_RULE_FALLBACK: RepaymentRuleKey = "UNKNOWN";
 
 export const DUO_RATE_HISTORY_BY_YEAR: Record<number, DuoRateHistoryEntry> = {
@@ -50,6 +64,72 @@ export const DUO_RATE_HISTORY_BY_YEAR: Record<number, DuoRateHistoryEntry> = {
     SF15_OLD: 2.29,
     SF15_LLLK: 2.33,
     UNKNOWN: 2.33,
+  },
+};
+
+export const DUO_RATE_YEAR_METADATA_BY_YEAR: Record<number, DuoRateYearMetadata> = {
+  2022: {
+    year: 2022,
+    validFrom: "2022-01-01",
+    validUntil: "2022-12-31",
+    rateFixedUntilForNewPeriod: "2026-12-31",
+    appliesWhen:
+      "Gebruik alleen wanneer dit het persoonlijke DUO-rentejaar of een leningdeelrentejaar in Mijn DUO is.",
+    sourceUrl: DUO_RATE_HISTORY_META.sourceUrl ?? "https://www.duo.nl/particulier/rente/rente-voor-terugbetalers.jsp",
+    sourceTier: "overheidsuitleg",
+    status: "definitief",
+    lastChecked: "2026-07-18",
+  },
+  2023: {
+    year: 2023,
+    validFrom: "2023-01-01",
+    validUntil: "2023-12-31",
+    rateFixedUntilForNewPeriod: "2027-12-31",
+    appliesWhen:
+      "Gebruik alleen wanneer dit het persoonlijke DUO-rentejaar of een leningdeelrentejaar in Mijn DUO is.",
+    sourceUrl: DUO_RATE_HISTORY_META.sourceUrl ?? "https://www.duo.nl/particulier/rente/rente-voor-terugbetalers.jsp",
+    sourceTier: "overheidsuitleg",
+    status: "definitief",
+    lastChecked: "2026-07-18",
+  },
+  2024: {
+    year: 2024,
+    validFrom: "2024-01-01",
+    validUntil: "2024-12-31",
+    rateFixedUntilForNewPeriod: "2028-12-31",
+    appliesWhen:
+      "Gebruik alleen wanneer dit het persoonlijke DUO-rentejaar of een leningdeelrentejaar in Mijn DUO is.",
+    sourceUrl: DUO_RATE_HISTORY_META.sourceUrl ?? "https://www.duo.nl/particulier/rente/rente-voor-terugbetalers.jsp",
+    sourceTier: "overheidsuitleg",
+    status: "definitief",
+    lastChecked: "2026-07-18",
+  },
+  2025: {
+    year: 2025,
+    validFrom: "2025-01-01",
+    validUntil: "2025-12-31",
+    rateFixedUntilForNewPeriod: "2029-12-31",
+    appliesWhen:
+      "Gebruik alleen wanneer dit het persoonlijke DUO-rentejaar of een leningdeelrentejaar in Mijn DUO is.",
+    sourceUrl: DUO_RATE_HISTORY_META.sourceUrl ?? "https://www.duo.nl/particulier/rente/rente-voor-terugbetalers.jsp",
+    sourceTier: "overheidsuitleg",
+    status: "definitief",
+    lastChecked: "2026-07-18",
+  },
+  2026: {
+    year: 2026,
+    validFrom: "2026-01-01",
+    validUntil: "2026-12-31",
+    rateFixedUntilForNewPeriod: "2030-12-31",
+    publishedAt: "2025-10-10",
+    appliesWhen:
+      "Voor studenten in 2026 als jaarpercentage; voor terugbetalers alleen wanneer hun persoonlijke vijfjarige rentevaste periode op 2025-12-31 afliep.",
+    sourceUrl: "https://duo.nl/particulier/nieuws/nieuwe-rentepercentages-bekend.jsp",
+    sourceTier: "overheidsuitleg",
+    status: "definitief",
+    lastChecked: "2026-07-18",
+    notes:
+      "Levenlanglerenkrediet volgt de SF35-rente. Toekomstige rentejaren mogen niet uit deze waarde worden afgeleid.",
   },
 };
 
@@ -106,6 +186,16 @@ export function getDuoHistoricalRateYearForRule(
     const historicalRate = getDuoHistoricalRateForRule(rule, year);
     return sanitizeRate(historicalRate) === safeRate;
   });
+}
+
+export function getDuoRateYearMetadata(year?: number) {
+  const safeYear = sanitizeRateYear(year);
+  const fallbackYear = getAvailableDuoRateYears(1)[0] ?? DEFAULT_FINANCIAL_YEAR;
+
+  return (
+    DUO_RATE_YEAR_METADATA_BY_YEAR[safeYear] ??
+    DUO_RATE_YEAR_METADATA_BY_YEAR[fallbackYear]
+  );
 }
 
 export function formatDuoRateYearLabel(year: number, rule: RepaymentRuleKey = "UNKNOWN") {

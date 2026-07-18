@@ -7,6 +7,7 @@ import {
   getAvailableDuoRateYears,
   getDuoHistoricalRateForRule,
   getDuoHistoricalRateYearForRule,
+  getDuoRateYearMetadata,
   formatDuoRateYearLabel,
   isSupportedDuoRateYear,
 } from "@/lib/financial-constants/duo-rate-history";
@@ -17,6 +18,7 @@ import {
 import type {
   AnnualFinancialConstants,
   GrossUpFactorBand,
+  MortgageAfmTestRate,
   RepaymentRuleKey,
   MortgageFinancingLoadLookupInput,
 } from "@/lib/financial-constants/types";
@@ -113,6 +115,35 @@ export function getIndicativeIncomeHousingCostRatio(year?: number) {
   return getFinancialConstants(year).mortgage.indicativeIncomeHousingCostRatio;
 }
 
+export function getMortgageNhgRules(year?: number) {
+  return getFinancialConstants(year).mortgage.nhg;
+}
+
+export function getMortgageLtvRules(year?: number) {
+  return getFinancialConstants(year).mortgage.ltv;
+}
+
+export function getMortgageEnergyRules(year?: number) {
+  return getFinancialConstants(year).mortgage.energy;
+}
+
+export function getMortgageAfmTestRates(year?: number): MortgageAfmTestRate[] {
+  return [...getFinancialConstants(year).mortgage.afmTestRates];
+}
+
+export function getMortgageAfmTestRateForQuarter(
+  quarter?: string,
+  year?: number,
+): MortgageAfmTestRate {
+  const constants = getFinancialConstants(year);
+  const targetQuarter = quarter ?? constants.mortgage.defaultAfmTestRateQuarter;
+  const match = constants.mortgage.afmTestRates.find(
+    (testRate) => testRate.quarter === targetQuarter,
+  );
+
+  return match ?? constants.mortgage.afmTestRates[0];
+}
+
 export function getMortgageFinancingLoadRatio(input: MortgageFinancingLoadLookupInput) {
   return getMortgageFinancingLoadPercentage(input);
 }
@@ -123,16 +154,22 @@ export type {
   AssumptionStatus,
   DuoIncomeBasedRule,
   GrossUpFactorBand,
+  MortgageAfmTestRate,
+  MortgageEnergyLabelKey,
+  MortgageEnergyRules,
   MortgageFinancingLoadData,
   MortgageFinancingLoadAgeGroup,
   MortgageFinancingLoadLookupInput,
   MortgageFinancingLoadRateBand,
   MortgageFinancingLoadRow,
   MortgageFinancingLoadTable,
+  MortgageLtvRules,
+  MortgageNhgRules,
   RepaymentRuleKey,
   SourceTier,
 } from "@/lib/financial-constants/types";
 export { getMortgageFinancingLoadTable };
 export { getAvailableDuoRateYears };
 export { getDuoHistoricalRateYearForRule };
+export { getDuoRateYearMetadata };
 export { formatDuoRateYearLabel };
