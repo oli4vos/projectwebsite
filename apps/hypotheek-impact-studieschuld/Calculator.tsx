@@ -949,13 +949,20 @@ function CalculatorContent({
                   {isDownloadingPdf ? "PDF wordt gemaakt..." : "Download uitgebreid PDF-overzicht"}
                 </ToolActionButton>
                 {pdfStatus ? (
-                  <span className="text-[12.5px] leading-[1.5] text-white/70">
+                  <span
+                    role="status"
+                    aria-live="polite"
+                    className="text-[12.5px] leading-[1.5] text-white/70"
+                  >
                     {pdfStatus}
                   </span>
                 ) : null}
               </div>
               {pdfError ? (
-                <p className="mt-3 rounded-xl border border-white/15 bg-white/8 px-4 py-3 text-[13px] leading-[1.6] text-white/82">
+                <p
+                  role="alert"
+                  className="mt-3 rounded-xl border border-white/15 bg-white/8 px-4 py-3 text-[13px] leading-[1.6] text-white/82"
+                >
                   {pdfError}
                 </p>
               ) : null}
