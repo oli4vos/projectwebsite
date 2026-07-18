@@ -246,6 +246,24 @@ Belangrijk:
 - Voor project-repositories wordt de juiste `basePath` automatisch afgeleid uit `GITHUB_REPOSITORY`.
 - Live marktdata wordt op GitHub Pages een build-time snapshot. De site blijft werken, maar dagelijkse revalidatie van server-side Next caching bestaat daar niet.
 
+## Environment en observability
+
+De huidige publieke site is bewust Type A/local-first: er zijn geen serversecrets nodig om te bouwen of te gebruiken. Alle variabelen in `.env.example` zijn `NEXT_PUBLIC_*` en komen dus in de clientbundle terecht.
+
+| Variabele | Doel | Secret? |
+|---|---|---|
+| `NEXT_PUBLIC_PROFILE_STORAGE_MODE` | Kies `local`, `hybrid` of `remote`; productie-default blijft `local`. | Nee |
+| `NEXT_PUBLIC_ENABLE_PROFILE` | Feature flag voor profiel-UI. | Nee |
+| `NEXT_PUBLIC_ENABLE_KNOWLEDGE_LEVEL` | Feature flag voor kennisniveauhints. | Nee |
+| `NEXT_PUBLIC_ENABLE_PROFILE_SYNC_PANEL` | Feature flag voor handmatige sync-UI. | Nee |
+| `NEXT_PUBLIC_ENABLE_SAVED_CALCULATIONS` | Feature flag voor lokaal opgeslagen berekeningen. | Nee |
+| `NEXT_PUBLIC_SUPABASE_URL` | Browser-safe Supabase URL voor een latere remote fase. | Nee |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Browser-safe Supabase anon key; nooit service-role keys gebruiken. | Nee |
+| `NEXT_PUBLIC_MONITORING_WEBHOOK_URL` | Optionele publieke foutmelding-endpoint voor niet-gevoelige events. | Nee, alleen spam-tolerante endpoints |
+| `NEXT_PUBLIC_RELEASE_VERSION` | Release-label in client-side foutmeldingen. | Nee |
+
+Gebruik geen echte webhook-, service-role- of providersecrets met `NEXT_PUBLIC_`. Runtime monitoring slaat maximaal 50 gesaneerde foutmeldingen lokaal op en verstuurt alleen type, korte message, release, path en timestamp wanneer een publieke monitoring-URL is ingesteld.
+
 ## Security-uitgangspunten
 
 - Geen `eval` of willekeurige code-executie.
@@ -255,3 +273,4 @@ Belangrijk:
 - Apps worden alleen zichtbaar via een geldig manifest.
 - Inputvalidatie gebeurt in calculatorcomponenten en app-façades; formules horen centraal.
 - De generator weigert ongeldige manifests of onveilige `entry`-paden.
+- GitHub Pages ondersteunt in deze setup geen project-eigen security headers zoals CSP of `X-Frame-Options`; herbeoordeel headers bij een toekomstige hostingmigratie of Type B-backend.

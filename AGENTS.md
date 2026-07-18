@@ -188,7 +188,8 @@ Controleer minimaal:
 - Inputvalidatie en eventuele rate limiting zijn passend geregeld.
 - Logging en foutafhandeling voldoen aan de repositoryregels.
 - Type A-tools blijven statisch exporteerbaar en krijgen geen backend, secret of externe API-afhankelijkheid zonder aantoonbare noodzaak.
-- Type B-tools hebben een afgebakende API, servervalidatie, auth/autorisatie waar nodig, veilige CORS, rate limiting bij misbruikrisico, time-outs, minimale rechten en basislogging zonder gevoelige data.
+- Type B-tools hebben een afgebakende API, schema- en servervalidatie, auth/autorisatie waar nodig, veilige CORS, rate limiting bij misbruikrisico, request-sizebeperkingen, time-outs, minimale rechten en basislogging zonder gevoelige data.
+- Type B-tools documenteren vóór activatie hun dataretentie, upload- en dependencybeleid, abuse- en kostenlimieten, monitoring en rollbackpad.
 - Nieuwe dependencies, externe scripts en grote datasets zijn gemotiveerd, clientbundel-impact is beoordeeld en lazy-loading is toegepast waar passend.
 - CI/deploy blijft goedkoop en simpel: `npm run generate:apps`, generated-file diff-check waar relevant, lint, typecheck, tests en build blijven groen voordat een tool publiek wordt.
 - Hostingwijzigingen beschrijven noodzaak, kostenimpact, securityrisico's, benodigde environment variables en rollbackpad.

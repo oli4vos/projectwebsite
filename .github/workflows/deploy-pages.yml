@@ -43,6 +43,15 @@ jobs:
       - name: Generate app registry
         run: npm run generate:apps
 
+      - name: Verify generated files are committed
+        run: git diff --exit-code src/lib/app-registry.ts src/lib/app-components.tsx
+
+      - name: Run unit tests
+        run: npm run test
+
+      - name: Run lint
+        run: npm run lint
+
       - name: Typecheck
         run: npm run typecheck
 
