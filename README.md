@@ -45,6 +45,9 @@ Voor reproduceerbare CI-achtige installaties gebruik je `npm ci`; voor dagelijks
 |---|---|
 | `npm run create:tool` | Scaffoldt een nieuwe tool via `scripts/create-tool.mjs`. |
 | `npm run generate:apps` | Genereert `src/lib/app-registry.ts` en `src/lib/app-components.tsx` uit de manifests onder `apps/`. |
+| `npm run generate:source-overview` | Genereert `docs/source-data-overview.md` uit de centrale source-datasetregistry. |
+| `npm run validate:source-data` | Valideert bronmetadata, actieve datasetselectie en dataset-specifieke grenzen. |
+| `npm run check:source-freshness` | Rapporteert freshnesswaarschuwingen zonder reviewwaarschuwingen automatisch hard te blokkeren. |
 | `npm run update:mortgage-financing-load-table` | Werkt de centrale hypotheek-financieringslasttabel bij via het importscripts. |
 | `npm run import:artifact-tools` | Importeert staging/artifact-tools naar `apps/`. |
 | `npm run browser:compare` | Draait de browservergelijking voor hypotheekaanbiederscenario's. |
@@ -108,8 +111,11 @@ src/
     app-types.ts
     duo/
     financial-constants/
+      source-datasets.ts
     mortgage/
 ```
+
+Brondata-architectuur staat in `docs/source-data-architecture.md`. De actuele gegenereerde inventaris staat in `docs/source-data-overview.md`.
 
 ## Nieuwe app toevoegen
 

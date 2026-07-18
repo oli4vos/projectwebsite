@@ -22,6 +22,8 @@ Voorbeelden: `src/lib/duo/`, `src/lib/mortgage/`, `src/lib/tax/`, `src/lib/pensi
 
 Deze laag bevat financiele formules, wettelijke regels, normen, bronmetadata, tabellen, afrondingsregels, scenariofuncties en domeinresultaten. Deze laag bevat geen React, JSX, formulierstatus, browser-API's, dashboardlogica, routes of PDF-rendering.
 
+Brondata voor rekentools loopt via `src/lib/financial-constants`. De centrale source-datasetregistry valideert metadata, selecteert een actieve dataset per familie/scenario/peildatum en levert een UI-neutraal `SourceReference`-contract voor scherm en PDF. Componenten en PDF-layoutcode lezen geen losse JSON-bronnen en kiezen niet zelfstandig geldigheidsjaren.
+
 ### 2. Applicatielaag
 
 Voorbeelden: `apps/<slug>/logic.ts`, `apps/<slug>/report.ts` voor report-viewmodels, of gerichte modules onder `apps/<slug>/application/`.
@@ -86,6 +88,7 @@ Gebruik bestaande helpers eerst:
 - `parseOptionalDecimalInput` en gerelateerde helpers in `src/lib/number-input.ts` voor numerieke invoer.
 - `profile-tool-mapping` en `profile-prefill` voor profieldefaults.
 - Centrale domeinfuncties in `src/lib/duo`, `src/lib/mortgage`, `src/lib/tax`, `src/lib/pension` en `src/lib/planning`.
+- Brondatahelpers in `src/lib/financial-constants/source-datasets.ts` voor datasetvalidatie, actieve selectie, freshness en source references.
 
 Wanneer herhaling in minimaal twee actieve tools ontstaat, mag een klein type-safe contract worden toegevoegd. Richtinggevend:
 

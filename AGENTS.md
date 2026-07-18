@@ -142,6 +142,12 @@ De Sources & Regulations Guardian bewaakt primaire bronnen, regelgeving, uitvoer
 - Tool-specifieke `apps/<slug>/logic.ts`-bestanden mogen orchestration bevatten, maar geen berekeningen dupliceren die al centraal bestaan.
 - `Calculator.tsx`-bestanden zijn presentatie; daar staan geen business rules, renteformules, leencapaciteitberekeningen of tabelopzoekingen in.
 - Wijzigbare normen, tabellen, parameters en percentages moeten centraal, versieerbaar en testbaar zijn opgeslagen.
+- `src/lib/financial-constants` is de single source of truth voor wijziglijke brondata die rekentools gebruiken. Nieuwe tools hardcoden geen jaarlijkse waarden, banktarieven, toeslaggrenzen, DUO-percentages, hypotheeknormen of fiscale parameters lokaal.
+- Iedere actieve dataset heeft minimaal bron-URL, geldigheidsperiode, status, `lastVerifiedAt` en `nextReviewAt`; verlopen brondata wordt niet stil geselecteerd.
+- Officiële bronnen hebben voorrang. Providerdata zoals banktarieven blijft gescheiden van officiële normdata, wordt handmatig gereviewd en niet tijdens gebruikersbezoek gescrapet.
+- Projectaannames zijn expliciet als projectaanname of indicatieve benadering gemarkeerd en krijgen regressietests wanneer ze rekenuitkomsten beïnvloeden.
+- Scherm en PDF gebruiken dezelfde datasetmetadata of hetzelfde centrale source-reference model; PDF's mogen geen eigen brondata of peildatum kiezen.
+- Toeslagendata wordt pas actief wanneer bronregels volledig genormaliseerd, gevalideerd en getest zijn.
 - Als een tool of flow niet meer actief aangeroepen wordt, zet dan de zichtbare manifest-/route-exposure uit en leg de status vast in `FUNCTIONALITY_STATUS.md`; laat de code alleen bestaan als verborgen heractiveringsbron.
 
 ## Nieuwe berekeningen toevoegen
@@ -177,6 +183,8 @@ Controleer minimaal:
 - PDF-output gebruikt dezelfde resultaatdata of hetzelfde viewmodel als het scherm.
 - Er bestaan geen afzonderlijke PDF-formules.
 - Relevante bronnen en toelichtingen worden centraal en consistent gebruikt.
+- Bronafhankelijkheden staan in de centrale source-datasetregistry of zijn bewust buiten de rekenscope gehouden.
+- Brondatawijzigingen hebben regressietests en slagen voor `npm run validate:source-data`; gegenereerde broninventaris is bijgewerkt wanneer de registry wijzigt.
 - De tool heeft relevante unit- en regressietests.
 - De tool werkt via het dashboard.
 - De tool werkt via de directe URL.

@@ -42,6 +42,18 @@ jobs:
       - name: Verify generated files are committed
         run: git diff --exit-code src/lib/app-registry.ts src/lib/app-components.tsx
 
+      - name: Validate source data
+        run: npm run validate:source-data
+
+      - name: Generate source data overview
+        run: npm run generate:source-overview
+
+      - name: Verify source data overview is committed
+        run: git diff --exit-code docs/source-data-overview.md
+
+      - name: Check source freshness
+        run: npm run check:source-freshness
+
       - name: Run unit tests
         run: npm run test
 
