@@ -255,6 +255,55 @@ test("hypotheek-impact maakt een PDF vanuit de laatst berekende invoer", async (
   ).toHaveCount(0);
 });
 
+test("hypotheek-impact haalt DUO-maandbedrag op via expliciete returnflow", async ({
+  page,
+}, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "Desktopinteractie controleren");
+
+  await page.goto("/apps/hypotheek-impact-studieschuld", {
+    waitUntil: "networkidle",
+  });
+  await page.getByRole("button", { name: "Start met voorbeeldwaarden" }).click();
+  await page
+    .getByRole("button", { name: "Bereken eerst mijn DUO-maandbedrag" })
+    .click();
+
+  await expect(page).toHaveURL(/\/apps\/duo-maandbedrag\?duoMortgageTransfer=/);
+  const duoUrl = new URL(page.url());
+  expect([...duoUrl.searchParams.keys()]).toEqual(["duoMortgageTransfer"]);
+  expect(duoUrl.search).not.toContain("150");
+  expect(duoUrl.search).not.toContain("48000");
+  await expect(page.getByText("Je kwam vanuit de hypotheektool")).toBeVisible();
+
+  await page
+    .getByRole("button", { name: "Terug naar mijn hypotheekberekening" })
+    .click();
+
+  await expect(page).toHaveURL(/\/apps\/hypotheek-impact-studieschuld/);
+  await expect(page.getByText("DUO-bedrag uit rekentool")).toBeVisible();
+  await expect(
+    page.getByRole("button", {
+      name: "Dit bedrag gebruiken in mijn hypotheekberekening",
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("textbox", { name: "Huidig DUO-maandbedrag" }),
+  ).toHaveValue("150");
+
+  await page
+    .getByRole("button", {
+      name: "Dit bedrag gebruiken in mijn hypotheekberekening",
+    })
+    .click();
+
+  await expect(
+    page.getByText("Klik opnieuw op Bereken om de uitkomst te vernieuwen."),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("textbox", { name: "Huidig DUO-maandbedrag" }),
+  ).not.toHaveValue("150");
+});
+
 test("v2 routes houden mobiele breedtes zonder horizontale overflow", async ({
   page,
 }) => {
