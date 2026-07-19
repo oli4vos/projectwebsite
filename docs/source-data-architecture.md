@@ -108,5 +108,5 @@ Open migraties:
 ## Nieuwe Domeinfamilies
 
 - `mortgage-provider-rate` is gereserveerd voor handmatig gereviewde provider-rentes. De centrale validatie controleert providerrecords, vergelijkbare scenario's, HTTPS-bronnen, datumvelden en plausibele rentebandbreedtes. Deze familie wordt pas actief geregistreerd wanneer volledige grootbankrecords beschikbaar zijn.
-- `allowance-signal-rules` is gereserveerd voor toeslagensignalen. De familie blijft signal-only totdat officiele regels, grenzen, uitzonderingen en regressiescenario's volledig zijn genormaliseerd.
+- `allowance-signal-rules` bevat de actieve 2026 signaleringsdataset voor harde toeslagenvoorwaarden en officiele bronlinks. De familie blijft signal-only: bedragen, afbouwformules en complexe uitzonderingen blijven buiten de dataset totdat ze volledig genormaliseerd en getest zijn.
 - Inputlimieten staan los van datasets in `src/lib/financial-constants/input-limits.ts`. Een praktische slidergrens is geen wettelijke of providermaximumgrens en mag een invoer niet stil wijzigen.

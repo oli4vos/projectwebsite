@@ -14,7 +14,21 @@ Peildatum: 2026-07-19.
 
 Provider-rentes zijn bewust niet als actieve productiedataset geregistreerd. Voor bruikbaar gebruik is handmatig genormaliseerde providerdata nodig met minimaal providernaam, scenario, rente, bron-URL, opgehaaldatum, verificatiedatum, reviewdatum, status en uitsluiting van kortingen. Scraping tijdens gebruikersbezoek is uitgesloten.
 
-Toeslagen zijn bewust signal-only. Toeslagbedragen, staffels en complexe huishoudregels worden pas actief wanneer de regels volledig genormaliseerd, dateerbaar, gevalideerd en regressiegetest zijn. Tot die tijd verwijzen adapters naar de officiele rekentool voor bedrag en definitieve beoordeling.
+Toeslagen zijn bewust signal-only. `allowance-signal-rules-2026` is actief geregistreerd voor harde voorwaarden en officiele bronlinks. Toeslagbedragen, staffels, afbouwformules en complexe huishoudregels worden pas actief wanneer de regels volledig genormaliseerd, dateerbaar, gevalideerd en regressiegetest zijn. Tot die tijd verwijzen adapters naar de officiele proefberekening voor bedrag en definitieve beoordeling.
+
+Ondersteund per 2026:
+
+- Zorgtoeslag: leeftijd, Nederlandse zorgverzekering, partnerafhankelijke inkomensgrens en partnerafhankelijke vermogensgrens.
+- Huurtoeslag: huur/koop, zelfstandige woonruimte en partner-/huishoudafhankelijke vermogenssignalering; kale huur wordt niet als harde uitsluiting gebruikt.
+- Kindgebonden budget: kinderen, kind jonger dan 18, kinderbijslagstatus, kind woont bij aanvrager en partnerafhankelijke vermogensgrens.
+- Kinderopvangtoeslag: kinderen, opvanggebruik, LRK-registratie, kind woont bij aanvrager, eigen bijdrage, aanvrageractiviteit en partneractiviteit.
+
+Statusprioriteit:
+
+1. ontbrekende of technisch ongeldige kerninformatie -> `insufficient-information`;
+2. bekende harde uitsluiting -> `probably-not`;
+3. complexe situatie of beperkte MVP-dekking -> `official-calculation-recommended`;
+4. alleen bij zorgtoeslag kan volledige basisinformatie zonder uitsluiting -> `possible`.
 
 ## Integratie-instructie
 
