@@ -71,6 +71,35 @@ describe("toeslagen-scan adapter", () => {
     expect(input.childcare?.hoursPerMonth).toBe(0);
   });
 
+  it("does not validate hidden stale fields after progressive-disclosure changes", () => {
+    const values = {
+      ...exampleValues,
+      partnerStatus: "no" as const,
+      jointAssessmentIncome: "niet zichtbaar",
+      jointAssets: "-1",
+      tenure: "owner" as const,
+      basicRent: "geen huur",
+      hasCoResidents: "yes" as const,
+      householdIncome: "ook verborgen",
+      householdAssets: "-2",
+      hasChildren: "no" as const,
+      usesChildcare: "yes" as const,
+      childcareHoursPerMonth: "veel",
+    };
+    const errors = validateAllowanceScanForm(values);
+    const input = mapFormToAllowanceScanInput(values);
+
+    expect(errors.jointAssessmentIncome).toBeUndefined();
+    expect(errors.jointAssets).toBeUndefined();
+    expect(errors.basicRent).toBeUndefined();
+    expect(errors.householdIncome).toBeUndefined();
+    expect(errors.householdAssets).toBeUndefined();
+    expect(errors.childcareHoursPerMonth).toBeUndefined();
+    expect(input.jointAssessmentIncome).toBeUndefined();
+    expect(input.rent?.householdIncome).toBeUndefined();
+    expect(input.childcare?.hoursPerMonth).toBe(0);
+  });
+
   it("keeps unknown answers as insufficient-information signals instead of validation errors", () => {
     const errors = validateAllowanceScanForm(defaultValues);
     const view = createAllowanceScanView(defaultValues);

@@ -16,6 +16,7 @@ import {
 } from "./copy";
 import type {
   AllowanceScanErrors,
+  AllowanceScanField,
   AllowanceScanFormState,
   AllowanceScanView,
   ChildResidenceChoice,
@@ -145,22 +146,29 @@ function hasInvalidIntegerInput(value: string) {
 export function validateAllowanceScanForm(values: AllowanceScanFormState): AllowanceScanErrors {
   const errors: AllowanceScanErrors = {};
 
-  for (const field of [
-    "age",
-    "assessmentIncome",
-    "jointAssessmentIncome",
-    "assets",
-    "jointAssets",
-    "basicRent",
-    "householdIncome",
-    "householdAssets",
-    "childcareHoursPerMonth",
-  ] as const) {
+  function validateMoneyField(
+    field: Extract<
+      AllowanceScanField,
+      | "age"
+      | "assessmentIncome"
+      | "jointAssessmentIncome"
+      | "assets"
+      | "jointAssets"
+      | "basicRent"
+      | "householdIncome"
+      | "householdAssets"
+      | "childcareHoursPerMonth"
+    >,
+  ) {
     if (hasInvalidNumberInput(values[field])) {
       errors[field] = "Gebruik een geldig getal of laat dit veld leeg.";
     } else if (hasNegativeNumberInput(values[field])) {
       errors[field] = "Gebruik 0 of een hogere waarde.";
     }
+  }
+
+  for (const field of ["age", "assessmentIncome", "assets"] as const) {
+    validateMoneyField(field);
   }
 
   if (values.age.trim().length > 0) {
@@ -171,6 +179,8 @@ export function validateAllowanceScanForm(values: AllowanceScanFormState): Allow
   }
 
   if (values.partnerStatus === "yes") {
+    validateMoneyField("jointAssessmentIncome");
+    validateMoneyField("jointAssets");
     if (values.jointAssessmentIncome.trim().length > 0 && errors.jointAssessmentIncome) {
       errors.jointAssessmentIncome = "Gebruik een geldig gezamenlijk inkomen.";
     }
@@ -179,16 +189,21 @@ export function validateAllowanceScanForm(values: AllowanceScanFormState): Allow
     }
   }
 
-  if (values.tenure === "rent" && errors.basicRent) {
-    errors.basicRent = "Gebruik een geldige kale huur per maand.";
-  }
-
-  if (values.hasCoResidents === "yes") {
-    if (errors.householdIncome) {
-      errors.householdIncome = "Gebruik een geldig huishoudinkomen.";
+  if (values.tenure === "rent") {
+    validateMoneyField("basicRent");
+    if (errors.basicRent) {
+      errors.basicRent = "Gebruik een geldige kale huur per maand.";
     }
-    if (errors.householdAssets) {
-      errors.householdAssets = "Gebruik een geldig huishoudvermogen.";
+
+    if (values.hasCoResidents === "yes") {
+      validateMoneyField("householdIncome");
+      validateMoneyField("householdAssets");
+      if (errors.householdIncome) {
+        errors.householdIncome = "Gebruik een geldig huishoudinkomen.";
+      }
+      if (errors.householdAssets) {
+        errors.householdAssets = "Gebruik een geldig huishoudvermogen.";
+      }
     }
   }
 
@@ -208,7 +223,8 @@ export function validateAllowanceScanForm(values: AllowanceScanFormState): Allow
     }
   }
 
-  if (values.usesChildcare === "yes") {
+  if (values.hasChildren === "yes" && values.usesChildcare === "yes") {
+    validateMoneyField("childcareHoursPerMonth");
     const hours = parseMoney(values.childcareHoursPerMonth);
     if (values.childcareHoursPerMonth.trim().length > 0) {
       if (hours === undefined || !Number.isFinite(hours)) {

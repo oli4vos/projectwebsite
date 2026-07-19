@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, type ReactNode } from "react";
 import { DisclosureSection } from "@/components/DisclosureSection";
 import { FieldError } from "@/components/forms/FieldError";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
@@ -58,6 +58,11 @@ function TextInput({
   onChange: (value: string) => void;
 }) {
   const errorId = `${id}-error`;
+  const hintId = `${id}-hint`;
+  const describedBy =
+    [hint ? hintId : null, error ? errorId : null].filter(Boolean).join(" ") ||
+    undefined;
+
   return (
     <FieldShell>
       <Label htmlFor={id}>{label}</Label>
@@ -67,10 +72,14 @@ function TextInput({
         inputMode={inputMode}
         onChange={(event) => onChange(event.target.value)}
         aria-invalid={error ? "true" : "false"}
-        aria-describedby={error ? errorId : undefined}
+        aria-describedby={describedBy}
         className="ring-focus hair h-12 min-w-0 rounded-md border bg-white px-4 font-mono text-[15px] tabular text-[var(--ink)] outline-none"
       />
-      {hint ? <p className="text-[12px] leading-[1.5] text-[var(--soft)]">{hint}</p> : null}
+      {hint ? (
+        <p id={hintId} className="text-[12px] leading-[1.5] text-[var(--soft)]">
+          {hint}
+        </p>
+      ) : null}
       <div id={errorId}>
         <FieldError message={error} />
       </div>
@@ -93,6 +102,8 @@ function SelectField<T extends string>({
   hint?: string;
   onChange: (value: T) => void;
 }) {
+  const hintId = `${id}-hint`;
+
   return (
     <FieldShell>
       <Label htmlFor={id}>{label}</Label>
@@ -100,6 +111,7 @@ function SelectField<T extends string>({
         id={id}
         value={value}
         onChange={(event) => onChange(event.target.value as T)}
+        aria-describedby={hint ? hintId : undefined}
         className="ring-focus hair h-12 min-w-0 rounded-md border bg-white px-4 text-[15px] text-[var(--ink)] outline-none"
       >
         {options.map((option) => (
@@ -108,7 +120,11 @@ function SelectField<T extends string>({
           </option>
         ))}
       </select>
-      {hint ? <p className="text-[12px] leading-[1.5] text-[var(--soft)]">{hint}</p> : null}
+      {hint ? (
+        <p id={hintId} className="text-[12px] leading-[1.5] text-[var(--soft)]">
+          {hint}
+        </p>
+      ) : null}
     </FieldShell>
   );
 }
@@ -195,6 +211,7 @@ function ResultCard({ card }: { card: AllowanceResultCardView }) {
 }
 
 export default function ToeslagenScanCalculator() {
+  const resultRef = useRef<HTMLDivElement | null>(null);
   const {
     formValues,
     setFormValues,
@@ -215,6 +232,14 @@ export default function ToeslagenScanCalculator() {
   const hasCoResidents = renting && formValues.hasCoResidents === "yes";
   const hasChildren = formValues.hasChildren === "yes";
   const usesChildcare = hasChildren && formValues.usesChildcare === "yes";
+
+  useEffect(() => {
+    if (!submittedView?.result) {
+      return;
+    }
+
+    resultRef.current?.focus();
+  }, [submittedView]);
 
   function updateField<K extends keyof AllowanceScanFormState>(
     field: K,
@@ -560,14 +585,24 @@ export default function ToeslagenScanCalculator() {
   );
 
   const result = submittedView?.result ? (
-    <div id="tool-result-summary" className="space-y-5" aria-live="polite">
+    <div
+      id="tool-result-summary"
+      ref={resultRef}
+      tabIndex={-1}
+      className="space-y-5 outline-none"
+      aria-live="polite"
+    >
       <section className="surface-panel-strong p-6 text-white">
         <h2 className="text-xl font-semibold">Samenvatting</h2>
         <p className="mt-3 text-[14px] leading-[1.65] text-white/80">
           {submittedView.result.summary}
         </p>
         {hasDirtyChanges ? (
-          <p className="mt-3 rounded-lg bg-white/10 px-3 py-2 text-[13px] text-white/80">
+          <p
+            role="status"
+            aria-live="polite"
+            className="mt-3 rounded-lg bg-white/10 px-3 py-2 text-[13px] text-white/80"
+          >
             Je hebt de invoer gewijzigd na de laatste scan. Klik opnieuw op
             Bekijk mijn toeslagensignalen voor een actuele uitkomst.
           </p>
