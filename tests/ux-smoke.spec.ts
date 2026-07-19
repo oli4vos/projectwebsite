@@ -248,6 +248,15 @@ test("hypotheek-impact maakt een PDF vanuit de laatst berekende invoer", async (
     page.getByText("PDF-overzicht gemaakt met de laatst berekende invoer."),
   ).toBeVisible();
 
+  await page.getByRole("textbox", { name: /^Bruto jaarinkomen gebruiker/ }).fill("51000");
+  await expect(pdfButton).toHaveCount(0);
+  await expect(
+    page.getByText("Bereken opnieuw om een actueel PDF-overzicht te downloaden."),
+  ).toBeVisible();
+
+  await page.getByRole("button", { name: "Bereken opnieuw" }).click();
+  await expect(pdfButton).toBeVisible();
+
   await page.getByRole("button", { name: "Wis invoer" }).click();
   await expect(pdfButton).toHaveCount(0);
   await expect(

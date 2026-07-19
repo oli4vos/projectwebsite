@@ -288,6 +288,7 @@ function CalculatorContent({
       mortgageTermYears: errors.mortgageTermYears,
     }[mobileFlow.activeFieldId],
   );
+  const canDownloadPdf = Boolean(result && !hasDirtyChanges);
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -451,7 +452,12 @@ function CalculatorContent({
   }
 
   async function handleDownloadPdf() {
-    if (!submittedValidation?.parsedValues || !result || isDownloadingPdf) {
+    if (
+      !submittedValidation?.parsedValues ||
+      !result ||
+      !canDownloadPdf ||
+      isDownloadingPdf
+    ) {
       return;
     }
 
@@ -1184,14 +1190,24 @@ function CalculatorContent({
                 </li>
               </ul>
               <div className="mt-5 flex flex-wrap items-center gap-3">
-                <ToolActionButton
-                  type="button"
-                  variant="accent"
-                  onClick={handleDownloadPdf}
-                  disabled={isDownloadingPdf}
-                >
-                  {isDownloadingPdf ? "PDF wordt gemaakt..." : "Download uitgebreid PDF-overzicht"}
-                </ToolActionButton>
+                {canDownloadPdf ? (
+                  <ToolActionButton
+                    type="button"
+                    variant="accent"
+                    onClick={handleDownloadPdf}
+                    disabled={isDownloadingPdf}
+                  >
+                    {isDownloadingPdf ? "PDF wordt gemaakt..." : "Download uitgebreid PDF-overzicht"}
+                  </ToolActionButton>
+                ) : (
+                  <span
+                    role="status"
+                    aria-live="polite"
+                    className="text-[12.5px] leading-[1.5] text-white/70"
+                  >
+                    Bereken opnieuw om een actueel PDF-overzicht te downloaden.
+                  </span>
+                )}
                 {pdfStatus ? (
                   <span
                     role="status"
