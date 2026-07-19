@@ -330,6 +330,10 @@ function hasChildUnder18(children: readonly number[] | undefined) {
   return (children ?? []).some((age) => Number.isFinite(age) && age >= 0 && age < 18);
 }
 
+function hasChildAge16Or17(children: readonly number[] | undefined) {
+  return (children ?? []).some((age) => Number.isFinite(age) && (age === 16 || age === 17));
+}
+
 function resolveIncomeAndAssets(input: AllowanceScanInput) {
   const hasPartner = input.partnerStatus === "yes";
 
@@ -701,13 +705,21 @@ export function evaluateChildBudgetAllowance(
     state.hardExclusion = true;
     addUnique(state.reasonCodes, "child-budget-no-child-under-18");
   }
-  if (isKnownFalse(input.childBudget?.receivesChildBenefit)) {
+  const childBenefitExceptionPossible =
+    input.childBudget?.specialChildBenefitSituation ||
+    hasChildAge16Or17(input.childBudget?.childAges);
+  if (isKnownFalse(input.childBudget?.receivesChildBenefit) && !childBenefitExceptionPossible) {
     state.hardExclusion = true;
     addUnique(state.reasonCodes, "child-budget-no-child-benefit");
+  } else if (isKnownFalse(input.childBudget?.receivesChildBenefit)) {
+    state.complex = true;
+    addUnique(state.reasonCodes, "child-budget-family-complex");
+    addUnique(state.uncertaintyCodes, "child-benefit-exception");
   }
   if (isKnownFalse(input.childBudget?.childLivesWithApplicant)) {
-    state.hardExclusion = true;
+    state.complex = true;
     addUnique(state.reasonCodes, "child-budget-child-residence-excluded");
+    addUnique(state.uncertaintyCodes, "child-benefit-exception");
   }
   if (input.partnerStatus === "yes" || input.partnerStatus === "no") {
     const maxAssets =

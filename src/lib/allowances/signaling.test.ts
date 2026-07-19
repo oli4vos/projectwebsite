@@ -331,15 +331,42 @@ describe("child budget 2026", () => {
       ).reasonCodes,
     ).toContain("child-budget-no-child-benefit");
     expect(
-      evaluateChildBudgetAllowance(
-        { ...completeInput, childBudget: { ...completeInput.childBudget, childLivesWithApplicant: false } },
-        dataset,
-      ).reasonCodes,
-    ).toContain("child-budget-child-residence-excluded");
-    expect(
       evaluateChildBudgetAllowance({ ...completeInput, assets: 146_012 }, dataset)
         .reasonCodes,
     ).toContain("child-budget-assets-above-limit");
+  });
+
+  it("does not hard reject child benefit or residence exceptions that require official review", () => {
+    const childBenefitException = evaluateChildBudgetAllowance(
+      {
+        ...completeInput,
+        childBudget: {
+          ...completeInput.childBudget,
+          childAges: [16],
+          receivesChildBenefit: false,
+        },
+      },
+      dataset,
+    );
+    const residenceException = evaluateChildBudgetAllowance(
+      {
+        ...completeInput,
+        childBudget: {
+          ...completeInput.childBudget,
+          childLivesWithApplicant: false,
+        },
+      },
+      dataset,
+    );
+
+    expect(childBenefitException.hardExclusion).toBe(false);
+    expect(childBenefitException.status).toBe("official-calculation-recommended");
+    expect(childBenefitException.reasonCodes).toContain("child-budget-family-complex");
+    expect(childBenefitException.uncertaintyCodes).toContain("child-benefit-exception");
+    expect(residenceException.hardExclusion).toBe(false);
+    expect(residenceException.status).toBe("official-calculation-recommended");
+    expect(residenceException.reasonCodes).toContain("child-budget-child-residence-excluded");
+    expect(residenceException.uncertaintyCodes).toContain("child-benefit-exception");
   });
 
   it("routes complete and complex child budget cases to official calculation", () => {

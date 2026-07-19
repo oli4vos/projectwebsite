@@ -22,7 +22,7 @@ Peildatum: 2026-07-19. Scope: zelfstandige toeslagenscan als signaleringsscan. G
 | Tests | `src/lib/allowances/signaling.test.ts` dekt basispaden, maar gebruikt deels testwaarden die niet overeenkomen met 2026-bronnen. |
 | Herbruikbaar | Statusmodel, resultmodel, officialCalculationUrl, freshness/sourceReferences-contract en signal-only benadering. |
 | Aanpassing nodig | Reason codes specifieker maken per ontbrekend veld; partnerstatus niet versimpelen; huurtoeslag medebewoners/vermogen corrigeren; kindgebonden budget kinderbijslagstatus toevoegen; kinderopvang kind woont bij aanvrager, eigen bijdrage en opvangregistratie explicieter maken. |
-| Ontbrekende datasets | Geen actieve `allowance-signal-rules`-dataset in `SOURCE_DATASET_REGISTRY`. |
+| Datasetstatus | `allowance-signal-rules-2026` is na de domeinfase actief geregistreerd voor signal-only gebruik. |
 | Overlap tax/profile | `src/lib/tax` bevat box 1/box 3 indicaties, maar is geen toeslagenengine. Gebruik niet om toeslagbedragen of toetsingsinkomen volledig te reconstrueren. |
 
 ## 3. Gemeenschappelijke begrippen
@@ -76,7 +76,7 @@ Peildatum: 2026-07-19. Scope: zelfstandige toeslagenscan als signaleringsscan. G
 - Harde voorwaarden: 1 of meer kinderen jonger dan 18; meestal kinderbijslag via SVB; inkomen niet te hoog afhankelijk van gezinssamenstelling; vermogen 2026 maximaal EUR 146.011 zonder toeslagpartner en EUR 184.633 met toeslagpartner; minderjarig kindvermogen telt mee.
 - Benodigde invoer: kinderen/leeftijden, kinderbijslagstatus per kind of globaal, toeslagpartnerstatus, toetsingsinkomen, vermogen inclusief minderjarig kindvermogen, alleenstaande-ouderstatus afgeleid uit geen toeslagpartner.
 - Mogelijk-rechtregels: kind onder 18 aanwezig, kinderbijslagstatus niet negatief, vermogen niet boven harde grens; geef status bij voorkeur `official-calculation-recommended` omdat inkomensgrens gezinssamenstellingafhankelijk is.
-- Waarschijnlijk-geen-rechtregels: `no-child-under-18`; `assets-above-hard-threshold`; `no-child-benefit` alleen als gebruiker zeker aangeeft geen kinderbijslag/relevante kindvoorwaarde en geen 16/17-uitzondering.
+- Waarschijnlijk-geen-rechtregels: `no-child-under-18`; `assets-above-hard-threshold`; `no-child-benefit` alleen als gebruiker zeker aangeeft geen kinderbijslag/relevante kindvoorwaarde en er geen 16/17-jaarssignaal of bijzondere kindvoorwaarde is.
 - Onvoldoende informatie: ontbrekende kinderen/leeftijden, kinderbijslagstatus, partnerstatus, inkomen of vermogen.
 - Officiële berekening aanbevolen: altijd voor definitieve beoordeling/bedrag; bij co-ouderschap, samengesteld gezin, stief-/pleeg-/adoptiekind, buitenland of 16/17-jarigen zonder gewone kinderbijslag.
 - Officiële links: voorwaarden `https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/toeslagen/kindgebonden-budget/voorwaarden/voorwaarden-kindgebonden-budget`; vermogen `https://www.belastingdienst.nl/wps/wcm/connect/nl/kindgebonden-budget/content/maximaal-vermogen-kindgebonden-budget`; inkomen `https://www.belastingdienst.nl/wps/wcm/connect/nl/kindgebonden-budget/content/maximaal-inkomen-kindgebonden-budget`; proefberekening.
@@ -101,7 +101,7 @@ Peildatum: 2026-07-19. Scope: zelfstandige toeslagenscan als signaleringsscan. G
 |---|---|---|---|---|---|---|
 | Zorgtoeslag | `age-under-18`, `no-dutch-health-insurance`, `income-above-hard-threshold`, `assets-above-hard-threshold`, `hard-conditions-pass` | Leeftijd < 18, geen Nederlandse zorgverzekering, inkomen/vermogen boven 2026-grens. | `age`, `hasAllowancePartner`, `assessmentIncome`, `assets`, `hasDutchHealthInsurance` | `foreign-or-residence-status`, `special-assets`, `assessment-income-uncertain` | `possible` alleen als harde voorwaarden slagen; bedrag altijd officieel. | Buitenland, verdragsverzekering, bijzonder vermogen. |
 | Huurtoeslag | `not-renting`, `not-independent-home`, `assets-above-hard-threshold`, `complex-rules-official-calculation` | Koop/geen huur, niet-zelfstandige woonruimte zonder bekende uitzondering, vermogen boven grens. | `housing.tenure`, `housing.independentHome`, `housing.basicRent`, `age`, `hasAllowancePartner`, `householdMembers`, `assessmentIncome`, `assets` | `rent-income-table-not-implemented`, `special-housing`, `special-income`, `disabled-household-member` | Na harde checks meestal `official-calculation-recommended`, niet `possible` als inkomen/huren niet volledig genormaliseerd zijn. | Woonboot, recreatiewoning, aangepaste woning, bijzondere onzelfstandige woning. |
-| Kindgebonden budget | `no-child-under-18`, `missing-child-benefit-status`, `no-child-benefit`, `assets-above-hard-threshold`, `complex-rules-official-calculation` | Geen kind < 18, vermogen boven grens, zeker geen kinderbijslag/relevante kindvoorwaarde. | `children`, `childAges`, `childBenefitStatus`, `hasAllowancePartner`, `assessmentIncome`, `assets` | `income-table-not-implemented`, `co-parenting`, `composite-family`, `foreign-child-or-parent` | Na harde checks `official-calculation-recommended`; `possible` pas na volledige inkomensregels. | 16/17-jarigen, co-ouderschap, stief/pleeg/adoptie, buitenland. |
+| Kindgebonden budget | `no-child-under-18`, `missing-child-benefit-status`, `no-child-benefit`, `assets-above-hard-threshold`, `complex-rules-official-calculation` | Geen kind < 18, vermogen boven grens, zeker geen kinderbijslag/relevante kindvoorwaarde zonder 16/17-jaarssignaal of bijzondere kindvoorwaarde. Kind woont niet bij aanvrager is geen harde MVP-uitsluiting maar een complex signaal voor officiële controle. | `children`, `childAges`, `childBenefitStatus`, `hasAllowancePartner`, `assessmentIncome`, `assets` | `income-table-not-implemented`, `co-parenting`, `composite-family`, `foreign-child-or-parent`, `child-benefit-exception` | Na harde checks `official-calculation-recommended`; `possible` pas na volledige inkomensregels. | 16/17-jarigen, co-ouderschap, stief/pleeg/adoptie, buitenland. |
 | Kinderopvangtoeslag | `no-child-under-18`, `no-childcare`, `no-registered-childcare`, `child-not-living-with-applicant`, `missing-qualifying-activity`, `no-own-contribution`, `complex-rules-official-calculation` | Geen kind/opvang, opvang niet LRK-geregistreerd, kind woont niet bij aanvrager, geen kwalificerende activiteit, geen eigen bijdrage. | `children`, `childAges`, `childcare.registeredChildcare`, `childcare.hoursPerMonth`, `childcare.parentHasQualifyingActivity`, `childcare.partnerHasQualifyingActivity`, `childLivesWithApplicant`, `paysOwnContribution` | `childcare-amount-engine-not-implemented`, `education-recognition-uncertain`, `trajectory-uncertain`, `co-parenting` | Na harde checks altijd `official-calculation-recommended`. | Buitenland, co-ouderschap, wisselende opvang, opleiding/trajectdetails. |
 
 ## 9. Progressive disclosure
@@ -125,9 +125,9 @@ Peildatum: 2026-07-19. Scope: zelfstandige toeslagenscan als signaleringsscan. G
 
 ## 11. Brondata
 
-- Voorgestelde datasets: houd repositoryconventie aan en gebruik voor MVP eerst een gecombineerde family `allowance-signal-rules` met scenario `healthcare-rent-child-budget-childcare-2026`, omdat de bestaande `AllowanceSignalDataset` de vier secties bundelt. Splitsing per toeslag kan later pas nadat `SourceDatasetFamily` en selectiehelpers daarop zijn aangepast.
-- Actief: pas registreren als 2026-waarden in tests zijn gecorrigeerd en alle harde reason codes zijn toegevoegd.
-- Draft/incomplete: documenteer concept-id `allowance-signal-rules-2026`; niet `active` totdat missing fields, links en reason codes compleet zijn.
+- Voorgestelde datasets: houd repositoryconventie aan en gebruik voor MVP eerst een gecombineerde family `allowance-signal-rules` met scenario `general`, omdat de bestaande `AllowanceSignalDataset` de vier secties bundelt. Splitsing per toeslag kan later pas nadat `SourceDatasetFamily` en selectiehelpers daarop zijn aangepast.
+- Actief: `allowance-signal-rules-2026` is actief voor signal-only gebruik, niet voor bedragberekeningen.
+- Draft/incomplete: de dataset is inhoudelijk incompleet voor bedragen; incomplete onderdelen blijven expliciet in `incompleteRules` staan.
 - Metadata: `year: 2026`, `version: 1.0.0`, `effectiveFrom: 2026-01-01`, `effectiveTo: 2026-12-31`, `retrievedAt/lastVerifiedAt: 2026-07-19`, `nextReviewAt: 2026-11-15`, `sourceName: Dienst Toeslagen / Belastingdienst`, `sourceType: official-execution`, `methodologyType: official-norm`, `usedBy: ["toeslagenscan"]`.
 - Data: grenswaarden zorgtoeslag, huurtoeslag vermogen en huurcaps, kindgebonden budget vermogen, kinderopvang max uren/uurtariefcontext, officialCalculationUrl en per-toeslag informatie/aanvraaglinks.
 - Freshness: jaarlijkse review uiterlijk 15 november; extra review bij Belastingdienst 2027-publicatie of tussentijdse wetswijziging.
@@ -221,3 +221,24 @@ De bestaande `src/lib/allowances/signaling.ts` is bruikbaar als basis, maar moet
 Primaire bronnen zijn Dienst Toeslagen/Belastingdienst-pagina's voor zorgtoeslag, huurtoeslag, kindgebonden budget, kinderopvangtoeslag, toetsingsinkomen, toeslagpartner, vermogen en de officiële proefberekening. Zorgtoeslag heeft de meest harde MVP-checks. Huurtoeslag, kindgebonden budget en kinderopvangtoeslag moeten na basisuitsluitingen meestal naar de officiële proefberekening verwijzen.
 
 Advies: laat de volgende agent `Controleer rekenlogica` de centrale allowances-laag en tests aanpassen en pas daarna een `allowance-signal-rules-2026` dataset registreren. Daarna kan `Add feature integrator guide` een hidden-draft app bouwen met progressive disclosure, officiële links, privacy-first local-only gedrag en geen bedragen.
+
+## 19. Officiële bronhercontrole 2026-07-19
+
+Uitkomst: de 2026-grenswaarden, huurtoeslagwijzigingen, officiële links en signal-only datasetmetadata zijn opnieuw gecontroleerd tegen Dienst Toeslagen/Belastingdienst. Zorgtoeslagwaarden, huurtoeslagwaarden, kindgebonden-budgetvermogensgrenzen, kinderopvang-uren en kinderopvang-uurtariefcontext zijn bevestigd.
+
+Correctie naar aanleiding van officiële bronhercontrole:
+
+- Kindgebonden budget: geen kinderbijslag mag niet in alle gevallen hard uitsluiten, omdat de officiële voorwaarden aangeven dat kinderbijslag voor kinderen van 16 en 17 jaar niet altijd vereist is.
+- Kindgebonden budget: "kind woont niet bij aanvrager" is niet als generieke harde officiële voorwaarde gevonden op de voorwaardenpagina; de scan moet dit als complex signaal naar officiële controle behandelen.
+
+Metadata:
+
+- Dataset: `allowance-signal-rules-2026`.
+- Version: `1.0.0`.
+- Status: `active`, uitsluitend signal-only.
+- EffectiveFrom: `2026-01-01`.
+- EffectiveTo: `2026-12-31`.
+- LastVerifiedAt: `2026-07-19`.
+- NextReviewAt: `2026-11-15`.
+
+Publieke activatie blijft afhankelijk van QA/releasecontrole, browseraudit en activatiediff. Vanaf 2027 mag de tool niet stil terugvallen op 2026; ontbrekende actieve 2027-dataset moet publieke scan blokkeren of onderhoudsstatus tonen.
