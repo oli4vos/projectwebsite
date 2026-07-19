@@ -332,7 +332,7 @@ export default function ToeslagenScanCalculator() {
             href="https://www.belastingdienst.nl/wps/wcm/connect/nl/toeslagen/content/toeslagpartner"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[13px] font-medium text-[var(--ink)] underline"
+            className="touch-link ring-focus inline-flex min-h-11 items-center rounded-lg text-[13px] font-medium text-[var(--ink)] underline outline-none"
           >
             Officiële uitleg over toeslagpartner <span className="sr-only">(opent extern)</span>
           </a>
