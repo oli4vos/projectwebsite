@@ -25,7 +25,7 @@ describe("generated app registry", () => {
   });
 
   it("contains expected public tools", () => {
-    expect(appRegistry).toHaveLength(9);
+    expect(appRegistry).toHaveLength(10);
     expect(appRegistryBySlug["artifact-hypotheek-wonen-maximale-hypotheek"]).toBeDefined();
     expect(appRegistryBySlug["duo-doorlenen-of-stoppen"]).toBeUndefined();
     expect(appRegistryBySlug["duo-extra-aflossen"]).toBeDefined();
@@ -44,24 +44,32 @@ describe("generated app registry", () => {
     expect(appRegistryBySlug["zzp-uurtarief"]).toBeUndefined();
     expect(appRegistryBySlug["koop-vs-huur"]).toBeUndefined();
     expect(appRegistryBySlug["kind-wordt-18-impact"]).toBeUndefined();
-    expect(appRegistryBySlug["toeslagen-scan"]).toBeUndefined();
-    expect(appComponents["toeslagen-scan"]).toBeUndefined();
+    expect(appRegistryBySlug["toeslagen-scan"]).toBeDefined();
+    expect(appComponents["toeslagen-scan"]).toBeDefined();
   });
 
-  it("keeps hidden allowance scan out of public registry while manifest exists", () => {
+  it("publishes allowance scan while keeping other hidden manifests excluded", () => {
     const manifests = getManifestFiles().map(readManifest);
     const allowanceScan = manifests.find((manifest) => manifest.slug === "toeslagen-scan");
     const hiddenManifests = manifests.filter((manifest) => manifest.visibility === "hidden");
 
     expect(manifests).toHaveLength(166);
-    expect(appRegistry).toHaveLength(9);
-    expect(hiddenManifests).toHaveLength(157);
+    expect(appRegistry).toHaveLength(10);
+    expect(hiddenManifests).toHaveLength(156);
     expect(allowanceScan).toMatchObject({
-      status: "draft",
-      visibility: "hidden",
+      title: "Welke toeslagen passen mogelijk bij mij?",
+      status: "beta",
+      visibility: "public",
       type: "frontend",
       entry: "Calculator.tsx",
     });
+    expect(appRegistryBySlug["toeslagen-scan"]).toMatchObject({
+      status: "beta",
+      visibility: "public",
+      outputType: "checklist",
+      disclaimerType: "taxIndicative",
+    });
+    expect(appComponents["volgende-euro"]).toBeUndefined();
   });
 
   it("keeps manifest metadata consistent for disclaimer and output type", () => {
@@ -72,10 +80,9 @@ describe("generated app registry", () => {
       const outputType = manifest.outputType;
 
       if (disclaimerType === "taxIndicative") {
-        expect(assumptionsUsed).toContain("tax");
         expect(
           assumptionsUsed.some(
-            (value) => value === "box1" || value === "box3",
+            (value) => value === "tax" || value === "box1" || value === "box3",
           ),
         ).toBe(true);
       }

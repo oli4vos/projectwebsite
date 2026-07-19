@@ -7,6 +7,8 @@ type AppManifest = {
   visibility?: "public" | "hidden";
 };
 
+const allowanceScanRoute = "/apps/toeslagen-scan";
+
 function getPublicToolRoutes() {
   const appsDirectory = path.join(process.cwd(), "apps");
 
@@ -351,22 +353,141 @@ test("dashboard toont publieke toolkaarten met centrale surface-stijl", async ({
     ...new Set(links.map((link) => link.getAttribute("href")).filter(Boolean)),
   ]);
   expect(uniqueToolRoutes).toHaveLength(9);
-  expect(uniqueToolRoutes).not.toContain("/apps/toeslagen-scan");
-  await expect(page.getByText("Toeslagenscan")).toHaveCount(0);
+  expect(uniqueToolRoutes).not.toContain(allowanceScanRoute);
   await expect(page.getByText("Waarom dit rustig blijft")).toBeVisible();
+
+  await page.getByRole("button", { name: "Alle tools" }).click();
+  await expect(page.locator(`a[href="${allowanceScanRoute}"]`)).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Welke toeslagen passen mogelijk bij mij?" }),
+  ).toBeVisible();
 });
 
-test("hidden toeslagenscan blijft buiten publieke app-routes", async ({ page }, testInfo) => {
+test("toeslagenscan is publiek vindbaar via dashboard en app-overzicht", async ({
+  page,
+}, testInfo) => {
   test.skip(!testInfo.project.name.startsWith("desktop"), "Desktop routecontrole");
 
-  await page.goto("/", { waitUntil: "networkidle" });
-  await expect(page.locator('a[href="/apps/toeslagen-scan"]')).toHaveCount(0);
+  await page.goto("/apps", { waitUntil: "networkidle" });
+  await page.getByRole("button", { name: "Alle tools" }).click();
+  await expect(page.locator(`a[href="${allowanceScanRoute}"]`)).toBeVisible();
 
-  const response = await page.goto("/apps/toeslagen-scan", {
+  await page.goto("/v2/apps", { waitUntil: "networkidle" });
+  await expect(page.getByText("10 van 10")).toBeVisible();
+  await page.getByLabel("Zoek tool").fill("zorgtoeslag");
+  await expect(
+    page.getByRole("heading", { name: "Welke toeslagen passen mogelijk bij mij?" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Regelingen en maandruimte" }).click();
+  await expect(page.getByText("1 van 10")).toBeVisible();
+});
+
+test("publieke toeslagenscan route, formulier en signal-only resultaat werken", async ({
+  page,
+}, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "Desktopinteractie controleren");
+
+  const response = await page.goto(allowanceScanRoute, { waitUntil: "networkidle" });
+  expect(response?.status()).toBe(200);
+  await page.reload({ waitUntil: "networkidle" });
+  await expect(
+    page.getByRole("heading", { name: "Welke toeslagen passen mogelijk bij mij?", level: 1 }),
+  ).toBeVisible();
+  await expect(page.getByText("Beta · signalering 2026")).toBeVisible();
+  await expect(
+    page.getByText("Geen advies en geen officiële beschikking"),
+  ).toBeVisible();
+  await expect(page.getByText("toeslagbedragen berekend")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Download uitgebreid PDF-overzicht" })).toHaveCount(0);
+
+  const bodyText = (await page.locator("body").innerText()).toLowerCase();
+  expect(bodyText).not.toContain("je hebt recht op");
+  expect(bodyText).not.toContain("je ontvangt");
+  expect(bodyText).not.toContain("gegarandeerd recht");
+
+  await page.getByRole("button", { name: "Voorbeeldwaarden" }).click();
+  await expect(page.getByLabel("Kale huur per maand")).toBeVisible();
+  await expect(page.getByLabel("Opvanguren per maand")).toBeVisible();
+  await page.getByRole("button", { name: "Bekijk mijn toeslagensignalen" }).click();
+  await expect(page.locator("#tool-result-summary article")).toHaveCount(4);
+  await expect(page.getByRole("heading", { name: "Zorgtoeslag" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Huurtoeslag" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Kindgebonden budget" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Kinderopvangtoeslag" })).toBeVisible();
+
+  const officialLinks = page.locator("#tool-result-summary a[href^='https://www.belastingdienst.nl/']");
+  await expect(officialLinks.first()).toBeVisible();
+  expect(await officialLinks.count()).toBeGreaterThanOrEqual(4);
+
+  await page.getByRole("textbox", { name: "Leeftijd", exact: true }).fill("35");
+  await expect(
+    page.getByText("Je hebt de invoer gewijzigd na de laatste scan."),
+  ).toBeVisible();
+
+  await page.getByLabel("Woonsituatie", { exact: true }).selectOption("owner");
+  await expect(page.getByLabel("Kale huur per maand")).toHaveCount(0);
+  await page.getByLabel("Heb je kinderen?", { exact: true }).selectOption("no");
+  await expect(page.getByLabel("Opvanguren per maand")).toHaveCount(0);
+
+  await page.getByRole("button", { name: "Wis invoer" }).click();
+  await expect(page.getByText("Nog geen scan uitgevoerd")).toBeVisible();
+});
+
+test("toeslagenscan v2-route werkt en verborgen routes blijven 404", async ({
+  page,
+}, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "Desktop routecontrole");
+
+  const response = await page.goto("/v2/apps/toeslagen-scan", { waitUntil: "networkidle" });
+  expect(response?.status()).toBe(200);
+  await page.reload({ waitUntil: "networkidle" });
+  await expect(
+    page.getByRole("heading", { name: "Welke toeslagen passen mogelijk bij mij?", level: 1 }),
+  ).toBeVisible();
+
+  const hiddenResponse = await page.goto("/apps/volgende-euro", { waitUntil: "networkidle" });
+  expect(hiddenResponse?.status()).toBe(404);
+  const response404 = await page.goto("/apps/bestaat-niet", {
+    waitUntil: "networkidle",
+  });
+  expect(response404?.status()).toBe(404);
+});
+
+test("mobiele toeslagenscan houdt 390px zonder horizontale overflow en focusbasis", async ({
+  page,
+}, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("mobile"), "Mobiele controle");
+
+  await page.goto(allowanceScanRoute, { waitUntil: "networkidle" });
+  await page.keyboard.press("Tab");
+  const activeTag = await page.evaluate(() => document.activeElement?.tagName.toLowerCase());
+  expect(activeTag).toMatch(/a|button|input|select/);
+
+  const audit = await page.evaluate(() => ({
+    bodyWidth: document.body.scrollWidth,
+    viewportWidth: document.documentElement.clientWidth,
+  }));
+  expect(audit.bodyWidth).toBeLessThanOrEqual(audit.viewportWidth + 1);
+});
+
+test("hidden toeslagenscan route is niet langer 404", async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "Desktop routecontrole");
+
+  const response = await page.goto(allowanceScanRoute, {
+    waitUntil: "networkidle",
+  });
+  expect(response?.status()).toBe(200);
+  await expect(page.getByText("Hidden draft")).toHaveCount(0);
+  await expect(page.getByText("hidden draft")).toHaveCount(0);
+});
+
+test("onbekende app slug blijft 404", async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "Desktop routecontrole");
+
+  const response = await page.goto("/apps/onbekende-tool", {
     waitUntil: "networkidle",
   });
   expect(response?.status()).toBe(404);
-  await expect(page.getByText("Toeslagenscan")).toHaveCount(0);
 });
 
 test("losse DUO-tools tonen simpele scenario-uitkomst en schuldenvrije datum", async ({ page }, testInfo) => {
