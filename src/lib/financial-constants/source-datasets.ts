@@ -14,7 +14,7 @@ import type {
 } from "@/lib/financial-constants/types";
 import { FINANCIAL_CONSTANTS_BY_YEAR } from "@/lib/financial-constants/years";
 
-export const SOURCE_DATA_REFERENCE_DATE = "2026-07-18";
+export const SOURCE_DATA_REFERENCE_DATE = "2026-07-19";
 
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
 
@@ -266,6 +266,9 @@ function validateAllowanceSignalRulesDataset(data: unknown) {
   const issues: string[] = [];
   const candidate = data as {
     year?: number;
+    ruleVersion?: string;
+    officialCalculationUrl?: string;
+    applicationUrl?: string;
     healthcare?: Record<string, unknown>;
     rent?: Record<string, unknown>;
     childBudget?: Record<string, unknown>;
@@ -274,6 +277,17 @@ function validateAllowanceSignalRulesDataset(data: unknown) {
 
   if (!Number.isInteger(candidate.year) || (candidate.year as number) < 2000 || (candidate.year as number) > 2100) {
     issues.push("Toeslagensignaaldataset heeft een ongeldig jaar.");
+  }
+  if (typeof candidate.ruleVersion !== "string" || !SEMVER_PATTERN.test(candidate.ruleVersion)) {
+    issues.push("Toeslagensignaaldataset mist een geldige ruleVersion.");
+  }
+  for (const [key, value] of Object.entries({
+    officialCalculationUrl: candidate.officialCalculationUrl,
+    applicationUrl: candidate.applicationUrl,
+  })) {
+    if (typeof value !== "string" || !value.startsWith("https://")) {
+      issues.push(`Toeslagensignaaldataset mist een https-URL voor ${key}.`);
+    }
   }
 
   for (const [sectionName, section] of Object.entries({
@@ -308,6 +322,16 @@ function validateAllowanceSignalRulesDataset(data: unknown) {
     maxIncomeWithPartner < maxIncomeSingle
   ) {
     issues.push("Zorgtoeslag partner-inkomensgrens ligt onder de alleenstaande grens.");
+  }
+
+  const healthcareAssetsSingle = candidate.healthcare?.maxAssetsSingle;
+  const healthcareAssetsWithPartner = candidate.healthcare?.maxAssetsWithPartner;
+  if (
+    typeof healthcareAssetsSingle === "number" &&
+    typeof healthcareAssetsWithPartner === "number" &&
+    healthcareAssetsWithPartner < healthcareAssetsSingle
+  ) {
+    issues.push("Zorgtoeslag partner-vermogensgrens ligt onder de alleenstaande grens.");
   }
 
   return issues;
@@ -773,5 +797,125 @@ export const SOURCE_DATASET_REGISTRY: readonly SourceDataset[] = [
     },
     data: constants2026.duo.borrowingLimits,
     usedBy: ["duo-leenbedrag-impact", "duo-schuld-bij-starten-lenen"],
+  },
+  {
+    family: "allowance-signal-rules",
+    scenario: "general",
+    meta: {
+      recordType: "dataset",
+      id: "allowance-signal-rules-2026",
+      title: "Toeslagensignalen 2026",
+      year: 2026,
+      version: "1.0.0",
+      effectiveFrom: "2026-01-01",
+      effectiveTo: "2026-12-31",
+      retrievedAt: "2026-07-19",
+      lastVerifiedAt: "2026-07-19",
+      nextReviewAt: "2026-11-15",
+      sourceName: "Dienst Toeslagen / Belastingdienst",
+      sourceUrl: "https://www.belastingdienst.nl/wps/wcm/connect/nl/toeslagen/content/hulpmiddel-proefberekening-toeslagen",
+      sourceType: "official-execution",
+      methodology:
+        "Signal-only toeslagenscan 2026. De dataset bevat alleen harde voorwaarden en bronlinks die voldoende zijn voor signalering; concrete toeslagbedragen en afbouwformules blijven buiten scope.",
+      methodologyType: "official-norm",
+      notes:
+        "Zorgtoeslag ondersteunt harde grenschecks. Huurtoeslag, kindgebonden budget en kinderopvangtoeslag blijven terughoudend en verwijzen na basischecks naar de officiele proefberekening.",
+      status: "active",
+    },
+    data: {
+      year: 2026,
+      ruleVersion: "1.0.0",
+      officialCalculationUrl:
+        "https://www.belastingdienst.nl/wps/wcm/connect/nl/toeslagen/content/hulpmiddel-proefberekening-toeslagen",
+      applicationUrl:
+        "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/toeslagen/aanvragen/ik-wil-een-toeslag-aanvragen",
+      healthcare: {
+        minimumAge: 18,
+        maxIncomeSingle: 40_857,
+        maxIncomeWithPartner: 51_142,
+        maxAssetsSingle: 146_011,
+        maxAssetsWithPartner: 184_633,
+        informationUrl:
+          "https://www.belastingdienst.nl/wps/wcm/connect/nl/zorgtoeslag/content/kan-ik-zorgtoeslag-krijgen",
+        incomeUrl:
+          "https://www.belastingdienst.nl/wps/wcm/connect/nl/zorgtoeslag/content/maximaal-inkomen-voor-zorgtoeslag",
+        officialCalculationUrl:
+          "https://www.belastingdienst.nl/wps/wcm/connect/nl/toeslagen/content/hulpmiddel-proefberekening-toeslagen",
+        applicationUrl:
+          "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/toeslagen/aanvragen/ik-wil-een-toeslag-aanvragen",
+        incompleteRules: [
+          "foreign-or-residence-status",
+          "special-assets",
+          "monthly-start-after-eighteenth-birthday",
+        ],
+      },
+      rent: {
+        maxAssetsSingle: 38_479,
+        maxAssetsWithPartner: 76_958,
+        maxAssetsPerCoResident: 38_479,
+        cappedRentThreshold: 932.93,
+        cappedRentThresholdUnder21: 498.20,
+        informationUrl:
+          "https://www.belastingdienst.nl/wps/wcm/connect/nl/huurtoeslag/content/kan-ik-huurtoeslag-krijgen",
+        changes2026Url:
+          "https://www.belastingdienst.nl/wps/wcm/connect/nl/huurtoeslag/content/huurtoeslag-verandert-vanaf-2026",
+        assetsUrl:
+          "https://www.belastingdienst.nl/wps/wcm/connect/nl/huurtoeslag/content/maximaal-vermogen-huurtoeslag",
+        coResidentUrl:
+          "https://www.belastingdienst.nl/wps/wcm/connect/nl/huurtoeslag/content/wie-telt-als-medebewoner",
+        officialCalculationUrl:
+          "https://www.belastingdienst.nl/wps/wcm/connect/nl/toeslagen/content/hulpmiddel-proefberekening-toeslagen",
+        applicationUrl:
+          "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/toeslagen/aanvragen/ik-wil-een-toeslag-aanvragen",
+        incompleteRules: [
+          "income-rent-taper",
+          "special-housing",
+          "subsidisable-rent-exceptions",
+          "co-resident-income-and-assets",
+        ],
+      },
+      childBudget: {
+        maxAssetsSingle: 146_011,
+        maxAssetsWithPartner: 184_633,
+        informationUrl:
+          "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/toeslagen/kindgebonden-budget/voorwaarden/voorwaarden-kindgebonden-budget",
+        assetsUrl:
+          "https://www.belastingdienst.nl/wps/wcm/connect/nl/kindgebonden-budget/content/maximaal-vermogen-kindgebonden-budget",
+        incomeUrl:
+          "https://www.belastingdienst.nl/wps/wcm/connect/nl/kindgebonden-budget/content/maximaal-inkomen-kindgebonden-budget",
+        officialCalculationUrl:
+          "https://www.belastingdienst.nl/wps/wcm/connect/nl/toeslagen/content/hulpmiddel-proefberekening-toeslagen",
+        applicationUrl:
+          "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/toeslagen/aanvragen/ik-wil-een-toeslag-aanvragen",
+        incompleteRules: [
+          "income-taper",
+          "single-parent-top",
+          "co-parenting",
+          "sixteen-seventeen-year-old-exceptions",
+          "composite-family",
+        ],
+      },
+      childcare: {
+        maxHoursPerMonth: 230,
+        informationUrl:
+          "https://www.belastingdienst.nl/wps/wcm/connect/nl/kinderopvangtoeslag/content/kan-ik-kinderopvangtoeslag-krijgen",
+        applicationUrl:
+          "https://www.belastingdienst.nl/wps/wcm/connect/nl/kinderopvangtoeslag/content/hoe-moet-ik-kinderopvangtoeslag-aanvragen",
+        maxHourlyRateUrl:
+          "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/toeslagen/kinderopvangtoeslag/hoeveel-kinderopvangtoeslag-kan-ik-krijgen/maximaal-uurtarief-voor-de-kinderopvang",
+        changes2026Url:
+          "https://www.belastingdienst.nl/wps/wcm/connect/nl/toeslagen-2026/topics/veranderingen-toeslagen-2026",
+        officialCalculationUrl:
+          "https://www.belastingdienst.nl/wps/wcm/connect/nl/toeslagen/content/hulpmiddel-proefberekening-toeslagen",
+        incompleteRules: [
+          "amount-calculation",
+          "hourly-rate-tables",
+          "application-deadline",
+          "lrk-lookup",
+          "education-or-trajectory-recognition",
+        ],
+      },
+    },
+    usedBy: ["toeslagenscan"],
   },
 ];
