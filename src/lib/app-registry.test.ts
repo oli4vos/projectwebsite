@@ -1,6 +1,20 @@
+import fs from "node:fs";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 import type { AppManifest } from "@/lib/app-types";
+import { appComponents } from "@/lib/app-components";
 import { appRegistry, appRegistryBySlug } from "@/lib/app-registry";
+
+function getManifestFiles() {
+  return fs.readdirSync(path.join(process.cwd(), "apps"), { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => path.join(process.cwd(), "apps", entry.name, "app.json"))
+    .filter((manifestPath) => fs.existsSync(manifestPath));
+}
+
+function readManifest(manifestPath: string): AppManifest {
+  return JSON.parse(fs.readFileSync(manifestPath, "utf8")) as AppManifest;
+}
 
 describe("generated app registry", () => {
   it("does not expose hidden draft apps", () => {
@@ -30,6 +44,24 @@ describe("generated app registry", () => {
     expect(appRegistryBySlug["zzp-uurtarief"]).toBeUndefined();
     expect(appRegistryBySlug["koop-vs-huur"]).toBeUndefined();
     expect(appRegistryBySlug["kind-wordt-18-impact"]).toBeUndefined();
+    expect(appRegistryBySlug["toeslagen-scan"]).toBeUndefined();
+    expect(appComponents["toeslagen-scan"]).toBeUndefined();
+  });
+
+  it("keeps hidden allowance scan out of public registry while manifest exists", () => {
+    const manifests = getManifestFiles().map(readManifest);
+    const allowanceScan = manifests.find((manifest) => manifest.slug === "toeslagen-scan");
+    const hiddenManifests = manifests.filter((manifest) => manifest.visibility === "hidden");
+
+    expect(manifests).toHaveLength(166);
+    expect(appRegistry).toHaveLength(9);
+    expect(hiddenManifests).toHaveLength(157);
+    expect(allowanceScan).toMatchObject({
+      status: "draft",
+      visibility: "hidden",
+      type: "frontend",
+      entry: "Calculator.tsx",
+    });
   });
 
   it("keeps manifest metadata consistent for disclaimer and output type", () => {

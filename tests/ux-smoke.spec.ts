@@ -351,7 +351,22 @@ test("dashboard toont publieke toolkaarten met centrale surface-stijl", async ({
     ...new Set(links.map((link) => link.getAttribute("href")).filter(Boolean)),
   ]);
   expect(uniqueToolRoutes).toHaveLength(9);
+  expect(uniqueToolRoutes).not.toContain("/apps/toeslagen-scan");
+  await expect(page.getByText("Toeslagenscan")).toHaveCount(0);
   await expect(page.getByText("Waarom dit rustig blijft")).toBeVisible();
+});
+
+test("hidden toeslagenscan blijft buiten publieke app-routes", async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "Desktop routecontrole");
+
+  await page.goto("/", { waitUntil: "networkidle" });
+  await expect(page.locator('a[href="/apps/toeslagen-scan"]')).toHaveCount(0);
+
+  const response = await page.goto("/apps/toeslagen-scan", {
+    waitUntil: "networkidle",
+  });
+  expect(response?.status()).toBe(404);
+  await expect(page.getByText("Toeslagenscan")).toHaveCount(0);
 });
 
 test("losse DUO-tools tonen simpele scenario-uitkomst en schuldenvrije datum", async ({ page }, testInfo) => {
