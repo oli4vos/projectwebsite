@@ -1,0 +1,19 @@
+{
+  "slug": "toeslagen-scan",
+  "title": "Toeslagenscan",
+  "description": "Signaleer zonder bedragen of zorgtoeslag, huurtoeslag, kindgebonden budget of kinderopvangtoeslag mogelijk relevant kan zijn.",
+  "type": "frontend",
+  "category": "Belasting",
+  "tags": ["toeslagen", "inkomen", "huishouden", "belastingdienst"],
+  "status": "draft",
+  "visibility": "hidden",
+  "requiredProfileFields": [],
+  "reasonHint": "Hidden draft voor een voorzichtige toeslagensignalering zonder bedragberekening.",
+  "assumptionsUsed": ["tax"],
+  "calculationDomains": ["tax", "cashflow"],
+  "riskLevel": "high",
+  "disclaimerType": "taxIndicative",
+  "outputType": "checklist",
+  "version": "0.1.0",
+  "entry": "Calculator.tsx"
+}

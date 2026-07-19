@@ -345,6 +345,11 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `[hidden]` `apps/volgende-euro`
   - technisch aanwezig maar niet meer gelinkt vanuit de publieke route.
   - reden: bredere prioriteitenhulp valt buiten de huidige studieschuld-launchscope.
+- `[hidden]` `apps/toeslagen-scan`
+  - eerste hidden-draft signaleringsscan voor zorgtoeslag, huurtoeslag, kindgebonden budget en kinderopvangtoeslag.
+  - gebruikt uitsluitend `evaluateAllowanceSignals(...)` uit de centrale allowances-laag.
+  - toont geen concrete toeslagbedragen, heeft geen PDF, geen opslag, geen backend en geen analytics.
+  - blijft buiten publieke registry/dashboard totdat UX, security en QA de volledige blueprint-check hebben afgerond.
 - `[hidden]` overige artifact-, hypotheek-, tax-, pensioen-, FIRE-, planning- en concepttools.
   - code en manifests blijven behouden voor heractivatie.
   - publicatie verloopt via manifest `visibility: "public"` plus `npm run generate:apps` en groene checks.
