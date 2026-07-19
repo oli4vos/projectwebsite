@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { DuoDebtPartsEditor } from "@/components/duo/DuoDebtPartsEditor";
 import { DisclosureSection } from "@/components/DisclosureSection";
 import { FieldError } from "@/components/forms/FieldError";
@@ -25,6 +25,15 @@ import {
   type DuoDebtPartFormValue,
 } from "@/lib/duo/debt-parts-form";
 import {
+  cancelDuoMortgageTransfer,
+  consumeDuoMortgageTransfer,
+  createDuoMortgageTransfer,
+  getDuoMortgageTransferIdFromUrl,
+  getDuoMortgageTransferUrl,
+  readDuoMortgageTransfer,
+  type DuoMortgageTransferCandidate,
+} from "@/lib/duo-mortgage-transfer";
+import {
   createProfilePrefillState,
   mergeProfilePatchIntoValues,
 } from "@/lib/profile-prefill";
@@ -47,6 +56,13 @@ import {
   type RepaymentRule,
 } from "./logic";
 import { downloadHypotheekImpactPdfReport } from "./report";
+import {
+  applyDuoMortgageCandidateToForm,
+  getDuoMortgageCandidateTargetField,
+  isFormStateDraft,
+  showActualPaymentFieldFor,
+  showStatutoryPaymentFieldFor,
+} from "./duo-transfer";
 
 const FINANCIAL_CONSTANTS = getFinancialConstants(2026);
 
@@ -54,6 +70,11 @@ type CalculatorContentProps = {
   initialValues: FormState;
   hasRelevantProfileValues: boolean;
   profilePatch: Partial<FormState>;
+};
+
+type PendingDuoMortgageCandidate = {
+  transferId: string;
+  candidate: DuoMortgageTransferCandidate;
 };
 
 function formatIsoDateLabel(value: string) {
@@ -77,6 +98,10 @@ function formatCurrency(value: number) {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(value);
+}
+
+function formatMoneyInputValue(value: number) {
+  return value.toFixed(2).replace(".", ",");
 }
 
 function formatPercent(value: number) {
@@ -173,6 +198,9 @@ function CalculatorContent({
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
   const [pdfError, setPdfError] = useState("");
   const [pdfStatus, setPdfStatus] = useState("");
+  const [duoTransferMessage, setDuoTransferMessage] = useState("");
+  const [pendingDuoCandidate, setPendingDuoCandidate] =
+    useState<PendingDuoMortgageCandidate | null>(null);
   const {
     formValues,
     setFormValues,
@@ -200,15 +228,8 @@ function CalculatorContent({
     ? calculateHypotheekImpact(submittedValidation.parsedValues)
     : null;
   const hasErrors = Object.keys(errors).length > 0;
-  const showActualField =
-    formValues.situation === "repaying" ||
-    formValues.situation === "incomeBasedReduction" ||
-    formValues.situation === "paymentPause";
-  const showStatutoryField =
-    formValues.situation === "gracePeriod" ||
-    formValues.situation === "incomeBasedReduction" ||
-    formValues.situation === "paymentPause" ||
-    formValues.situation === "unknown";
+  const showActualField = showActualPaymentFieldFor(formValues);
+  const showStatutoryField = showStatutoryPaymentFieldFor(formValues);
   const usedDefaultTerm = formValues.remainingTermYears.trim().length === 0;
   const mobileFieldOrder = [
     "situation",
@@ -248,6 +269,8 @@ function CalculatorContent({
   const step4Fields = ["mortgageRate", "mortgageTermYears", "showAdvancedAssumptions"];
   const isStepVisible = (fieldIds: string[]) =>
     fieldIds.some((fieldId) => mobileFlow.isActiveField(fieldId));
+  const isDuoStepVisible =
+    isStepVisible(step2Fields) || pendingDuoCandidate !== null;
   const isCurrentFieldBlocked = Boolean(
     {
       actualMonthlyPayment: errors.actualMonthlyPayment,
@@ -265,6 +288,64 @@ function CalculatorContent({
       mortgageTermYears: errors.mortgageTermYears,
     }[mobileFlow.activeFieldId],
   );
+
+  useEffect(() => {
+    queueMicrotask(() => {
+      const transferId = getDuoMortgageTransferIdFromUrl(window.location.search);
+      if (!transferId) {
+        return;
+      }
+
+      const transfer = readDuoMortgageTransfer<FormState>(
+        transferId,
+        {
+          sourceTool: "hypotheek-impact-studieschuld",
+          targetTool: "duo-maandbedrag",
+          allowCandidateReady: true,
+        },
+      );
+
+      if (!transfer.ok) {
+        setDuoTransferMessage(
+          "De terugkoppeling van de DUO-tool is verlopen of al verwerkt. Je conceptinvoer is niet aangepast.",
+        );
+        return;
+      }
+
+      if (!isFormStateDraft(transfer.data.draft)) {
+        setDuoTransferMessage(
+          "De opgeslagen hypotheekinvoer kon niet veilig worden hersteld. Je huidige invoer is niet aangepast.",
+        );
+        return;
+      }
+
+      setPdfError("");
+      setPdfStatus("");
+      setValues(
+        transfer.data.draft,
+        "Je hypotheekinvoer is hersteld. Bevestig het DUO-bedrag hieronder en klik daarna opnieuw op Bereken.",
+      );
+
+      if (transfer.data.candidate) {
+        setPendingDuoCandidate({
+          transferId: transfer.data.transferId,
+          candidate: transfer.data.candidate,
+        });
+        setDuoTransferMessage("");
+      } else {
+        setDuoTransferMessage(
+          "Je hypotheekinvoer is hersteld, maar er staat geen DUO-bedrag klaar om over te nemen.",
+        );
+      }
+
+      window.history.replaceState(
+        {},
+        document.title,
+        `${window.location.pathname}${window.location.hash}`,
+      );
+    });
+  }, [setValues]);
+
   function updateField<K extends keyof FormState>(field: K, value: FormState[K]) {
     setFormValues((current) => ({
       ...current,
@@ -348,6 +429,8 @@ function CalculatorContent({
   function clearAllInputs() {
     setPdfError("");
     setPdfStatus("");
+    setDuoTransferMessage("");
+    setPendingDuoCandidate(null);
     reset("Alle invoervelden zijn gewist. Vul opnieuw in of laad voorbeeldwaarden.");
   }
 
@@ -386,6 +469,83 @@ function CalculatorContent({
     } finally {
       setIsDownloadingPdf(false);
     }
+  }
+
+  function startDuoMonthlyPaymentTransfer() {
+    setPdfError("");
+    setPdfStatus("");
+    setDuoTransferMessage("");
+
+    const transfer = createDuoMortgageTransfer<FormState>({
+      sourceTool: "hypotheek-impact-studieschuld",
+      targetTool: "duo-maandbedrag",
+      returnPath: "/apps/hypotheek-impact-studieschuld",
+      returnStep: "duo-bedragen",
+      returnAnchor: "duo-bedragen",
+      draft: formValues,
+    });
+
+    if (!transfer.ok) {
+      setDuoTransferMessage(
+        "Je browser kan het concept niet tijdelijk bewaren. Open de DUO-maandbedragtool los en vul het bedrag daarna handmatig in.",
+      );
+      return;
+    }
+
+    window.location.assign(
+      getDuoMortgageTransferUrl(
+        "/apps/duo-maandbedrag",
+        transfer.data.transferId,
+      ),
+    );
+  }
+
+  function applyPendingDuoCandidate() {
+    if (!pendingDuoCandidate) {
+      return;
+    }
+
+    const { transferId, candidate } = pendingDuoCandidate;
+    const targetField = getDuoMortgageCandidateTargetField(formValues, candidate);
+    const targetLabel =
+      targetField === "actualMonthlyPayment"
+        ? "huidig DUO-maandbedrag"
+        : "wettelijk DUO-maandbedrag";
+    const nextValues = applyDuoMortgageCandidateToForm(
+      formValues,
+      candidate,
+      formatMoneyInputValue,
+    );
+    const consumed = consumeDuoMortgageTransfer<FormState>(transferId);
+
+    setPdfError("");
+    setPdfStatus("");
+    setValues(
+      nextValues,
+      `DUO-bedrag overgenomen als ${targetLabel}. Klik opnieuw op Bereken om de uitkomst te vernieuwen.`,
+    );
+    setPendingDuoCandidate(null);
+    setDuoTransferMessage(
+      consumed.ok
+        ? "De DUO-terugkoppeling is verwerkt."
+        : "Het DUO-bedrag is overgenomen, maar de tijdelijke terugkoppeling kon niet worden gemarkeerd als verwerkt.",
+    );
+  }
+
+  function rejectPendingDuoCandidate() {
+    if (!pendingDuoCandidate) {
+      return;
+    }
+
+    const cancelled = cancelDuoMortgageTransfer<FormState>(
+      pendingDuoCandidate.transferId,
+    );
+    setPendingDuoCandidate(null);
+    setDuoTransferMessage(
+      cancelled.ok
+        ? "Het DUO-bedrag is niet overgenomen. Je herstelde hypotheekinvoer blijft staan."
+        : "Het DUO-bedrag is niet overgenomen. Je herstelde hypotheekinvoer blijft staan, maar de tijdelijke terugkoppeling kon niet worden gesloten.",
+    );
   }
 
   return (
@@ -452,6 +612,11 @@ function CalculatorContent({
             Klik opnieuw op Bereken om de uitkomst te vernieuwen.
           </p>
         ) : null}
+        {duoTransferMessage ? (
+          <p className="mt-3 text-[12.5px] text-[var(--muted)]">
+            {duoTransferMessage}
+          </p>
+        ) : null}
 
         <div className={`mt-7 ${isStepVisible(step1Fields) ? "block" : "hidden"} md:block`}>
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
@@ -510,7 +675,10 @@ function CalculatorContent({
           </div>
         </div>
 
-        <div className={`mt-7 ${isStepVisible(step2Fields) ? "block" : "hidden"} md:block`}>
+        <div
+          id="duo-bedragen"
+          className={`mt-7 ${isDuoStepVisible ? "block" : "hidden"} md:block`}
+        >
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
             Stap 2
           </div>
@@ -570,6 +738,78 @@ function CalculatorContent({
                 </p>
                 <FieldError message={errors.statutoryMonthlyPayment} />
               </label>
+            ) : null}
+
+            <div className="surface-subtle px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
+              <div className="flex flex-wrap items-center gap-3">
+                <span>
+                  Weet je niet welk DUO-maandbedrag voor je hypotheek meetelt?
+                </span>
+                <ToolActionButton
+                  type="button"
+                  onClick={startDuoMonthlyPaymentTransfer}
+                  variant="secondary"
+                  size="sm"
+                >
+                  Bereken eerst mijn DUO-maandbedrag
+                </ToolActionButton>
+              </div>
+            </div>
+
+            {pendingDuoCandidate ? (
+              <div className="rounded-xl border border-[var(--hair)] bg-white px-4 py-4 text-[13px] leading-[1.65] text-[var(--muted)]">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="text-[12px] uppercase tracking-[0.08em] text-[var(--soft)]">
+                      DUO-bedrag uit rekentool
+                    </p>
+                    <p className="mt-1 text-lg font-semibold text-[var(--ink)]">
+                      {formatCurrency(
+                        pendingDuoCandidate.candidate.recommendedMonthlyAssessmentPayment,
+                      )}{" "}
+                      per maand
+                    </p>
+                    <p className="mt-1">
+                      Voorgesteld voor{" "}
+                      {getDuoMortgageCandidateTargetField(
+                        formValues,
+                        pendingDuoCandidate.candidate,
+                      ) ===
+                      "actualMonthlyPayment"
+                        ? "het huidige DUO-maandbedrag"
+                        : "het wettelijke DUO-maandbedrag"}
+                      . Je hypotheekberekening wordt pas vernieuwd nadat je dit
+                      bedrag overneemt en opnieuw op Bereken klikt.
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <ToolActionButton
+                      type="button"
+                      onClick={applyPendingDuoCandidate}
+                      variant="accent"
+                      size="sm"
+                    >
+                      Dit bedrag gebruiken in mijn hypotheekberekening
+                    </ToolActionButton>
+                    <ToolActionButton
+                      type="button"
+                      onClick={rejectPendingDuoCandidate}
+                      variant="secondary"
+                      size="sm"
+                    >
+                      Niet overnemen
+                    </ToolActionButton>
+                  </div>
+                </div>
+                {pendingDuoCandidate.candidate.assessment.warnings.length > 0 ? (
+                  <InfoList
+                    items={[
+                      "Controleer in Mijn DUO of dit bedrag past bij je actuele situatie voordat je het gebruikt.",
+                    ]}
+                    tone="warning"
+                  />
+                ) : null}
+              </div>
             ) : null}
 
             <label className={mobileFlow.getFieldClassName("remainingStudentDebt")}>

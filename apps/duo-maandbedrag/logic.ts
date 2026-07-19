@@ -7,10 +7,13 @@ import {
 import {
   calculateDuoDebtPortfolio,
   calculateIndicativeIncomeBasedMonthlyPayment,
+  determineDuoMortgageAssessmentPayment,
   type DuoDebtPortfolioSummary,
   type DuoIncomeBasedMonthlyPaymentResult,
+  type DuoMortgageAssessmentInput,
   type RepaymentRule,
 } from "@/lib/duo";
+import type { DuoMortgageTransferCandidate } from "@/lib/duo-mortgage-transfer";
 import {
   createDefaultDuoDebtPartFormValues,
   type DuoDebtPartFieldErrors,
@@ -230,5 +233,68 @@ export function calculateDuoMonthlyPaymentView(
       "Bij bijzondere situaties, peiljaarverlegging of buitenlandse inkomens kan DUO anders uitpakken.",
       ...(incomeBased?.warnings ?? []),
     ],
+  };
+}
+
+export function createDuoMortgageAssessmentTransferCandidate(
+  view: DuoMonthlyPaymentView,
+  now = new Date(),
+): DuoMortgageTransferCandidate | null {
+  if (!view.isValid) {
+    return null;
+  }
+
+  const assessmentInput = createMortgageAssessmentInput(view);
+  const assessment = determineDuoMortgageAssessmentPayment(assessmentInput);
+
+  return {
+    assessment,
+    sourceSituation: assessmentInput.situation,
+    recommendedMonthlyAssessmentPayment:
+      assessment.recommendedMonthlyAssessmentPayment,
+    createdAt: now.toISOString(),
+  };
+}
+
+function createMortgageAssessmentInput(
+  view: Extract<DuoMonthlyPaymentView, { isValid: true }>,
+): DuoMortgageAssessmentInput {
+  if (view.debtPortfolio.usesDebtParts) {
+    return {
+      situation: "debt-parts",
+      repaymentRule: view.repaymentRule,
+      duoRateYear: view.duoRateYear,
+      remainingTermYears: view.termYears,
+      debtParts: view.debtPortfolio.parts.map((part) => ({
+        label: part.label,
+        remainingDebt: part.remainingDebt,
+        annualInterestRate: part.annualInterestRate,
+        rateYear: part.rateYear,
+      })),
+    };
+  }
+
+  if (view.duoMonthlyPaymentSource === "incomeBased" && view.incomeBased) {
+    return {
+      situation: "income-based-reduction",
+      repaymentRule: view.repaymentRule,
+      collectedPayment: view.incomeBased.requiredMonthlyPayment,
+      statutoryPayment: view.statutoryMonthlyPayment,
+      remainingDebt: view.remainingDebt,
+      annualInterestRate: view.annualInterestRate,
+      duoRateYear: view.duoRateYear,
+      remainingTermYears: view.termYears,
+    };
+  }
+
+  return {
+    situation: "statutory-payment",
+    repaymentRule: view.repaymentRule,
+    collectedPayment: view.statutoryMonthlyPayment,
+    statutoryPayment: view.statutoryMonthlyPayment,
+    remainingDebt: view.remainingDebt,
+    annualInterestRate: view.annualInterestRate,
+    duoRateYear: view.duoRateYear,
+    remainingTermYears: view.termYears,
   };
 }

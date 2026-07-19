@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { DuoDebtPartsEditor } from "@/components/duo/DuoDebtPartsEditor";
 import { DisclosureSection } from "@/components/DisclosureSection";
 import { FieldError } from "@/components/forms/FieldError";
@@ -19,6 +19,7 @@ import {
 } from "@/lib/duo/debt-parts-form";
 import {
   calculateDuoMonthlyPaymentView,
+  createDuoMortgageAssessmentTransferCandidate,
   createDuoMonthlyPaymentDefaultValues,
   createEmptyDuoMonthlyPaymentValues,
   repaymentRuleOptions,
@@ -26,6 +27,13 @@ import {
   type DuoMonthlyPaymentFormValues,
 } from "./logic";
 import { downloadDuoMonthlyPaymentPdfReport } from "./report";
+import {
+  attachDuoMortgageTransferCandidate,
+  getDuoMortgageTransferIdFromUrl,
+  getDuoMortgageTransferUrl,
+  readDuoMortgageTransfer,
+  type DuoMortgageTransferRecord,
+} from "@/lib/duo-mortgage-transfer";
 
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("nl-NL", {
@@ -83,7 +91,33 @@ export default function DuoMaandbedragCalculator() {
     createDuoMonthlyPaymentDefaultValues,
   );
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
+  const [transferRecord, setTransferRecord] =
+    useState<DuoMortgageTransferRecord | null>(null);
+  const [transferMessage, setTransferMessage] = useState("");
   const view = useMemo(() => calculateDuoMonthlyPaymentView(formValues), [formValues]);
+
+  useEffect(() => {
+    queueMicrotask(() => {
+      const transferId = getDuoMortgageTransferIdFromUrl(window.location.search);
+      if (!transferId) {
+        return;
+      }
+
+      const transfer = readDuoMortgageTransfer(transferId, {
+        sourceTool: "hypotheek-impact-studieschuld",
+        targetTool: "duo-maandbedrag",
+      });
+
+      if (!transfer.ok) {
+        setTransferMessage(
+          "De koppeling met je hypotheekberekening is verlopen of niet beschikbaar. Je kunt deze DUO-tool nog los gebruiken.",
+        );
+        return;
+      }
+
+      setTransferRecord(transfer.data);
+    });
+  }, []);
 
   function updateField<K extends keyof DuoMonthlyPaymentFormValues>(
     field: K,
@@ -133,6 +167,37 @@ export default function DuoMaandbedragCalculator() {
     } finally {
       setIsDownloadingPdf(false);
     }
+  }
+
+  function handleReturnToMortgageTool() {
+    if (!transferRecord || !view.isValid) {
+      return;
+    }
+
+    const candidate = createDuoMortgageAssessmentTransferCandidate(view);
+    if (!candidate) {
+      setTransferMessage("Bereken eerst een geldig DUO-maandbedrag voordat je teruggaat.");
+      return;
+    }
+
+    const updated = attachDuoMortgageTransferCandidate(
+      transferRecord.transferId,
+      candidate,
+    );
+    if (!updated.ok) {
+      setTransferMessage(
+        "Het terugzetten naar je hypotheekberekening lukt niet in deze browser. Open de hypotheektool opnieuw en vul het bedrag handmatig in.",
+      );
+      return;
+    }
+
+    window.location.assign(
+      getDuoMortgageTransferUrl(
+        updated.data.returnPath,
+        updated.data.transferId,
+        updated.data.returnAnchor,
+      ),
+    );
   }
 
   function toggleDebtParts(enabled: boolean) {
@@ -281,12 +346,29 @@ export default function DuoMaandbedragCalculator() {
           Wis invoer
         </ToolActionButton>
       </div>
+      {transferRecord ? (
+        <div className="surface-subtle px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
+          Je kwam vanuit de hypotheektool. Bereken hier je DUO-maandbedrag en
+          stuur daarna alleen het bevestigbare hypotheekbedrag terug naar je
+          opgeslagen concept.
+        </div>
+      ) : null}
+      {transferMessage ? (
+        <div className="surface-subtle px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
+          {transferMessage}
+        </div>
+      ) : null}
     </div>
   );
 
   const result = view.isValid ? (
     <div id="tool-result-summary" className="space-y-5">
       <div className="flex flex-wrap items-center gap-2">
+        {transferRecord ? (
+          <ToolActionButton type="button" variant="accent" onClick={handleReturnToMortgageTool}>
+            Terug naar mijn hypotheekberekening
+          </ToolActionButton>
+        ) : null}
         <ToolActionButton
           type="button"
           variant="accent"

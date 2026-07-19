@@ -303,6 +303,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - beta-tool voor wettelijke DUO-maandtermijn en optionele draagkrachtindicatie.
   - gebruikt centrale DUO-berekeningen en centrale DUO-rente/looptijdconstants.
   - biedt een uitgebreide PDF-download op dezelfde centrale uitkomstdata.
+  - kan in een veilige returnflow vanuit `hypotheek-impact-studieschuld` een hypotheekassessment-kandidaat teruggeven via sessionStorage, zonder financiële waarden in queryparameters.
 - `[public]` `apps/duo-extra-aflossen`
   - beta-tool voor extra aflossen bij DUO.
   - toont feitelijk effect op maandtermijn, looptijd, rentelast en afloscurve zonder beleggingsvergelijking.
@@ -320,6 +321,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - indicatieve tool voor de impact van een DUO-maandlast op hypotheekruimte.
   - rekent primair via relevante DUO-maandlast -> brutering -> annuïtaire hypotheekimpact.
   - verwerkt DUO-situaties zoals aanloopfase, draagkrachtverlaging en betaalpauze.
+  - kan een concept lokaal bewaren, naar `duo-maandbedrag` sturen en een teruggegeven DUO-bedrag pas na expliciete bevestiging in het relevante maandbedragveld zetten.
 - `[public]` `apps/artifact-hypotheek-wonen-maximale-hypotheek`
   - indicatieve maximale-hypotheektool voor starters zonder bestaande hypotheek.
   - toont inkomen, woningwaarde, studieschuld, NHG, financieringslast en energieruimte in een uitlegpad.

@@ -50,6 +50,7 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 | Submit-driven calculatorflow | actief | n.v.t. | aan | Patroon beschikbaar via `CalculatorShell` + submitlogica | n.v.t. |
 | DUO-impact in maximale-hypotheektool | actief | n.v.t. | aan | Kernuitkomst toont rechtsboven de indicatieve daling van de leencapaciteit | n.v.t. |
 | Hypotheekrentelink en salarisverhogingsanalyse | actief | centrale linkconfig + salarisadapter | aan | Maximale-hypotheekflow toont externe inspiratielink bij renteveld en vervolganalyse voor extra leenruimte via centrale hypotheekengine; PDF-uitbreiding blijft vervolgwerk | n.v.t. |
+| DUO-maandbedrag-returnflow naar hypotheekimpact | actief | sessionStorage-transfer | aan | `hypotheek-impact-studieschuld` kan een concept bewaren, `duo-maandbedrag` laten rekenen en een bevestigbaar DUO-bedrag teruggeven zonder financiële data in de URL; maximale-hypotheektool bewust niet gekoppeld in deze iteratie | n.v.t. |
 | Doorstap vanaf DUO-doorlenen-of-stoppen | actief | n.v.t. | aan | Resultaat toont scenariovergelijking, schuldenvrije datum en uitgebreide PDF | n.v.t. |
 | Chart-standaardisatie (jaar/euro/tooltips) | actief | n.v.t. | aan | Centrale charthelpers/componenten | n.v.t. |
 | Profielfunctie (`/profiel`, prefillpad) | uitgeschakeld | `NEXT_PUBLIC_ENABLE_PROFILE` | `false` | UI/CTA's verborgen, code blijft intact | zet op `1` en valideer profiel + tools |
@@ -64,6 +65,7 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 
 | Datum | Commit | Wijziging | Impact |
 |---|---|---|---|
+| 2026-07-19 | `pending` | Veilige DUO-maandbedrag-returnflow toegevoegd tussen hypotheek-impact en DUO-maandbedrag via allowlisted sessionStorage-transfer en expliciete gebruikerbevestiging | DUO / studieschuld / hypotheek-impact |
 | 2026-07-19 | `pending` | Externe hypotheekrentelink toegevoegd bij publieke rentevelden en salarisverhogingsanalyse geïntegreerd in maximale-hypotheekflow via centrale hypotheekengine | Maximale hypotheek / hypotheekrente / salaris |
 | 2026-07-18 | `pending` | Calculatorarchitectuur en blueprint-check gedocumenteerd; statusmatrix afgestemd op huidige publieke registry zonder manifestwijzigingen | Architectuur / statusdocumentatie |
 | 2026-07-13 | `pending` | DUO-maandbedrag en DUO-extra-aflossen krijgen uitgebreide PDF-overzichten vanuit dezelfde centrale DUO-rekendata | DUO / studieschuld / PDF |
