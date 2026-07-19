@@ -38,7 +38,7 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${app.title} | GRIP v2`,
+    title: `${app.title} | Project Site`,
     description: app.description,
   };
 }

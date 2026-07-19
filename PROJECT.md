@@ -101,6 +101,7 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
   - `artifact-hypotheek-wonen-maximale-hypotheek`
   - `schulden-volgorde`
   - `familiehulp-eerste-woning`
+  - `toeslagen-scan`
 - `duo-doorlenen-of-stoppen`, `studieschuld-vs-beleggen` en `volgende-euro` blijven technisch aanwezig maar zijn hidden.
 
 ## Centrale berekeningslaag
@@ -345,14 +346,19 @@ Interne documentatie mag Nederlands of Engels zijn, maar alle gebruikersgerichte
 - `[hidden]` `apps/volgende-euro`
   - technisch aanwezig maar niet meer gelinkt vanuit de publieke route.
   - reden: bredere prioriteitenhulp valt buiten de huidige studieschuld-launchscope.
-- `[hidden]` `apps/toeslagen-scan`
-  - eerste hidden-draft signaleringsscan voor zorgtoeslag, huurtoeslag, kindgebonden budget en kinderopvangtoeslag.
-  - gebruikt uitsluitend `evaluateAllowanceSignals(...)` uit de centrale allowances-laag.
-  - toont geen concrete toeslagbedragen, heeft geen PDF, geen opslag, geen backend en geen analytics.
-  - blijft buiten publieke registry/dashboard totdat UX, security en QA de volledige blueprint-check hebben afgerond.
 - `[hidden]` overige artifact-, hypotheek-, tax-, pensioen-, FIRE-, planning- en concepttools.
   - code en manifests blijven behouden voor heractivatie.
   - publicatie verloopt via manifest `visibility: "public"` plus `npm run generate:apps` en groene checks.
+
+### Publieke toeslagenscan beta
+
+- `apps/toeslagen-scan`
+  - publieke beta voor zorgtoeslag, huurtoeslag, kindgebonden budget en kinderopvangtoeslag.
+  - gebruikt uitsluitend `evaluateAllowanceSignals(...)` uit de centrale allowances-laag.
+  - werkt signal-only: geen concrete toeslagbedragen, geen rechtstoekenning en geen beschikking.
+  - gebruikt officiële 2026-bronnen via dataset `allowance-signal-rules-2026`.
+  - heeft geen PDF, opslag, backend, URL-state of analytics.
+  - 2027-dataset is vereist voordat de tool in 2027 gebruikt mag worden.
 
 ## Profiel-MVP
 

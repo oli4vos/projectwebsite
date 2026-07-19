@@ -37,7 +37,7 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 |---|---|---|---|---|---|
 | Toolbibliotheek + categorie-navigatie | actief | n.v.t. | aan | Homepage en routes draaien publiek | n.v.t. |
 | Financiële kennisbank (`/kennisbank`) | actief | n.v.t. | aan | Centrale studieschuld-kennislaag met DUO-bronnen, hidden oude horizon-/beleggingskaders | n.v.t. |
-| Publieke calculators (app-registry) | actief | `visibility: "public"` | aan | 9 publieke tools in de huidige registry | n.v.t. |
+| Publieke calculators (app-registry) | actief | `visibility: "public"` | aan | 10 publieke tools in de huidige registry | n.v.t. |
 | Draft tools (concept) | hidden-draft | `visibility: "hidden"` | uit | Alle tools en flows die niet meer actief aangeroepen worden blijven hier verborgen totdat er expliciet heractivatie is | zet manifest op `public` + checks draaien |
 | Studieschuld-vs-beleggen | hidden-draft | `visibility: "hidden"` | uit | Bewust uit zichtbare positionering; code behouden voor mogelijke latere heractivatie | alleen heractiveren met nieuwe productbeslissing + copycheck |
 | Volgende euro | hidden-draft | `visibility: "hidden"` | uit | Bewust uit zichtbare positionering; route niet meer gelinkt vanuit publieke UI | alleen heractiveren met nieuwe productbeslissing + copycheck |
@@ -51,8 +51,8 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 | DUO-impact in maximale-hypotheektool | actief | n.v.t. | aan | Kernuitkomst toont rechtsboven de indicatieve daling van de leencapaciteit | n.v.t. |
 | Hypotheekrentelink en salarisverhogingsanalyse | actief | centrale linkconfig + salarisadapter | aan | Maximale-hypotheekflow toont externe inspiratielink bij renteveld en vervolganalyse voor extra leenruimte via centrale hypotheekengine; PDF-uitbreiding blijft vervolgwerk | n.v.t. |
 | DUO-maandbedrag-returnflow naar hypotheekimpact | actief | sessionStorage-transfer | aan | `hypotheek-impact-studieschuld` kan een concept bewaren, `duo-maandbedrag` laten rekenen en een bevestigbaar DUO-bedrag teruggeven zonder financiële data in de URL; maximale-hypotheektool bewust niet gekoppeld in deze iteratie | n.v.t. |
-| Centrale toeslagensignalering | voorbereid | n.v.t. | uit publieke UI | Centrale 2026 signal-only domeinlaag en brondata zijn gereed; er worden geen bedragen berekend | hidden-draft app controleren en pas later publiek activeren |
-| Toeslagenscan hidden draft | hidden-draft | `visibility: "hidden"` | uit | Eerste UI-draft in `apps/toeslagen-scan` gebruikt de centrale allowances-engine, toont geen bedragen, heeft geen PDF/opslag/backend en blijft buiten publieke registry/dashboard | UX-, security- en QA-review + volledige blueprint-check vóór publicatie |
+| Centrale toeslagensignalering | actief | n.v.t. | aan via publieke beta | Centrale 2026 signal-only domeinlaag en brondata zijn gereed; er worden geen bedragen berekend | 2027-dataset vereist vóór gebruik in 2027 |
+| Toeslagenscan publieke beta | experimenteel | `visibility: "public"` | aan | `apps/toeslagen-scan` gebruikt de centrale allowances-engine, toont geen bedragen, heeft geen PDF/opslag/backend/analytics en verwijst naar officiële 2026-bronnen | 2027-dataset vereist vóór gebruik in 2027 |
 | Doorstap vanaf DUO-doorlenen-of-stoppen | actief | n.v.t. | aan | Resultaat toont scenariovergelijking, schuldenvrije datum en uitgebreide PDF | n.v.t. |
 | Chart-standaardisatie (jaar/euro/tooltips) | actief | n.v.t. | aan | Centrale charthelpers/componenten | n.v.t. |
 | Profielfunctie (`/profiel`, prefillpad) | uitgeschakeld | `NEXT_PUBLIC_ENABLE_PROFILE` | `false` | UI/CTA's verborgen, code blijft intact | zet op `1` en valideer profiel + tools |
@@ -67,6 +67,7 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 
 | Datum | Commit | Wijziging | Impact |
 |---|---|---|---|
+| 2026-07-19 | `pending` | Toeslagenscan gecontroleerd geactiveerd als publieke beta-tool; 10 publieke tools, signal-only, geen bedragen/PDF/opslag/backend/analytics | Toeslagen / publieke beta / registry |
 | 2026-07-19 | `pending` | Eerste hidden-draft toeslagenscan toegevoegd op basis van centrale allowances-signalering; geen bedragen, geen PDF, geen opslag en niet publiek zichtbaar | Toeslagen / hidden draft / UI |
 | 2026-07-19 | `pending` | Veilige DUO-maandbedrag-returnflow toegevoegd tussen hypotheek-impact en DUO-maandbedrag via allowlisted sessionStorage-transfer en expliciete gebruikerbevestiging | DUO / studieschuld / hypotheek-impact |
 | 2026-07-19 | `pending` | Centrale 2026 toeslagensignalering toegevoegd voor zorgtoeslag, huurtoeslag, kindgebonden budget en kinderopvangtoeslag; signal-only, geen bedragen, nog geen publieke UI | Toeslagen / domeinlaag / brondata |

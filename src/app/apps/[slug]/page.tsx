@@ -58,7 +58,7 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${app.title} | Financiële rekentools`,
+    title: `${app.title} | Project Site`,
     description: app.description,
   };
 }

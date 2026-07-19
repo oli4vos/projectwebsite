@@ -317,6 +317,38 @@ export const appRegistry = [
     "outputType": "checklist",
     "version": "1.0.0",
     "entry": "Calculator.tsx"
+  },
+  {
+    "slug": "toeslagen-scan",
+    "title": "Welke toeslagen passen mogelijk bij mij?",
+    "description": "Bekijk zonder bedragen of zorgtoeslag, huurtoeslag, kindgebonden budget of kinderopvangtoeslag mogelijk relevant is.",
+    "type": "frontend",
+    "category": "Regelingen en maandruimte",
+    "tags": [
+      "toeslagen",
+      "zorgtoeslag",
+      "huurtoeslag",
+      "kindgebonden budget",
+      "kinderopvangtoeslag",
+      "inkomen",
+      "huishouden"
+    ],
+    "status": "beta",
+    "visibility": "public",
+    "requiredProfileFields": [],
+    "reasonHint": "Voor een eerste signaal op basis van 2026-regels; controleer bedragen en voorwaarden met de officiële proefberekening.",
+    "assumptionsUsed": [
+      "tax"
+    ],
+    "calculationDomains": [
+      "tax",
+      "cashflow"
+    ],
+    "riskLevel": "high",
+    "disclaimerType": "taxIndicative",
+    "outputType": "checklist",
+    "version": "1.0.0-beta.1",
+    "entry": "Calculator.tsx"
   }
 ] satisfies AppManifest[];
 

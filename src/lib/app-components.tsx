@@ -70,4 +70,11 @@ export const appComponents: Record<string, AppCalculatorComponent> = {
       </div>
     ),
   }),
+  "toeslagen-scan": dynamic(() => import("../../apps/toeslagen-scan/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
 };

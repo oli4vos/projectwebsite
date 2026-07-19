@@ -140,7 +140,7 @@ export const uncertaintyCopy: Record<AllowanceUncertaintyCode, string> = {
   "variable-childcare-hours": "Wisselende opvanguren vragen om officiële controle.",
   "multiple-childcare-types": "Meerdere opvangvormen vragen om officiële controle.",
   "lrk-registration-uncertain": "Onzekerheid over LRK-registratie vraagt om officiële controle.",
-  "dataset-not-fresh": "De brondata vraagt om hercontrole voor publieke activatie.",
+  "dataset-not-fresh": "De brondata vraagt om hercontrole voordat je op dit signaal vertrouwt.",
 };
 
 export function getReasonCodeCopy(code: string) {

@@ -485,7 +485,7 @@ export default function ToeslagenScanCalculator() {
             />
             <YesNoUnknownField
               id="receivesChildBenefit"
-              label="Ontvang je kinderbijslag?"
+              label="Is er kinderbijslag voor je kind?"
               value={formValues.receivesChildBenefit}
               onChange={(value) => updateField("receivesChildBenefit", value)}
             />
@@ -631,14 +631,14 @@ export default function ToeslagenScanCalculator() {
       intro={
         <>
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
-            Hidden draft · signalering
+            Beta · signalering 2026
           </div>
           <h2 className="mt-2 font-serif text-[30px] tracking-[-0.02em] text-[var(--ink)]">
-            Toeslagenscan
+            Welke toeslagen passen mogelijk bij mij?
           </h2>
           <p className="mt-3 text-[14px] leading-[1.7] text-[var(--ink-2)]">
             Deze scan geeft alleen een signaal voor vier toeslagen. Er worden geen
-            toeslagbedragen berekend en er wordt niets opgeslagen.
+            toeslagbedragen berekend en je antwoorden worden door deze app niet opgeslagen.
           </p>
         </>
       }
@@ -668,16 +668,16 @@ export default function ToeslagenScanCalculator() {
       details={
         <DisclosureSection title="Afbakening">
           <ul className="list-disc space-y-2 pl-5 text-[13px] leading-[1.65] text-[var(--muted)]">
-            <li>Deze MVP gebruikt de centrale 2026 signaleringsengine.</li>
+            <li>Deze beta gebruikt de centrale 2026-signaleringsregels.</li>
             <li>Complexe situaties verwijzen naar de officiële proefberekening.</li>
-            <li>PDF, opslag en publieke activatie zitten niet in deze hidden draft.</li>
+            <li>Deze scan is geen officiële beschikking en berekent geen bedragen.</li>
           </ul>
         </DisclosureSection>
       }
       disclaimer={
         <p className="surface-subtle p-4 text-[12.5px] leading-[1.7] text-[var(--muted)]">
-          Geen advies en geen beschikking. Controleer altijd de officiële voorwaarden
-          en proefberekening van Dienst Toeslagen.
+          Geen advies en geen officiële beschikking. Controleer altijd de officiële voorwaarden
+          en proefberekening van Dienst Toeslagen; die blijven leidend.
         </p>
       }
     />

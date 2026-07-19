@@ -35,6 +35,12 @@ export const toolGroups: ToolGroup[] = [
     description: "Bekijk aflossen als volgorde- en maandruimte-vraag, zonder adviesclaim.",
     slugs: ["duo-extra-aflossen", "duo-maandbedrag", "schulden-volgorde"],
   },
+  {
+    title: "Regelingen en maandruimte",
+    description:
+      "Check welke regelingen mogelijk relevant zijn voor je maandruimte, zonder bedrag- of rechtclaim.",
+    slugs: ["toeslagen-scan"],
+  },
 ];
 
 const categoryToGroupTitle: Record<string, string> = {
@@ -43,6 +49,7 @@ const categoryToGroupTitle: Record<string, string> = {
   Beleggen: "Terugbetalen",
   Belasting: "Belasting",
   Werk: "Werk & ZZP",
+  "Regelingen en maandruimte": "Regelingen en maandruimte",
   "Persoonlijke financiën": "Terugbetalen",
   "Studieschuld & wonen": "Wonen",
 };
@@ -64,6 +71,7 @@ const preferredSlugsByCategory: Record<string, string[]> = {
   Beleggen: ["duo-extra-aflossen", "duo-maandbedrag"],
   Belasting: ["duo-maandbedrag"],
   Werk: ["zzp-uurtarief"],
+  "Regelingen en maandruimte": ["toeslagen-scan"],
   "Persoonlijke financiën": [
     "duo-maandbedrag",
     "duo-extra-aflossen",
