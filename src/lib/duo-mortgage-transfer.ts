@@ -215,7 +215,8 @@ export function getDuoMortgageTransferUrl(
 ) {
   const params = new URLSearchParams();
   params.set(DUO_MORTGAGE_TRANSFER_QUERY_PARAM, transferId);
-  return `${path}?${params.toString()}${anchor ? `#${encodeURIComponent(anchor)}` : ""}`;
+  const prefixedPath = prefixCurrentBasePath(path);
+  return `${prefixedPath}?${params.toString()}${anchor ? `#${encodeURIComponent(anchor)}` : ""}`;
 }
 
 function updateDuoMortgageTransfer<TDraft>(
@@ -329,4 +330,19 @@ function getSessionStorage() {
   } catch {
     return null;
   }
+}
+
+function prefixCurrentBasePath(path: string) {
+  if (typeof window === "undefined" || !path.startsWith("/apps/")) {
+    return path;
+  }
+
+  const currentPath = window.location.pathname;
+  const appsIndex = currentPath.indexOf("/apps/");
+  if (appsIndex <= 0) {
+    return path;
+  }
+
+  const basePath = currentPath.slice(0, appsIndex);
+  return `${basePath}${path}`;
 }

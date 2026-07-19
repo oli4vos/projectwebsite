@@ -4,6 +4,7 @@ import {
   consumeDuoMortgageTransfer,
   createDuoMortgageTransfer,
   getDuoMortgageTransferIdFromUrl,
+  getDuoMortgageTransferUrl,
   readDuoMortgageTransfer,
 } from "@/lib/duo-mortgage-transfer";
 
@@ -28,6 +29,9 @@ function createWindowMock(overrides: Partial<SessionStorageMock> = {}) {
 
   return {
     sessionStorage,
+    location: {
+      pathname: "/apps/hypotheek-impact-studieschuld",
+    },
     __values: values,
   };
 }
@@ -202,5 +206,19 @@ describe("duo mortgage transfer", () => {
     expect(created.ok).toBe(false);
     if (created.ok) throw new Error("expected storage write error");
     expect(created.error).toBe("storage-write-failed");
+  });
+
+  it("keeps transfer redirects inside the current GitHub Pages basePath", () => {
+    const windowMock = installWindowMock();
+    windowMock.location.pathname = "/projectwebsite/apps/hypotheek-impact-studieschuld";
+
+    expect(getDuoMortgageTransferUrl("/apps/duo-maandbedrag", "transfer-safe-1")).toBe(
+      "/projectwebsite/apps/duo-maandbedrag?duoMortgageTransfer=transfer-safe-1",
+    );
+
+    windowMock.location.pathname = "/apps/hypotheek-impact-studieschuld";
+    expect(getDuoMortgageTransferUrl("/apps/duo-maandbedrag", "transfer-safe-1")).toBe(
+      "/apps/duo-maandbedrag?duoMortgageTransfer=transfer-safe-1",
+    );
   });
 });
