@@ -22,6 +22,12 @@ export {
 } from "@/lib/regulations/dependencies";
 export { createRegulationDefinition } from "@/lib/regulations/definition";
 export { evaluateRegulation } from "@/lib/regulations/evaluator";
+export {
+  createEstimateResult,
+  mergeEstimateRanges,
+  mergeEstimateResults,
+  propagateEstimateConfidence,
+} from "@/lib/regulations/estimate-engine";
 export { createEstimateRange } from "@/lib/regulations/estimate";
 export { mergeCalculationEvidence } from "@/lib/regulations/evidence";
 export {
@@ -70,4 +76,10 @@ export type {
   RegulationDefinition,
   RegulationEvaluationContext,
 } from "@/lib/regulations/evaluator";
+export type {
+  ConfidenceLevel,
+  EstimateResult,
+  EstimateSource,
+  EstimateStrategy,
+} from "@/lib/regulations/estimate-engine";
 export type * from "@/lib/regulations/types";
