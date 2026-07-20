@@ -20,9 +20,26 @@ export {
   evaluateQuestionCondition,
   resolveFollowUpQuestion,
 } from "@/lib/regulations/dependencies";
+export { createRegulationDefinition } from "@/lib/regulations/definition";
 export { evaluateRegulation } from "@/lib/regulations/evaluator";
 export { createEstimateRange } from "@/lib/regulations/estimate";
 export { mergeCalculationEvidence } from "@/lib/regulations/evidence";
+export type {
+  RegulationAdapterMetadata,
+  RegulationDefinitionMetadata,
+  RegulationDomain,
+  RegulationCategory,
+  RegulationEstimateStrategy,
+  RegulationEvidenceStrategy,
+  RegulationFieldDatatype,
+  RegulationFieldValidationType,
+  RegulationInferenceMetadata,
+  RegulationInputDefinition,
+  RegulationQuestionDefinition,
+  RegulationRecommendationStrategy,
+  RegulationReviewPolicy,
+  RegulationUnknownStrategy,
+} from "@/lib/regulations/definition";
 export type {
   RegulationDefinition,
   RegulationEvaluationContext,
