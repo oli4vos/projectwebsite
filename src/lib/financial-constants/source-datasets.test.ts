@@ -255,12 +255,49 @@ describe("source dataset registry", () => {
     );
   });
 
+  it("registers prepared official 2026 allowance calculation rules without activating UI calculations", () => {
+    const dataset = getActiveDataset("allowance-calculation-rules", {
+      scenario: "official-2026-prepared",
+      asOf: "2026-07-20",
+    });
+    const data = dataset.data as {
+      year: number;
+      healthcare: {
+        maxIncomeSingle: { value: number; officialSourceUrl: string };
+        monthlyTableSingle: Array<{ incomeUpTo: number; monthlyAmount: number }>;
+        monthlyTableWithPartner: Array<{ incomeUpTo: number; monthlyAmount: number }>;
+      };
+      rent: { blockers: readonly string[] };
+      childBudget: { blockers: readonly string[] };
+      childcare: {
+        maxHourlyRateDaycare: { value: number; officialSourceUrl: string };
+        blockers: readonly string[];
+      };
+    };
+
+    expect(dataset.meta.id).toBe("allowance-calculation-rules-2026");
+    expect(dataset.meta.effectiveFrom).toBe("2026-01-01");
+    expect(dataset.meta.effectiveTo).toBe("2026-12-31");
+    expect(dataset.usedBy).toEqual(["allowances-calculation-guardian-preparation"]);
+    expect(data.year).toBe(2026);
+    expect(data.healthcare.maxIncomeSingle.value).toBe(40_857);
+    expect(data.healthcare.maxIncomeSingle.officialSourceUrl).toContain("belastingdienst.nl");
+    expect(data.healthcare.monthlyTableSingle[0]).toEqual({ incomeUpTo: 29_500, monthlyAmount: 129 });
+    expect(data.healthcare.monthlyTableWithPartner.at(-1)).toEqual({ incomeUpTo: 51_500, monthlyAmount: 0 });
+    expect(data.childcare.maxHourlyRateDaycare.value).toBe(11.23);
+    expect(data.childcare.maxHourlyRateDaycare.officialSourceUrl).toContain("belastingdienst.nl");
+    expect(data.rent.blockers.length).toBeGreaterThan(0);
+    expect(data.childBudget.blockers.length).toBeGreaterThan(0);
+    expect(data.childcare.blockers.length).toBeGreaterThan(0);
+  });
+
   it("generates a source inventory from the registry", () => {
     const markdown = buildSourceDataOverviewMarkdown(SOURCE_DATASET_REGISTRY);
 
     expect(markdown).toContain("| Dataset-id | Titel | Jaar |");
     expect(markdown).toContain("mortgage-financing-load-2026");
     expect(markdown).toContain("duo-rate-year-2026");
+    expect(markdown).toContain("allowance-calculation-rules-2026");
   });
 
   it("exposes a UI-neutral source reference contract", () => {

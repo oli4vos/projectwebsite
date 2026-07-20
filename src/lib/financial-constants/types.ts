@@ -65,6 +65,7 @@ export type SourceDatasetFamily =
   | "duo-rate-year"
   | "duo-borrowing-limits"
   | "allowance-signal-rules"
+  | "allowance-calculation-rules"
   | "mortgage-provider-rate";
 
 export type SourceDataset<TData = unknown> = {

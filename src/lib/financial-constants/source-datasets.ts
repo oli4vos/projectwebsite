@@ -1,4 +1,5 @@
 import { DUO_RATE_HISTORY_BY_YEAR, DUO_RATE_YEAR_METADATA_BY_YEAR } from "@/lib/financial-constants/duo-rate-history";
+import { ALLOWANCE_CALCULATION_RULES_2026 } from "@/lib/financial-constants/allowance-calculation-rules-2026";
 import { MORTGAGE_FINANCING_LOAD_DATA } from "@/lib/financial-constants/mortgage-financing-load-data";
 import type {
   AssumptionMeta,
@@ -337,6 +338,113 @@ function validateAllowanceSignalRulesDataset(data: unknown) {
   return issues;
 }
 
+function collectAllowanceValueSources(data: unknown) {
+  const sources: unknown[] = [];
+
+  function visit(value: unknown) {
+    if (Array.isArray(value)) {
+      for (const item of value) visit(item);
+      return;
+    }
+    if (typeof value !== "object" || value === null) {
+      return;
+    }
+
+    const candidate = value as Record<string, unknown>;
+    if (
+      typeof candidate.regulationId === "string" &&
+      typeof candidate.officialSourceUrl === "string" &&
+      typeof candidate.validFrom === "string"
+    ) {
+      sources.push(candidate);
+    }
+
+    for (const nested of Object.values(candidate)) {
+      visit(nested);
+    }
+  }
+
+  visit(data);
+  return sources;
+}
+
+function validateAllowanceCalculationRulesDataset(data: unknown) {
+  const issues: string[] = [];
+  const candidate = data as {
+    year?: number;
+    ruleVersion?: string;
+    healthcare?: { monthlyTableSingle?: unknown[]; monthlyTableWithPartner?: unknown[] };
+    rent?: { blockers?: unknown[] };
+    childBudget?: { blockers?: unknown[] };
+    childcare?: { blockers?: unknown[] };
+    officialTestVectors?: unknown[];
+  };
+
+  if (candidate.year !== 2026) {
+    issues.push("Toeslagenberekeningsdataset moet expliciet berekeningsjaar 2026 hebben.");
+  }
+  if (typeof candidate.ruleVersion !== "string" || !SEMVER_PATTERN.test(candidate.ruleVersion)) {
+    issues.push("Toeslagenberekeningsdataset mist een geldige ruleVersion.");
+  }
+
+  const valueSources = collectAllowanceValueSources(data);
+  if (valueSources.length === 0) {
+    issues.push("Toeslagenberekeningsdataset mist machineleesbare bronwaardes.");
+  }
+
+  for (const source of valueSources) {
+    const record = source as Record<string, unknown>;
+    for (const field of [
+      "regulationId",
+      "calculationYear",
+      "value",
+      "unit",
+      "validFrom",
+      "validUntil",
+      "reviewedAt",
+      "officialSourceTitle",
+      "officialSourceUrl",
+      "sourceSection",
+      "verificationStatus",
+      "interpretationNote",
+    ] as const) {
+      if (record[field] === undefined || record[field] === "") {
+        issues.push(`Toeslagenbronwaarde mist ${field}.`);
+      }
+    }
+    if (record.calculationYear !== 2026) {
+      issues.push("Toeslagenbronwaarde heeft geen berekeningsjaar 2026.");
+    }
+    if (typeof record.officialSourceUrl !== "string" || !record.officialSourceUrl.startsWith("https://www.belastingdienst.nl/")) {
+      issues.push("Toeslagenbronwaarde moet naar een officiele Belastingdienst/Dienst Toeslagen-URL verwijzen.");
+    }
+    if (typeof record.value === "number" && record.value < 0) {
+      issues.push("Toeslagenbronwaarde mag niet negatief zijn.");
+    }
+  }
+
+  if (!Array.isArray(candidate.healthcare?.monthlyTableSingle) || candidate.healthcare.monthlyTableSingle.length === 0) {
+    issues.push("Zorgtoeslagtabel zonder partner ontbreekt.");
+  }
+  if (!Array.isArray(candidate.healthcare?.monthlyTableWithPartner) || candidate.healthcare.monthlyTableWithPartner.length === 0) {
+    issues.push("Zorgtoeslagtabel met partner ontbreekt.");
+  }
+  for (const [section, blockers] of Object.entries({
+    rent: candidate.rent?.blockers,
+    childBudget: candidate.childBudget?.blockers,
+    childcare: candidate.childcare?.blockers,
+  })) {
+    if (!Array.isArray(blockers) || blockers.length === 0) {
+      issues.push(`Toeslagenberekeningsdataset mist expliciete blockers voor ${section}.`);
+    }
+  }
+  if (!Array.isArray(candidate.officialTestVectors) || candidate.officialTestVectors.length === 0) {
+    issues.push("Toeslagenberekeningsdataset mist officiele testvectors.");
+  }
+
+  return issues;
+}
+
 function validateDatasetSpecificBounds(dataset: SourceDataset) {
   const issues: string[] = [];
 
@@ -405,6 +513,8 @@ function validateDatasetSpecificBounds(dataset: SourceDataset) {
     }
     case "allowance-signal-rules":
       return validateAllowanceSignalRulesDataset(dataset.data);
+    case "allowance-calculation-rules":
+      return validateAllowanceCalculationRulesDataset(dataset.data);
     case "mortgage-provider-rate":
       return validateMortgageProviderRateDataset(dataset.data);
   }
@@ -917,5 +1027,33 @@ export const SOURCE_DATASET_REGISTRY: readonly SourceDataset[] = [
       },
     },
     usedBy: ["toeslagenscan"],
+  },
+  {
+    family: "allowance-calculation-rules",
+    scenario: "official-2026-prepared",
+    meta: {
+      recordType: "dataset",
+      id: "allowance-calculation-rules-2026",
+      title: "Officiele toeslagenberekeningsregels 2026 voorbereid",
+      year: 2026,
+      version: "0.1.0",
+      effectiveFrom: "2026-01-01",
+      effectiveTo: "2026-12-31",
+      retrievedAt: "2026-07-20",
+      lastVerifiedAt: "2026-07-20",
+      nextReviewAt: "2026-10-15",
+      sourceName: "Dienst Toeslagen / Belastingdienst",
+      sourceUrl:
+        "https://www.belastingdienst.nl/wps/wcm/connect/nl/toeslagen/content/hulpmiddel-proefberekening-toeslagen",
+      sourceType: "official-execution",
+      methodology:
+        "Voorbereide officiele 2026-brondata voor toekomstige euro-indicaties. De dataset documenteert geverifieerde waarden, benodigde invoer, onbekend-routes, blockers en testvectors, maar wordt nog niet geselecteerd door de publieke toeslagenscan.",
+      methodologyType: "official-norm",
+      notes:
+        "Geen publieke bedragberekening geactiveerd. Volledige huurtoeslag-, kindgebonden-budget- en kinderopvangtoeslagformules vereisen verdere normalisatie door de Financial Domain & Calculation Guardian.",
+      status: "active",
+    },
+    data: ALLOWANCE_CALCULATION_RULES_2026,
+    usedBy: ["allowances-calculation-guardian-preparation"],
   },
 ];
