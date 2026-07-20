@@ -1,4 +1,9 @@
 export {
+  adaptAllowanceScanToRegulationResults,
+  adaptAllowanceSignalToRegulationResult,
+  getAllowanceRegulationId,
+} from "@/lib/allowances/adapter";
+export {
   ALLOWANCE_SIGNAL_ORDER,
   evaluateAllowanceSignals,
   evaluateChildBudgetAllowance,
