@@ -57,6 +57,7 @@ export {
 } from "@/lib/regulations/question-flow";
 export type {
   RegulationAdapterMetadata,
+  RegulationAlternativeQuestionDefinition,
   RegulationDefinitionMetadata,
   RegulationDomain,
   RegulationCategory,
@@ -84,8 +85,15 @@ export type {
 } from "@/lib/regulations/recommendations";
 export type {
   BuildQuestionFlowInput,
+  GuidedQuestionFlowInputState,
   QuestionFlowDecision,
+  QuestionFlowAlternativeRouteState,
+  QuestionFlowCompletionState,
+  QuestionFlowConfirmationState,
   QuestionFlowGroup,
+  QuestionFlowIntegrity,
+  QuestionFlowIntegrityIssue,
+  QuestionFlowNavigationState,
   QuestionFlowProgress,
   QuestionFlowQuestionState,
   QuestionFlowQuestionStatus,

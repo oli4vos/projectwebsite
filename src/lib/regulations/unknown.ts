@@ -1,5 +1,9 @@
 import { buildConfidenceAssessment } from "@/lib/regulations/confidence";
-import type { RegulationDefinition, RegulationInputDefinition } from "@/lib/regulations/definition";
+import type {
+  RegulationAlternativeQuestionDefinition,
+  RegulationDefinition,
+  RegulationInputDefinition,
+} from "@/lib/regulations/definition";
 import type {
   AnswerState,
   FieldId,
@@ -31,6 +35,9 @@ export type UnknownResolution = {
   readonly reasonCodes: readonly ReasonCode[];
   readonly confidenceImpact: number;
   readonly nextQuestionCandidate?: string;
+  readonly alternativeQuestionCandidates?: readonly RegulationAlternativeQuestionDefinition[];
+  readonly skipAllowed?: boolean;
+  readonly confirmationRequired?: boolean;
   readonly requiredSources: readonly string[];
 };
 
@@ -97,6 +104,27 @@ function nextQuestionFor(definition: RegulationDefinition, fieldId: FieldId) {
     ?.questionId;
 }
 
+function fallbackAlternativeQuestion(
+  definition: RegulationDefinition,
+  fieldId: FieldId,
+): readonly RegulationAlternativeQuestionDefinition[] {
+  const questionId = nextQuestionFor(definition, fieldId);
+  if (!questionId) {
+    return [];
+  }
+
+  return [{
+    routeId: `${fieldId}.primary`,
+    questionId,
+    fieldId,
+    labelKey: `${questionId}.alternative`,
+    priority: 0,
+    blocking: false,
+    confirmationRequired: false,
+    reasonCodes: [`alternative:${fieldId}`],
+  }];
+}
+
 function resolveField(
   definition: RegulationDefinition,
   field: RegulationInputDefinition,
@@ -115,6 +143,9 @@ function resolveField(
       blocking: false,
       reasonCodes: [],
       confidenceImpact: 0,
+      alternativeQuestionCandidates: [],
+      skipAllowed: false,
+      confirmationRequired: false,
       requiredSources: [],
     };
   }
@@ -130,9 +161,11 @@ function resolveField(
   const requiresOfficialSource = Boolean(strategy?.officialSourceAvailable && !inferable);
   const alternativeQuestion = Boolean(strategy?.followUpPossible);
   const blocking = Boolean(field.required && !field.optional && !strategy?.allowed && !inferable);
-  const nextQuestionCandidate = alternativeQuestion
-    ? nextQuestionFor(definition, field.fieldId)
-    : undefined;
+  const alternativeQuestionCandidates = alternativeQuestion
+    ? [...(strategy?.alternativeQuestions ?? fallbackAlternativeQuestion(definition, field.fieldId))]
+      .sort((left, right) => left.priority - right.priority || left.routeId.localeCompare(right.routeId))
+    : [];
+  const nextQuestionCandidate = alternativeQuestionCandidates[0]?.questionId;
   const resolutionType: UnknownResolutionType = inferable
     ? "inferable"
     : requiresOfficialSource
@@ -159,6 +192,9 @@ function resolveField(
     ],
     confidenceImpact: (strategy?.confidenceImpact ?? 0) + (inference?.confidenceModifier ?? 0),
     nextQuestionCandidate,
+    alternativeQuestionCandidates,
+    skipAllowed: Boolean(strategy?.skipAllowed),
+    confirmationRequired: Boolean(strategy?.confirmationRequired),
     requiredSources: inference?.preferredSources ?? [],
   };
 }

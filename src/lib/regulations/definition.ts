@@ -60,6 +60,21 @@ export type RegulationUnknownStrategy = {
   readonly confidenceImpact: number;
   readonly followUpPossible: boolean;
   readonly reasonCodes: readonly ReasonCode[];
+  readonly alternativeQuestions?: readonly RegulationAlternativeQuestionDefinition[];
+  readonly skipAllowed?: boolean;
+  readonly confirmationRequired?: boolean;
+};
+
+export type RegulationAlternativeQuestionDefinition = {
+  readonly routeId: string;
+  readonly questionId: QuestionId;
+  readonly fieldId?: FieldId;
+  readonly labelKey: string;
+  readonly descriptionKey?: string;
+  readonly priority: number;
+  readonly blocking: boolean;
+  readonly confirmationRequired: boolean;
+  readonly reasonCodes: readonly ReasonCode[];
 };
 
 export type RegulationInferenceMetadata = {

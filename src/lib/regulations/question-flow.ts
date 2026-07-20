@@ -9,6 +9,7 @@ import type {
   AnswerState,
   FieldId,
   InferenceId,
+  QuestionCondition,
   QuestionId,
   ReasonCode,
   RegulationEvaluationResult,
@@ -25,6 +26,54 @@ export type QuestionFlowQuestionStatus =
   | "skipped"
   | "blocked"
   | "not-applicable";
+
+export type QuestionFlowCompletionState =
+  | "completed"
+  | "partially-completed"
+  | "blocked"
+  | "unresolved";
+
+export type QuestionFlowAlternativeRouteState = {
+  readonly routeId: string;
+  readonly questionId: QuestionId;
+  readonly fieldId?: FieldId;
+  readonly labelKey: string;
+  readonly descriptionKey?: string;
+  readonly priority: number;
+  readonly blocking: boolean;
+  readonly confirmationRequired: boolean;
+  readonly selected: boolean;
+  readonly answered: boolean;
+  readonly skipped: boolean;
+  readonly reasonCodes: readonly ReasonCode[];
+};
+
+export type QuestionFlowConfirmationState = {
+  readonly questionId: QuestionId;
+  readonly fieldId: FieldId;
+  readonly inferenceId?: InferenceId;
+  readonly required: boolean;
+  readonly confirmed: boolean;
+  readonly reasonCodes: readonly ReasonCode[];
+};
+
+export type QuestionFlowNavigationState = {
+  readonly currentQuestionId?: QuestionId;
+  readonly previousQuestionId?: QuestionId;
+  readonly visitedQuestionIds: readonly QuestionId[];
+  readonly canGoBack: boolean;
+};
+
+export type QuestionFlowIntegrityIssue = {
+  readonly code: ReasonCode;
+  readonly questionIds: readonly QuestionId[];
+  readonly fieldIds: readonly FieldId[];
+};
+
+export type QuestionFlowIntegrity = {
+  readonly ok: boolean;
+  readonly issues: readonly QuestionFlowIntegrityIssue[];
+};
 
 export type QuestionFlowQuestionState = {
   readonly questionId: QuestionId;
@@ -44,7 +93,11 @@ export type QuestionFlowQuestionState = {
   readonly enablesInferences: readonly InferenceId[];
   readonly blocksRules: readonly RuleId[];
   readonly alternativeQuestionIds: readonly QuestionId[];
+  readonly alternativeQuestions: readonly QuestionFlowAlternativeRouteState[];
   readonly officialSourceRequired: boolean;
+  readonly confirmationRequired: boolean;
+  readonly confirmed: boolean;
+  readonly skipAllowed: boolean;
   readonly unknownResolution?: UnknownResolution;
   readonly inference?: InferenceResult;
   readonly recommendations: readonly RecommendationResult[];
@@ -65,9 +118,11 @@ export type QuestionFlowStep = {
 export type QuestionFlowDecision = {
   readonly nextQuestionId?: QuestionId;
   readonly nextFieldId?: FieldId;
-  readonly reason: "empty" | "next-pending" | "blocked" | "complete";
+  readonly reason: "empty" | "next-pending" | "blocked" | "complete" | "unresolved";
+  readonly completionState: QuestionFlowCompletionState;
   readonly blockingQuestionIds: readonly QuestionId[];
   readonly remainingQuestionIds: readonly QuestionId[];
+  readonly unresolvedQuestionIds: readonly QuestionId[];
 };
 
 export type QuestionFlowProgress = {
@@ -100,6 +155,9 @@ export type QuestionFlowSummary = {
   readonly blockingQuestionIds: readonly QuestionId[];
   readonly missingBlockingFieldIds: readonly FieldId[];
   readonly remainingQuestionIds: readonly QuestionId[];
+  readonly unresolvedQuestionIds: readonly QuestionId[];
+  readonly alternativeRouteIds: readonly string[];
+  readonly pendingConfirmationQuestionIds: readonly QuestionId[];
   readonly reasonCodes: readonly ReasonCode[];
   readonly confidenceImpact: number;
   readonly sourceReferences: readonly SourceReference[];
@@ -114,6 +172,19 @@ export type QuestionFlowState = {
   readonly decision: QuestionFlowDecision;
   readonly progress: QuestionFlowProgress;
   readonly summary: QuestionFlowSummary;
+  readonly navigation: QuestionFlowNavigationState;
+  readonly confirmations: readonly QuestionFlowConfirmationState[];
+  readonly integrity: QuestionFlowIntegrity;
+};
+
+export type GuidedQuestionFlowInputState = {
+  readonly currentQuestionId?: QuestionId;
+  readonly visitedQuestionIds?: readonly QuestionId[];
+  readonly selectedAlternativeRouteIds?: readonly string[];
+  readonly skippedQuestionIds?: readonly QuestionId[];
+  readonly confirmedQuestionIds?: readonly QuestionId[];
+  readonly confirmedInferenceIds?: readonly InferenceId[];
+  readonly requireInferredConfirmation?: boolean;
 };
 
 export type BuildQuestionFlowInput = {
@@ -124,6 +195,7 @@ export type BuildQuestionFlowInput = {
   readonly evaluation?: RegulationEvaluationResult;
   readonly recommendations?: readonly RecommendationResult[];
   readonly activeQuestionId?: QuestionId;
+  readonly flowState?: GuidedQuestionFlowInputState;
 };
 
 const DEFAULT_GROUP_ID = "default";
@@ -176,6 +248,22 @@ function sortStrings(values: readonly string[]) {
   return [...values].sort((left, right) => left.localeCompare(right));
 }
 
+function confirmedQuestionIds(flowState?: GuidedQuestionFlowInputState) {
+  return new Set(flowState?.confirmedQuestionIds ?? []);
+}
+
+function confirmedInferenceIds(flowState?: GuidedQuestionFlowInputState) {
+  return new Set(flowState?.confirmedInferenceIds ?? []);
+}
+
+function skippedQuestionIds(flowState?: GuidedQuestionFlowInputState) {
+  return new Set(flowState?.skippedQuestionIds ?? []);
+}
+
+function selectedAlternativeRouteIds(flowState?: GuidedQuestionFlowInputState) {
+  return new Set(flowState?.selectedAlternativeRouteIds ?? []);
+}
+
 function relatedRecommendations(
   recommendations: readonly RecommendationResult[],
   question: RegulationQuestionDefinition,
@@ -198,6 +286,76 @@ function relatedInference(
   fieldId: FieldId,
 ) {
   return inferences.find((inference) => inference.targetField === fieldId);
+}
+
+function confirmationState(input: {
+  question: RegulationQuestionDefinition;
+  answer?: AnswerState;
+  inference?: InferenceResult;
+  resolution?: UnknownResolution;
+  flowState?: GuidedQuestionFlowInputState;
+}): QuestionFlowConfirmationState {
+  const confirmedQuestions = confirmedQuestionIds(input.flowState);
+  const confirmedInferences = confirmedInferenceIds(input.flowState);
+  const inferenceId =
+    input.inference?.inferenceId ??
+    (input.answer?.state === "inferred" ? input.answer.inferenceId : undefined);
+  const inferred = input.answer?.state === "inferred" || Boolean(input.inference);
+  const required = Boolean(
+    inferred &&
+      (input.flowState?.requireInferredConfirmation ||
+        input.resolution?.confirmationRequired ||
+        input.inference?.overwriteAllowed),
+  );
+
+  return {
+    questionId: input.question.questionId,
+    fieldId: input.question.fieldId,
+    inferenceId,
+    required,
+    confirmed:
+      !required ||
+      confirmedQuestions.has(input.question.questionId) ||
+      Boolean(inferenceId && confirmedInferences.has(inferenceId)),
+    reasonCodes: required ? ["question-flow.confirm-inferred-answer"] : [],
+  };
+}
+
+function alternativeRoutes(input: {
+  resolution?: UnknownResolution;
+  answers: Readonly<Record<FieldId, AnswerState>>;
+  flowState?: GuidedQuestionFlowInputState;
+}): readonly QuestionFlowAlternativeRouteState[] {
+  const selected = selectedAlternativeRouteIds(input.flowState);
+  const skipped = skippedQuestionIds(input.flowState);
+  const candidates = input.resolution?.alternativeQuestionCandidates ??
+    (input.resolution?.nextQuestionCandidate
+      ? [{
+          routeId: `${input.resolution.fieldId}.primary`,
+          questionId: input.resolution.nextQuestionCandidate,
+          fieldId: input.resolution.fieldId,
+          labelKey: `${input.resolution.nextQuestionCandidate}.alternative`,
+          priority: 0,
+          blocking: false,
+          confirmationRequired: false,
+          reasonCodes: input.resolution.reasonCodes,
+        }]
+      : []);
+
+  return candidates.map((route) => ({
+    routeId: route.routeId,
+    questionId: route.questionId,
+    fieldId: route.fieldId,
+    labelKey: route.labelKey,
+    descriptionKey: route.descriptionKey,
+    priority: route.priority,
+    blocking: route.blocking,
+    confirmationRequired: route.confirmationRequired,
+    selected: selected.has(route.routeId),
+    answered: route.fieldId ? input.answers[route.fieldId]?.state === "known" : false,
+    skipped: skipped.has(route.questionId),
+    reasonCodes: route.reasonCodes,
+  }));
 }
 
 function resolutionForField(
@@ -239,9 +397,14 @@ function statusForQuestion(input: {
   required: boolean;
   resolution?: UnknownResolution;
   inference?: InferenceResult;
+  flowState?: GuidedQuestionFlowInputState;
 }): QuestionFlowQuestionStatus {
   if (!input.relevant) {
     return input.answer?.state === "not-applicable" ? "not-applicable" : "skipped";
+  }
+
+  if (skippedQuestionIds(input.flowState).has(input.question.questionId) && input.resolution?.skipAllowed) {
+    return "skipped";
   }
 
   if (input.answer?.state === "known") {
@@ -261,6 +424,13 @@ function statusForQuestion(input: {
   }
 
   if (input.answer?.state === "unknown") {
+    if (
+      input.resolution?.alternativeQuestion &&
+      ((input.resolution.alternativeQuestionCandidates?.length ?? 0) > 0 ||
+        Boolean(input.resolution.nextQuestionCandidate))
+    ) {
+      return input.resolution.blocking ? "blocked" : "pending";
+    }
     return input.resolution?.blocking ? "blocked" : "answered";
   }
 
@@ -296,6 +466,7 @@ function buildQuestionState(input: {
   unknownResolutions: readonly UnknownResolution[];
   inferences: readonly InferenceResult[];
   recommendations: readonly RecommendationResult[];
+  flowState?: GuidedQuestionFlowInputState;
 }): QuestionFlowQuestionState {
   const answer = input.answers[input.question.fieldId];
   const condition = conditionMetadata(input.question, input.answers);
@@ -309,6 +480,19 @@ function buildQuestionState(input: {
     required: condition.required,
     resolution,
     inference,
+    flowState: input.flowState,
+  });
+  const confirmation = confirmationState({
+    question: input.question,
+    answer,
+    inference,
+    resolution,
+    flowState: input.flowState,
+  });
+  const alternatives = alternativeRoutes({
+    resolution,
+    answers: input.answers,
+    flowState: input.flowState,
   });
   const reasonCodes = unique([
     ...input.question.evidenceContribution,
@@ -330,7 +514,7 @@ function buildQuestionState(input: {
     relevant: condition.relevant,
     required: condition.required,
     blocking: status === "blocked",
-    completed: isCompleted(status),
+    completed: isCompleted(status) && confirmation.confirmed,
     order: input.order,
     groupId: input.question.groupId ?? DEFAULT_GROUP_ID,
     groupLabel: input.question.groupLabel,
@@ -344,10 +528,12 @@ function buildQuestionState(input: {
       recommendations.reduce((sum, recommendation) => sum + recommendation.confidenceImpact, 0),
     enablesInferences: inference ? [inference.inferenceId] : [],
     blocksRules: [],
-    alternativeQuestionIds: resolution?.nextQuestionCandidate
-      ? [resolution.nextQuestionCandidate]
-      : [],
+    alternativeQuestionIds: alternatives.map((route) => route.questionId),
+    alternativeQuestions: alternatives,
     officialSourceRequired: Boolean(resolution?.requiresOfficialSource),
+    confirmationRequired: confirmation.required,
+    confirmed: confirmation.confirmed,
+    skipAllowed: Boolean(resolution?.skipAllowed),
     unknownResolution: resolution,
     inference,
     recommendations,
@@ -384,9 +570,60 @@ export function determineRemainingQuestions(
 export function determineNextQuestion(
   questions: readonly QuestionFlowQuestionState[],
 ): QuestionFlowQuestionState | undefined {
+  for (const question of questions) {
+    if (question.answerState !== "unknown" || question.alternativeQuestions.length === 0) {
+      continue;
+    }
+    const sortedRoutes = [...question.alternativeQuestions].sort((left, right) =>
+      Number(right.selected) - Number(left.selected) ||
+      left.priority - right.priority ||
+      left.routeId.localeCompare(right.routeId),
+    );
+    const routeQuestion = sortedRoutes
+      .map((route) => questions.find((candidate) => candidate.questionId === route.questionId))
+      .find((candidate) => candidate && candidate.relevant && !candidate.completed);
+    if (routeQuestion) {
+      return routeQuestion;
+    }
+  }
+
   return questions.find((question) => question.status === "active" && question.relevant) ??
     questions.find((question) => question.status === "pending" && question.relevant) ??
     determineBlockingQuestions(questions)[0];
+}
+
+function pendingConfirmations(questions: readonly QuestionFlowQuestionState[]) {
+  return questions.filter((question) => question.confirmationRequired && !question.confirmed);
+}
+
+function unresolvedQuestions(questions: readonly QuestionFlowQuestionState[]) {
+  return questions.filter((question) =>
+    question.relevant &&
+    !question.completed &&
+    question.status !== "blocked" &&
+    (
+      question.alternativeQuestions.length > 0 ||
+      question.officialSourceRequired ||
+      question.confirmationRequired
+    )
+  );
+}
+
+function completionState(questions: readonly QuestionFlowQuestionState[]): QuestionFlowCompletionState {
+  if (questions.length === 0) {
+    return "completed";
+  }
+  if (determineBlockingQuestions(questions).length > 0) {
+    return "blocked";
+  }
+  if (unresolvedQuestions(questions).length > 0 || pendingConfirmations(questions).length > 0) {
+    return "unresolved";
+  }
+  if (determineRemainingQuestions(questions).length > 0) {
+    return "partially-completed";
+  }
+
+  return "completed";
 }
 
 export function determineProgress(
@@ -440,11 +677,15 @@ function buildGroups(questions: readonly QuestionFlowQuestionState[]): readonly 
 function buildDecision(questions: readonly QuestionFlowQuestionState[]): QuestionFlowDecision {
   const remaining = determineRemainingQuestions(questions);
   const blocking = determineBlockingQuestions(questions);
+  const unresolved = unresolvedQuestions(questions);
   const next = determineNextQuestion(questions);
+  const state = completionState(questions);
   const reason = questions.length === 0
     ? "empty"
     : next?.status === "blocked"
       ? "blocked"
+      : state === "unresolved" && !next
+        ? "unresolved"
       : next
         ? "next-pending"
         : "complete";
@@ -453,8 +694,10 @@ function buildDecision(questions: readonly QuestionFlowQuestionState[]): Questio
     nextQuestionId: next?.questionId,
     nextFieldId: next?.fieldId,
     reason,
+    completionState: state,
     blockingQuestionIds: blocking.map((question) => question.questionId),
     remainingQuestionIds: remaining.map((question) => question.questionId),
+    unresolvedQuestionIds: unresolved.map((question) => question.questionId),
   });
 }
 
@@ -485,6 +728,8 @@ function buildSummary(
 ): QuestionFlowSummary {
   const remaining = determineRemainingQuestions(questions);
   const blocking = determineBlockingQuestions(questions);
+  const unresolved = unresolvedQuestions(questions);
+  const pendingConfirmation = pendingConfirmations(questions);
   const reasonCodes = unique([
     ...questions.flatMap((question) => question.reasonCodes),
     ...questions.flatMap((question) => question.skipReasonCodes),
@@ -517,11 +762,126 @@ function buildSummary(
     blockingQuestionIds: blocking.map((question) => question.questionId),
     missingBlockingFieldIds: blocking.map((question) => question.fieldId),
     remainingQuestionIds: remaining.map((question) => question.questionId),
+    unresolvedQuestionIds: unresolved.map((question) => question.questionId),
+    alternativeRouteIds: questions.flatMap((question) =>
+      question.alternativeQuestions.map((route) => route.routeId),
+    ),
+    pendingConfirmationQuestionIds: pendingConfirmation.map((question) => question.questionId),
     reasonCodes: sortStrings(reasonCodes),
     confidenceImpact: questions.reduce((sum, question) => sum + question.confidenceImpact, 0),
     sourceReferences,
     recommendationIds: recommendations.map((recommendation) => recommendation.recommendationId),
   });
+}
+
+function conditionFieldIds(condition: QuestionCondition | undefined): readonly FieldId[] {
+  if (!condition) {
+    return [];
+  }
+  if ("fieldId" in condition) {
+    return [condition.fieldId];
+  }
+
+  return condition.conditions.flatMap(conditionFieldIds);
+}
+
+function buildDependencyIntegrity(
+  definitions: readonly RegulationQuestionDefinition[],
+  resolutions: readonly UnknownResolution[],
+): QuestionFlowIntegrity {
+  const byField = new Map<FieldId, QuestionId>();
+  for (const question of definitions) {
+    byField.set(question.fieldId, question.questionId);
+  }
+
+  const graph = new Map<QuestionId, Set<QuestionId>>();
+  for (const question of definitions) {
+    const dependencyQuestionIds = [
+      ...question.dependsOn,
+      ...conditionFieldIds(question.condition),
+    ]
+      .map((fieldId) => byField.get(fieldId))
+      .filter((questionId): questionId is QuestionId => Boolean(questionId));
+    graph.set(question.questionId, new Set(dependencyQuestionIds));
+  }
+
+  for (const resolution of resolutions) {
+    const sourceQuestionId = byField.get(resolution.fieldId);
+    if (!sourceQuestionId) continue;
+    const existing = graph.get(sourceQuestionId) ?? new Set<QuestionId>();
+    for (const alternative of resolution.alternativeQuestionCandidates ?? []) {
+      existing.add(alternative.questionId);
+    }
+    graph.set(sourceQuestionId, existing);
+  }
+
+  const issues: QuestionFlowIntegrityIssue[] = [];
+  const visiting = new Set<QuestionId>();
+  const visited = new Set<QuestionId>();
+  const stack: QuestionId[] = [];
+
+  function visit(questionId: QuestionId) {
+    if (visiting.has(questionId)) {
+      const cycle = stack.slice(stack.indexOf(questionId)).concat(questionId);
+      issues.push({
+        code: "question-flow.circular-dependency",
+        questionIds: cycle,
+        fieldIds: cycle
+          .map((item) => definitions.find((question) => question.questionId === item)?.fieldId)
+          .filter((fieldId): fieldId is FieldId => Boolean(fieldId)),
+      });
+      return;
+    }
+    if (visited.has(questionId)) {
+      return;
+    }
+
+    visiting.add(questionId);
+    stack.push(questionId);
+    for (const dependency of graph.get(questionId) ?? []) {
+      visit(dependency);
+    }
+    stack.pop();
+    visiting.delete(questionId);
+    visited.add(questionId);
+  }
+
+  for (const question of definitions) {
+    visit(question.questionId);
+  }
+
+  return deepFreeze({
+    ok: issues.length === 0,
+    issues,
+  });
+}
+
+function buildNavigation(
+  questions: readonly QuestionFlowQuestionState[],
+  flowState?: GuidedQuestionFlowInputState,
+): QuestionFlowNavigationState {
+  const visited = flowState?.visitedQuestionIds ?? [];
+  const current = flowState?.currentQuestionId ?? determineNextQuestion(questions)?.questionId;
+
+  return deepFreeze({
+    currentQuestionId: current,
+    previousQuestionId: visited.at(-1),
+    visitedQuestionIds: visited,
+    canGoBack: visited.length > 0,
+  });
+}
+
+function buildConfirmations(questions: readonly QuestionFlowQuestionState[]): readonly QuestionFlowConfirmationState[] {
+  return deepFreeze(questions
+    .filter((question) => question.confirmationRequired || !question.confirmed)
+    .map((question) => ({
+      questionId: question.questionId,
+      fieldId: question.fieldId,
+      inferenceId: question.inference?.inferenceId,
+      required: question.confirmationRequired,
+      confirmed: question.confirmed,
+      reasonCodes: question.confirmationRequired ? ["question-flow.confirm-inferred-answer"] : [],
+    })));
 }
 
 export function buildQuestionFlow(input: BuildQuestionFlowInput): QuestionFlowState {
@@ -535,9 +895,14 @@ export function buildQuestionFlow(input: BuildQuestionFlowInput): QuestionFlowSt
       unknownResolutions: input.unknownResolutions ?? [],
       inferences: input.inferences ?? [],
       recommendations: input.recommendations ?? [],
+      flowState: input.flowState,
     }),
   );
   const questions = applyActiveQuestion(baseQuestions, input.activeQuestionId);
+  const integrity = buildDependencyIntegrity(
+    input.definition.questionDefinitions,
+    input.unknownResolutions ?? [],
+  );
 
   return deepFreeze({
     regulationId: input.definition.regulationId,
@@ -547,5 +912,8 @@ export function buildQuestionFlow(input: BuildQuestionFlowInput): QuestionFlowSt
     decision: buildDecision(questions),
     progress: determineProgress(questions),
     summary: buildSummary(questions, input.recommendations ?? [], input.evaluation),
+    navigation: buildNavigation(questions, input.flowState),
+    confirmations: buildConfirmations(questions),
+    integrity,
   });
 }
