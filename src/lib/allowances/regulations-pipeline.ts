@@ -16,6 +16,8 @@ import type {
 } from "@/lib/allowances/signaling";
 import { evaluateRegulation } from "@/lib/regulations/evaluator";
 import type { RegulationDefinition } from "@/lib/regulations/definition";
+import { createUnavailableEstimateResult } from "@/lib/regulations/estimate-engine";
+import type { EstimateResult, EstimateSource, EstimateStrategy } from "@/lib/regulations/estimate-engine";
 import {
   buildRecommendations,
   mergeRecommendations,
@@ -49,6 +51,7 @@ export type AllowanceRegulationAssessment = {
   readonly blockingUnknowns: readonly UnknownResolution[];
   readonly evaluation: RegulationEvaluationResult;
   readonly recommendations: readonly RecommendationResult[];
+  readonly estimate: EstimateResult;
   readonly actionPlan: readonly ActionPlanItem[];
   readonly evidence: CalculationEvidence;
   readonly sourceReferences: RegulationEvaluationResult["evidence"]["sourceReferences"];
@@ -220,6 +223,29 @@ function inferenceCandidatesFor(
   return candidates;
 }
 
+function estimateStrategyFor(definition: RegulationDefinition): EstimateStrategy {
+  return {
+    strategyId: `${definition.regulationId}.signal-only-estimate`,
+    estimateType: definition.estimateStrategy.estimateType === "signal-only" ? "signal-only" : "none",
+    rangeMergePolicy: "union",
+    confidencePolicy: "minimum",
+    minimumConfidenceLevel: "low",
+    officialVerificationRequired: definition.estimateStrategy.officialVerificationRequired,
+    reasonCodes: definition.estimateStrategy.reasonCodes,
+  };
+}
+
+function estimateSourceFor(definition: RegulationDefinition): EstimateSource {
+  return {
+    sourceId: `${definition.regulationId}.source`,
+    sourceType: "adapter",
+    sourceReferences: definition.sourceReferences,
+    reasonCodes: ["allowance-signal-only-source"],
+    validFrom: definition.validFrom,
+    validUntil: definition.validUntil,
+  };
+}
+
 function evaluateAssessment(input: {
   scanInput: AllowanceScanInput;
   signal: AllowanceSignalResult;
@@ -262,6 +288,20 @@ function evaluateAssessment(input: {
     unknownResolutions: resolved.value.unknownResolutions,
     inferences: resolved.value.inferences,
   }));
+  const estimate = createUnavailableEstimateResult({
+    estimateId: `${definition.regulationId}.estimate`,
+    strategy: estimateStrategyFor(definition),
+    confidence: evaluated.value.confidence,
+    sources: [estimateSourceFor(definition)],
+    availability: "signal-only",
+    reasonCodes: ["allowance-estimate-not-implemented"],
+    assumptions: evaluated.value.evidence.assumptions,
+    warnings: evaluated.value.evidence.uncertaintyCodes,
+    officialVerificationRequired: evaluated.value.officialVerification.required,
+  });
+  if (!estimate.ok) {
+    return estimate;
+  }
 
   return {
     ok: true,
@@ -276,6 +316,7 @@ function evaluateAssessment(input: {
       blockingUnknowns: resolved.value.blockingUnknowns,
       evaluation: evaluated.value,
       recommendations,
+      estimate: estimate.value,
       actionPlan: evaluated.value.actionPlan,
       evidence: evaluated.value.evidence,
       sourceReferences: evaluated.value.evidence.sourceReferences,

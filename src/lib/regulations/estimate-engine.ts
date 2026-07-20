@@ -32,9 +32,12 @@ export type EstimateStrategy = {
   readonly reasonCodes: readonly ReasonCode[];
 };
 
+export type EstimateAvailability = "available" | "not-available" | "signal-only";
+
 export type EstimateResult = {
   readonly estimateId: string;
-  readonly range: EstimateRange;
+  readonly availability: EstimateAvailability;
+  readonly range?: EstimateRange;
   readonly confidence: ConfidenceAssessment;
   readonly confidenceLevel: ConfidenceLevel;
   readonly sources: readonly EstimateSource[];
@@ -220,6 +223,7 @@ export function createEstimateResult(input: {
     ok: true,
     value: deepFreeze({
       estimateId: input.estimateId,
+      availability: "available",
       range: input.range,
       confidence: input.range.confidence,
       confidenceLevel: getConfidenceLabel(input.range.confidence.score),
@@ -229,6 +233,45 @@ export function createEstimateResult(input: {
         input.officialVerificationRequired ?? input.strategy.officialVerificationRequired,
       reasonCodes: unique([...(input.reasonCodes ?? []), ...input.strategy.reasonCodes]),
       assumptions: unique([...(input.assumptions ?? []), ...input.range.assumptions]),
+      warnings: unique(input.warnings ?? []),
+    }),
+  };
+}
+
+export function createUnavailableEstimateResult(input: {
+  readonly estimateId: string;
+  readonly strategy: EstimateStrategy;
+  readonly confidence: ConfidenceAssessment;
+  readonly sources: readonly EstimateSource[];
+  readonly availability?: Exclude<EstimateAvailability, "available">;
+  readonly reasonCodes?: readonly ReasonCode[];
+  readonly assumptions?: readonly ReasonCode[];
+  readonly warnings?: readonly ReasonCode[];
+  readonly officialVerificationRequired?: boolean;
+}): Result<EstimateResult> {
+  const errors = [
+    input.estimateId.trim().length === 0 ? "missing-estimate-id" : undefined,
+    input.sources.length === 0 ? "missing-estimate-sources" : undefined,
+    ...validateStrategy(input.strategy),
+  ].filter(Boolean) as ReasonCode[];
+
+  if (errors.length > 0) {
+    return { ok: false, errors };
+  }
+
+  return {
+    ok: true,
+    value: deepFreeze({
+      estimateId: input.estimateId,
+      availability: input.availability ?? "not-available",
+      confidence: input.confidence,
+      confidenceLevel: getConfidenceLabel(input.confidence.score),
+      sources: input.sources,
+      strategy: input.strategy,
+      officialVerificationRequired:
+        input.officialVerificationRequired ?? input.strategy.officialVerificationRequired,
+      reasonCodes: unique([...(input.reasonCodes ?? []), ...input.strategy.reasonCodes]),
+      assumptions: unique(input.assumptions ?? []),
       warnings: unique(input.warnings ?? []),
     }),
   };
@@ -244,6 +287,11 @@ export function mergeEstimateResults(input: {
   if (input.estimates.length === 0) {
     return { ok: false, errors: ["missing-estimate-results"] };
   }
+  const ranges = input.estimates.map((estimate) => estimate.range);
+  if (ranges.some((range): range is undefined => range === undefined)) {
+    return { ok: false, errors: ["estimate-result-range-missing"] };
+  }
+  const availableRanges = ranges as readonly EstimateRange[];
 
   const confidence = propagateEstimateConfidence(
     input.estimates.map((estimate) => estimate.confidence),
@@ -254,12 +302,12 @@ export function mergeEstimateResults(input: {
   }
 
   const range = mergeEstimateRanges({
-    ranges: input.estimates.map((estimate) => estimate.range),
+    ranges: availableRanges,
     policy: input.strategy.rangeMergePolicy,
     confidence: confidence.value,
     assumptions: input.estimates.flatMap((estimate) => estimate.assumptions),
-    uncertaintyCodes: input.estimates.flatMap((estimate) => estimate.range.uncertaintyCodes),
-    explanationCodes: input.estimates.flatMap((estimate) => estimate.range.explanationCodes),
+    uncertaintyCodes: availableRanges.flatMap((estimateRange) => estimateRange.uncertaintyCodes),
+    explanationCodes: availableRanges.flatMap((estimateRange) => estimateRange.explanationCodes),
   });
   if (!range.ok) {
     return range;

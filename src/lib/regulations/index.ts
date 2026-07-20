@@ -23,6 +23,7 @@ export {
 export { createRegulationDefinition } from "@/lib/regulations/definition";
 export { evaluateRegulation } from "@/lib/regulations/evaluator";
 export {
+  createUnavailableEstimateResult,
   createEstimateResult,
   mergeEstimateRanges,
   mergeEstimateResults,
@@ -78,6 +79,7 @@ export type {
 } from "@/lib/regulations/evaluator";
 export type {
   ConfidenceLevel,
+  EstimateAvailability,
   EstimateResult,
   EstimateSource,
   EstimateStrategy,

@@ -87,6 +87,9 @@ describe("allowance regulations pipeline", () => {
       expect(item.sourceReferences.length).toBeGreaterThan(0);
       expect(item.officialVerification).toBeDefined();
       expect(item.evaluation.estimateRange).toBeUndefined();
+      expect(item.estimate.availability).toBe("signal-only");
+      expect(item.estimate.range).toBeUndefined();
+      expect(item.estimate.strategy.estimateType).toBe("signal-only");
     }
   });
 
@@ -107,6 +110,21 @@ describe("allowance regulations pipeline", () => {
       expect(item.evidence.usedRuleIds.length).toBeGreaterThan(0);
       expect(item.evidence.sourceReferences.length).toBeGreaterThan(0);
       expect(item.evaluation.recommendations.length).toBeGreaterThan(0);
+      expect(item.estimate.sources[0].sourceType).toBe("adapter");
+      expect(item.estimate.officialVerificationRequired).toBe(item.officialVerification.required);
+    }
+  });
+
+  it("represents estimates through the Estimate Engine without amount logic", () => {
+    const result = unwrap();
+
+    for (const item of result.assessments) {
+      expect(item.estimate.estimateId).toBe(`${item.regulationId}.estimate`);
+      expect(item.estimate.availability).toBe("signal-only");
+      expect(item.estimate.range).toBeUndefined();
+      expect(item.estimate.reasonCodes).toEqual(["allowance-estimate-not-implemented"]);
+      expect(item.estimate.assumptions).toContain("allowance-adapter-signal-only");
+      expect(item.estimate.sources[0].sourceReferences).toEqual(item.definition.sourceReferences);
     }
   });
 

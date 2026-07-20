@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { buildConfidenceAssessment } from "@/lib/regulations/confidence";
 import { createEstimateRange } from "@/lib/regulations/estimate";
 import {
+  createUnavailableEstimateResult,
   createEstimateResult,
   mergeEstimateRanges,
   mergeEstimateResults,
@@ -112,6 +113,8 @@ describe("regulations estimate engine", () => {
     const result = estimate("estimate.a");
 
     expect(result.estimateId).toBe("estimate.a");
+    expect(result.availability).toBe("available");
+    expect(result.range).toBeDefined();
     expect(result.confidenceLevel).toBe("high");
     expect(result.officialVerificationRequired).toBe(true);
     expect(result.reasonCodes).toEqual(["estimate.a.reason", "generic-estimate-strategy"]);
@@ -120,6 +123,34 @@ describe("regulations estimate engine", () => {
     expect(Object.isFrozen(result)).toBe(true);
     expect(Object.isFrozen(result.range)).toBe(true);
     expect(Object.isFrozen(result.sources)).toBe(true);
+  });
+
+  it("creates signal-only unavailable estimate results without a range", () => {
+    const result = createUnavailableEstimateResult({
+      estimateId: "signal-only",
+      strategy: {
+        ...strategy,
+        estimateType: "signal-only",
+      },
+      confidence: confidence(35, "signal-only-confidence"),
+      sources: [source],
+      availability: "signal-only",
+      reasonCodes: ["amount-rules-not-modeled"],
+      assumptions: ["signal-only"],
+      officialVerificationRequired: true,
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.availability).toBe("signal-only");
+    expect(result.value.range).toBeUndefined();
+    expect(result.value.confidenceLevel).toBe("low");
+    expect(result.value.officialVerificationRequired).toBe(true);
+    expect(result.value.reasonCodes).toEqual([
+      "amount-rules-not-modeled",
+      "generic-estimate-strategy",
+    ]);
+    expect(Object.isFrozen(result.value)).toBe(true);
   });
 
   it("rejects missing estimate metadata", () => {
@@ -242,12 +273,35 @@ describe("regulations estimate engine", () => {
     expect(merged.ok).toBe(true);
     if (!merged.ok) return;
     expect(merged.value.estimateId).toBe("merged");
+    expect(merged.value.range).toBeDefined();
+    if (!merged.value.range) return;
     expect(merged.value.range.minimum).toBe(10);
     expect(merged.value.range.maximum).toBe(25);
     expect(merged.value.confidence.score).toBe(50);
     expect(merged.value.confidenceLevel).toBe("medium");
     expect(merged.value.officialVerificationRequired).toBe(true);
     expect(merged.value.sources).toHaveLength(2);
+  });
+
+  it("rejects result merging when an estimate has no range", () => {
+    const unavailable = createUnavailableEstimateResult({
+      estimateId: "signal-only",
+      strategy: { ...strategy, estimateType: "signal-only" },
+      confidence: confidence(35, "signal-only-confidence"),
+      sources: [source],
+      availability: "signal-only",
+    });
+    expect(unavailable.ok).toBe(true);
+    if (!unavailable.ok) return;
+
+    expect(mergeEstimateResults({
+      estimateId: "merged",
+      estimates: [unavailable.value],
+      strategy,
+    })).toEqual({
+      ok: false,
+      errors: ["estimate-result-range-missing"],
+    });
   });
 
   it("is deterministic across repeated merges", () => {
