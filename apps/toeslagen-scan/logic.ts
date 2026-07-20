@@ -566,12 +566,25 @@ function emptyQuestionFlowView(errors: AllowanceScanErrors): AllowanceQuestionFl
     errors,
     totalRelevant: 0,
     completed: 0,
+    answered: 0,
+    inferred: 0,
+    skipped: 0,
     blocked: 0,
     remaining: 0,
     percentage: 0,
     decisionReason: "empty",
     items: [],
     questionStatuses: {},
+    reporting: {
+      answeredFieldLabels: [],
+      inferredFieldLabels: [],
+      skippedFieldLabels: [],
+      notApplicableFieldLabels: [],
+      blockingFieldLabels: [],
+      confidenceLabels: [],
+      officialVerificationRequired: false,
+      recommendationIds: [],
+    },
   };
 }
 
@@ -583,6 +596,10 @@ function labelsForQuestions(
     .map((questionId) => questions.find((question) => question.questionId === questionId)?.fieldId)
     .map(fieldLabel)
     .filter((label): label is string => Boolean(label));
+}
+
+function uniqueLabels(labels: readonly string[]) {
+  return [...new Set(labels)];
 }
 
 export function createAllowanceQuestionFlowView(
@@ -619,17 +636,33 @@ export function createAllowanceQuestionFlowView(
     nextFieldLabel: fieldLabel(flow.decision.nextFieldId),
     decisionReason: flow.decision.reason,
     progress: flow.progress,
+    answeredFieldLabels: labelsForQuestions(flow.summary.answeredQuestionIds, flow.questions),
     blockingFieldLabels: flow.summary.missingBlockingFieldIds
       .map(fieldLabel)
       .filter((label): label is string => Boolean(label)),
     inferredFieldLabels: labelsForQuestions(flow.summary.inferredQuestionIds, flow.questions),
     skippedFieldLabels: labelsForQuestions(flow.summary.skippedQuestionIds, flow.questions),
     notApplicableFieldLabels: labelsForQuestions(flow.summary.notApplicableQuestionIds, flow.questions),
+    confidenceLabel: assessment.evaluation.confidence.label,
+    officialVerificationRequired: assessment.officialVerification.required,
     recommendationIds: flow.summary.recommendationIds,
   })) satisfies AllowanceQuestionFlowItemView[];
 
   const totalRelevant = items.reduce((sum, item) => sum + item.progress.totalRelevant, 0);
   const completed = items.reduce((sum, item) => sum + item.progress.completed, 0);
+  const answered = items.reduce((sum, item) => sum + item.progress.answered, 0);
+  const inferred = items.reduce((sum, item) => sum + item.progress.inferred, 0);
+  const skipped = items.reduce((sum, item) => sum + item.progress.skipped, 0);
+  const reporting: AllowanceQuestionFlowView["reporting"] = {
+    answeredFieldLabels: uniqueLabels(items.flatMap((item) => item.answeredFieldLabels)),
+    inferredFieldLabels: uniqueLabels(items.flatMap((item) => item.inferredFieldLabels)),
+    skippedFieldLabels: uniqueLabels(items.flatMap((item) => item.skippedFieldLabels)),
+    notApplicableFieldLabels: uniqueLabels(items.flatMap((item) => item.notApplicableFieldLabels)),
+    blockingFieldLabels: uniqueLabels(items.flatMap((item) => item.blockingFieldLabels)),
+    confidenceLabels: uniqueLabels(items.map((item) => item.confidenceLabel)),
+    officialVerificationRequired: items.some((item) => item.officialVerificationRequired),
+    recommendationIds: uniqueLabels(items.flatMap((item) => item.recommendationIds)),
+  };
   const questionStatuses: AllowanceQuestionFlowView["questionStatuses"] = {};
   for (const { flow } of flows) {
     for (const question of flow.questions) {
@@ -646,6 +679,9 @@ export function createAllowanceQuestionFlowView(
     errors,
     totalRelevant,
     completed,
+    answered,
+    inferred,
+    skipped,
     blocked: items.reduce((sum, item) => sum + item.progress.blocked, 0),
     remaining: items.reduce((sum, item) => sum + item.progress.remaining, 0),
     percentage: totalRelevant === 0 ? 100 : Math.round((completed / totalRelevant) * 100),
@@ -654,5 +690,6 @@ export function createAllowanceQuestionFlowView(
     decisionReason: aggregateDecision(items),
     items,
     questionStatuses,
+    reporting,
   };
 }

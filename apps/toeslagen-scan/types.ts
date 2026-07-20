@@ -100,10 +100,24 @@ export type AllowanceQuestionFlowItemView = {
   nextFieldLabel?: string;
   decisionReason: QuestionFlowDecision["reason"];
   progress: QuestionFlowProgress;
+  answeredFieldLabels: readonly string[];
   blockingFieldLabels: readonly string[];
   inferredFieldLabels: readonly string[];
   skippedFieldLabels: readonly string[];
   notApplicableFieldLabels: readonly string[];
+  confidenceLabel: string;
+  officialVerificationRequired: boolean;
+  recommendationIds: readonly string[];
+};
+
+export type AllowanceQuestionFlowReportingView = {
+  answeredFieldLabels: readonly string[];
+  inferredFieldLabels: readonly string[];
+  skippedFieldLabels: readonly string[];
+  notApplicableFieldLabels: readonly string[];
+  blockingFieldLabels: readonly string[];
+  confidenceLabels: readonly string[];
+  officialVerificationRequired: boolean;
   recommendationIds: readonly string[];
 };
 
@@ -112,6 +126,9 @@ export type AllowanceQuestionFlowView = {
   errors: AllowanceScanErrors;
   totalRelevant: number;
   completed: number;
+  answered: number;
+  inferred: number;
+  skipped: number;
   blocked: number;
   remaining: number;
   percentage: number;
@@ -119,6 +136,7 @@ export type AllowanceQuestionFlowView = {
   decisionReason: QuestionFlowDecision["reason"];
   items: readonly AllowanceQuestionFlowItemView[];
   questionStatuses: Partial<Record<AllowanceMissingField, QuestionFlowQuestionStatus>>;
+  reporting: AllowanceQuestionFlowReportingView;
 };
 
 export type CopyCoverage = {

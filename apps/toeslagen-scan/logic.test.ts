@@ -162,8 +162,10 @@ describe("toeslagen-scan adapter", () => {
     expect(flow.nextFieldLabel).toBe("Leeftijd");
     expect(flow.questionStatuses.age).toBe("active");
     expect(flow.totalRelevant).toBeGreaterThan(0);
+    expect(flow.answered).toBeGreaterThanOrEqual(1);
     expect(flow.remaining).toBeGreaterThan(0);
     expect(flow.percentage).toBeLessThan(100);
+    expect(flow.reporting.answeredFieldLabels).toContain("Kalenderjaar");
   });
 
   it("computes progress from the central question flow", () => {
@@ -172,6 +174,9 @@ describe("toeslagen-scan adapter", () => {
 
     expect(example.completed).toBeGreaterThan(empty.completed);
     expect(example.percentage).toBeGreaterThan(empty.percentage);
+    expect(example.answered).toBeGreaterThan(empty.answered);
+    expect(example.inferred).toBeGreaterThanOrEqual(0);
+    expect(example.skipped).toBeGreaterThanOrEqual(0);
     expect(example.items.map((item) => item.allowanceKind)).toEqual([
       "healthcare",
       "rent",
@@ -190,6 +195,7 @@ describe("toeslagen-scan adapter", () => {
 
     expect(flow.questionStatuses["children.hasChildren"]).toBe("inferred");
     expect(flow.items.some((item) => item.inferredFieldLabels.includes("Kinderen"))).toBe(true);
+    expect(flow.reporting.inferredFieldLabels).toContain("Kinderen");
   });
 
   it("supports skipped and not-applicable questions from the central flow", () => {
@@ -204,6 +210,8 @@ describe("toeslagen-scan adapter", () => {
     expect(flow.questionStatuses["childcare.partnerHasQualifyingActivity"]).toBe("not-applicable");
     expect(flow.items.some((item) => item.skippedFieldLabels.length > 0)).toBe(true);
     expect(flow.items.some((item) => item.notApplicableFieldLabels.length > 0)).toBe(true);
+    expect(flow.reporting.skippedFieldLabels).toContain("Kale huur per maand");
+    expect(flow.reporting.notApplicableFieldLabels).toContain("Activiteit toeslagpartner");
   });
 
   it("honours central blocking decisions without turning regular allowance unknowns into blockers", () => {
@@ -211,6 +219,7 @@ describe("toeslagen-scan adapter", () => {
 
     expect(flow.blocked).toBe(0);
     expect(flow.items.flatMap((item) => item.blockingFieldLabels)).toEqual([]);
+    expect(flow.reporting.blockingFieldLabels).toEqual([]);
     expect(flow.decisionReason).not.toBe("blocked");
   });
 
@@ -221,5 +230,15 @@ describe("toeslagen-scan adapter", () => {
 
     expect(flow.isValid).toBe(true);
     expect(after).toEqual(before);
+  });
+
+  it("keeps reporting/PDF metadata available without adding amount data", () => {
+    const flow = createAllowanceQuestionFlowView(exampleValues);
+
+    expect(flow.reporting.answeredFieldLabels).toContain("Geschat toetsingsinkomen");
+    expect(flow.reporting.confidenceLabels.length).toBeGreaterThan(0);
+    expect(flow.reporting.officialVerificationRequired).toBe(true);
+    expect(flow.reporting.recommendationIds.length).toBeGreaterThan(0);
+    expect(JSON.stringify(flow.reporting).toLowerCase()).not.toContain("amount");
   });
 });

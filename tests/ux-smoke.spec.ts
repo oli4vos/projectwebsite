@@ -398,6 +398,11 @@ test("publieke toeslagenscan route, formulier en signal-only resultaat werken", 
     page.getByText("Geen advies en geen officiële beschikking"),
   ).toBeVisible();
   await expect(page.getByText("toeslagbedragen berekend")).toBeVisible();
+  await expect(
+    page.getByRole("progressbar", { name: "Voortgang van relevante toeslagenvragen" }),
+  ).toBeVisible();
+  await expect(page.getByText("Volgende stap: vul leeftijd in.")).toBeVisible();
+  await expect(page.getByText("centrale vraagflow")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Download uitgebreid PDF-overzicht" })).toHaveCount(0);
 
   const bodyText = (await page.locator("body").innerText()).toLowerCase();
@@ -406,8 +411,11 @@ test("publieke toeslagenscan route, formulier en signal-only resultaat werken", 
   expect(bodyText).not.toContain("gegarandeerd recht");
 
   await page.getByRole("button", { name: "Voorbeeldwaarden" }).click();
+  await expect(page.getByText("Niet van toepassing")).toBeVisible();
+  await page.getByLabel("Leeftijden kinderen").fill("6");
+  await page.getByLabel("Heb je kinderen?", { exact: true }).selectOption("unknown");
   await expect(page.getByLabel("Kale huur per maand")).toBeVisible();
-  await expect(page.getByLabel("Opvanguren per maand")).toBeVisible();
+  await expect(page.getByText("Afgeleid uit eerdere antwoorden")).toBeVisible();
   await page.getByRole("button", { name: "Bekijk mijn toeslagensignalen" }).click();
   await expect(page.locator("#tool-result-summary article")).toHaveCount(4);
   await expect(page.getByRole("heading", { name: "Zorgtoeslag" })).toBeVisible();
@@ -426,6 +434,7 @@ test("publieke toeslagenscan route, formulier en signal-only resultaat werken", 
 
   await page.getByLabel("Woonsituatie", { exact: true }).selectOption("owner");
   await expect(page.getByLabel("Kale huur per maand")).toHaveCount(0);
+  await expect(page.getByText("Niet gevraagd in deze route")).toBeVisible();
   await page.getByLabel("Heb je kinderen?", { exact: true }).selectOption("no");
   await expect(page.getByLabel("Opvanguren per maand")).toHaveCount(0);
 
@@ -459,6 +468,10 @@ test("mobiele toeslagenscan houdt 390px zonder horizontale overflow en focusbasi
   test.skip(!testInfo.project.name.startsWith("mobile"), "Mobiele controle");
 
   await page.goto(allowanceScanRoute, { waitUntil: "networkidle" });
+  await expect(
+    page.getByRole("progressbar", { name: "Voortgang van relevante toeslagenvragen" }),
+  ).toBeVisible();
+  await expect(page.getByText("Volgende stap: vul leeftijd in.")).toBeVisible();
   await page.keyboard.press("Tab");
   const activeTag = await page.evaluate(() => document.activeElement?.tagName.toLowerCase());
   expect(activeTag).toMatch(/a|button|input|select/);

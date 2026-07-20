@@ -156,7 +156,7 @@ function YesNoUnknownField({
   );
 }
 
-function ResultList({ title, items }: { title: string; items: string[] }) {
+function ResultList({ title, items }: { title: string; items: readonly string[] }) {
   if (items.length === 0) {
     return null;
   }
@@ -217,10 +217,15 @@ function QuestionFlowSummary({ flow }: { flow: AllowanceQuestionFlowView }) {
     return null;
   }
 
-  const inferred = [...new Set(flow.items.flatMap((item) => item.inferredFieldLabels))];
-  const skipped = [...new Set(flow.items.flatMap((item) => item.skippedFieldLabels))];
-  const notApplicable = [...new Set(flow.items.flatMap((item) => item.notApplicableFieldLabels))];
-  const blocking = [...new Set(flow.items.flatMap((item) => item.blockingFieldLabels))];
+  const { reporting } = flow;
+  const progressDescriptionId = "toeslagen-question-flow-progress-description";
+  const nextStepText = flow.decisionReason === "blocked"
+    ? reporting.blockingFieldLabels.length > 0
+      ? `Nog nodig: ${reporting.blockingFieldLabels.join(", ")}.`
+      : "Er ontbreekt nog verplichte informatie."
+    : flow.nextFieldLabel
+      ? `Volgende stap: vul ${flow.nextFieldLabel.toLowerCase()} in.`
+      : "Alle nu relevante vragen zijn verwerkt voor deze scan.";
 
   return (
     <section className="surface-panel p-4" aria-labelledby="toeslagen-question-flow-title">
@@ -229,30 +234,45 @@ function QuestionFlowSummary({ flow }: { flow: AllowanceQuestionFlowView }) {
           <h3 id="toeslagen-question-flow-title" className="text-base font-semibold text-[var(--ink)]">
             Voortgang
           </h3>
-          <p className="mt-1 text-[13px] leading-[1.55] text-[var(--muted)]">
-            {flow.completed} van {flow.totalRelevant} relevante vragen verwerkt.
+          <p
+            id={progressDescriptionId}
+            className="mt-1 text-[13px] leading-[1.55] text-[var(--muted)]"
+          >
+            {flow.completed} van {flow.totalRelevant} relevante vragen verwerkt. Daarvan zijn
+            er {flow.answered} rechtstreeks ingevuld en {flow.inferred} afgeleid.
           </p>
         </div>
-        <span className="rounded-full border border-[var(--hair)] bg-[var(--paper-soft)] px-3 py-1 text-[12px] font-medium text-[var(--ink)]">
+        <span
+          className="rounded-full border border-[var(--hair)] bg-[var(--paper-soft)] px-3 py-1 text-[12px] font-medium text-[var(--ink)]"
+          aria-hidden="true"
+        >
           {flow.percentage}%
         </span>
       </div>
       <div
+        role="progressbar"
+        aria-label="Voortgang van relevante toeslagenvragen"
+        aria-describedby={progressDescriptionId}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={flow.percentage}
+        aria-valuetext={`${flow.percentage}% verwerkt`}
         className="mt-3 h-2 overflow-hidden rounded-full bg-[var(--paper-soft)]"
-        aria-hidden="true"
       >
         <div className="h-full bg-[var(--accent)]" style={{ width: `${flow.percentage}%` }} />
       </div>
       <p className="mt-3 text-[13px] leading-[1.6] text-[var(--ink-2)]">
-        {flow.decisionReason === "blocked"
-          ? "De centrale vraagflow wacht op een verplicht onbekend gegeven."
-          : flow.nextFieldLabel
-            ? `Volgende vraag volgens de centrale vraagflow: ${flow.nextFieldLabel}.`
-            : "De centrale vraagflow heeft geen vervolgvraag nodig voor de huidige invoer."}
+        {nextStepText}
       </p>
-      <ResultList title="Verplicht onbekend" items={blocking} />
-      <ResultList title="Afgeleid uit eerdere antwoorden" items={inferred} />
-      <ResultList title="Overgeslagen of niet van toepassing" items={[...skipped, ...notApplicable]} />
+      {flow.blocked > 0 ? (
+        <p className="mt-2 text-[13px] leading-[1.6] text-[oklch(35%_0.13_28)]">
+          De voortgang is nog geen volledige invoer zolang verplichte gegevens ontbreken.
+        </p>
+      ) : null}
+      <ResultList title="Nog verplicht onbekend" items={reporting.blockingFieldLabels} />
+      <ResultList title="Afgeleid uit eerdere antwoorden" items={reporting.inferredFieldLabels} />
+      <ResultList title="Niet gevraagd in deze route" items={reporting.skippedFieldLabels} />
+      <ResultList title="Niet van toepassing" items={reporting.notApplicableFieldLabels} />
     </section>
   );
 }
