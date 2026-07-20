@@ -10,6 +10,165 @@ Lees dit eerst voordat je berekeningen, manifests of routing aanpast.
 De zichtbare site is in de huidige launch-scope puur informatief over studieschuld. Publieke UI-copy bevat geen beleggen-framing, geen aflossen-vs-beleggen-route en geen persoonlijk advies. `FUNCTIONALITY_STATUS.md` is leidend voor welke tools en flows publiek zichtbaar, hidden, voorbereid of uitgeschakeld zijn.
 Alles wat niet meer actief aangeroepen wordt in de zichtbare site blijft wel in de codebase, maar wordt hidden/draft gehouden en uit de publieke registry, navigatie en route-oppervlakken gehouden totdat er expliciet een heractivatiebesluit is.
 
+## Projectdoel
+
+Project Site is een browser-first, modulair platform voor financiele hulpmiddelen. Het project helpt gebruikers hun situatie te begrijpen met rekentools, signaleringen, scenario's, bronverwijzingen en uitleg, zonder juridisch, financieel, fiscaal of hypotheekadvies te geven.
+
+De vaste projectrichting:
+
+- browser-first en static-first waar mogelijk;
+- modulair via apps onder `apps/<slug>` met manifestgedreven discovery;
+- Type A-apps blijven pure frontend/static tools zonder geheimen, backend of verplichte externe runtime;
+- Type B-apps krijgen alleen een backend wanneer een expliciet architectuur-, security-, kosten- en rollbackbesluit dat rechtvaardigt;
+- centrale domeinengines en gedeelde rekenlagen blijven leidend;
+- de centrale Regulations Engine-primitives ondersteunen definitions, unknown answers, inference, evaluation, confidence, reason codes, recommendations, estimates en action plans;
+- `src/lib/financial-constants` blijft de SSOT voor brondata, metadata, geldigheid, freshness en bronverwijzingen;
+- hosting blijft goedkoop, simpel en reproduceerbaar;
+- toekomstige schaalbaarheid komt uit centrale primitives, adapters, source governance, tests en duidelijke publicatiechecks, niet uit losse calculatorframeworks.
+
+## Documentatiehierarchie
+
+Gebruik deze volgorde wanneer documenten of prompts elkaar overlappen:
+
+1. `AGENTS.md`: bindende werkwijze, scope-, git-, architectuur-, test- en releaseguardrails voor agents.
+2. `PROJECT.md`: canonieke projectvisie, productrichting, hoofdarchitectuur, domeinen, roadmap en niet-doelen.
+3. `FUNCTIONALITY_STATUS.md`: single source of truth voor zichtbaarheid, flags, publieke/hidden status en functionele status.
+4. Gerichte documenten in `docs/`, zoals `docs/calculator-architecture.md`, `docs/source-data-architecture.md`, `docs/regulations-engine-technical-design.md`, `docs/regelingen-toeslagen-engine-architecture.md` en brondocumenten.
+5. `CONTRIBUTING.md`, `README.md` en inline comments voor aanvullende lokale conventies.
+
+Verwijs waar mogelijk naar bestaande documenten in plaats van dezelfde regels opnieuw te beschrijven. Als een prompt afwijkt van deze hierarchie, volg de hoogste geldige bron en benoem de afwijking in de overdracht.
+
+## Standaard werkwijze
+
+Iedere Codex-agent volgt standaard deze workflow, ook als een prompt kort is:
+
+1. Lees `AGENTS.md`.
+2. Lees `PROJECT.md`.
+3. Lees relevante architectuur-, status-, bron- of domeindocumenten voor de gevraagde scope.
+4. Controleer repositorypad, branch, HEAD, origin en werkboom.
+5. Bepaal doel, scope, out-of-scope en geraakte eigenaarschappen.
+6. Inventariseer bestaande centrale logica, adapters, tests en documentatie voordat je iets wijzigt.
+7. Wijzig alleen noodzakelijke bestanden binnen scope.
+8. Houd gebruikers- en andere agentwijzigingen intact.
+9. Voer passende controles uit: gericht bij documentatie, volledig bij code, manifest, registry, rekenlogica, UI, PDF of release-impact.
+10. Stage alleen eigen bestanden.
+11. Commit met een gerichte conventionele commitmessage wanneer de opdracht dat vraagt of de wijziging afgerond is.
+12. Push naar `main` wanneer controles groen zijn en het gitbeleid dat toestaat.
+13. Sluit af met een compacte overdracht met status, wijzigingen, controles, commit en resterende punten.
+
+## Gitbeleid
+
+- Werk standaard op `main`, tenzij de gebruiker expliciet anders vraagt.
+- Commit en push uitsluitend vanuit de vaste repositorydirectory.
+- Force-push is verboden.
+- Destructieve commando's zoals `git reset --hard`, `git clean -fd`, `git checkout -- .` en `git restore .` zijn verboden zonder expliciete opdracht.
+- `ideetjes.txt` is gebruikersruimte: nooit wijzigen, stage, committen, resetten, restoren of overschrijven tenzij de gebruiker dat expliciet en ondubbelzinnig vraagt.
+- Neem geen unrelated wijzigingen mee.
+- Stage alleen bestanden die je zelf doelgericht hebt gewijzigd.
+- Als bestaande user- of agentwijzigingen dezelfde bestanden raken, lees ze zorgvuldig en werk ermee; overschrijf ze niet.
+- Lever de werkboom zo schoon mogelijk op. Als bestaande gebruikerswijzigingen blijven staan, benoem exact welke dat zijn.
+
+## Scopebeleid
+
+- Werk alleen binnen de gevraagde scope.
+- Doe geen opportunistische refactors, cleanup, redesigns, dependency-upgrades of documentatieherschrijvingen buiten scope.
+- Voeg geen dependency toe zonder aantoonbare noodzaak, bestaande alternatieven te controleren en impact te documenteren.
+- Activeer geen hidden/draft tools zonder expliciet activatieverzoek en volledige blueprint-check.
+- Verander geen publieke routes, manifests, registry, PDF, brondata, formulelogica of UX-copy wanneer de opdracht documentatie-only is.
+- Bij twijfel: kies de kleinste wijziging die het doel volledig bereikt.
+
+## Test- en controlebeleid
+
+Standaard beschikbare controles:
+
+- `npm run generate:apps`
+- `npm run validate:source-data`
+- `npm run generate:source-overview`
+- `npm run check:source-freshness`
+- `npm run lint`
+- `npm run typecheck`
+- `npm test`
+- `npm run build`
+- `git diff --check`
+
+Controlekeuze:
+
+- Documentatie-only: minimaal relevante diffinspectie, `git diff --check` voor geraakte bestanden of staged diff, en `git status --short`.
+- Brondatawijziging: source-data validatie, source-overview generatie, freshnesscheck en relevante domeintests.
+- Manifest/registrywijziging: `generate:apps`, generated-file diff-check, relevante registrytests en build wanneer publiek zichtbaar.
+- Rekenlogica: gerichte unit/regressietests plus volledige tests, typecheck en build.
+- UI/form/PDF: lint, typecheck, relevante unit/integratietests, build en waar passend browser/UX-checks.
+- Release of publieke activatie: volledige generate-, lint-, typecheck-, test- en buildreeks.
+
+Een globale `git diff --check` kan falen op bestaande gebruikerswijzigingen buiten scope. Controleer dan expliciet de staged diff of de geraakte bestanden en benoem de bestaande afwijking.
+
+## Stopcriteria
+
+Stop zonder commit en rapporteer wanneer:
+
+- de branch niet `main` is terwijl `main` vereist is;
+- HEAD en `origin/main` onverwacht afwijken en veilig pushen niet kan;
+- `ideetjes.txt` of andere gebruikerswijzigingen geraakt of staged zouden worden;
+- benodigde tests, typecheck of build rood zijn;
+- een publieke regressie, routewijziging, manifestwijziging of registrywijziging buiten scope ontstaat;
+- de opdracht een centrale architectuurregel zou schenden;
+- een wijziging een hidden tool zichtbaar maakt zonder blueprint-check;
+- een dependency, backend, opslag, analytics of secret nodig lijkt maar niet expliciet in scope staat;
+- er onvoldoende bronbasis is voor een financiële formule, bedrag, rechtclaim of actuele waarde.
+
+## Promptminimalisatie
+
+Toekomstige prompts mogen kort zijn wanneer `AGENTS.md`, `PROJECT.md`, `FUNCTIONALITY_STATUS.md` en de relevante `docs/`-bestanden voldoende context bevatten. Een prompt hoeft dan vaak alleen nog te bevatten:
+
+- doel;
+- scope;
+- relevante documenten of bestanden;
+- gewenste commitomschrijving;
+- expliciete uitzonderingen.
+
+De agent volgt daarna zelfstandig de vaste workflow uit dit bestand, controleert de repository, leest relevante documentatie, bewaakt scope, draait passende controles, commit/pusht waar toegestaan en levert een overdracht.
+
+## Standaard overdracht
+
+Gebruik standaard deze compacte structuur, tenzij de prompt een specifieker format vraagt:
+
+```text
+# Overdracht
+
+## 1. Repositorystatus
+- Branch:
+- HEAD voor/na:
+- Origin voor/na:
+- Werkboom voor/na:
+- Bewaarde gebruikerswijzigingen:
+
+## 2. Scope en besluit
+- Doel:
+- Binnen scope:
+- Buiten scope:
+- Belangrijkste beslissing:
+
+## 3. Wijzigingen
+- Bestanden:
+- Gedrag/functionele impact:
+- Architectuurimpact:
+- Backwards compatibility:
+
+## 4. Controles
+- Uitgevoerd:
+- Resultaat:
+- Niet uitgevoerd en waarom:
+
+## 5. Git
+- Commit:
+- Push:
+- Resterende lokale wijzigingen:
+
+## 6. Volgende stap
+- Aanbevolen agent of actie:
+- Open punten:
+```
+
 ## Vaste repositoryregel
 
 Alle Codex-agents en engineers werken voor de Project Site uitsluitend in deze repository:
@@ -142,6 +301,10 @@ De Sources & Regulations Guardian bewaakt primaire bronnen, regelgeving, uitvoer
 - Tool-specifieke `apps/<slug>/logic.ts`-bestanden mogen orchestration bevatten, maar geen berekeningen dupliceren die al centraal bestaan.
 - `Calculator.tsx`-bestanden zijn presentatie; daar staan geen business rules, renteformules, leencapaciteitberekeningen of tabelopzoekingen in.
 - Wijzigbare normen, tabellen, parameters en percentages moeten centraal, versieerbaar en testbaar zijn opgeslagen.
+- Domeinmodellen zijn waar praktisch immutable: functies retourneren nieuwe waarden en muteren geen gedeelde globale state.
+- Pure functies zijn de standaard voor reken-, evaluatie-, inference-, recommendation- en estimate-logica.
+- Composition gaat boven duplicatie: hergebruik bestaande engines, adapters en helpers voordat je nieuwe lagen toevoegt.
+- Verborgen side effects zijn niet toegestaan in domeinlagen; opslag, URL-state, analytics, logging en browsergedrag blijven buiten centrale reken- en regelsmodules.
 - `src/lib/financial-constants` is de single source of truth voor wijziglijke brondata die rekentools gebruiken. Nieuwe tools hardcoden geen jaarlijkse waarden, banktarieven, toeslaggrenzen, DUO-percentages, hypotheeknormen of fiscale parameters lokaal.
 - Iedere actieve dataset heeft minimaal bron-URL, geldigheidsperiode, status, `lastVerifiedAt` en `nextReviewAt`; verlopen brondata wordt niet stil geselecteerd.
 - Officiële bronnen hebben voorrang. Providerdata zoals banktarieven blijft gescheiden van officiële normdata, wordt handmatig gereviewd en niet tijdens gebruikersbezoek gescrapet.
@@ -149,6 +312,16 @@ De Sources & Regulations Guardian bewaakt primaire bronnen, regelgeving, uitvoer
 - Scherm en PDF gebruiken dezelfde datasetmetadata of hetzelfde centrale source-reference model; PDF's mogen geen eigen brondata of peildatum kiezen.
 - Toeslagendata wordt pas actief wanneer bronregels volledig genormaliseerd, gevalideerd en getest zijn.
 - Als een tool of flow niet meer actief aangeroepen wordt, zet dan de zichtbare manifest-/route-exposure uit en leg de status vast in `FUNCTIONALITY_STATUS.md`; laat de code alleen bestaan als verborgen heractiveringsbron.
+
+## Domeinregels
+
+- Unknown is metadata: onbekende antwoorden zijn expliciete domeinstatussen met reason codes, confidence-impact en mogelijke vervolgstappen.
+- Inference is expliciet: iedere afleiding heeft broninputs, methode, evidence, confidence en overschrijfbaarheid.
+- Evaluation bepaalt status: domeinevaluatie beslist over harde uitsluitingen, mogelijke relevantie, complexiteit, ontbrekende informatie en officiële controle.
+- Recommendation bepaalt acties: aanbevelingen en actieplannen komen uit domeinoutput of adapters, niet uit losse UI-copy.
+- Estimate bepaalt bedragen: bedragen verschijnen alleen via getypte estimates met bandbreedte, periode, eenheid, bronjaar, aannames, onzekerheden en bronverwijzingen.
+- Definitions zijn declaratief: regels, dependencies, requiredness, skip-reasons, reason codes en bronkoppelingen worden machineleesbaar beschreven waar dat praktisch is.
+- UI-copy is presentatie: zichtbare tekst mag reason codes toelichten, maar mag machineleesbare domeinbeslissingen niet vervangen.
 
 ## Regelingen & Toeslagen Engine
 
