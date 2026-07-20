@@ -4,6 +4,13 @@ export {
   getAllowanceRegulationId,
 } from "@/lib/allowances/adapter";
 export {
+  ALLOWANCE_REGULATION_DEFINITIONS,
+  getAllowanceRegulationDefinition,
+} from "@/lib/allowances/definitions";
+export {
+  evaluateAllowanceRegulations,
+} from "@/lib/allowances/regulations-pipeline";
+export {
   ALLOWANCE_SIGNAL_ORDER,
   evaluateAllowanceSignals,
   evaluateChildBudgetAllowance,
@@ -36,3 +43,7 @@ export type {
   HealthcareAllowanceInput,
   RentAllowanceInput,
 } from "@/lib/allowances/signaling";
+export type {
+  AllowanceRegulationAssessment,
+  AllowanceRegulationsScanResult,
+} from "@/lib/allowances/regulations-pipeline";
