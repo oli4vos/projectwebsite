@@ -32,6 +32,13 @@ export {
   resolveUnknownFields,
   runInference,
 } from "@/lib/regulations/unknown";
+export {
+  buildRecommendations,
+  collectRecommendationEvidence,
+  filterSuppressedRecommendations,
+  mergeRecommendations,
+  sortRecommendations,
+} from "@/lib/regulations/recommendations";
 export type {
   RegulationAdapterMetadata,
   RegulationDefinitionMetadata,
@@ -55,6 +62,10 @@ export type {
   UnknownResolution,
   UnknownResolutionType,
 } from "@/lib/regulations/unknown";
+export type {
+  BuildRecommendationsInput,
+  RecommendationResult,
+} from "@/lib/regulations/recommendations";
 export type {
   RegulationDefinition,
   RegulationEvaluationContext,
