@@ -1,9 +1,20 @@
 import {
+  ALLOWANCE_ADVISOR_APPLICATION_GUIDANCE,
+  ALLOWANCE_UNKNOWN_RESOLUTION_MATRIX,
+  type AllowanceAdvisorReliabilityLabel,
+  type AllowanceAdvisorReportLine,
+  type AllowanceAdvisorReportModel,
+  type AllowanceAdvisorReportResult,
+} from "@/lib/allowances/advisor-experience";
+import {
+  calculateOfficialAllowanceScan2026,
+  type OfficialAllowanceCalculationResult,
+} from "@/lib/allowances/official-calculations";
+import {
   evaluateAllowanceRegulations,
 } from "@/lib/allowances/regulations-pipeline";
 import {
   ALLOWANCE_SIGNAL_ORDER,
-  evaluateAllowanceSignals,
   type AllowanceKind,
   type AllowanceMissingField,
   type AllowanceScanInput,
@@ -15,15 +26,14 @@ import { buildQuestionFlow } from "@/lib/regulations/question-flow";
 import type { AnswerState, FieldId } from "@/lib/regulations/types";
 import {
   allowanceTitles,
-  getMissingFieldCopy,
   getReasonCodeCopy,
   getUncertaintyCopy,
-  statusLabels,
-  statusSummaries,
 } from "./copy";
 import type {
   AllowanceQuestionFlowItemView,
   AllowanceQuestionFlowView,
+  AllowancePublicResultStatus,
+  AllowanceMissingInputView,
   AllowanceScanErrors,
   AllowanceScanField,
   AllowanceScanFormState,
@@ -338,20 +348,241 @@ function dedupeOfficialLinks(references: SourceReference[], officialCalculationU
   });
 }
 
-function createSummary(statuses: string[]) {
-  if (statuses.includes("insufficient-information")) {
+function formatCurrency(value: number) {
+  return new Intl.NumberFormat("nl-NL", {
+    style: "currency",
+    currency: "EUR",
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+function publicStatusFor(result: OfficialAllowanceCalculationResult): AllowancePublicResultStatus {
+  if (result.status === "incomplete") {
+    return "incomplete";
+  }
+  if (result.status === "special-case") {
+    return "special-case";
+  }
+  if (result.status === "unavailable") {
+    return result.eligibilityStatus === "fails-known-hard-checks" ? "ineligible" : "unavailable";
+  }
+  if (result.eligibilityStatus === "fails-known-hard-checks") {
+    return "ineligible";
+  }
+  return "eligible-estimate";
+}
+
+const publicStatusLabels: Record<AllowancePublicResultStatus, string> = {
+  "eligible-estimate": "eligible-estimate",
+  ineligible: "ineligible",
+  incomplete: "incomplete",
+  "special-case": "special-case",
+  unavailable: "unavailable",
+};
+
+function publicSummary(result: OfficialAllowanceCalculationResult) {
+  const status = publicStatusFor(result);
+  if (status === "eligible-estimate") {
+    return result.amount.monthlyAmount !== undefined
+      ? "De centrale berekening kan voor deze toeslag een indicatief maand- en jaarbedrag tonen. Controleer altijd met Mijn Toeslagen."
+      : "De bekende harde voorwaarden sluiten deze toeslag niet uit, maar er is nog geen bedrag beschikbaar.";
+  }
+  if (status === "ineligible") {
+    return "Op basis van bekende harde voorwaarden lijkt deze toeslag waarschijnlijk niet van toepassing.";
+  }
+  if (status === "incomplete") {
+    return "Er ontbreken nog gegevens voordat de centrale berekening deze toeslag kan beoordelen.";
+  }
+  if (status === "special-case") {
+    return "Je situatie bevat een bijzondere of onzekere factor. Officiële controle blijft nodig.";
+  }
+  return "De centrale berekening kan voor deze toeslag nog geen bedrag tonen.";
+}
+
+function reliabilityFor(result: OfficialAllowanceCalculationResult): {
+  label: AllowanceAdvisorReliabilityLabel;
+  description: string;
+} {
+  if (result.status === "available" && result.amount.monthlyAmount !== undefined) {
+    return {
+      label: result.officialVerificationRequired ? "redelijke-indicatie" : "sterke-indicatie",
+      description: result.officialVerificationRequired
+        ? "Berekend met centrale brondata, maar Mijn Toeslagen blijft leidend."
+        : "Berekend met complete centrale gegevens.",
+    };
+  }
+  if (result.status === "incomplete") {
+    return {
+      label: "voorlopige-indicatie",
+      description: "Aanvullende gegevens nodig voordat een bedrag verantwoord is.",
+    };
+  }
+  if (result.status === "special-case") {
+    return {
+      label: "voorlopige-indicatie",
+      description: "Officiële controle nodig door een bijzondere of onzekere situatie.",
+    };
+  }
+  return {
+    label: "voorlopige-indicatie",
+    description: "Indicatief signaal; niet alle bedragregels zijn beschikbaar voor deze toeslag.",
+  };
+}
+
+function createSummary(statuses: readonly AllowancePublicResultStatus[]) {
+  if (statuses.includes("incomplete")) {
     return "Voor één of meer toeslagen ontbreken nog gegevens.";
   }
-  if (statuses.includes("possible")) {
-    return "Op basis van je antwoorden kan één of meer toeslagen relevant zijn. Controleer dit met de officiële proefberekening.";
+  if (statuses.includes("eligible-estimate")) {
+    return "De centrale toeslagenberekening kan voor één of meer toeslagen een indicatie tonen. Controleer aanvragen of wijzigingen altijd in Mijn Toeslagen.";
   }
-  if (statuses.every((status) => status === "official-calculation-recommended")) {
-    return "Voor één of meer toeslagen is een officiële proefberekening nodig om een bruikbaar antwoord te krijgen.";
+  if (statuses.includes("special-case")) {
+    return "Voor één of meer toeslagen is officiële controle nodig door een bijzondere situatie.";
   }
-  if (statuses.every((status) => status === "probably-not")) {
+  if (statuses.every((status) => status === "ineligible")) {
     return "Op basis van de ingevulde harde voorwaarden lijken de onderzochte toeslagen waarschijnlijk niet van toepassing.";
   }
-  return "Bekijk per toeslag het signaal en controleer complexe situaties met de officiële proefberekening.";
+  return "Bekijk per toeslag de centrale status, ontbrekende gegevens en vervolgstappen.";
+}
+
+function unknownDesignForField(fieldId: string) {
+  return ALLOWANCE_UNKNOWN_RESOLUTION_MATRIX.find((item) =>
+    item.fieldIds.includes(fieldId as AllowanceMissingField),
+  );
+}
+
+function missingInputViews(fields: readonly string[]): readonly AllowanceMissingInputView[] {
+  return fields.map((fieldId) => {
+    const design = unknownDesignForField(fieldId);
+    return {
+      label: fieldLabel(fieldId),
+      whyNeeded: design?.whyNeeded ?? "Deze informatie is nodig om de centrale toeslagenberekening verantwoord te maken.",
+      alternativeQuestions: design?.alternativeQuestions ?? ["Kun je dit controleren in Mijn Toeslagen of je eigen documenten?"],
+      whereToFind: design?.whereToFind ?? ["Mijn Toeslagen"],
+    };
+  });
+}
+
+function sourceLinksFor(result: OfficialAllowanceCalculationResult) {
+  return dedupeOfficialLinks(
+    result.sourceReferences as SourceReference[],
+    result.signal.officialCalculationUrl,
+  );
+}
+
+function reportLine(label: string, value: string, reasonCodes: readonly string[], sourceFieldId?: string): AllowanceAdvisorReportLine {
+  return {
+    label,
+    value,
+    sourceFieldId: sourceFieldId ? sourceFieldId as AllowanceMissingField : undefined,
+    reasonCodes,
+  };
+}
+
+function reportStatusFor(status: AllowancePublicResultStatus): AllowanceAdvisorReportResult["status"] {
+  if (status === "eligible-estimate") return "likely-eligible-with-indication";
+  if (status === "ineligible") return "likely-not-eligible";
+  if (status === "special-case") return "special-situation";
+  return "not-determinable-yet";
+}
+
+function buildReport(input: {
+  summary: string;
+  calculationYear: number;
+  results: readonly OfficialAllowanceCalculationResult[];
+  cards: readonly ReturnType<typeof cardForResult>[];
+}): AllowanceAdvisorReportModel {
+  const reportResults = input.results.map((result, index) => {
+    const card = input.cards[index];
+    if (!card) {
+      throw new Error("Ontbrekende rapportkaart voor toeslagenrapport.");
+    }
+    const guidance = ALLOWANCE_ADVISOR_APPLICATION_GUIDANCE.find((item) =>
+      item.allowanceKind === result.allowanceKind,
+    );
+    const reasons = result.reasonCodes.map((code) =>
+      reportLine("Reden", getReasonCodeCopy(code), [code]),
+    );
+    const missingInputs = result.missingFields.map((fieldId) =>
+      reportLine("Ontbrekend gegeven", fieldLabel(fieldId), result.reasonCodes, fieldId),
+    );
+    const warnings = result.uncertaintyCodes.map((code) =>
+      reportLine("Waarschuwing", getUncertaintyCopy(code), [code]),
+    );
+
+    return {
+      allowanceKind: result.allowanceKind,
+      status: reportStatusFor(card.status),
+      reliability: card.reliabilityLabel,
+      monthlyAmountLabel: card.monthlyAmountLabel,
+      yearlyAmountLabel: card.annualAmountLabel,
+      calculationYear: input.calculationYear,
+      reasons,
+      answeredInputs: [],
+      inferredInputs: card.inferredInputMessages.map((message) =>
+        reportLine("Afgeleid gegeven", message, result.reasonCodes),
+      ),
+      missingInputs,
+      warnings,
+      applicationSteps: guidance?.steps ?? ["Controleer je gegevens in Mijn Toeslagen."],
+      officialSources: result.sourceReferences,
+    } satisfies AllowanceAdvisorReportResult;
+  });
+
+  return {
+    title: "Toeslagenadvies",
+    generatedAt: "2026-07-20T00:00:00.000Z",
+    calculationYear: input.calculationYear,
+    summary: [input.summary],
+    results: reportResults,
+    answeredInputs: [],
+    inferredInputs: reportResults.flatMap((item) => item.inferredInputs),
+    missingInputs: reportResults.flatMap((item) => item.missingInputs),
+    officialSources: [...new Map(input.results.flatMap((item) => item.sourceReferences).map((source) => [
+      `${source.datasetId}:${source.version}:${source.sourceUrl}`,
+      source,
+    ])).values()],
+    disclaimer: "Deze rapportdata gebruikt dezelfde centrale berekening en invoer als het scherm. Het is geen beschikking en geen advies; Mijn Toeslagen blijft leidend voor aanvragen en wijzigingen.",
+  };
+}
+
+function cardForResult(item: OfficialAllowanceCalculationResult) {
+  const status = publicStatusFor(item);
+  const reliability = reliabilityFor(item);
+  const inferred = item.assessment.inferredValues.map((inference) =>
+    `${fieldLabel(inference.targetField)} is afgeleid uit ${inference.sourceFields.map(fieldLabel).join(", ")}.`,
+  );
+  const confirmationMessages = item.assessment.inferredValues
+    .filter((inference) => inference.overwriteAllowed)
+    .map((inference) => `Controleer ${fieldLabel(inference.targetField).toLowerCase()} en pas de invoer aan als dit niet klopt.`);
+
+  return {
+    kind: item.allowanceKind,
+    title: allowanceTitles[item.allowanceKind],
+    status,
+    statusLabel: publicStatusLabels[status],
+    summary: publicSummary(item),
+    hardExclusion: item.signal.hardExclusion,
+    monthlyAmountLabel: item.amount.monthlyAmount !== undefined
+      ? formatCurrency(item.amount.monthlyAmount)
+      : undefined,
+    annualAmountLabel: item.amount.annualAmount !== undefined
+      ? formatCurrency(item.amount.annualAmount)
+      : undefined,
+    reliabilityLabel: reliability.label,
+    reliabilityDescription: reliability.description,
+    reasonMessages: item.reasonCodes.map(getReasonCodeCopy),
+    missingFieldMessages: item.missingFields.map((field) => fieldLabel(field)),
+    missingInputs: missingInputViews(item.missingFields),
+    uncertaintyMessages: item.uncertaintyCodes.map(getUncertaintyCopy),
+    inferredInputMessages: inferred,
+    confirmationMessages,
+    officialCalculationUrl: item.signal.officialCalculationUrl,
+    sourceLinks: sourceLinksFor(item),
+    ruleYear: item.calculationYear,
+    datasetId: item.datasetId,
+    datasetVersion: item.datasetVersion,
+  };
 }
 
 export function createAllowanceScanView(values: AllowanceScanFormState): AllowanceScanView {
@@ -361,37 +592,36 @@ export function createAllowanceScanView(values: AllowanceScanFormState): Allowan
   }
 
   const input = mapFormToAllowanceScanInput(values);
-  const scan = evaluateAllowanceSignals(input);
-  const ordered = [...scan.results].sort(
+  const calculation = calculateOfficialAllowanceScan2026({
+    ...input,
+    calculationYear: 2026,
+  });
+  if (!calculation.ok) {
+    throw new Error(`Toeslagenberekening kon niet worden opgebouwd: ${calculation.errors.join(", ")}`);
+  }
+  const ordered = [...calculation.value.results].sort(
     (a, b) =>
       ALLOWANCE_SIGNAL_ORDER.indexOf(a.allowanceKind) -
       ALLOWANCE_SIGNAL_ORDER.indexOf(b.allowanceKind),
   );
+  const cards = ordered.map(cardForResult);
+  const summary = createSummary(cards.map((card) => card.status));
 
   return {
     isValid: true,
     errors,
     result: {
-      summary: createSummary(ordered.map((item) => item.status)),
-      ruleYear: scan.ruleYear,
-      datasetId: scan.datasetId,
-      datasetVersion: scan.datasetVersion,
-      cards: ordered.map((item) => ({
-        kind: item.allowanceKind,
-        title: allowanceTitles[item.allowanceKind],
-        status: item.status,
-        statusLabel: statusLabels[item.status],
-        summary: statusSummaries[item.status],
-        hardExclusion: item.hardExclusion,
-        reasonMessages: item.reasonCodes.map(getReasonCodeCopy),
-        missingFieldMessages: item.missingFields.map(getMissingFieldCopy),
-        uncertaintyMessages: item.uncertaintyCodes.map(getUncertaintyCopy),
-        officialCalculationUrl: item.officialCalculationUrl,
-        sourceLinks: dedupeOfficialLinks(item.sourceReferences, item.officialCalculationUrl),
-        ruleYear: item.ruleYear,
-        datasetId: item.datasetId,
-        datasetVersion: item.datasetVersion,
-      })),
+      summary,
+      ruleYear: calculation.value.calculationYear,
+      datasetId: calculation.value.datasetId,
+      datasetVersion: calculation.value.datasetVersion,
+      cards,
+      report: buildReport({
+        summary,
+        calculationYear: calculation.value.calculationYear,
+        results: ordered,
+        cards,
+      }),
     },
   };
 }
@@ -430,7 +660,7 @@ function allowanceOrder(kind: AllowanceKind) {
 
 function fieldLabel(fieldId: FieldId | undefined) {
   if (!fieldId) {
-    return undefined;
+    return "Aanvullende informatie";
   }
 
   return fieldLabels[fieldId as AllowanceMissingField] ?? fieldId;

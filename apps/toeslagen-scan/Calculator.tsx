@@ -191,9 +191,58 @@ function ResultCard({ card }: { card: AllowanceResultCardView }) {
           {card.statusLabel}
         </span>
       </div>
+      {card.monthlyAmountLabel || card.annualAmountLabel ? (
+        <dl className="mt-4 grid gap-3 sm:grid-cols-2">
+          {card.monthlyAmountLabel ? (
+            <div className="rounded-lg border border-[var(--hair)] bg-[var(--paper-soft)] p-3">
+              <dt className="text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--muted)]">
+                Per maand
+              </dt>
+              <dd className="mt-1 font-mono text-xl tabular text-[var(--ink)]">
+                {card.monthlyAmountLabel}
+              </dd>
+            </div>
+          ) : null}
+          {card.annualAmountLabel ? (
+            <div className="rounded-lg border border-[var(--hair)] bg-[var(--paper-soft)] p-3">
+              <dt className="text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--muted)]">
+                Per jaar
+              </dt>
+              <dd className="mt-1 font-mono text-xl tabular text-[var(--ink)]">
+                {card.annualAmountLabel}
+              </dd>
+            </div>
+          ) : null}
+        </dl>
+      ) : null}
       <p className="mt-3 text-[14px] leading-[1.65] text-[var(--ink-2)]">{card.summary}</p>
+      <p className="mt-2 text-[13px] leading-[1.6] text-[var(--muted)]">
+        Betrouwbaarheid: {card.reliabilityLabel.replace(/-/g, " ")}. {card.reliabilityDescription}
+      </p>
       <ResultList title="Redenen" items={card.reasonMessages} />
-      <ResultList title="Ontbrekende informatie" items={card.missingFieldMessages} />
+      {card.missingInputs.length > 0 ? (
+        <div className="mt-3">
+          <h4 className="text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--muted)]">
+            Ontbrekende informatie
+          </h4>
+          <ul className="mt-2 space-y-2 text-[13px] leading-[1.55] text-[var(--ink-2)]">
+            {card.missingInputs.map((item) => (
+              <li key={item.label} className="rounded-lg border border-[var(--hair)] bg-white p-3">
+                <strong className="block text-[var(--ink)]">{item.label}</strong>
+                <span className="mt-1 block">{item.whyNeeded}</span>
+                <span className="mt-1 block text-[var(--muted)]">
+                  Alternatieve vraag: {item.alternativeQuestions[0]}
+                </span>
+                <span className="mt-1 block text-[var(--muted)]">
+                  Waar vind je dit: {item.whereToFind.slice(0, 2).join(", ")}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+      <ResultList title="Afgeleid uit je invoer" items={card.inferredInputMessages} />
+      <ResultList title="Nog te bevestigen" items={card.confirmationMessages} />
       <ResultList title="Onzekerheden" items={card.uncertaintyMessages} />
       <div className="mt-4 flex flex-wrap gap-2">
         {card.sourceLinks.map((link) => (
@@ -677,7 +726,7 @@ export default function ToeslagenScanCalculator() {
             className="mt-3 rounded-lg bg-white/10 px-3 py-2 text-[13px] text-white/80"
           >
             Je hebt de invoer gewijzigd na de laatste scan. Klik opnieuw op
-            Bekijk mijn toeslagensignalen voor een actuele uitkomst.
+            Bekijk mijn toeslagenadvies voor een actuele uitkomst.
           </p>
         ) : null}
       </section>
@@ -693,8 +742,8 @@ export default function ToeslagenScanCalculator() {
         Nog geen scan uitgevoerd
       </h2>
       <p className="mt-2 text-[13px] leading-[1.65] text-[var(--muted)]">
-        Vul in wat je weet. “Weet ik niet” mag; de centrale signalering toont dan
-        ontbrekende informatie in plaats van een harde conclusie.
+        Vul in wat je weet. “Weet ik niet” mag; de centrale vraagflow toont dan
+        vervolgstappen, alternatieve vragen en ontbrekende informatie.
       </p>
     </section>
   );
@@ -704,14 +753,14 @@ export default function ToeslagenScanCalculator() {
       intro={
         <>
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
-            Beta · signalering 2026
+            Beta · toeslagenadviseur 2026
           </div>
           <h2 className="mt-2 font-serif text-[30px] tracking-[-0.02em] text-[var(--ink)]">
             Welke toeslagen passen mogelijk bij mij?
           </h2>
           <p className="mt-3 text-[14px] leading-[1.7] text-[var(--ink-2)]">
-            Deze scan geeft alleen een signaal voor vier toeslagen. Er worden geen
-            toeslagbedragen berekend en je antwoorden worden door deze app niet opgeslagen.
+            Deze scan gebruikt de centrale vraagflow en toeslagenberekening voor vier toeslagen.
+            Bedragen verschijnen alleen waar de centrale engine ze verantwoord kan geven.
           </p>
         </>
       }
@@ -734,16 +783,16 @@ export default function ToeslagenScanCalculator() {
           onClick={handleSubmit}
           full
         >
-          Bekijk mijn toeslagensignalen
+          Bekijk mijn toeslagenadvies
         </ToolActionButton>
       }
       result={result}
       details={
         <DisclosureSection title="Afbakening">
           <ul className="list-disc space-y-2 pl-5 text-[13px] leading-[1.65] text-[var(--muted)]">
-            <li>Deze beta gebruikt de centrale 2026-signaleringsregels.</li>
-            <li>Complexe situaties verwijzen naar de officiële proefberekening.</li>
-            <li>Deze scan is geen officiële beschikking en berekent geen bedragen.</li>
+            <li>Deze beta gebruikt de centrale 2026-vraagflow, brondata en berekeningslaag.</li>
+            <li>Complexe of onvolledige situaties tonen ontbrekende gegevens en officiële vervolgstappen.</li>
+            <li>Deze scan is geen officiële beschikking; Mijn Toeslagen blijft leidend.</li>
           </ul>
         </DisclosureSection>
       }

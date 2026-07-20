@@ -1,10 +1,13 @@
 import type {
   AllowanceKind,
-  AllowanceSignalStatus,
   AllowanceMissingField,
   AllowanceReasonCode,
   AllowanceUncertaintyCode,
 } from "@/lib/allowances/signaling";
+import type {
+  AllowanceAdvisorReliabilityLabel,
+  AllowanceAdvisorReportModel,
+} from "@/lib/allowances/advisor-experience";
 import type { RegulationId } from "@/lib/regulations/types";
 import type {
   QuestionFlowDecision,
@@ -62,16 +65,37 @@ export type AllowanceScanFormState = {
 export type AllowanceScanField = keyof AllowanceScanFormState;
 export type AllowanceScanErrors = Partial<Record<AllowanceScanField, string>>;
 
+export type AllowancePublicResultStatus =
+  | "eligible-estimate"
+  | "ineligible"
+  | "incomplete"
+  | "special-case"
+  | "unavailable";
+
+export type AllowanceMissingInputView = {
+  label: string;
+  whyNeeded: string;
+  alternativeQuestions: readonly string[];
+  whereToFind: readonly string[];
+};
+
 export type AllowanceResultCardView = {
   kind: AllowanceKind;
   title: string;
-  status: AllowanceSignalStatus;
+  status: AllowancePublicResultStatus;
   statusLabel: string;
   summary: string;
   hardExclusion: boolean;
+  monthlyAmountLabel?: string;
+  annualAmountLabel?: string;
+  reliabilityLabel: AllowanceAdvisorReliabilityLabel;
+  reliabilityDescription: string;
   reasonMessages: string[];
-  missingFieldMessages: string[];
+  missingFieldMessages: readonly string[];
+  missingInputs: readonly AllowanceMissingInputView[];
   uncertaintyMessages: string[];
+  inferredInputMessages: readonly string[];
+  confirmationMessages: readonly string[];
   officialCalculationUrl: string;
   sourceLinks: {
     label: string;
@@ -91,6 +115,7 @@ export type AllowanceScanView = {
     datasetId: string;
     datasetVersion: string;
     cards: AllowanceResultCardView[];
+    report: AllowanceAdvisorReportModel;
   };
 };
 

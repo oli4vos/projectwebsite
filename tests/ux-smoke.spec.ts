@@ -393,16 +393,15 @@ test("publieke toeslagenscan route, formulier en signal-only resultaat werken", 
   await expect(
     page.getByRole("heading", { name: "Welke toeslagen passen mogelijk bij mij?", level: 1 }),
   ).toBeVisible();
-  await expect(page.getByText("Beta · signalering 2026")).toBeVisible();
+  await expect(page.getByText("Beta · toeslagenadviseur 2026")).toBeVisible();
   await expect(
     page.getByText("Geen advies en geen officiële beschikking"),
   ).toBeVisible();
-  await expect(page.getByText("toeslagbedragen berekend")).toBeVisible();
+  await expect(page.getByText("centrale vraagflow en toeslagenberekening")).toBeVisible();
   await expect(
     page.getByRole("progressbar", { name: "Voortgang van relevante toeslagenvragen" }),
   ).toBeVisible();
   await expect(page.getByText("Volgende stap: vul leeftijd in.")).toBeVisible();
-  await expect(page.getByText("centrale vraagflow")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Download uitgebreid PDF-overzicht" })).toHaveCount(0);
 
   const bodyText = (await page.locator("body").innerText()).toLowerCase();
@@ -416,12 +415,15 @@ test("publieke toeslagenscan route, formulier en signal-only resultaat werken", 
   await page.getByLabel("Heb je kinderen?", { exact: true }).selectOption("unknown");
   await expect(page.getByLabel("Kale huur per maand")).toBeVisible();
   await expect(page.getByText("Afgeleid uit eerdere antwoorden")).toBeVisible();
-  await page.getByRole("button", { name: "Bekijk mijn toeslagensignalen" }).click();
+  await page.getByRole("button", { name: "Bekijk mijn toeslagenadvies" }).click();
   await expect(page.locator("#tool-result-summary article")).toHaveCount(4);
   await expect(page.getByRole("heading", { name: "Zorgtoeslag" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Huurtoeslag" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Kindgebonden budget" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Kinderopvangtoeslag" })).toBeVisible();
+  await expect(page.getByText("eligible-estimate").first()).toBeVisible();
+  await expect(page.getByText("Per maand").first()).toBeVisible();
+  await expect(page.getByText("Betrouwbaarheid:").first()).toBeVisible();
 
   const officialLinks = page.locator("#tool-result-summary a[href^='https://www.belastingdienst.nl/']");
   await expect(officialLinks.first()).toBeVisible();

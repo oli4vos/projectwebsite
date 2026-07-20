@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { evaluateAllowanceSignals } from "@/lib/allowances/signaling";
+import { calculateOfficialAllowanceScan2026 } from "@/lib/allowances/official-calculations";
 import {
   createAllowanceQuestionFlowView,
   createAllowanceScanView,
@@ -107,7 +107,7 @@ describe("toeslagen-scan adapter", () => {
 
     expect(errors).toEqual({});
     expect(view.isValid).toBe(true);
-    expect(view.result?.cards.some((card) => card.status === "insufficient-information")).toBe(true);
+    expect(view.result?.cards.some((card) => card.status === "incomplete")).toBe(true);
   });
 
   it("blocks technically invalid input without silently clamping", () => {
@@ -126,7 +126,7 @@ describe("toeslagen-scan adapter", () => {
     expect(errors.childAges).toBeDefined();
   });
 
-  it("preserves fixed result order, source links and absence of amount fields", () => {
+  it("preserves fixed result order, source links and safe public amount fields", () => {
     const view = createAllowanceScanView(exampleValues);
 
     expect(view.isValid).toBe(true);
@@ -146,11 +146,13 @@ describe("toeslagen-scan adapter", () => {
 
   it("matches the central engine entrypoint output metadata", () => {
     const input = mapFormToAllowanceScanInput(exampleValues);
-    const direct = evaluateAllowanceSignals(input);
+    const direct = calculateOfficialAllowanceScan2026({ ...input, calculationYear: 2026 });
     const view = createAllowanceScanView(exampleValues);
 
-    expect(view.result?.datasetId).toBe(direct.datasetId);
-    expect(view.result?.datasetVersion).toBe(direct.datasetVersion);
+    expect(direct.ok).toBe(true);
+    if (!direct.ok) return;
+    expect(view.result?.datasetId).toBe(direct.value.datasetId);
+    expect(view.result?.datasetVersion).toBe(direct.value.datasetVersion);
     expect(view.result?.ruleYear).toBe(2026);
   });
 
