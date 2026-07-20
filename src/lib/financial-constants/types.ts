@@ -64,6 +64,7 @@ export type SourceDatasetFamily =
   | "mortgage-afm-test-rate"
   | "duo-rate-year"
   | "duo-borrowing-limits"
+  | "duo-additional-grant-rules"
   | "allowance-signal-rules"
   | "allowance-calculation-rules"
   | "mortgage-provider-rate";

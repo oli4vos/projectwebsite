@@ -1,4 +1,5 @@
 import { DUO_RATE_HISTORY_BY_YEAR, DUO_RATE_YEAR_METADATA_BY_YEAR } from "@/lib/financial-constants/duo-rate-history";
+import { DUO_ADDITIONAL_GRANT_RULES_2026 } from "@/lib/financial-constants/duo-additional-grant-rules-2026";
 import { ALLOWANCE_CALCULATION_RULES_2026 } from "@/lib/financial-constants/allowance-calculation-rules-2026";
 import { MORTGAGE_FINANCING_LOAD_DATA } from "@/lib/financial-constants/mortgage-financing-load-data";
 import type {
@@ -338,6 +339,77 @@ function validateAllowanceSignalRulesDataset(data: unknown) {
   return issues;
 }
 
+function validateDuoAdditionalGrantRulesDataset(data: unknown) {
+  const issues: string[] = [];
+  const candidate = data as {
+    year?: number;
+    ruleVersion?: string;
+    referenceYear?: { standardReferenceYear?: { value?: unknown } };
+    referenceYearChange?: { minimumIncomeDropPercent?: { value?: unknown } };
+    amounts?: {
+      mbo?: { maximumLivingAtHome?: { value?: unknown }; maximumLivingAway?: { value?: unknown } };
+      hboUniversity?: { maximum?: { value?: unknown } };
+    };
+    typedInputContract?: unknown[];
+    typedResultContract?: { statuses?: unknown[] };
+    testVectors?: unknown[];
+    blockers?: unknown[];
+  };
+
+  if (candidate.year !== 2026) {
+    issues.push("DUO aanvullende-beursdataset moet berekeningsjaar 2026 hebben.");
+  }
+  if (typeof candidate.ruleVersion !== "string" || !SEMVER_PATTERN.test(candidate.ruleVersion)) {
+    issues.push("DUO aanvullende-beursdataset mist een geldige ruleVersion.");
+  }
+  if (candidate.referenceYear?.standardReferenceYear?.value !== 2024) {
+    issues.push("DUO aanvullende-beursdataset moet standaardpeiljaar 2024 voor berekeningsjaar 2026 vastleggen.");
+  }
+  if (candidate.referenceYearChange?.minimumIncomeDropPercent?.value !== 15) {
+    issues.push("DUO peiljaarverlegging moet de 15 procent inkomensdalingsdrempel vastleggen.");
+  }
+  for (const [label, sourceValue] of Object.entries({
+    "mbo thuiswonend": candidate.amounts?.mbo?.maximumLivingAtHome?.value,
+    "mbo uitwonend": candidate.amounts?.mbo?.maximumLivingAway?.value,
+    "hbo/wo": candidate.amounts?.hboUniversity?.maximum?.value,
+  })) {
+    if (typeof sourceValue !== "number" || sourceValue <= 0) {
+      issues.push(`DUO aanvullende-beursdataset mist positief maximumbedrag voor ${label}.`);
+    }
+  }
+  if (!Array.isArray(candidate.typedInputContract) || candidate.typedInputContract.length === 0) {
+    issues.push("DUO aanvullende-beursdataset mist typed inputcontract.");
+  }
+  if (!Array.isArray(candidate.typedResultContract?.statuses) || candidate.typedResultContract.statuses.length === 0) {
+    issues.push("DUO aanvullende-beursdataset mist typed resultaatstatussen.");
+  }
+  if (!Array.isArray(candidate.testVectors) || candidate.testVectors.length === 0) {
+    issues.push("DUO aanvullende-beursdataset mist testvectors.");
+  }
+  if (!Array.isArray(candidate.blockers) || candidate.blockers.length === 0) {
+    issues.push("DUO aanvullende-beursdataset mist expliciete blockers.");
+  }
+
+  for (const source of collectAllowanceValueSources(data)) {
+    const record = source as Record<string, unknown>;
+    if (
+      typeof record.officialSourceUrl !== "string" ||
+      (!record.officialSourceUrl.startsWith("https://duo.nl/") &&
+        !record.officialSourceUrl.startsWith("https://www.duo.nl/"))
+    ) {
+      issues.push("DUO aanvullende-beursbronwaarde moet naar een officiele DUO-URL verwijzen.");
+    }
+    if (record.calculationYear !== 2026) {
+      issues.push("DUO aanvullende-beursbronwaarde mist berekeningsjaar 2026.");
+    }
+    if (typeof record.value === "number" && record.value < 0) {
+      issues.push("DUO aanvullende-beursbronwaarde mag niet negatief zijn.");
+    }
+  }
+
+  return issues;
+}
+
 function collectAllowanceValueSources(data: unknown) {
   const sources: unknown[] = [];
 
@@ -511,6 +583,8 @@ function validateDatasetSpecificBounds(dataset: SourceDataset) {
       }
       break;
     }
+    case "duo-additional-grant-rules":
+      return validateDuoAdditionalGrantRulesDataset(dataset.data);
     case "allowance-signal-rules":
       return validateAllowanceSignalRulesDataset(dataset.data);
     case "allowance-calculation-rules":
@@ -907,6 +981,33 @@ export const SOURCE_DATASET_REGISTRY: readonly SourceDataset[] = [
     },
     data: constants2026.duo.borrowingLimits,
     usedBy: ["duo-leenbedrag-impact", "duo-schuld-bij-starten-lenen"],
+  },
+  {
+    family: "duo-additional-grant-rules",
+    scenario: "official-2026-prepared",
+    meta: {
+      recordType: "dataset",
+      id: "duo-additional-grant-rules-2026",
+      title: "DUO aanvullende beurs en peiljaarverlegging 2026 voorbereid",
+      year: 2026,
+      version: "0.1.0",
+      effectiveFrom: "2026-01-01",
+      effectiveTo: "2026-12-31",
+      retrievedAt: "2026-07-20",
+      lastVerifiedAt: "2026-07-20",
+      nextReviewAt: "2026-10-15",
+      sourceName: "DUO",
+      sourceUrl: "https://duo.nl/particulier/aanvullende-beurs-studiefinanciering/hoeveel-is-het.jsp",
+      sourceType: "official-execution",
+      methodology:
+        "Voorbereide officiele DUO-brondata en ontwerpcontracten voor de Aanvullende-beursscan 2026. De dataset legt bedragen, standaardpeiljaar, peiljaarverlegging, typed input/result-contracten, special cases en testvectors vast, maar activeert geen publieke calculator.",
+      methodologyType: "official-norm",
+      notes:
+        "PDF-formulierlogica uit DUO-berekeningsfolders is als requires-calculation-guardian-review gemarkeerd. Geen React, route, manifest of PDF-output geactiveerd.",
+      status: "active",
+    },
+    data: DUO_ADDITIONAL_GRANT_RULES_2026,
+    usedBy: ["duo-additional-grant-scan-preparation"],
   },
   {
     family: "allowance-signal-rules",

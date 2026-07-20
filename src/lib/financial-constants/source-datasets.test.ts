@@ -291,12 +291,57 @@ describe("source dataset registry", () => {
     expect(data.childcare.blockers.length).toBeGreaterThan(0);
   });
 
+  it("registers prepared official 2026 DUO additional grant rules without public integration", () => {
+    const dataset = getActiveDataset("duo-additional-grant-rules", {
+      scenario: "official-2026-prepared",
+      asOf: "2026-07-20",
+    });
+    const data = dataset.data as {
+      year: number;
+      referenceYear: { standardReferenceYear: { value: number } };
+      referenceYearChange: { minimumIncomeDropPercent: { value: number } };
+      amounts: {
+        mbo: {
+          maximumLivingAtHome: { value: number; officialSourceUrl: string };
+          maximumLivingAway: { value: number };
+          parentalContributionTaperPercent: { value: number; verificationStatus: string };
+        };
+        hboUniversity: {
+          maximum: { value: number; officialSourceUrl: string };
+          maximumGrantParentIncomeThreshold: { value: number };
+          parentalContributionTaperPercent: { value: number; verificationStatus: string };
+        };
+      };
+      typedResultContract: { statuses: readonly string[] };
+      testVectors: readonly unknown[];
+      blockers: readonly string[];
+    };
+
+    expect(dataset.meta.id).toBe("duo-additional-grant-rules-2026");
+    expect(dataset.usedBy).toEqual(["duo-additional-grant-scan-preparation"]);
+    expect(data.year).toBe(2026);
+    expect(data.referenceYear.standardReferenceYear.value).toBe(2024);
+    expect(data.referenceYearChange.minimumIncomeDropPercent.value).toBe(15);
+    expect(data.amounts.mbo.maximumLivingAtHome.value).toBe(438.08);
+    expect(data.amounts.mbo.maximumLivingAway.value).toBe(466.4);
+    expect(data.amounts.mbo.maximumLivingAtHome.officialSourceUrl).toContain("duo.nl");
+    expect(data.amounts.mbo.parentalContributionTaperPercent.value).toBe(26);
+    expect(data.amounts.mbo.parentalContributionTaperPercent.verificationStatus).toBe("requires-calculation-guardian-review");
+    expect(data.amounts.hboUniversity.maximum.value).toBe(491.08);
+    expect(data.amounts.hboUniversity.maximumGrantParentIncomeThreshold.value).toBe(41_500.6);
+    expect(data.amounts.hboUniversity.parentalContributionTaperPercent.value).toBe(13.6);
+    expect(data.typedResultContract.statuses).toContain("special-case");
+    expect(data.testVectors.length).toBeGreaterThanOrEqual(6);
+    expect(data.blockers.length).toBeGreaterThan(0);
+  });
+
   it("generates a source inventory from the registry", () => {
     const markdown = buildSourceDataOverviewMarkdown(SOURCE_DATASET_REGISTRY);
 
     expect(markdown).toContain("| Dataset-id | Titel | Jaar |");
     expect(markdown).toContain("mortgage-financing-load-2026");
     expect(markdown).toContain("duo-rate-year-2026");
+    expect(markdown).toContain("duo-additional-grant-rules-2026");
     expect(markdown).toContain("allowance-calculation-rules-2026");
   });
 
