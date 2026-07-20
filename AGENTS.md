@@ -150,6 +150,72 @@ De Sources & Regulations Guardian bewaakt primaire bronnen, regelgeving, uitvoer
 - Toeslagendata wordt pas actief wanneer bronregels volledig genormaliseerd, gevalideerd en getest zijn.
 - Als een tool of flow niet meer actief aangeroepen wordt, zet dan de zichtbare manifest-/route-exposure uit en leg de status vast in `FUNCTIONALITY_STATUS.md`; laat de code alleen bestaan als verborgen heractiveringsbron.
 
+## Regelingen & Toeslagen Engine
+
+Deze guardrails gelden voor de geplande Regelingen & Toeslagen Engine en voor iedere toekomstige uitbreiding naar toeslagen, gemeentelijke regelingen, studiefinanciering, energieregelingen, belastingvoordelen, pensioen, zorg, wonen of vergelijkbare regelingen.
+
+### Centrale architectuur
+
+- Toekomstige generieke primitives horen in een centrale pure TypeScript-laag, bij voorkeur onder `src/lib/regulations`, mits implementatieonderzoek bevestigt dat dit past bij de bestaande structuur.
+- Regeling-specifieke rekenregels blijven in hun eigen domeinmodule, zoals `src/lib/allowances`, `src/lib/duo`, `src/lib/mortgage`, `src/lib/tax` of `src/lib/family-financing`.
+- De generieke laag orkestreert hooguit confidence, unknown answers, dependencies, inferenties, evidence, aanbevelingen en actieplannen.
+- De generieke laag vervangt geen bestaande DUO-, hypotheek-, tax-, allowance- of family-financing-engine.
+- Er komt geen tweede parallel calculatorframework en geen generieke runtime die bestaande domeinengines omzeilt.
+- Domeinfuncties zijn deterministisch, unit-testbaar en hebben geen browser-, React-, route-, storage-, analytics- of PDF-afhankelijkheden.
+
+### Confidence
+
+- Confidence is de kwaliteit van de Project Site-inschatting, geen kans dat iemand juridisch recht heeft.
+- Confidence moet verklaarbaar en testbaar zijn; willekeurige percentages zonder gedocumenteerde factoren zijn niet toegestaan.
+- Confidencefactoren zijn machineleesbaar en staan los van zichtbare UI-copy.
+- Bronfreshness, onbekende antwoorden, inferenties, grensnabijheid, bronstatus en complexiteit wegen expliciet mee.
+- UI-copy mag confidence nooit presenteren als juridische kans, beschikking, rechtstoekenning of aanvraagzekerheid.
+
+### Schattingen en bedragen
+
+- Geen financieel bedrag zonder typed estimate range met minimaal minimum, likely en maximum.
+- Iedere estimate bevat eenheid, periode, bronjaar, bronverwijzingen, confidence, aannames, onzekerheden en een persoonlijk actieplan.
+- Als officiële bedraglogica onvoldoende centraal is gemodelleerd, blijft de output signal-only en volgt een officiële controleactie.
+- Exact ogende bedragen zijn verboden wanneer alleen een ruwe indicatie verantwoord is.
+- Brondata voor schattingen komt uit `src/lib/financial-constants`; React of appdirectories hardcoden geen bronjaren, grenzen, bedragen of afbouwregels.
+
+### Unknown answers en inferenties
+
+- `unknown` is een geldige domeinstatus en mag niet automatisch de volledige flow beëindigen.
+- De domeinlaag bepaalt mogelijke vervolgvragen, vereenvoudigde vragen en afleidingsmogelijkheden.
+- Doorgaan met lagere confidence moet mogelijk blijven wanneer dat inhoudelijk verantwoord is.
+- Afgeleide waarden zijn zichtbaar, traceerbaar, overschrijfbaar en voorzien van broninputs, methode, confidence en evidence.
+- Inferenties mogen niet stil als rechtstreeks gebruikersantwoord worden opgeslagen.
+- Gegevensoverdracht uit andere tools vereist zichtbare toestemming; geen persoonsgegevens of financiële invoer in URL's, logs of analytics.
+
+### Vraagdependencies en complexe situaties
+
+- Businessafhankelijkheden horen niet in React. Zichtbaarheid, requiredness, skip-reasons en vervolgvragen komen uit centrale definities of adapters.
+- De UI rendert domeinoutput en beheert alleen presentatiestate; stale hidden velden mogen niet blijven doorwerken.
+- Complexiteit is een domeinclassificatie en betekent niet automatisch stoppen.
+- Alleen het niet-betrouwbaar te beoordelen onderdeel wordt beperkt; andere regelingen of onderdelen blijven beoordeelbaar wanneer dat verantwoord is.
+- Internationale, juridische, deeljaar- en uitzonderingssituaties mogen nooit met schijnzekerheid worden berekend.
+
+### Evidence, reason codes en actieplannen
+
+- Iedere signalering, schatting en aanbeveling verwijst machineleesbaar naar gebruikte regels, brondata, inputs, inferenties, aannames, uitgesloten regels, ontbrekende velden, onzekerheden en geldigheidsperiode.
+- Machineleesbare reason codes staan los van UI-copy en mogen niet als volledige gebruikersboodschap worden behandeld.
+- Iedere afgeronde evaluatie bevat een geprioriteerd actieplan.
+- Actietypen bevatten minimaal `collect-data`, `verify-officially`, `run-project-tool`, `apply-officially`, `monitor-year-change`, `review-later` en `not-relevant-now`.
+- Officiële aanvraag, proefberekening of beschikking blijft eindverantwoordelijk waar nodig; officiële links worden centraal en veilig beheerd.
+
+### Privacy, hosting en tests
+
+- Static-first blijft verplicht. Geen backend, opslag, analytics op inhoudelijke invoer, secrets of runtimekosten zonder expliciet architectuurbesluit.
+- Generieke primitives krijgen pure unit tests; adapters krijgen domeinspecifieke tests.
+- Confidencefactoren, unknown-answerflows, inference provenance, dependencygedrag, stale hidden fields, source-year- en freshnessgedrag worden afzonderlijk getest.
+- Reacttests mogen domeintests niet vervangen; regressietests voor bestaande publieke tools blijven verplicht.
+
+### Eerste implementatiegrens
+
+- De eerstvolgende technische implementatie mag alleen een technische ontwerpnotitie voor `src/lib/regulations`, minimale centrale TypeScript-primitives, pure generieke helpers en unit tests voor generiek gedrag toevoegen.
+- De eerstvolgende technische implementatie mag nog geen publieke toeslagenscan aanpassen, bedragen berekenen, officiële toeslagformules invoeren, allowance-adapters koppelen, React wijzigen, manifests/routes/dashboard/PDF wijzigen, gegevensoverdracht activeren, backend of opslag toevoegen.
+
 ## Nieuwe berekeningen toevoegen
 
 1. Zoek eerst bestaande centrale helpers, constants en tests.
