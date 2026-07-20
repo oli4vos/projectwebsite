@@ -24,6 +24,14 @@ export { createRegulationDefinition } from "@/lib/regulations/definition";
 export { evaluateRegulation } from "@/lib/regulations/evaluator";
 export { createEstimateRange } from "@/lib/regulations/estimate";
 export { mergeCalculationEvidence } from "@/lib/regulations/evidence";
+export {
+  collectInferenceEvidence,
+  filterBlockingUnknowns,
+  mergeResolvedAnswers,
+  resolveRegulationInputs,
+  resolveUnknownFields,
+  runInference,
+} from "@/lib/regulations/unknown";
 export type {
   RegulationAdapterMetadata,
   RegulationDefinitionMetadata,
@@ -40,6 +48,13 @@ export type {
   RegulationReviewPolicy,
   RegulationUnknownStrategy,
 } from "@/lib/regulations/definition";
+export type {
+  InferenceCandidate,
+  InferenceResult,
+  ResolutionPipelineResult,
+  UnknownResolution,
+  UnknownResolutionType,
+} from "@/lib/regulations/unknown";
 export type {
   RegulationDefinition,
   RegulationEvaluationContext,
