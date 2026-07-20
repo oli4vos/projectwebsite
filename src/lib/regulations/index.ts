@@ -20,6 +20,11 @@ export {
   evaluateQuestionCondition,
   resolveFollowUpQuestion,
 } from "@/lib/regulations/dependencies";
+export { evaluateRegulation } from "@/lib/regulations/evaluator";
 export { createEstimateRange } from "@/lib/regulations/estimate";
 export { mergeCalculationEvidence } from "@/lib/regulations/evidence";
+export type {
+  RegulationDefinition,
+  RegulationEvaluationContext,
+} from "@/lib/regulations/evaluator";
 export type * from "@/lib/regulations/types";
