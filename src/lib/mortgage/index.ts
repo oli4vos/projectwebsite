@@ -10,6 +10,12 @@ export {
   buildMortgagePdfReport,
   mortgageReportFileName,
 } from "@/lib/mortgage/report";
+export {
+  adaptMortgageToRegulationAssessment,
+  mapMortgageInputToRegulationAnswers,
+  MORTGAGE_REGULATION_DEFINITION,
+  MORTGAGE_REGULATION_MIGRATION_INVENTORY,
+} from "@/lib/mortgage/regulations-adapter";
 export { calculateSalaryBorrowingPower } from "@/lib/mortgage/salary-borrowing-power";
 export type {
   MortgageAnnuityInput,
@@ -48,6 +54,13 @@ export type {
   MortgageRateAverageStatus,
   MortgageRateReferenceScenario,
 } from "@/lib/mortgage/provider-rates";
+export type {
+  MortgageRegulationAdapterInput,
+  MortgageRegulationAssessment,
+  MortgageRegulationFieldId,
+  MortgageRegulationMigrationInventory,
+  MortgageRegulationToolId,
+} from "@/lib/mortgage/regulations-adapter";
 export type {
   SalaryBorrowingPowerInput,
   RequiredIncomeSearchResult,

@@ -68,6 +68,8 @@ Question Flow vertaalt dezelfde centrale definitions, resolved answers, unknown 
 
 Adapters verbinden formulierinput met domeininput en domeinresultaten met scherm- en rapportmodellen. Definitions beschrijven regels, afhankelijkheden, vragen, bronkoppelingen, reason codes en domeinmetadata machineleesbaar, zodat UI en PDF dezelfde inhoudelijke basis gebruiken.
 
+Voor hypotheektools start deze adapterlaag als voorbereidende centrale integratie: bestaande `MortgageMaxMortgageInput`- en `MortgageMaxMortgageResult`-data kan naar Regulations-context worden vertaald voor definitions, question flow, unknowns, recommendations, estimates en reportingbeschikbaarheid, terwijl hypotheekformules en publieke uitkomsten in de bestaande centrale mortgage-domeinlaag blijven.
+
 ## 4. Domeinen
 
 De Project Site ondersteunt nu en in de toekomst meerdere financiële domeinen. Elk domein behoudt zijn eigen centrale rekenlaag, brondata en testbare aannames, terwijl gedeelde primitives voor evaluatie, uitleg en rapportage herbruikbaar blijven.

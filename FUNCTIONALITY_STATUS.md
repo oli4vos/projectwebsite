@@ -50,6 +50,7 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 | Submit-driven calculatorflow | actief | n.v.t. | aan | Patroon beschikbaar via `CalculatorShell` + submitlogica | n.v.t. |
 | DUO-impact in maximale-hypotheektool | actief | n.v.t. | aan | Kernuitkomst toont rechtsboven de indicatieve daling van de leencapaciteit | n.v.t. |
 | Hypotheekrentelink en salarisverhogingsanalyse | actief | centrale linkconfig + salarisadapter | aan | Maximale-hypotheekflow toont externe inspiratielink bij renteveld en vervolganalyse voor extra leenruimte via centrale hypotheekengine; PDF-uitbreiding blijft vervolgwerk | n.v.t. |
+| Hypotheek Regulations-integratieadapter | voorbereid | centrale adapter | uit in UI | Centrale adapterlaag voor hypotheektools richting Regulations-architectuur; nog niet gekoppeld aan calculators en wijzigt geen publieke uitkomsten | koppel per tool pas na UX/PDF- en regressiecontrole |
 | DUO-maandbedrag-returnflow naar hypotheekimpact | actief | sessionStorage-transfer | aan | `hypotheek-impact-studieschuld` kan een concept bewaren, `duo-maandbedrag` laten rekenen en een bevestigbaar DUO-bedrag teruggeven zonder financiële data in de URL; maximale-hypotheektool bewust niet gekoppeld in deze iteratie | n.v.t. |
 | Centrale toeslagensignalering | actief | n.v.t. | aan via publieke beta | Centrale 2026 signal-only domeinlaag en brondata zijn gereed; er worden geen bedragen berekend | 2027-dataset vereist vóór gebruik in 2027 |
 | Toeslagenscan publieke beta | experimenteel | `visibility: "public"` | aan | `apps/toeslagen-scan` gebruikt de centrale allowances-engine, toont geen bedragen, heeft geen PDF/opslag/backend/analytics en verwijst naar officiële 2026-bronnen | 2027-dataset vereist vóór gebruik in 2027 |
@@ -67,6 +68,7 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 
 | Datum | Commit | Wijziging | Impact |
 |---|---|---|---|
+| 2026-07-20 | `pending` | Centrale hypotheekadapter richting Regulations-architectuur toegevoegd met inventarisatie, definitions, answer mapping, evaluation/recommendation/estimate-context en regressietests; niet gekoppeld aan publieke UI | Hypotheek / Regulations / voorbereid |
 | 2026-07-19 | `pending` | Toeslagenscan gecontroleerd geactiveerd als publieke beta-tool; 10 publieke tools, signal-only, geen bedragen/PDF/opslag/backend/analytics | Toeslagen / publieke beta / registry |
 | 2026-07-20 | `pending` | Toeslagenscan gebruikt de centrale Regulation Question Flow voor voortgang, vervolgvraag en inferred/skipped/not-applicable-statussen zonder publieke signaleringsuitkomsten of berekeningen te wijzigen | Toeslagen / question flow / publieke beta |
 | 2026-07-19 | `pending` | Eerste hidden-draft toeslagenscan toegevoegd op basis van centrale allowances-signalering; geen bedragen, geen PDF, geen opslag en niet publiek zichtbaar | Toeslagen / hidden draft / UI |
