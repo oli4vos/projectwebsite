@@ -68,6 +68,7 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 | Datum | Commit | Wijziging | Impact |
 |---|---|---|---|
 | 2026-07-19 | `pending` | Toeslagenscan gecontroleerd geactiveerd als publieke beta-tool; 10 publieke tools, signal-only, geen bedragen/PDF/opslag/backend/analytics | Toeslagen / publieke beta / registry |
+| 2026-07-20 | `pending` | Toeslagenscan gebruikt de centrale Regulation Question Flow voor voortgang, vervolgvraag en inferred/skipped/not-applicable-statussen zonder publieke signaleringsuitkomsten of berekeningen te wijzigen | Toeslagen / question flow / publieke beta |
 | 2026-07-19 | `pending` | Eerste hidden-draft toeslagenscan toegevoegd op basis van centrale allowances-signalering; geen bedragen, geen PDF, geen opslag en niet publiek zichtbaar | Toeslagen / hidden draft / UI |
 | 2026-07-19 | `pending` | Veilige DUO-maandbedrag-returnflow toegevoegd tussen hypotheek-impact en DUO-maandbedrag via allowlisted sessionStorage-transfer en expliciete gebruikerbevestiging | DUO / studieschuld / hypotheek-impact |
 | 2026-07-19 | `pending` | Centrale 2026 toeslagensignalering toegevoegd voor zorgtoeslag, huurtoeslag, kindgebonden budget en kinderopvangtoeslag; signal-only, geen bedragen, nog geen publieke UI | Toeslagen / domeinlaag / brondata |

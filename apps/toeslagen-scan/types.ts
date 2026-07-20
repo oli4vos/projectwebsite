@@ -5,6 +5,12 @@ import type {
   AllowanceReasonCode,
   AllowanceUncertaintyCode,
 } from "@/lib/allowances/signaling";
+import type { RegulationId } from "@/lib/regulations/types";
+import type {
+  QuestionFlowDecision,
+  QuestionFlowProgress,
+  QuestionFlowQuestionStatus,
+} from "@/lib/regulations/question-flow";
 
 export type YesNoUnknown = "yes" | "no" | "unknown";
 export type PartnerChoice = YesNoUnknown;
@@ -86,6 +92,33 @@ export type AllowanceScanView = {
     datasetVersion: string;
     cards: AllowanceResultCardView[];
   };
+};
+
+export type AllowanceQuestionFlowItemView = {
+  regulationId: RegulationId;
+  allowanceKind: AllowanceKind;
+  nextFieldLabel?: string;
+  decisionReason: QuestionFlowDecision["reason"];
+  progress: QuestionFlowProgress;
+  blockingFieldLabels: readonly string[];
+  inferredFieldLabels: readonly string[];
+  skippedFieldLabels: readonly string[];
+  notApplicableFieldLabels: readonly string[];
+  recommendationIds: readonly string[];
+};
+
+export type AllowanceQuestionFlowView = {
+  isValid: boolean;
+  errors: AllowanceScanErrors;
+  totalRelevant: number;
+  completed: number;
+  blocked: number;
+  remaining: number;
+  percentage: number;
+  nextFieldLabel?: string;
+  decisionReason: QuestionFlowDecision["reason"];
+  items: readonly AllowanceQuestionFlowItemView[];
+  questionStatuses: Partial<Record<AllowanceMissingField, QuestionFlowQuestionStatus>>;
 };
 
 export type CopyCoverage = {

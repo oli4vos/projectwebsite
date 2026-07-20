@@ -1,11 +1,18 @@
 import {
+  evaluateAllowanceRegulations,
+} from "@/lib/allowances/regulations-pipeline";
+import {
   ALLOWANCE_SIGNAL_ORDER,
   evaluateAllowanceSignals,
+  type AllowanceKind,
+  type AllowanceMissingField,
   type AllowanceScanInput,
   type UnknownableBoolean,
 } from "@/lib/allowances/signaling";
 import type { SourceReference } from "@/lib/financial-constants";
 import { parseOptionalDecimalInput } from "@/lib/number-input";
+import { buildQuestionFlow } from "@/lib/regulations/question-flow";
+import type { AnswerState, FieldId } from "@/lib/regulations/types";
 import {
   allowanceTitles,
   getMissingFieldCopy,
@@ -15,6 +22,8 @@ import {
   statusSummaries,
 } from "./copy";
 import type {
+  AllowanceQuestionFlowItemView,
+  AllowanceQuestionFlowView,
   AllowanceScanErrors,
   AllowanceScanField,
   AllowanceScanFormState,
@@ -384,5 +393,266 @@ export function createAllowanceScanView(values: AllowanceScanFormState): Allowan
         datasetVersion: item.datasetVersion,
       })),
     },
+  };
+}
+
+const fieldLabels: Record<AllowanceMissingField, string> = {
+  year: "Kalenderjaar",
+  age: "Leeftijd",
+  partnerStatus: "Toeslagpartner",
+  assessmentIncome: "Geschat toetsingsinkomen",
+  jointAssessmentIncome: "Gezamenlijk toetsingsinkomen",
+  assets: "Vermogen op 1 januari",
+  jointAssets: "Gezamenlijk vermogen op 1 januari",
+  householdIncome: "Huishoudinkomen voor huurtoeslag",
+  householdAssets: "Huishoudvermogen",
+  "healthcare.hasDutchHealthInsurance": "Nederlandse zorgverzekering",
+  "rent.tenure": "Woonsituatie",
+  "rent.independentHome": "Zelfstandige woonruimte",
+  "rent.basicRent": "Kale huur per maand",
+  "rent.hasCoResidents": "Medebewoners",
+  "children.hasChildren": "Kinderen",
+  "children.childAges": "Leeftijden kinderen",
+  "children.receivesChildBenefit": "Kinderbijslag",
+  "children.childLivesWithApplicant": "Kind woont bij jou",
+  "childcare.usesChildcare": "Betaalde kinderopvang",
+  "childcare.registeredChildcare": "LRK-registratie opvang",
+  "childcare.paysOwnContribution": "Eigen bijdrage opvang",
+  "childcare.childLivesWithApplicant": "Kind woont bij jou",
+  "childcare.applicantHasQualifyingActivity": "Jouw activiteit",
+  "childcare.partnerHasQualifyingActivity": "Activiteit toeslagpartner",
+  "childcare.hoursPerMonth": "Opvanguren per maand",
+};
+
+function allowanceOrder(kind: AllowanceKind) {
+  return ALLOWANCE_SIGNAL_ORDER.indexOf(kind);
+}
+
+function fieldLabel(fieldId: FieldId | undefined) {
+  if (!fieldId) {
+    return undefined;
+  }
+
+  return fieldLabels[fieldId as AllowanceMissingField] ?? fieldId;
+}
+
+function skipped(fieldId: FieldId, reasonCodes: readonly string[]): AnswerState {
+  return { state: "skipped", fieldId, reasonCodes };
+}
+
+function notApplicable(fieldId: FieldId, reasonCodes: readonly string[]): AnswerState {
+  return { state: "not-applicable", fieldId, reasonCodes };
+}
+
+function applyQuestionFlowVisibility(
+  values: AllowanceScanFormState,
+  answers: Readonly<Record<FieldId, AnswerState>>,
+): Readonly<Record<FieldId, AnswerState>> {
+  const mapped = { ...answers };
+  const hasPartner = values.partnerStatus === "yes";
+  const renting = values.tenure === "rent";
+  const notRenting = values.tenure === "owner" || values.tenure === "other";
+  const hasCoResidents = renting && values.hasCoResidents === "yes";
+  const hasChildren = values.hasChildren === "yes";
+  const noChildren = values.hasChildren === "no";
+  const usesChildcare = hasChildren && values.usesChildcare === "yes";
+
+  if (!hasPartner) {
+    mapped.jointAssessmentIncome = skipped("jointAssessmentIncome", ["allowance.flow.hidden.no-partner"]);
+    mapped.jointAssets = skipped("jointAssets", ["allowance.flow.hidden.no-partner"]);
+    mapped["childcare.partnerHasQualifyingActivity"] = notApplicable(
+      "childcare.partnerHasQualifyingActivity",
+      ["allowance.flow.not-applicable.no-partner"],
+    );
+  }
+
+  if (notRenting) {
+    for (const fieldId of [
+      "rent.independentHome",
+      "rent.basicRent",
+      "rent.hasCoResidents",
+      "householdIncome",
+      "householdAssets",
+    ] as const) {
+      mapped[fieldId] = skipped(fieldId, ["allowance.flow.hidden.not-renting"]);
+    }
+  } else if (!hasCoResidents) {
+    mapped.householdIncome = skipped("householdIncome", ["allowance.flow.hidden.no-co-residents"]);
+    mapped.householdAssets = skipped("householdAssets", ["allowance.flow.hidden.no-co-residents"]);
+  }
+
+  if (noChildren) {
+    for (const fieldId of [
+      "children.childAges",
+      "children.receivesChildBenefit",
+      "children.childLivesWithApplicant",
+      "childcare.usesChildcare",
+      "childcare.registeredChildcare",
+      "childcare.paysOwnContribution",
+      "childcare.childLivesWithApplicant",
+      "childcare.applicantHasQualifyingActivity",
+      "childcare.hoursPerMonth",
+    ] as const) {
+      mapped[fieldId] = skipped(fieldId, ["allowance.flow.hidden.no-children"]);
+    }
+  } else if (!usesChildcare) {
+    for (const fieldId of [
+      "childcare.registeredChildcare",
+      "childcare.paysOwnContribution",
+      "childcare.childLivesWithApplicant",
+      "childcare.applicantHasQualifyingActivity",
+      "childcare.partnerHasQualifyingActivity",
+      "childcare.hoursPerMonth",
+    ] as const) {
+      mapped[fieldId] = skipped(fieldId, ["allowance.flow.hidden.no-childcare"]);
+    }
+  }
+
+  return mapped;
+}
+
+function mapFormToAllowanceQuestionFlowInput(
+  values: AllowanceScanFormState,
+): AllowanceScanInput {
+  const input = mapFormToAllowanceScanInput(values);
+  const childAges = parseChildAges(values.childAges) ?? [];
+
+  if (values.hasChildren === "unknown" && childAges.length > 0) {
+    input.childBudget = {
+      ...input.childBudget,
+      hasChildren: undefined,
+      childAges,
+    };
+    input.childcare = {
+      ...input.childcare,
+      hasChildren: undefined,
+    };
+  }
+
+  return input;
+}
+
+function statusRank(status: NonNullable<AllowanceQuestionFlowView["questionStatuses"][AllowanceMissingField]>) {
+  return {
+    blocked: 7,
+    inferred: 6,
+    active: 5,
+    pending: 4,
+    "not-applicable": 3,
+    skipped: 2,
+    answered: 1,
+  }[status];
+}
+
+function aggregateDecision(
+  items: readonly AllowanceQuestionFlowItemView[],
+): AllowanceQuestionFlowView["decisionReason"] {
+  if (items.length === 0) {
+    return "empty";
+  }
+  if (items.some((item) => item.decisionReason === "blocked")) {
+    return "blocked";
+  }
+  if (items.some((item) => item.decisionReason === "next-pending")) {
+    return "next-pending";
+  }
+
+  return "complete";
+}
+
+function emptyQuestionFlowView(errors: AllowanceScanErrors): AllowanceQuestionFlowView {
+  return {
+    isValid: false,
+    errors,
+    totalRelevant: 0,
+    completed: 0,
+    blocked: 0,
+    remaining: 0,
+    percentage: 0,
+    decisionReason: "empty",
+    items: [],
+    questionStatuses: {},
+  };
+}
+
+function labelsForQuestions(
+  questionIds: readonly string[],
+  questions: ReturnType<typeof buildQuestionFlow>["questions"],
+) {
+  return questionIds
+    .map((questionId) => questions.find((question) => question.questionId === questionId)?.fieldId)
+    .map(fieldLabel)
+    .filter((label): label is string => Boolean(label));
+}
+
+export function createAllowanceQuestionFlowView(
+  values: AllowanceScanFormState,
+): AllowanceQuestionFlowView {
+  const errors = validateAllowanceScanForm(values);
+  if (Object.keys(errors).length > 0) {
+    return emptyQuestionFlowView(errors);
+  }
+
+  const input = mapFormToAllowanceQuestionFlowInput(values);
+  const regulations = evaluateAllowanceRegulations(input);
+  if (!regulations.ok) {
+    throw new Error(`Toeslagenvraagflow kon niet worden opgebouwd: ${regulations.errors.join(", ")}`);
+  }
+
+  const flows = [...regulations.value.assessments]
+    .sort((left, right) => allowanceOrder(left.allowanceKind) - allowanceOrder(right.allowanceKind))
+    .map((assessment) => ({
+      assessment,
+      flow: buildQuestionFlow({
+        definition: assessment.definition,
+        answers: applyQuestionFlowVisibility(values, assessment.resolvedAnswers),
+        unknownResolutions: assessment.unknownResolutions,
+        inferences: assessment.inferredValues,
+        evaluation: assessment.evaluation,
+        recommendations: assessment.recommendations,
+      }),
+    }));
+
+  const items = flows.map(({ assessment, flow }) => ({
+    regulationId: assessment.regulationId,
+    allowanceKind: assessment.allowanceKind,
+    nextFieldLabel: fieldLabel(flow.decision.nextFieldId),
+    decisionReason: flow.decision.reason,
+    progress: flow.progress,
+    blockingFieldLabels: flow.summary.missingBlockingFieldIds
+      .map(fieldLabel)
+      .filter((label): label is string => Boolean(label)),
+    inferredFieldLabels: labelsForQuestions(flow.summary.inferredQuestionIds, flow.questions),
+    skippedFieldLabels: labelsForQuestions(flow.summary.skippedQuestionIds, flow.questions),
+    notApplicableFieldLabels: labelsForQuestions(flow.summary.notApplicableQuestionIds, flow.questions),
+    recommendationIds: flow.summary.recommendationIds,
+  })) satisfies AllowanceQuestionFlowItemView[];
+
+  const totalRelevant = items.reduce((sum, item) => sum + item.progress.totalRelevant, 0);
+  const completed = items.reduce((sum, item) => sum + item.progress.completed, 0);
+  const questionStatuses: AllowanceQuestionFlowView["questionStatuses"] = {};
+  for (const { flow } of flows) {
+    for (const question of flow.questions) {
+      const fieldId = question.fieldId as AllowanceMissingField;
+      const existing = questionStatuses[fieldId];
+      if (!existing || statusRank(question.status) > statusRank(existing)) {
+        questionStatuses[fieldId] = question.status;
+      }
+    }
+  }
+
+  return {
+    isValid: true,
+    errors,
+    totalRelevant,
+    completed,
+    blocked: items.reduce((sum, item) => sum + item.progress.blocked, 0),
+    remaining: items.reduce((sum, item) => sum + item.progress.remaining, 0),
+    percentage: totalRelevant === 0 ? 100 : Math.round((completed / totalRelevant) * 100),
+    nextFieldLabel: items.find((item) => item.decisionReason === "blocked")?.nextFieldLabel ??
+      items.find((item) => item.decisionReason === "next-pending")?.nextFieldLabel,
+    decisionReason: aggregateDecision(items),
+    items,
+    questionStatuses,
   };
 }

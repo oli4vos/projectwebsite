@@ -64,6 +64,8 @@ Unknown Resolution behandelt ontbrekende of onzekere antwoorden als geldige dome
 
 Evaluation bepaalt welke regels gelden, welke onderdelen onzeker zijn en welke uitkomst verantwoord is. Recommendation vertaalt die evaluatie naar prioriteiten, vervolgstappen en officiële controles. Estimate beschrijft bedragen of bandbreedtes alleen wanneer de brondata en rekenregels daarvoor voldoende betrouwbaar zijn.
 
+Question Flow vertaalt dezelfde centrale definitions, resolved answers, unknown resolutions, inferences, evaluations en recommendations naar voortgang, vervolgvraag en vraagstatussen. Apps gebruiken dit als flowcontext; de financiële signalering of berekening blijft in de bestaande domein- en adapterlagen.
+
 Adapters verbinden formulierinput met domeininput en domeinresultaten met scherm- en rapportmodellen. Definitions beschrijven regels, afhankelijkheden, vragen, bronkoppelingen, reason codes en domeinmetadata machineleesbaar, zodat UI en PDF dezelfde inhoudelijke basis gebruiken.
 
 ## 4. Domeinen

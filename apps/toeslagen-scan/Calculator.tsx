@@ -7,12 +7,14 @@ import { CalculatorShell } from "@/components/tool/CalculatorShell";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
 import { useSubmittedCalculation } from "@/hooks/useSubmittedCalculation";
 import {
+  createAllowanceQuestionFlowView,
   createAllowanceScanView,
   defaultValues,
   exampleValues,
   validateAllowanceScanForm,
 } from "./logic";
 import type {
+  AllowanceQuestionFlowView,
   AllowanceResultCardView,
   AllowanceScanField,
   AllowanceScanFormState,
@@ -210,6 +212,51 @@ function ResultCard({ card }: { card: AllowanceResultCardView }) {
   );
 }
 
+function QuestionFlowSummary({ flow }: { flow: AllowanceQuestionFlowView }) {
+  if (!flow.isValid) {
+    return null;
+  }
+
+  const inferred = [...new Set(flow.items.flatMap((item) => item.inferredFieldLabels))];
+  const skipped = [...new Set(flow.items.flatMap((item) => item.skippedFieldLabels))];
+  const notApplicable = [...new Set(flow.items.flatMap((item) => item.notApplicableFieldLabels))];
+  const blocking = [...new Set(flow.items.flatMap((item) => item.blockingFieldLabels))];
+
+  return (
+    <section className="surface-panel p-4" aria-labelledby="toeslagen-question-flow-title">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h3 id="toeslagen-question-flow-title" className="text-base font-semibold text-[var(--ink)]">
+            Voortgang
+          </h3>
+          <p className="mt-1 text-[13px] leading-[1.55] text-[var(--muted)]">
+            {flow.completed} van {flow.totalRelevant} relevante vragen verwerkt.
+          </p>
+        </div>
+        <span className="rounded-full border border-[var(--hair)] bg-[var(--paper-soft)] px-3 py-1 text-[12px] font-medium text-[var(--ink)]">
+          {flow.percentage}%
+        </span>
+      </div>
+      <div
+        className="mt-3 h-2 overflow-hidden rounded-full bg-[var(--paper-soft)]"
+        aria-hidden="true"
+      >
+        <div className="h-full bg-[var(--accent)]" style={{ width: `${flow.percentage}%` }} />
+      </div>
+      <p className="mt-3 text-[13px] leading-[1.6] text-[var(--ink-2)]">
+        {flow.decisionReason === "blocked"
+          ? "De centrale vraagflow wacht op een verplicht onbekend gegeven."
+          : flow.nextFieldLabel
+            ? `Volgende vraag volgens de centrale vraagflow: ${flow.nextFieldLabel}.`
+            : "De centrale vraagflow heeft geen vervolgvraag nodig voor de huidige invoer."}
+      </p>
+      <ResultList title="Verplicht onbekend" items={blocking} />
+      <ResultList title="Afgeleid uit eerdere antwoorden" items={inferred} />
+      <ResultList title="Overgeslagen of niet van toepassing" items={[...skipped, ...notApplicable]} />
+    </section>
+  );
+}
+
 export default function ToeslagenScanCalculator() {
   const resultRef = useRef<HTMLDivElement | null>(null);
   const {
@@ -225,6 +272,10 @@ export default function ToeslagenScanCalculator() {
   const submittedView = useMemo(
     () => (submittedValues ? createAllowanceScanView(submittedValues) : null),
     [submittedValues],
+  );
+  const questionFlowView = useMemo(
+    () => createAllowanceQuestionFlowView(formValues),
+    [formValues],
   );
   const hasErrors = Object.keys(errors).length > 0;
   const hasPartner = formValues.partnerStatus === "yes";
@@ -268,6 +319,8 @@ export default function ToeslagenScanCalculator() {
           “Weet ik niet” laten staan.
         </div>
       ) : null}
+
+      <QuestionFlowSummary flow={questionFlowView} />
 
       <section className="space-y-4" aria-labelledby="toeslagen-step-household">
         <h3 id="toeslagen-step-household" className="font-serif text-[23px] text-[var(--ink)]">

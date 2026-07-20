@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { evaluateAllowanceSignals } from "@/lib/allowances/signaling";
 import {
+  createAllowanceQuestionFlowView,
   createAllowanceScanView,
   defaultValues,
   exampleValues,
@@ -151,5 +152,74 @@ describe("toeslagen-scan adapter", () => {
     expect(view.result?.datasetId).toBe(direct.datasetId);
     expect(view.result?.datasetVersion).toBe(direct.datasetVersion);
     expect(view.result?.ruleYear).toBe(2026);
+  });
+
+  it("uses the central question flow to pick the next unanswered question", () => {
+    const flow = createAllowanceQuestionFlowView(defaultValues);
+
+    expect(flow.isValid).toBe(true);
+    expect(flow.decisionReason).toBe("next-pending");
+    expect(flow.nextFieldLabel).toBe("Leeftijd");
+    expect(flow.questionStatuses.age).toBe("active");
+    expect(flow.totalRelevant).toBeGreaterThan(0);
+    expect(flow.remaining).toBeGreaterThan(0);
+    expect(flow.percentage).toBeLessThan(100);
+  });
+
+  it("computes progress from the central question flow", () => {
+    const empty = createAllowanceQuestionFlowView(defaultValues);
+    const example = createAllowanceQuestionFlowView(exampleValues);
+
+    expect(example.completed).toBeGreaterThan(empty.completed);
+    expect(example.percentage).toBeGreaterThan(empty.percentage);
+    expect(example.items.map((item) => item.allowanceKind)).toEqual([
+      "healthcare",
+      "rent",
+      "child-budget",
+      "childcare",
+    ]);
+    expect(example.items.every((item) => item.recommendationIds.length > 0)).toBe(true);
+  });
+
+  it("keeps inferred answers visible as inferred", () => {
+    const flow = createAllowanceQuestionFlowView({
+      ...exampleValues,
+      hasChildren: "unknown",
+      childAges: "5",
+    });
+
+    expect(flow.questionStatuses["children.hasChildren"]).toBe("inferred");
+    expect(flow.items.some((item) => item.inferredFieldLabels.includes("Kinderen"))).toBe(true);
+  });
+
+  it("supports skipped and not-applicable questions from the central flow", () => {
+    const flow = createAllowanceQuestionFlowView({
+      ...exampleValues,
+      partnerStatus: "no",
+      tenure: "owner",
+      hasChildren: "no",
+    });
+
+    expect(flow.questionStatuses["rent.basicRent"]).toBe("skipped");
+    expect(flow.questionStatuses["childcare.partnerHasQualifyingActivity"]).toBe("not-applicable");
+    expect(flow.items.some((item) => item.skippedFieldLabels.length > 0)).toBe(true);
+    expect(flow.items.some((item) => item.notApplicableFieldLabels.length > 0)).toBe(true);
+  });
+
+  it("honours central blocking decisions without turning regular allowance unknowns into blockers", () => {
+    const flow = createAllowanceQuestionFlowView(defaultValues);
+
+    expect(flow.blocked).toBe(0);
+    expect(flow.items.flatMap((item) => item.blockingFieldLabels)).toEqual([]);
+    expect(flow.decisionReason).not.toBe("blocked");
+  });
+
+  it("does not change public scan results when the question flow is built", () => {
+    const before = createAllowanceScanView(exampleValues);
+    const flow = createAllowanceQuestionFlowView(exampleValues);
+    const after = createAllowanceScanView(exampleValues);
+
+    expect(flow.isValid).toBe(true);
+    expect(after).toEqual(before);
   });
 });
