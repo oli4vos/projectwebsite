@@ -68,6 +68,8 @@ Question Flow vertaalt dezelfde centrale definitions, resolved answers, unknown 
 
 Adapters verbinden formulierinput met domeininput en domeinresultaten met scherm- en rapportmodellen. Definitions beschrijven regels, afhankelijkheden, vragen, bronkoppelingen, reason codes en domeinmetadata machineleesbaar, zodat UI en PDF dezelfde inhoudelijke basis gebruiken.
 
+Voor toeslagen blijft `evaluateAllowanceSignals` de centrale hard-check- en eligibilitylaag voor bekende 2026-voorwaarden. `evaluateAllowanceRegulations` verrijkt die uitkomst met Regulations-contracten, unknown resolution, inference, recommendations en reportcontext. De officiële calculation engine gebruikt dezelfde assessments en voegt alleen bedragindicaties toe waar officiële bedragregels volledig genoeg zijn genormaliseerd, momenteel voor ondersteunde zorgtoeslagsituaties.
+
 Voor hypotheektools start deze adapterlaag als voorbereidende centrale integratie: bestaande `MortgageMaxMortgageInput`- en `MortgageMaxMortgageResult`-data kan naar Regulations-context worden vertaald voor definitions, question flow, unknowns, recommendations, estimates en reportingbeschikbaarheid, terwijl hypotheekformules en publieke uitkomsten in de bestaande centrale mortgage-domeinlaag blijven.
 
 ## 4. Domeinen

@@ -6,9 +6,15 @@ import type {
 } from "@/lib/allowances/signaling";
 import {
   getMissingFieldCopy,
+  getPublicResultStatusLabel,
   getReasonCodeCopy,
+  getReliabilityDescription,
+  getReliabilityLabel,
   getUncertaintyCopy,
   missingFieldCopy,
+  publicResultStatusLabels,
+  reliabilityDescriptions,
+  reliabilityLabels,
   reasonCodeCopy,
   statusSummaries,
   uncertaintyCopy,
@@ -137,6 +143,38 @@ describe("toeslagen-scan copy mapping", () => {
     expect(getReasonCodeCopy("new-code")).toContain("officiële controle");
     expect(getMissingFieldCopy("new-field")).toBe("Aanvullende informatie");
     expect(getUncertaintyCopy("new-uncertainty")).toContain("officiële controle");
+  });
+
+  it("translates public result and reliability machine values before rendering", () => {
+    expect(publicResultStatusLabels).toEqual({
+      "eligible-estimate": "Geschatte toeslag",
+      ineligible: "Waarschijnlijk geen recht",
+      incomplete: "Aanvullende gegevens nodig",
+      "special-case": "Bijzondere situatie",
+      unavailable: "Nog geen bedrag beschikbaar",
+    });
+    expect(getPublicResultStatusLabel("eligible-estimate")).toBe("Geschatte toeslag");
+    expect(getReliabilityLabel("redelijke-indicatie")).toBe("Redelijke indicatie");
+    expect(getReliabilityDescription("voorlopige-indicatie")).toContain("ontbreken");
+
+    const publicCopy = [
+      ...Object.values(publicResultStatusLabels),
+      ...Object.values(reliabilityLabels),
+      ...Object.values(reliabilityDescriptions),
+    ].join(" ");
+
+    for (const machineValue of [
+      "eligible-estimate",
+      "ineligible",
+      "incomplete",
+      "special-case",
+      "unavailable",
+      "sterke-indicatie",
+      "redelijke-indicatie",
+      "voorlopige-indicatie",
+    ]) {
+      expect(publicCopy).not.toContain(machineValue);
+    }
   });
 
   it("does not expose raw codes or entitlement promises", () => {

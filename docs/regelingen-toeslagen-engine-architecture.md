@@ -207,6 +207,8 @@ Complex betekent niet stoppen. Complex betekent:
 
 Signalering bepaalt welke regelingen relevant kunnen zijn voordat er bedragen worden geschat.
 
+Implementatiebesluit 2026: `evaluateAllowanceSignals` is de blijvende centrale hard-check- en eligibilitylaag voor de Toeslagenscan. Deze laag bewaakt bekende harde voorwaarden, ontbrekende gegevens, bijzondere situaties, reason codes en officiële bronlinks. `evaluateAllowanceRegulations` is de adapter- en verrijkingslaag daarboven: hij zet dezelfde signaleringsuitkomst om naar Regulation Definitions, Unknown Resolution, Inference, Evaluation, Recommendations, Estimate-contracten en Question Flow-context. De officiële calculation engine hergebruikt deze assessments en voegt alleen bedragindicaties toe waar de officiële bedragregels volledig genoeg centraal zijn genormaliseerd. Dit voorkomt dubbele eligibilityregels en houdt onvolledige bedraglogica expliciet gescheiden.
+
 Statussen:
 
 - `possibly-relevant`: harde voorwaarden sluiten de regeling niet uit.

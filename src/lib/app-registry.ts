@@ -321,7 +321,7 @@ export const appRegistry = [
   {
     "slug": "toeslagen-scan",
     "title": "Welke toeslagen passen mogelijk bij mij?",
-    "description": "Bekijk zonder bedragen of zorgtoeslag, huurtoeslag, kindgebonden budget of kinderopvangtoeslag mogelijk relevant is.",
+    "description": "Bekijk of zorgtoeslag, huurtoeslag, kindgebonden budget of kinderopvangtoeslag mogelijk relevant is. Voor ondersteunde zorgtoeslagsituaties toont de scan een officiële 2026-euro-indicatie; andere toeslagen kunnen nog geen bedrag tonen.",
     "type": "frontend",
     "category": "Regelingen en maandruimte",
     "tags": [
@@ -336,7 +336,7 @@ export const appRegistry = [
     "status": "beta",
     "visibility": "public",
     "requiredProfileFields": [],
-    "reasonHint": "Voor een eerste signaal op basis van 2026-regels; controleer bedragen en voorwaarden met de officiële proefberekening.",
+    "reasonHint": "2026-scan: zorgtoeslag kan een bedragindicatie tonen; huur, kindgebonden budget en kinderopvang blijven deels officiële-controlestappen.",
     "assumptionsUsed": [
       "tax"
     ],

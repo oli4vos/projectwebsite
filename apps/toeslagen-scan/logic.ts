@@ -26,7 +26,10 @@ import { buildQuestionFlow } from "@/lib/regulations/question-flow";
 import type { AnswerState, FieldId } from "@/lib/regulations/types";
 import {
   allowanceTitles,
+  getPublicResultStatusLabel,
   getReasonCodeCopy,
+  getReliabilityDescription,
+  getReliabilityLabel,
   getUncertaintyCopy,
 } from "./copy";
 import type {
@@ -261,11 +264,12 @@ export function mapFormToAllowanceScanInput(values: AllowanceScanFormState): All
   const hasPartner = values.partnerStatus === "yes";
   const hasChildren = values.hasChildren === "yes";
   const noChildren = values.hasChildren === "no";
+  const childAges = parseChildAges(values.childAges);
+  const inferChildrenFromAges = values.hasChildren === "unknown" && (childAges?.length ?? 0) > 0;
   const usesChildcare = hasChildren && values.usesChildcare === "yes";
   const renting = values.tenure === "rent";
   const coResidents = values.hasCoResidents === "yes";
   const childResidence = childLivesChoice(values.childLivesWithApplicant);
-  const childAges = hasChildren ? parseChildAges(values.childAges) : noChildren ? [] : undefined;
   const input: AllowanceScanInput = {
     year: 2026,
     age: parseInteger(values.age),
@@ -291,8 +295,8 @@ export function mapFormToAllowanceScanInput(values: AllowanceScanFormState): All
       uncertainSubsidiableRent: renting ? optionalFlag(values.uncertainSubsidiableRent) : undefined,
     },
     childBudget: {
-      hasChildren: yesNoUnknown(values.hasChildren),
-      childAges,
+      hasChildren: inferChildrenFromAges ? undefined : yesNoUnknown(values.hasChildren),
+      childAges: hasChildren || inferChildrenFromAges ? childAges : noChildren ? [] : undefined,
       receivesChildBenefit: hasChildren
         ? yesNoUnknown(values.receivesChildBenefit)
         : noChildren
@@ -304,7 +308,7 @@ export function mapFormToAllowanceScanInput(values: AllowanceScanFormState): All
       specialChildBenefitSituation: hasChildren ? optionalFlag(values.complexFamily) : undefined,
     },
     childcare: {
-      hasChildren: yesNoUnknown(values.hasChildren),
+      hasChildren: inferChildrenFromAges ? undefined : yesNoUnknown(values.hasChildren),
       usesChildcare: hasChildren ? yesNoUnknown(values.usesChildcare) : noChildren ? false : "unknown",
       registeredChildcare: usesChildcare ? yesNoUnknown(values.registeredChildcare) : false,
       paysOwnContribution: usesChildcare ? yesNoUnknown(values.paysOwnContribution) : false,
@@ -372,14 +376,6 @@ function publicStatusFor(result: OfficialAllowanceCalculationResult): AllowanceP
   return "eligible-estimate";
 }
 
-const publicStatusLabels: Record<AllowancePublicResultStatus, string> = {
-  "eligible-estimate": "eligible-estimate",
-  ineligible: "ineligible",
-  incomplete: "incomplete",
-  "special-case": "special-case",
-  unavailable: "unavailable",
-};
-
 function publicSummary(result: OfficialAllowanceCalculationResult) {
   const status = publicStatusFor(result);
   if (status === "eligible-estimate") {
@@ -401,31 +397,24 @@ function publicSummary(result: OfficialAllowanceCalculationResult) {
 
 function reliabilityFor(result: OfficialAllowanceCalculationResult): {
   label: AllowanceAdvisorReliabilityLabel;
-  description: string;
 } {
   if (result.status === "available" && result.amount.monthlyAmount !== undefined) {
     return {
       label: result.officialVerificationRequired ? "redelijke-indicatie" : "sterke-indicatie",
-      description: result.officialVerificationRequired
-        ? "Berekend met centrale brondata, maar Mijn Toeslagen blijft leidend."
-        : "Berekend met complete centrale gegevens.",
     };
   }
   if (result.status === "incomplete") {
     return {
       label: "voorlopige-indicatie",
-      description: "Aanvullende gegevens nodig voordat een bedrag verantwoord is.",
     };
   }
   if (result.status === "special-case") {
     return {
       label: "voorlopige-indicatie",
-      description: "Officiële controle nodig door een bijzondere of onzekere situatie.",
     };
   }
   return {
     label: "voorlopige-indicatie",
-    description: "Indicatief signaal; niet alle bedragregels zijn beschikbaar voor deze toeslag.",
   };
 }
 
@@ -470,13 +459,74 @@ function sourceLinksFor(result: OfficialAllowanceCalculationResult) {
   );
 }
 
-function reportLine(label: string, value: string, reasonCodes: readonly string[], sourceFieldId?: string): AllowanceAdvisorReportLine {
+function reportLine(
+  label: string,
+  value: string,
+  reasonCodes: readonly string[],
+  sourceFieldId?: string,
+  inputState?: AllowanceAdvisorReportLine["inputState"],
+): AllowanceAdvisorReportLine {
   return {
     label,
     value,
+    inputState,
     sourceFieldId: sourceFieldId ? sourceFieldId as AllowanceMissingField : undefined,
     reasonCodes,
   };
+}
+
+function formatReportValue(value: unknown): string {
+  if (Array.isArray(value)) {
+    return value.length > 0 ? value.join(", ") : "Geen";
+  }
+  if (typeof value === "boolean") {
+    return value ? "Ja" : "Nee";
+  }
+  if (typeof value === "number") {
+    return Number.isInteger(value) ? String(value) : new Intl.NumberFormat("nl-NL").format(value);
+  }
+  if (value === "yes") return "Ja";
+  if (value === "no") return "Nee";
+  if (value === "unknown") return "Weet ik niet";
+  if (value === "not-applicable") return "Niet van toepassing";
+  if (value === "rent") return "Huurwoning";
+  if (value === "owner") return "Koopwoning";
+  if (value === "other") return "Anders";
+  if (value === "work") return "Werk";
+  if (value === "study") return "Studie";
+  if (value === "trajectory") return "Traject";
+  if (value === "none") return "Geen";
+  if (value === undefined || value === null || value === "") return "Ontbreekt";
+  return String(value);
+}
+
+function reportAnsweredInputs(
+  results: readonly OfficialAllowanceCalculationResult[],
+  values: AllowanceScanFormState,
+): readonly AllowanceAdvisorReportLine[] {
+  const byField = new Map<FieldId, AnswerState>();
+  for (const result of results) {
+    const visibleAnswers = applyQuestionFlowVisibility(values, result.assessment.resolvedAnswers);
+    for (const [fieldId, answer] of Object.entries(visibleAnswers)) {
+      const existing = byField.get(fieldId);
+      if (!existing || existing.state === "unknown") {
+        byField.set(fieldId, answer);
+      }
+    }
+  }
+
+  return [...byField.entries()]
+    .filter(([, answer]) => answer.state === "known")
+    .sort(([left], [right]) => fieldLabel(left).localeCompare(fieldLabel(right), "nl-NL"))
+    .map(([fieldId, answer]) =>
+      reportLine(
+        fieldLabel(fieldId),
+        "value" in answer ? formatReportValue(answer.value) : "Ingevuld",
+        "reasonCodes" in answer ? answer.reasonCodes : [],
+        fieldId,
+        "answered",
+      ),
+    );
 }
 
 function reportStatusFor(status: AllowancePublicResultStatus): AllowanceAdvisorReportResult["status"] {
@@ -491,7 +541,10 @@ function buildReport(input: {
   calculationYear: number;
   results: readonly OfficialAllowanceCalculationResult[];
   cards: readonly ReturnType<typeof cardForResult>[];
+  values: AllowanceScanFormState;
+  generatedAt: string;
 }): AllowanceAdvisorReportModel {
+  const answeredInputs = reportAnsweredInputs(input.results, input.values);
   const reportResults = input.results.map((result, index) => {
     const card = input.cards[index];
     if (!card) {
@@ -504,10 +557,14 @@ function buildReport(input: {
       reportLine("Reden", getReasonCodeCopy(code), [code]),
     );
     const missingInputs = result.missingFields.map((fieldId) =>
-      reportLine("Ontbrekend gegeven", fieldLabel(fieldId), result.reasonCodes, fieldId),
+      reportLine("Ontbrekend gegeven", fieldLabel(fieldId), result.reasonCodes, fieldId, "missing"),
     );
     const warnings = result.uncertaintyCodes.map((code) =>
       reportLine("Waarschuwing", getUncertaintyCopy(code), [code]),
+    );
+    const resultFieldIds = new Set(result.assessment.definition.inputDefinitions.map((field) => field.fieldId));
+    const resultAnsweredInputs = answeredInputs.filter((line) =>
+      line.sourceFieldId ? resultFieldIds.has(line.sourceFieldId) : false,
     );
 
     return {
@@ -518,10 +575,15 @@ function buildReport(input: {
       yearlyAmountLabel: card.annualAmountLabel,
       calculationYear: input.calculationYear,
       reasons,
-      answeredInputs: [],
-      inferredInputs: card.inferredInputMessages.map((message) =>
-        reportLine("Afgeleid gegeven", message, result.reasonCodes),
-      ),
+      answeredInputs: resultAnsweredInputs,
+      inferredInputs: [
+        ...card.inferredInputMessages.map((message) =>
+          reportLine("Afgeleid gegeven", message, result.reasonCodes, undefined, "inferred"),
+        ),
+        ...card.confirmationMessages.map((message) =>
+          reportLine("Nog te bevestigen", message, result.reasonCodes, undefined, "pending-confirmation"),
+        ),
+      ],
       missingInputs,
       warnings,
       applicationSteps: guidance?.steps ?? ["Controleer je gegevens in Mijn Toeslagen."],
@@ -531,11 +593,11 @@ function buildReport(input: {
 
   return {
     title: "Toeslagenadvies",
-    generatedAt: "2026-07-20T00:00:00.000Z",
+    generatedAt: input.generatedAt,
     calculationYear: input.calculationYear,
     summary: [input.summary],
     results: reportResults,
-    answeredInputs: [],
+    answeredInputs,
     inferredInputs: reportResults.flatMap((item) => item.inferredInputs),
     missingInputs: reportResults.flatMap((item) => item.missingInputs),
     officialSources: [...new Map(input.results.flatMap((item) => item.sourceReferences).map((source) => [
@@ -560,7 +622,7 @@ function cardForResult(item: OfficialAllowanceCalculationResult) {
     kind: item.allowanceKind,
     title: allowanceTitles[item.allowanceKind],
     status,
-    statusLabel: publicStatusLabels[status],
+    statusLabel: getPublicResultStatusLabel(status),
     summary: publicSummary(item),
     hardExclusion: item.signal.hardExclusion,
     monthlyAmountLabel: item.amount.monthlyAmount !== undefined
@@ -570,7 +632,8 @@ function cardForResult(item: OfficialAllowanceCalculationResult) {
       ? formatCurrency(item.amount.annualAmount)
       : undefined,
     reliabilityLabel: reliability.label,
-    reliabilityDescription: reliability.description,
+    reliabilityDisplayLabel: getReliabilityLabel(reliability.label),
+    reliabilityDescription: getReliabilityDescription(reliability.label),
     reasonMessages: item.reasonCodes.map(getReasonCodeCopy),
     missingFieldMessages: item.missingFields.map((field) => fieldLabel(field)),
     missingInputs: missingInputViews(item.missingFields),
@@ -585,7 +648,10 @@ function cardForResult(item: OfficialAllowanceCalculationResult) {
   };
 }
 
-export function createAllowanceScanView(values: AllowanceScanFormState): AllowanceScanView {
+export function createAllowanceScanView(
+  values: AllowanceScanFormState,
+  options: { readonly generatedAt?: string | Date } = {},
+): AllowanceScanView {
   const errors = validateAllowanceScanForm(values);
   if (Object.keys(errors).length > 0) {
     return { isValid: false, errors, result: null };
@@ -621,6 +687,10 @@ export function createAllowanceScanView(values: AllowanceScanFormState): Allowan
         calculationYear: calculation.value.calculationYear,
         results: ordered,
         cards,
+        values,
+        generatedAt: options.generatedAt instanceof Date
+          ? options.generatedAt.toISOString()
+          : options.generatedAt ?? new Date().toISOString(),
       }),
     },
   };

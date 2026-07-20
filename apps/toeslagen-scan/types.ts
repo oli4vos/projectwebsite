@@ -89,6 +89,7 @@ export type AllowanceResultCardView = {
   monthlyAmountLabel?: string;
   annualAmountLabel?: string;
   reliabilityLabel: AllowanceAdvisorReliabilityLabel;
+  reliabilityDisplayLabel: string;
   reliabilityDescription: string;
   reasonMessages: string[];
   missingFieldMessages: readonly string[];

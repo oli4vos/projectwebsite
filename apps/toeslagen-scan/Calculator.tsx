@@ -217,7 +217,7 @@ function ResultCard({ card }: { card: AllowanceResultCardView }) {
       ) : null}
       <p className="mt-3 text-[14px] leading-[1.65] text-[var(--ink-2)]">{card.summary}</p>
       <p className="mt-2 text-[13px] leading-[1.6] text-[var(--muted)]">
-        Betrouwbaarheid: {card.reliabilityLabel.replace(/-/g, " ")}. {card.reliabilityDescription}
+        Betrouwbaarheid: {card.reliabilityDisplayLabel}. {card.reliabilityDescription}
       </p>
       <ResultList title="Redenen" items={card.reasonMessages} />
       {card.missingInputs.length > 0 ? (

@@ -332,6 +332,8 @@ export function evaluateAllowanceRegulations(
 ): Result<AllowanceRegulationsScanResult> {
   let originalScan: AllowanceScanResult;
   try {
+    // Central eligibility and hard-check layer. The Regulations pipeline enriches
+    // this result; it does not duplicate allowance eligibility rules.
     originalScan = evaluateAllowanceSignals(input, context);
   } catch (error) {
     return {

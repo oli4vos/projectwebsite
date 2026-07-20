@@ -108,6 +108,7 @@ export type AllowanceAdvisorApplicationGuidance = {
 export type AllowanceAdvisorReportLine = {
   readonly label: string;
   readonly value: string;
+  readonly inputState?: "answered" | "inferred" | "pending-confirmation" | "missing";
   readonly sourceFieldId?: AllowanceMissingField;
   readonly reasonCodes: readonly ReasonCode[];
 };

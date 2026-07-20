@@ -72,7 +72,7 @@ describe("allowance regulations pipeline", () => {
     expect(Object.isFrozen(result.assessments[0])).toBe(true);
   });
 
-  it("uses the correct definition and keeps original signaling available", () => {
+  it("uses the correct definition and keeps central hard-check eligibility output available", () => {
     const original = evaluateAllowanceSignals(completeInput);
     const result = unwrap();
 
@@ -115,7 +115,7 @@ describe("allowance regulations pipeline", () => {
     }
   });
 
-  it("represents estimates through the Estimate Engine without amount logic", () => {
+  it("represents regulation-layer estimates without duplicating official amount logic", () => {
     const result = unwrap();
 
     for (const item of result.assessments) {

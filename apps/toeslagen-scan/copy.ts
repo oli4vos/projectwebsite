@@ -5,6 +5,8 @@ import type {
   AllowanceSignalStatus,
   AllowanceUncertaintyCode,
 } from "@/lib/allowances/signaling";
+import type { AllowanceAdvisorReliabilityLabel } from "@/lib/allowances/advisor-experience";
+import type { AllowancePublicResultStatus } from "./types";
 
 export const allowanceTitles: Record<AllowanceKind, string> = {
   healthcare: "Zorgtoeslag",
@@ -29,6 +31,26 @@ export const statusSummaries: Record<AllowanceSignalStatus, string> = {
     "Er ontbreken gegevens om een betrouwbaar signaal te geven.",
   "official-calculation-recommended":
     "Deze situatie bevat aanvullende regels of uitzonderingen. Gebruik de officiële proefberekening.",
+};
+
+export const publicResultStatusLabels: Record<AllowancePublicResultStatus, string> = {
+  "eligible-estimate": "Geschatte toeslag",
+  ineligible: "Waarschijnlijk geen recht",
+  incomplete: "Aanvullende gegevens nodig",
+  "special-case": "Bijzondere situatie",
+  unavailable: "Nog geen bedrag beschikbaar",
+};
+
+export const reliabilityLabels: Record<AllowanceAdvisorReliabilityLabel, string> = {
+  "sterke-indicatie": "Sterke indicatie",
+  "redelijke-indicatie": "Redelijke indicatie",
+  "voorlopige-indicatie": "Voorlopige indicatie",
+};
+
+export const reliabilityDescriptions: Record<AllowanceAdvisorReliabilityLabel, string> = {
+  "sterke-indicatie": "De belangrijkste brondata en invoer zijn compleet genoeg voor een sterke Project Site-inschatting.",
+  "redelijke-indicatie": "De inschatting gebruikt centrale brondata, maar officiële controle blijft belangrijk.",
+  "voorlopige-indicatie": "Er ontbreken gegevens, uitzonderingen of volledige bedragregels. Gebruik dit vooral als vervolgstap.",
 };
 
 export const reasonCodeCopy: Record<AllowanceReasonCode, string> = {
@@ -153,4 +175,16 @@ export function getMissingFieldCopy(field: string) {
 
 export function getUncertaintyCopy(code: string) {
   return uncertaintyCopy[code as AllowanceUncertaintyCode] ?? "Deze onzekerheid vraagt om officiële controle.";
+}
+
+export function getPublicResultStatusLabel(status: AllowancePublicResultStatus) {
+  return publicResultStatusLabels[status];
+}
+
+export function getReliabilityLabel(label: AllowanceAdvisorReliabilityLabel) {
+  return reliabilityLabels[label];
+}
+
+export function getReliabilityDescription(label: AllowanceAdvisorReliabilityLabel) {
+  return reliabilityDescriptions[label];
 }

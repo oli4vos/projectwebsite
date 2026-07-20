@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { calculateOfficialAllowanceScan2026 } from "@/lib/allowances/official-calculations";
 import {
   createAllowanceQuestionFlowView,
@@ -127,7 +129,9 @@ describe("toeslagen-scan adapter", () => {
   });
 
   it("preserves fixed result order, source links and safe public amount fields", () => {
-    const view = createAllowanceScanView(exampleValues);
+    const view = createAllowanceScanView(exampleValues, {
+      generatedAt: "2026-07-20T12:34:56.000Z",
+    });
 
     expect(view.isValid).toBe(true);
     expect(view.result?.cards.map((card) => card.kind)).toEqual([
@@ -140,8 +144,27 @@ describe("toeslagen-scan adapter", () => {
       expect(card.sourceLinks.length).toBeGreaterThan(0);
       expect(card.sourceLinks.every((link) => link.href.startsWith("https://www.belastingdienst.nl/"))).toBe(true);
       expect("amount" in card).toBe(false);
+      expect(card.statusLabel).not.toBe(card.status);
+      expect(card.reliabilityDisplayLabel).not.toBe(card.reliabilityLabel);
       expect(JSON.stringify(card).toLowerCase()).not.toContain("je hebt recht");
     }
+    expect(view.result?.cards.find((card) => card.kind === "healthcare")?.monthlyAmountLabel).toBeDefined();
+    expect(view.result?.cards.find((card) => card.kind === "rent")?.monthlyAmountLabel).toBeUndefined();
+    expect(view.result?.report.generatedAt).toBe("2026-07-20T12:34:56.000Z");
+  });
+
+  it("keeps manifest copy aligned with healthcare-only amount support", () => {
+    const manifest = JSON.parse(
+      readFileSync(join(process.cwd(), "apps/toeslagen-scan/app.json"), "utf8"),
+    ) as { description: string; reasonHint: string };
+    const publicCopy = `${manifest.description} ${manifest.reasonHint}`.toLowerCase();
+
+    expect(publicCopy).toContain("zorgtoeslag");
+    expect(publicCopy).toContain("2026");
+    expect(publicCopy).toContain("huurtoeslag");
+    expect(publicCopy).toContain("nog geen bedrag");
+    expect(publicCopy).not.toContain("zonder bedragen");
+    expect(publicCopy).not.toContain("alle vier toeslagen");
   });
 
   it("matches the central engine entrypoint output metadata", () => {
@@ -226,15 +249,19 @@ describe("toeslagen-scan adapter", () => {
   });
 
   it("does not change public scan results when the question flow is built", () => {
-    const before = createAllowanceScanView(exampleValues);
+    const before = createAllowanceScanView(exampleValues, {
+      generatedAt: "2026-07-20T07:00:00.000Z",
+    });
     const flow = createAllowanceQuestionFlowView(exampleValues);
-    const after = createAllowanceScanView(exampleValues);
+    const after = createAllowanceScanView(exampleValues, {
+      generatedAt: "2026-07-20T07:00:00.000Z",
+    });
 
     expect(flow.isValid).toBe(true);
     expect(after).toEqual(before);
   });
 
-  it("keeps reporting/PDF metadata available without adding amount data", () => {
+  it("keeps reporting metadata available from the same calculation result as the screen", () => {
     const flow = createAllowanceQuestionFlowView(exampleValues);
 
     expect(flow.reporting.answeredFieldLabels).toContain("Geschat toetsingsinkomen");
@@ -242,5 +269,93 @@ describe("toeslagen-scan adapter", () => {
     expect(flow.reporting.officialVerificationRequired).toBe(true);
     expect(flow.reporting.recommendationIds.length).toBeGreaterThan(0);
     expect(JSON.stringify(flow.reporting).toLowerCase()).not.toContain("amount");
+  });
+
+  it("fills report answered inputs from relevant non-stale form answers", () => {
+    const view = createAllowanceScanView({
+      ...exampleValues,
+      partnerStatus: "no",
+      jointAssessmentIncome: "999999",
+      jointAssets: "999999",
+      tenure: "owner",
+      basicRent: "850",
+      hasCoResidents: "yes",
+      householdIncome: "12345",
+      householdAssets: "12345",
+      hasChildren: "no",
+      usesChildcare: "yes",
+      childcareHoursPerMonth: "80",
+    }, {
+      generatedAt: new Date("2026-07-20T08:00:00.000Z"),
+    });
+
+    const report = view.result?.report;
+    expect(report?.generatedAt).toBe("2026-07-20T08:00:00.000Z");
+    expect(report?.answeredInputs).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          label: "Geschat toetsingsinkomen",
+          value: "30000",
+          inputState: "answered",
+          sourceFieldId: "assessmentIncome",
+        }),
+        expect.objectContaining({
+          label: "Woonsituatie",
+          value: "Koopwoning",
+          inputState: "answered",
+          sourceFieldId: "rent.tenure",
+        }),
+      ]),
+    );
+    expect(report?.answeredInputs.some((line) => line.sourceFieldId === "jointAssessmentIncome")).toBe(false);
+    expect(report?.answeredInputs.some((line) => line.sourceFieldId === "rent.basicRent")).toBe(false);
+    expect(report?.answeredInputs.some((line) => line.sourceFieldId === "childcare.hoursPerMonth")).toBe(false);
+  });
+
+  it("marks inferred, pending-confirmation and missing report inputs explicitly", () => {
+    const view = createAllowanceScanView({
+      ...exampleValues,
+      age: "",
+      hasChildren: "unknown",
+      childAges: "5",
+    }, {
+      generatedAt: "2026-07-20T09:00:00.000Z",
+    });
+    const report = view.result?.report;
+
+    expect(report?.missingInputs).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          label: "Ontbrekend gegeven",
+          value: "Leeftijd",
+          inputState: "missing",
+          sourceFieldId: "age",
+        }),
+      ]),
+    );
+    expect(report?.inferredInputs).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          inputState: "inferred",
+          value: expect.stringContaining("Kinderen is afgeleid"),
+        }),
+        expect.objectContaining({
+          inputState: "pending-confirmation",
+          value: expect.stringContaining("Controleer kinderen"),
+        }),
+      ]),
+    );
+  });
+
+  it("uses the same calculation result for visible cards and report amounts", () => {
+    const view = createAllowanceScanView(exampleValues, {
+      generatedAt: "2026-07-20T10:00:00.000Z",
+    });
+    const healthcareCard = view.result?.cards.find((card) => card.kind === "healthcare");
+    const healthcareReport = view.result?.report.results.find((item) => item.allowanceKind === "healthcare");
+
+    expect(healthcareReport?.monthlyAmountLabel).toBe(healthcareCard?.monthlyAmountLabel);
+    expect(healthcareReport?.yearlyAmountLabel).toBe(healthcareCard?.annualAmountLabel);
+    expect(healthcareReport?.calculationYear).toBe(view.result?.ruleYear);
   });
 });
