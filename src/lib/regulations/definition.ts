@@ -87,6 +87,8 @@ export type RegulationInputDefinition = {
 export type RegulationQuestionDefinition = {
   readonly questionId: QuestionId;
   readonly fieldId: FieldId;
+  readonly groupId?: string;
+  readonly groupLabel?: string;
   readonly titleKey: string;
   readonly descriptionKey: string;
   readonly dependsOn: readonly FieldId[];

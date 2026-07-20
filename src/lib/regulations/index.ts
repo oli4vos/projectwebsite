@@ -46,6 +46,15 @@ export {
   mergeRecommendations,
   sortRecommendations,
 } from "@/lib/regulations/recommendations";
+export {
+  buildQuestionFlow,
+  determineBlockingQuestions,
+  determineCompletedQuestions,
+  determineNextQuestion,
+  determineProgress,
+  determineRemainingQuestions,
+  determineSkippedQuestions,
+} from "@/lib/regulations/question-flow";
 export type {
   RegulationAdapterMetadata,
   RegulationDefinitionMetadata,
@@ -73,6 +82,17 @@ export type {
   BuildRecommendationsInput,
   RecommendationResult,
 } from "@/lib/regulations/recommendations";
+export type {
+  BuildQuestionFlowInput,
+  QuestionFlowDecision,
+  QuestionFlowGroup,
+  QuestionFlowProgress,
+  QuestionFlowQuestionState,
+  QuestionFlowQuestionStatus,
+  QuestionFlowState,
+  QuestionFlowStep,
+  QuestionFlowSummary,
+} from "@/lib/regulations/question-flow";
 export type {
   RegulationDefinition,
   RegulationEvaluationContext,
