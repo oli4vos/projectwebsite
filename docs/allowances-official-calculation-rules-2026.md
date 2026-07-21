@@ -17,9 +17,17 @@ Dit document specificeert de officiele bronlaag voor de Toeslagenscan 2026. Het 
 
 | Toeslag | Status | Onderbouwing | Resterende blocker |
 |---|---|---|---|
-| Huurtoeslag | `amount-ready` | Officiele PDF geeft volledige 7-stappenberekening, basishuren, huurgrenzen, kwaliteitskortingsgrens, aftoppingsgrenzen, inkomensijkpunten, afbouwpercentages, vergoeding per huurschijf en afronding. | Bijzondere uitzonderingen en tijdvaklogica moeten als reason codes worden gemodelleerd voordat publieke koppeling plaatsvindt. |
-| Kindgebonden budget | `amount-ready` | Officiele PDF geeft maxima, leeftijdsverhogingen, grensinkomens, afbouwpercentage, vermogenstoets, Nederlandse woonlandfactor en voorbeelden. | Buitenlandse woonlandfactoren, co-ouderschap en leeftijdswijzigingen gedurende het jaar vragen tijdvak-/uitzonderingslogica. |
+| Huurtoeslag | `amount-ready`, centrale engine aanwezig | Officiele PDF geeft volledige 7-stappenberekening, basishuren, huurgrenzen, kwaliteitskortingsgrens, aftoppingsgrenzen, inkomensijkpunten, afbouwpercentages, vergoeding per huurschijf en afronding. `calculateRentBenefit2026` implementeert standaardjaarscenario's centraal. | Bijzondere uitzonderingen en tijdvaklogica blijven reason-code blockers voordat publieke koppeling plaatsvindt. |
+| Kindgebonden budget | `amount-ready`, centrale engine aanwezig | Officiele PDF geeft maxima, leeftijdsverhogingen, grensinkomens, afbouwpercentage, vermogenstoets, Nederlandse woonlandfactor en voorbeelden. `calculateChildBudget2026` implementeert standaardhuishoudens centraal. | Buitenlandse woonlandfactoren, co-ouderschap en leeftijdswijzigingen gedurende het jaar blijven geblokkeerd. |
 | Kinderopvangtoeslag | `blocked-pending-formula` | Officiele PDF geeft kostenbasis, eerste-kindregel, volledige vergoedingstabel en voorbeelden. | Rechtgevende activiteit, LRK/eigen bijdrage, meerdere contracten en tijdvakken moeten eerst als blokkerende invoer en berekeningscontract worden uitgewerkt. |
+
+## Implementatiestatus Centrale Engines
+
+- `src/lib/allowances/rent-benefit.ts`: pure huurtoeslagengine voor standaard 2026-jaarscenario's. Ondersteunt kale huur, servicekosten als genegeerde toelichtingsinput, jongerenregel, huurschijven, inkomenstaper, vermogenstoets en maand-/jaarbedrag.
+- `src/lib/allowances/child-budget.ts`: pure kindgebonden-budgetengine voor Nederland en standaardhuishoudens. Ondersteunt aantal kinderen, leeftijdsverhogingen, alleenstaande-ouderbedragen, partnerkolom, inkomensafbouw, vermogenstoets en maand-/jaarbedrag.
+- `src/lib/allowances/childcare-helpers.ts`: alleen interne helpers voor percentage lookup, uurtarief-/urencap en eerste-kindselectie. Er is bewust geen totaalengine of publieke bedragkoppeling.
+
+Publieke UI-integratie blijft een aparte opdracht. `apps/toeslagen-scan` blijft de bestaande `calculateOfficialAllowanceScan2026`-route gebruiken en toont door deze implementatie nog geen nieuwe huurtoeslag- of kindgebonden-budgetbedragen.
 
 ## Huurtoeslag 2026
 
