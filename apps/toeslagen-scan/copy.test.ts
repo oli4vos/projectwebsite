@@ -80,6 +80,25 @@ const activeReasonCodes: AllowanceReasonCode[] = [
   "childcare-possible",
 ];
 
+const activeEngineReasonCodes = [
+  "unsupported-non-independent-home",
+  "unsupported-special-housing-situation",
+  "partial-year-not-supported",
+  "rent-co-resident-assets-above-limit",
+  "rent-benefit-calculated",
+  "rent-benefit-zero-after-income-correction",
+  "rent-calculation-rent-capped",
+  "rent-service-costs-ignored-2026",
+  "rent-under-21-cap-applied",
+  "child-budget-no-qualifying-children",
+  "unsupported-foreign-residence-factor",
+  "unsupported-co-parenting",
+  "child-budget-calculated",
+  "child-budget-zero-after-income-reduction",
+  "child-budget-income-reduction-applied",
+  "child-budget-domestic-residence-factor-applied",
+];
+
 const activeMissingFields: AllowanceMissingField[] = [
   "year",
   "age",
@@ -134,7 +153,10 @@ const activeUncertaintyCodes: AllowanceUncertaintyCode[] = [
 
 describe("toeslagen-scan copy mapping", () => {
   it("translates all active central reason, missing and uncertainty codes", () => {
-    expect(Object.keys(reasonCodeCopy).sort()).toEqual(activeReasonCodes.sort());
+    expect(Object.keys(reasonCodeCopy).sort()).toEqual([
+      ...activeReasonCodes,
+      ...activeEngineReasonCodes,
+    ].sort());
     expect(Object.keys(missingFieldCopy).sort()).toEqual(activeMissingFields.sort());
     expect(Object.keys(uncertaintyCopy).sort()).toEqual(activeUncertaintyCodes.sort());
   });

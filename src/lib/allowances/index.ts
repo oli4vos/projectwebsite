@@ -14,6 +14,16 @@ export {
   calculateOfficialAllowance2026,
   calculateOfficialAllowanceScan2026,
 } from "@/lib/allowances/official-calculations";
+export {
+  adapterIssuesToScanResult,
+  calculateChildBudgetScanResult,
+  calculateRentBenefitScanResult,
+  mapChildBudgetResultToScanResult,
+  mapExistingHealthBenefitResultToScanResult,
+  mapRentBenefitResultToScanResult,
+  mapScanInputToChildBudgetInput,
+  mapScanInputToRentBenefitInput,
+} from "@/lib/allowances/scan-adapters";
 export { calculateRentBenefit2026 } from "@/lib/allowances/rent-benefit";
 export { calculateChildBudget2026 } from "@/lib/allowances/child-budget";
 export {
@@ -82,6 +92,15 @@ export type {
   ChildBudgetResult,
   ChildBudgetSpecialSituation,
 } from "@/lib/allowances/child-budget";
+export type {
+  AllowanceAdapterIssue,
+  AllowanceAdapterResult,
+  PublicAllowanceBenefitResult,
+  PublicAllowanceBenefitStatus,
+  PublicAllowanceChild,
+  PublicAllowanceHouseholdMember,
+  PublicAllowanceScanInput,
+} from "@/lib/allowances/scan-types";
 export type {
   ChildcareCareType,
   ChildcareContractInput,

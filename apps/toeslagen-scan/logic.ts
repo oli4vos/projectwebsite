@@ -11,6 +11,15 @@ import {
   type OfficialAllowanceCalculationResult,
 } from "@/lib/allowances/official-calculations";
 import {
+  calculateChildBudgetScanResult,
+  calculateRentBenefitScanResult,
+} from "@/lib/allowances/scan-adapters";
+import type {
+  PublicAllowanceBenefitResult,
+  PublicAllowanceHouseholdMember,
+  PublicAllowanceScanInput,
+} from "@/lib/allowances/scan-types";
+import {
   evaluateAllowanceRegulations,
 } from "@/lib/allowances/regulations-pipeline";
 import {
@@ -36,6 +45,7 @@ import type {
   AllowanceQuestionFlowItemView,
   AllowanceQuestionFlowView,
   AllowancePublicResultStatus,
+  AllowanceResultCardView,
   AllowanceMissingInputView,
   AllowanceScanErrors,
   AllowanceScanField,
@@ -49,6 +59,9 @@ import type {
 export const defaultValues: AllowanceScanFormState = {
   age: "",
   partnerStatus: "unknown",
+  partnerAge: "",
+  isFullYear: "unknown",
+  residenceCountry: "unknown",
   assessmentIncome: "",
   jointAssessmentIncome: "",
   assets: "",
@@ -61,7 +74,10 @@ export const defaultValues: AllowanceScanFormState = {
   tenure: "unknown",
   independentHome: "unknown",
   basicRent: "",
+  serviceCosts: "",
   hasCoResidents: "unknown",
+  coResidentAges: "",
+  coResidentAssets: "",
   householdIncome: "",
   householdAssets: "",
   complexHousing: "unknown",
@@ -86,12 +102,15 @@ export const exampleValues: AllowanceScanFormState = {
   ...defaultValues,
   age: "34",
   partnerStatus: "no",
+  isFullYear: "yes",
+  residenceCountry: "NL",
   assessmentIncome: "30000",
   assets: "12000",
   hasDutchHealthInsurance: "yes",
   tenure: "rent",
   independentHome: "yes",
   basicRent: "850",
+  serviceCosts: "0",
   hasCoResidents: "no",
   hasChildren: "yes",
   childCount: "1",
@@ -152,6 +171,16 @@ function parseChildAges(value: string) {
     .map((item) => Number(item.replace(",", ".")));
 }
 
+function parseNumberList(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return [];
+  return trimmed
+    .split(/[,\n;]/)
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .map((item) => Number(item.replace(",", ".")));
+}
+
 function hasInvalidNumberInput(value: string) {
   return value.trim().length > 0 && parseMoney(value) === undefined;
 }
@@ -172,11 +201,15 @@ export function validateAllowanceScanForm(values: AllowanceScanFormState): Allow
     field: Extract<
       AllowanceScanField,
       | "age"
+      | "partnerAge"
       | "assessmentIncome"
       | "jointAssessmentIncome"
       | "assets"
       | "jointAssets"
       | "basicRent"
+      | "serviceCosts"
+      | "coResidentAges"
+      | "coResidentAssets"
       | "householdIncome"
       | "householdAssets"
       | "childcareHoursPerMonth"
@@ -201,8 +234,15 @@ export function validateAllowanceScanForm(values: AllowanceScanFormState): Allow
   }
 
   if (values.partnerStatus === "yes") {
+    validateMoneyField("partnerAge");
     validateMoneyField("jointAssessmentIncome");
     validateMoneyField("jointAssets");
+    if (values.partnerAge.trim().length > 0) {
+      const age = parseInteger(values.partnerAge);
+      if (age === undefined || age < 0 || age > 120) {
+        errors.partnerAge = "Gebruik een leeftijd tussen 0 en 120 jaar.";
+      }
+    }
     if (values.jointAssessmentIncome.trim().length > 0 && errors.jointAssessmentIncome) {
       errors.jointAssessmentIncome = "Gebruik een geldig gezamenlijk inkomen.";
     }
@@ -213,18 +253,45 @@ export function validateAllowanceScanForm(values: AllowanceScanFormState): Allow
 
   if (values.tenure === "rent") {
     validateMoneyField("basicRent");
+    validateMoneyField("serviceCosts");
     if (errors.basicRent) {
       errors.basicRent = "Gebruik een geldige kale huur per maand.";
+    }
+    if (errors.serviceCosts) {
+      errors.serviceCosts = "Gebruik geldige servicekosten per maand.";
     }
 
     if (values.hasCoResidents === "yes") {
       validateMoneyField("householdIncome");
       validateMoneyField("householdAssets");
+      validateMoneyField("coResidentAges");
+      validateMoneyField("coResidentAssets");
       if (errors.householdIncome) {
         errors.householdIncome = "Gebruik een geldig huishoudinkomen.";
       }
       if (errors.householdAssets) {
         errors.householdAssets = "Gebruik een geldig huishoudvermogen.";
+      }
+      if (values.coResidentAges.trim().length === 0) {
+        errors.coResidentAges = "Vul de leeftijd van iedere medebewoner in.";
+      }
+      if (values.coResidentAssets.trim().length === 0) {
+        errors.coResidentAssets = "Vul het vermogen van iedere medebewoner in.";
+      }
+      const coResidentAges = parseNumberList(values.coResidentAges);
+      const coResidentAssets = parseNumberList(values.coResidentAssets);
+      if (
+        values.coResidentAges.trim().length > 0 &&
+        coResidentAges.some((age) => !Number.isInteger(age) || age < 0 || age > 120)
+      ) {
+        errors.coResidentAges = "Gebruik leeftijden als hele jaren, gescheiden door komma's.";
+      }
+      if (
+        values.coResidentAges.trim().length > 0 &&
+        values.coResidentAssets.trim().length > 0 &&
+        coResidentAges.length !== coResidentAssets.length
+      ) {
+        errors.coResidentAssets = "Vul voor iedere medebewoner precies één vermogensbedrag in.";
       }
     }
   }
@@ -258,6 +325,138 @@ export function validateAllowanceScanForm(values: AllowanceScanFormState): Allow
   }
 
   return errors;
+}
+
+function yesNoToBoolean(value: YesNoUnknown) {
+  if (value === "yes") return true;
+  if (value === "no") return false;
+  return undefined;
+}
+
+function coResidentsFrom(values: AllowanceScanFormState): PublicAllowanceHouseholdMember[] {
+  if (values.tenure !== "rent" || values.hasCoResidents !== "yes") return [];
+  const ages = parseNumberList(values.coResidentAges);
+  const assets = parseNumberList(values.coResidentAssets);
+  const fallbackAssets = parseMoney(values.householdAssets);
+  const count = Math.max(ages.length, assets.length);
+
+  return Array.from({ length: count }, (_, index) => ({
+    id: `co-resident-${index + 1}`,
+    age: ages[index] as number,
+    assets: assets[index] ?? fallbackAssets as number,
+    isChildOfApplicantOrPartner: (ages[index] as number) < 23,
+  }));
+}
+
+export function mapFormToPublicAllowanceScanInput(
+  values: AllowanceScanFormState,
+): PublicAllowanceScanInput {
+  const hasPartner = values.partnerStatus === "yes"
+    ? true
+    : values.partnerStatus === "no"
+      ? false
+      : undefined;
+  const childAges = parseChildAges(values.childAges) ?? [];
+  const hasChildren = values.hasChildren === "yes";
+  const childLivesWithApplicant = values.childLivesWithApplicant === "yes";
+  const childBenefit = values.receivesChildBenefit === "yes";
+  const coParenting = values.childLivesWithApplicant === "partial";
+  const compositeFamily = values.complexFamily === "yes";
+  const isFullYear = yesNoToBoolean(values.isFullYear);
+  const foreignSituation = values.foreignOrResidenceSituation === "yes";
+  const residenceCountry = values.residenceCountry === "NL"
+    ? "NL"
+    : values.residenceCountry === "other" || foreignSituation
+      ? "other"
+      : undefined;
+  const partnerAssets = hasPartner ? parseMoney(values.jointAssets) : undefined;
+  const partnerIncome = hasPartner ? parseMoney(values.jointAssessmentIncome) : undefined;
+  const rentSpecialSituations = [
+    ...(values.complexHousing === "yes" ? ["special-housing-situation" as const] : []),
+    ...(isFullYear === false || values.partYearPartner === "yes" ? ["partial-year" as const] : []),
+  ];
+
+  return {
+    calculationYear: 2026,
+    applicant: {
+      age: parseInteger(values.age),
+      assessmentIncome: parseMoney(values.assessmentIncome),
+      assets: parseMoney(values.assets),
+      hasDutchHealthInsurance: yesNoToBoolean(values.hasDutchHealthInsurance),
+    },
+    partner: hasPartner
+      ? {
+          age: parseInteger(values.partnerAge),
+          assessmentIncome: partnerIncome,
+          assets: partnerAssets,
+        }
+      : undefined,
+    household: {
+      hasPartner,
+      householdIncome: values.tenure === "rent" && values.hasCoResidents === "yes"
+        ? parseMoney(values.householdIncome)
+        : hasPartner
+          ? partnerIncome
+          : parseMoney(values.assessmentIncome),
+      householdMembers: coResidentsFrom(values),
+    },
+    children: hasChildren
+      ? childAges.map((age, index) => ({
+          id: `child-${index + 1}`,
+          age,
+          receivesChildBenefitOrMeetsMaintenanceCondition: childBenefit,
+          livesWithApplicant: childLivesWithApplicant,
+          coParenting,
+          compositeFamily,
+        }))
+      : [],
+    assets: {
+      applicant: parseMoney(values.assets),
+      partner: partnerAssets,
+      householdMembers: coResidentsFrom(values).map((member) => ({
+        memberId: member.id,
+        assets: member.assets,
+      })),
+    },
+    housing: {
+      tenure: values.tenure === "unknown" ? undefined : values.tenure,
+      residenceCountry,
+    },
+    rent: values.tenure === "rent"
+      ? {
+          isIndependentHome: yesNoToBoolean(values.independentHome),
+          basicRent: parseMoney(values.basicRent),
+          serviceCosts: parseMoney(values.serviceCosts),
+          hasChildOrDisabilityExceptionWhenUnder21:
+            yesNoToBoolean(values.adaptedHomeOrDisability),
+          specialSituations: rentSpecialSituations,
+        }
+      : undefined,
+    childcare: {
+      usesChildcare: yesNoToBoolean(values.usesChildcare),
+      contracts: [],
+      applicantHasQualifyingActivity: yesNoToBoolean(
+        values.applicantActivity === "none" ? "no" : values.applicantActivity === "unknown" ? "unknown" : "yes",
+      ),
+      partnerHasQualifyingActivity: hasPartner
+        ? yesNoToBoolean(
+            values.partnerActivity === "none" ? "no" : values.partnerActivity === "unknown" ? "unknown" : "yes",
+          )
+        : "not-applicable",
+    },
+    calculationPeriod: {
+      kind: isFullYear === true ? "full-year" : isFullYear === false ? "partial-year" : undefined,
+    },
+    unsupportedSituations: [
+      ...(foreignSituation ? ["foreign-residence-factor" as const] : []),
+      ...(coParenting ? ["co-parenting" as const] : []),
+      ...(compositeFamily ? ["composite-family" as const] : []),
+      ...(isFullYear === false ? ["partial-year" as const] : []),
+      ...(values.complexSituation === "yes" || values.specialAssets === "yes"
+        ? ["manual-review-required" as const]
+        : []),
+    ],
+  };
 }
 
 export function mapFormToAllowanceScanInput(values: AllowanceScanFormState): AllowanceScanInput {
@@ -434,6 +633,20 @@ function createSummary(statuses: readonly AllowancePublicResultStatus[]) {
   return "Bekijk per toeslag de centrale status, ontbrekende gegevens en vervolgstappen.";
 }
 
+function createSummaryFromCards(cards: readonly AllowanceResultCardView[]) {
+  const calculated = cards.filter((card) => card.monthlyAmountLabel || card.annualAmountLabel);
+  const notCalculated = cards.filter((card) => !card.monthlyAmountLabel && card.status !== "ineligible");
+
+  if (calculated.length > 0 && notCalculated.length > 0) {
+    return "De scan toont een totaal van alleen de toeslagen die concreet berekend zijn. Niet-berekende toeslagen staan apart per kaart.";
+  }
+  if (calculated.length > 0) {
+    return "De scan toont concrete indicaties voor de ondersteunde toeslagen. Controleer aanvragen of wijzigingen altijd in Mijn Toeslagen.";
+  }
+
+  return createSummary(cards.map((card) => card.status));
+}
+
 function unknownDesignForField(fieldId: string) {
   return ALLOWANCE_UNKNOWN_RESOLUTION_MATRIX.find((item) =>
     item.fieldIds.includes(fieldId as AllowanceMissingField),
@@ -540,7 +753,7 @@ function buildReport(input: {
   summary: string;
   calculationYear: number;
   results: readonly OfficialAllowanceCalculationResult[];
-  cards: readonly ReturnType<typeof cardForResult>[];
+  cards: readonly AllowanceResultCardView[];
   values: AllowanceScanFormState;
   generatedAt: string;
 }): AllowanceAdvisorReportModel {
@@ -648,6 +861,112 @@ function cardForResult(item: OfficialAllowanceCalculationResult) {
   };
 }
 
+function publicStatusFromScanResult(
+  result: PublicAllowanceBenefitResult,
+): AllowancePublicResultStatus {
+  if (result.status === "calculated") return "eligible-estimate";
+  if (result.status === "no-entitlement") return "ineligible";
+  if (result.status === "incomplete-input") return "incomplete";
+  if (result.status === "unsupported" || result.status === "manual-review") return "special-case";
+  return "unavailable";
+}
+
+function reliabilityFromScanResult(
+  result: PublicAllowanceBenefitResult,
+): AllowanceAdvisorReliabilityLabel {
+  if (result.status === "calculated" && result.reliability === "official-standard-scenario") {
+    return "sterke-indicatie";
+  }
+  if (result.status === "calculated") return "redelijke-indicatie";
+  return "voorlopige-indicatie";
+}
+
+function componentRows(result: PublicAllowanceBenefitResult) {
+  const labels: Record<string, string> = {
+    qualityDiscountPart: "Kwaliteitskortingdeel",
+    cappingBandPart: "Aftoppingsdeel",
+    aboveCappingPart: "Boven aftoppingsgrens",
+    incomeCorrection: "Inkomenscorrectie",
+    calculationRent: "Gebruikte kale huur",
+    cappedCalculationRent: "Begrensde rekenhuur",
+    householdIncomeUsed: "Gebruikt huishoudinkomen",
+    baseChildAmount: "Basisbedrag kinderen",
+    olderChildSupplements: "Leeftijdsverhogingen",
+    singleParentSupplement: "Alleenstaande-ouderdeel",
+    maximumYearlyAmount: "Maximum jaarbedrag",
+    incomeReduction: "Inkomensafbouw",
+  };
+  return Object.entries(result.components).map(([key, value]) => ({
+    label: labels[key] ?? key,
+    value: typeof value === "number" ? formatCurrency(value) : String(value),
+  }));
+}
+
+function summaryFromScanResult(result: PublicAllowanceBenefitResult) {
+  if (result.status === "calculated") {
+    return "Deze toeslag is indicatief berekend met de centrale 2026-engine voor ondersteunde standaardscenario's.";
+  }
+  if (result.status === "no-entitlement") {
+    return "De centrale engine geeft voor deze invoer een echte nuluitkomst of geen recht terug.";
+  }
+  if (result.status === "incomplete-input") {
+    return "Er ontbreken nog concrete gegevens voordat de centrale engine een bedrag mag berekenen.";
+  }
+  if (result.status === "unsupported" || result.status === "manual-review") {
+    return "Deze situatie wordt niet als standaardscenario berekend. Gebruik de officiële proefberekening.";
+  }
+  return "Voor deze toeslag is nog geen publieke totaalberekening beschikbaar.";
+}
+
+function applyCentralScanResultToCard(
+  base: AllowanceResultCardView,
+  result: PublicAllowanceBenefitResult,
+): AllowanceResultCardView {
+  const status = publicStatusFromScanResult(result);
+  const reliabilityLabel = reliabilityFromScanResult(result);
+
+  return {
+    ...base,
+    status,
+    statusLabel: getPublicResultStatusLabel(status),
+    summary: summaryFromScanResult(result),
+    hardExclusion: result.status === "no-entitlement",
+    monthlyAmountLabel: result.monthlyAmount !== undefined
+      ? formatCurrency(result.monthlyAmount)
+      : undefined,
+    annualAmountLabel: result.yearlyAmount !== undefined
+      ? formatCurrency(result.yearlyAmount)
+      : undefined,
+    reliabilityLabel,
+    reliabilityDisplayLabel: getReliabilityLabel(reliabilityLabel),
+    reliabilityDescription: getReliabilityDescription(reliabilityLabel),
+    reasonMessages: result.reasonCodes.map(getReasonCodeCopy),
+    missingFieldMessages: result.status === "incomplete-input" ? result.reasonCodes : [],
+    missingInputs: result.status === "incomplete-input" ? missingInputViews(result.reasonCodes) : [],
+    uncertaintyMessages: result.warnings.map(getUncertaintyCopy),
+    components: componentRows(result),
+    ruleYear: result.calculationYear,
+    datasetId: result.sourceDatasetId,
+  };
+}
+
+function integrateRentAndChildBudgetCards(
+  cards: readonly AllowanceResultCardView[],
+  values: AllowanceScanFormState,
+) {
+  const publicInput = mapFormToPublicAllowanceScanInput(values);
+  const rentResult = calculateRentBenefitScanResult(publicInput);
+  const childBudgetResult = calculateChildBudgetScanResult(publicInput);
+
+  return cards.map((card) => {
+    if (card.kind === "rent") return applyCentralScanResultToCard(card, rentResult);
+    if (card.kind === "child-budget") {
+      return applyCentralScanResultToCard(card, childBudgetResult);
+    }
+    return card;
+  });
+}
+
 export function createAllowanceScanView(
   values: AllowanceScanFormState,
   options: { readonly generatedAt?: string | Date } = {},
@@ -670,8 +989,8 @@ export function createAllowanceScanView(
       ALLOWANCE_SIGNAL_ORDER.indexOf(a.allowanceKind) -
       ALLOWANCE_SIGNAL_ORDER.indexOf(b.allowanceKind),
   );
-  const cards = ordered.map(cardForResult);
-  const summary = createSummary(cards.map((card) => card.status));
+  const cards = integrateRentAndChildBudgetCards(ordered.map(cardForResult), values);
+  const summary = createSummaryFromCards(cards);
 
   return {
     isValid: true,

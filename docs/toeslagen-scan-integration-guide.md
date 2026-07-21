@@ -2,7 +2,9 @@
 
 Datum: 2026-07-21.
 
-Scope: deze gids beschrijft hoe `calculateRentBenefit2026` en `calculateChildBudget2026` veilig op de publieke Toeslagenscan worden aangesloten. De gids activeert geen publieke bedragweergave, wijzigt geen UI en voegt geen berekeningen toe.
+Scope: deze gids beschrijft hoe `calculateRentBenefit2026` en `calculateChildBudget2026` veilig op de publieke Toeslagenscan worden aangesloten.
+
+Implementatiestatus na publieke integratie: zorgtoeslag, huurtoeslag en kindgebonden budget kunnen voor ondersteunde 2026-standaardscenario's een bedragindicatie tonen. Kinderopvangtoeslag blijft signal-only zonder totaalbedrag. De PDF-uitvoer is niet geactiveerd; de bestaande reportdata blijft voorbereid en mag geen apart rekenpad krijgen.
 
 ## 1. Huidige Architectuur
 
@@ -52,7 +54,7 @@ De volgorde van resultaatkaarten is vast:
 3. kindgebonden budget;
 4. kinderopvangtoeslag.
 
-Zorgtoeslag kan nu een bedrag tonen via `calculateOfficialAllowanceScan2026`. Huurtoeslag, kindgebonden budget en kinderopvangtoeslag tonen signalering, reason codes, ontbrekende gegevens, onzekerheden en bronlinks. Zij tonen nog geen publiek bedrag in de scan.
+Zorgtoeslag kan een bedrag tonen via `calculateOfficialAllowanceScan2026`. Huurtoeslag en kindgebonden budget kunnen na de publieke integratie bedragen tonen via respectievelijk `calculateRentBenefit2026` en `calculateChildBudget2026` wanneer het om ondersteunde 2026-standaardscenario's met concrete invoer gaat. Kinderopvangtoeslag toont signalering, reason codes, ontbrekende gegevens, onzekerheden en bronlinks, maar nog geen publiek totaalbedrag.
 
 ### Bestaande brondata
 
@@ -69,8 +71,8 @@ De Toeslagenscan bouwt in `logic.ts` een `AllowanceAdvisorReportModel` met dezel
 | Toeslag | Huidige publieke status | Centrale engine-status |
 |---|---|---|
 | Zorgtoeslag | Publieke indicatie met bedrag. | Via `calculateOfficialAllowanceScan2026`. |
-| Huurtoeslag | Publieke signalering zonder bedrag. | `calculateRentBenefit2026` is beschikbaar voor standaard 2026-jaarscenario's. |
-| Kindgebonden budget | Publieke signalering zonder bedrag. | `calculateChildBudget2026` is beschikbaar voor standaard 2026-jaarscenario's. |
+| Huurtoeslag | Publieke indicatie met bedrag voor ondersteunde standaardscenario's; blockers zonder nulbedrag. | `calculateRentBenefit2026` is aangesloten via centrale scanadapter. |
+| Kindgebonden budget | Publieke indicatie met bedrag voor ondersteunde Nederlandse standaardhuishoudens; blockers zonder nulbedrag. | `calculateChildBudget2026` is aangesloten via centrale scanadapter. |
 | Kinderopvangtoeslag | Publieke signalering zonder bedrag. | Alleen helpers in `childcare-helpers.ts`; nog geen totaalengine. |
 
 ### Tijdelijk behouden en later verwijderen

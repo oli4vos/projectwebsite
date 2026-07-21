@@ -29,6 +29,9 @@ export type QualifyingActivityChoice =
 export type AllowanceScanFormState = {
   age: string;
   partnerStatus: PartnerChoice;
+  partnerAge: string;
+  isFullYear: YesNoUnknown;
+  residenceCountry: "NL" | "other" | "unknown";
   assessmentIncome: string;
   jointAssessmentIncome: string;
   assets: string;
@@ -41,7 +44,10 @@ export type AllowanceScanFormState = {
   tenure: TenureChoice;
   independentHome: YesNoUnknown;
   basicRent: string;
+  serviceCosts: string;
   hasCoResidents: YesNoUnknown;
+  coResidentAges: string;
+  coResidentAssets: string;
   householdIncome: string;
   householdAssets: string;
   complexHousing: YesNoUnknown;
@@ -101,6 +107,10 @@ export type AllowanceResultCardView = {
   sourceLinks: {
     label: string;
     href: string;
+  }[];
+  components?: readonly {
+    label: string;
+    value: string;
   }[];
   ruleYear: number;
   datasetId: string;

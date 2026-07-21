@@ -149,11 +149,13 @@ describe("toeslagen-scan adapter", () => {
       expect(JSON.stringify(card).toLowerCase()).not.toContain("je hebt recht");
     }
     expect(view.result?.cards.find((card) => card.kind === "healthcare")?.monthlyAmountLabel).toBeDefined();
-    expect(view.result?.cards.find((card) => card.kind === "rent")?.monthlyAmountLabel).toBeUndefined();
+    expect(view.result?.cards.find((card) => card.kind === "rent")?.monthlyAmountLabel).toBe("€ 342");
+    expect(view.result?.cards.find((card) => card.kind === "child-budget")?.monthlyAmountLabel).toBe("€ 497");
+    expect(view.result?.cards.find((card) => card.kind === "childcare")?.monthlyAmountLabel).toBeUndefined();
     expect(view.result?.report.generatedAt).toBe("2026-07-20T12:34:56.000Z");
   });
 
-  it("keeps manifest copy aligned with healthcare-only amount support", () => {
+  it("keeps manifest copy aligned with public healthcare, rent and child budget amount support", () => {
     const manifest = JSON.parse(
       readFileSync(join(process.cwd(), "apps/toeslagen-scan/app.json"), "utf8"),
     ) as { description: string; reasonHint: string };
@@ -162,7 +164,8 @@ describe("toeslagen-scan adapter", () => {
     expect(publicCopy).toContain("zorgtoeslag");
     expect(publicCopy).toContain("2026");
     expect(publicCopy).toContain("huurtoeslag");
-    expect(publicCopy).toContain("nog geen bedrag");
+    expect(publicCopy).toContain("kindgebonden budget");
+    expect(publicCopy).toContain("kinderopvangtoeslag nog zonder totaalbedrag");
     expect(publicCopy).not.toContain("zonder bedragen");
     expect(publicCopy).not.toContain("alle vier toeslagen");
   });

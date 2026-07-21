@@ -221,6 +221,21 @@ function ResultCard({ card }: { card: AllowanceResultCardView }) {
       <p className="mt-2 text-[13px] leading-[1.6] text-[var(--muted)]">
         Betrouwbaarheid: {card.reliabilityDisplayLabel}. {card.reliabilityDescription}
       </p>
+      {card.components && card.components.length > 0 ? (
+        <dl className="mt-3 grid gap-2 text-[13px] sm:grid-cols-2">
+          {card.components.map((component) => (
+            <div
+              key={`${component.label}-${component.value}`}
+              className="rounded-lg border border-[var(--hair)] bg-white p-3"
+            >
+              <dt className="text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--muted)]">
+                {component.label}
+              </dt>
+              <dd className="mt-1 font-mono tabular text-[var(--ink)]">{component.value}</dd>
+            </div>
+          ))}
+        </dl>
+      ) : null}
       <ResultList title="Redenen" items={card.reasonMessages} />
       {card.missingInputs.length > 0 ? (
         <div className="mt-3">
@@ -425,6 +440,25 @@ export default function ToeslagenScanCalculator() {
             options={yesNoUnknownOptions}
             onChange={(value) => updateField("partnerStatus", value)}
           />
+          <SelectField
+            id="isFullYear"
+            label="Geldt je situatie het hele kalenderjaar?"
+            value={formValues.isFullYear}
+            options={yesNoUnknownOptions}
+            hint="De publieke bedragen ondersteunen nu standaard een volledig kalenderjaar."
+            onChange={(value) => updateField("isFullYear", value)}
+          />
+          <SelectField
+            id="residenceCountry"
+            label="Woonland"
+            value={formValues.residenceCountry}
+            options={[
+              { value: "unknown", label: "Weet ik niet" },
+              { value: "NL", label: "Nederland" },
+              { value: "other", label: "Ander land" },
+            ]}
+            onChange={(value) => updateField("residenceCountry", value)}
+          />
           <TextInput
             id="assessmentIncome"
             label="Geschat toetsingsinkomen"
@@ -442,6 +476,15 @@ export default function ToeslagenScanCalculator() {
           />
           {hasPartner ? (
             <>
+              <TextInput
+                id="partnerAge"
+                label="Leeftijd toeslagpartner"
+                value={formValues.partnerAge}
+                error={errors.partnerAge}
+                inputMode="numeric"
+                hint="Nodig voor huurtoeslagregels wanneer jullie huren."
+                onChange={(value) => updateField("partnerAge", value)}
+              />
               <TextInput
                 id="jointAssessmentIncome"
                 label="Gezamenlijk toetsingsinkomen"
@@ -544,6 +587,14 @@ export default function ToeslagenScanCalculator() {
               error={errors.basicRent}
               onChange={(value) => updateField("basicRent", value)}
             />
+            <TextInput
+              id="serviceCosts"
+              label="Servicekosten per maand"
+              value={formValues.serviceCosts}
+              error={errors.serviceCosts}
+              hint="Servicekosten worden apart gevraagd en niet als kale huur meegerekend."
+              onChange={(value) => updateField("serviceCosts", value)}
+            />
             <YesNoUnknownField
               id="hasCoResidents"
               label="Zijn er medebewoners?"
@@ -558,6 +609,24 @@ export default function ToeslagenScanCalculator() {
             />
             {hasCoResidents ? (
               <>
+                <TextInput
+                  id="coResidentAges"
+                  label="Leeftijden medebewoners"
+                  value={formValues.coResidentAges}
+                  error={errors.coResidentAges}
+                  inputMode="text"
+                  hint="Bijvoorbeeld: 5, 22"
+                  onChange={(value) => updateField("coResidentAges", value)}
+                />
+                <TextInput
+                  id="coResidentAssets"
+                  label="Vermogen per medebewoner"
+                  value={formValues.coResidentAssets}
+                  error={errors.coResidentAssets}
+                  inputMode="text"
+                  hint="Gebruik dezelfde volgorde als bij leeftijden."
+                  onChange={(value) => updateField("coResidentAssets", value)}
+                />
                 <TextInput
                   id="householdIncome"
                   label="Huishoudinkomen voor huurtoeslag"
