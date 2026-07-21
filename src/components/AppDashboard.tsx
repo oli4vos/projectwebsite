@@ -98,11 +98,17 @@ export function AppDashboard({ apps }: AppDashboardProps) {
     setActiveAudience(nextAudienceId);
 
     const targetId = getAudienceRouteAnchorId(nextAudienceId);
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
 
     requestAnimationFrame(() => {
       document
         .getElementById(targetId)
-        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+        ?.scrollIntoView({
+          behavior: prefersReducedMotion ? "auto" : "smooth",
+          block: "start",
+        });
     });
   }
 
@@ -124,6 +130,7 @@ export function AppDashboard({ apps }: AppDashboardProps) {
             <button
               key={preset.id}
               type="button"
+              aria-pressed={activeAudience === preset.id}
               onClick={() => applyAudienceFilter(preset.id)}
               className={`touch-link min-h-11 rounded-full border px-3 py-2 text-[12px] font-medium focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 ${
                 activeAudience === preset.id

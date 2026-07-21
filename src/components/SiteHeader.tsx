@@ -22,6 +22,14 @@ function navClassName(active: boolean) {
   }`;
 }
 
+function isActivePath(pathname: string, href: string) {
+  if (href.startsWith("/#")) {
+    return pathname === "/";
+  }
+
+  return pathname === href;
+}
+
 export function SiteHeader() {
   const pathname = usePathname();
 
@@ -45,7 +53,8 @@ export function SiteHeader() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={navClassName(pathname === item.href)}
+                aria-current={isActivePath(pathname, item.href) ? "page" : undefined}
+                className={navClassName(isActivePath(pathname, item.href))}
               >
                 {item.label}
               </Link>
@@ -76,7 +85,8 @@ export function SiteHeader() {
             <Link
               key={item.href}
               href={item.href}
-              className={navClassName(pathname === item.href)}
+              aria-current={isActivePath(pathname, item.href) ? "page" : undefined}
+              className={navClassName(isActivePath(pathname, item.href))}
             >
               {item.mobileLabel}
             </Link>
