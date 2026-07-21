@@ -488,7 +488,11 @@ function validateAllowanceCalculationRulesDataset(data: unknown) {
     if (record.calculationYear !== 2026) {
       issues.push("Toeslagenbronwaarde heeft geen berekeningsjaar 2026.");
     }
-    if (typeof record.officialSourceUrl !== "string" || !record.officialSourceUrl.startsWith("https://www.belastingdienst.nl/")) {
+    if (
+      typeof record.officialSourceUrl !== "string" ||
+      (!record.officialSourceUrl.startsWith("https://www.belastingdienst.nl/") &&
+        !record.officialSourceUrl.startsWith("https://download.belastingdienst.nl/"))
+    ) {
       issues.push("Toeslagenbronwaarde moet naar een officiele Belastingdienst/Dienst Toeslagen-URL verwijzen.");
     }
     if (typeof record.value === "number" && record.value < 0) {

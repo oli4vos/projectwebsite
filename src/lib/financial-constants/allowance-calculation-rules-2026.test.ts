@@ -80,7 +80,7 @@ describe("allowance calculation rules 2026 source data", () => {
       expect(source.validFrom).toBe("2026-01-01");
       expect(source.validUntil).toBe("2026-12-31");
       expect(source.reviewedAt).toBe("2026-07-20");
-      expect(source.officialSourceUrl).toMatch(/^https:\/\/www\.belastingdienst\.nl\//);
+      expect(source.officialSourceUrl).toMatch(/^https:\/\/(www|download)\.belastingdienst\.nl\//);
       expect(source.verificationStatus).toMatch(/^(verified|blocked-pending-official-normalization)$/);
       expect(typeof source.interpretationNote).toBe("string");
       expect((source.interpretationNote as string).length).toBeGreaterThan(20);
@@ -104,6 +104,73 @@ describe("allowance calculation rules 2026 source data", () => {
     expect(ALLOWANCE_CALCULATION_RULES_2026.unknownRoutes.map((route) => route.fieldId)).toEqual(
       expect.arrayContaining(["assessmentIncome", "assets", "rent.basicRent", "childcare.hoursAndHourlyRate"]),
     );
+  });
+
+  it("normalizes official 2026 rent benefit calculation parameters and examples", () => {
+    const { rent } = ALLOWANCE_CALCULATION_RULES_2026;
+
+    expect(rent.calculationStatus).toBe("amount-ready");
+    expect(rent.baseRentSingleHousehold.value).toBe(202.52);
+    expect(rent.baseRentMultiPersonHousehold.value).toBe(200.71);
+    expect(rent.qualityDiscountThreshold.value).toBe(498.2);
+    expect(rent.cappingThresholdOneOrTwoPersons.value).toBe(713.02);
+    expect(rent.cappingThresholdThreeOrMorePersons.value).toBe(764.14);
+    expect(rent.incomeReferencePointSingleHousehold.value).toBe(23_425);
+    expect(rent.incomeReferencePointMultiPersonHousehold.value).toBe(31_500);
+    expect(rent.incomeTaperSingleHousehold.value).toBe(27);
+    expect(rent.incomeTaperMultiPersonHousehold.value).toBe(22);
+    expect(rent.roundingRule.value).toBe("round-monthly-down-whole-euros");
+    expect(rent.calculationSteps).toHaveLength(11);
+
+    expect(ALLOWANCE_CALCULATION_RULES_2026.officialTestVectors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: "rent-official-example-young-single-2026" }),
+        expect.objectContaining({ id: "rent-official-example-partners-high-rent-2026" }),
+        expect.objectContaining({ id: "rent-official-example-aow-single-2026" }),
+      ]),
+    );
+  });
+
+  it("normalizes official 2026 child budget amounts and taper parameters", () => {
+    const { childBudget } = ALLOWANCE_CALCULATION_RULES_2026;
+
+    expect(childBudget.calculationStatus).toBe("amount-ready");
+    expect(childBudget.maxAnnualOneChildSingleParent.value).toBe(5_996);
+    expect(childBudget.maxAnnualTwoChildrenSingleParent.value).toBe(8_576);
+    expect(childBudget.maxAnnualOneChildWithPartner.value).toBe(2_580);
+    expect(childBudget.maxAnnualTwoChildrenWithPartner.value).toBe(5_160);
+    expect(childBudget.additionalAnnualFromThirdChild.value).toBe(2_580);
+    expect(childBudget.ageIncrease12To15.value).toBe(724);
+    expect(childBudget.ageIncrease16To17.value).toBe(964);
+    expect(childBudget.thresholdIncomeSingleParentChange2026.value).toBe(29_736);
+    expect(childBudget.thresholdIncomeSingleParentChange2026.interpretationNote).toContain("afbouwpunt");
+    expect(childBudget.thresholdIncomePartnersChange2026.value).toBe(39_141);
+    expect(childBudget.taperPercent.value).toBe(7.6);
+    expect(childBudget.domesticResidenceFactor.value).toBe(100);
+  });
+
+  it("normalizes the official 2026 childcare reimbursement table and first-child rule", () => {
+    const { childcare } = ALLOWANCE_CALCULATION_RULES_2026;
+
+    expect(childcare.calculationStatus).toBe("blocked-pending-formula");
+    expect(childcare.firstChildRule.value).toBe("child-with-most-subsidisable-hours-then-highest-subsidisable-costs");
+    expect(childcare.percentageTable).toHaveLength(69);
+    expect(childcare.percentageTable[0]).toEqual({
+      incomeFrom: 0,
+      incomeTo: 24_149,
+      firstChildPercent: 96,
+      nextChildPercent: 96,
+    });
+    expect(childcare.percentageTable.at(-1)).toEqual({
+      incomeFrom: 235_698,
+      incomeTo: 99_999_999,
+      firstChildPercent: 36.5,
+      nextChildPercent: 68.2,
+    });
+
+    for (let index = 1; index < childcare.percentageTable.length; index += 1) {
+      expect(childcare.percentageTable[index].incomeFrom).toBe(childcare.percentageTable[index - 1].incomeTo + 1);
+    }
   });
 
   it("fails validation when a source value loses its official URL or becomes negative", () => {
