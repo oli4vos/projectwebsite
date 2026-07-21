@@ -676,3 +676,380 @@ Bewust niet wijzigen in fase A:
 | `src/lib/allowances/childcare-helpers.ts` | Geen kinderopvangtotaalengine in deze integratiefase. |
 | Centrale PDF-laag | PDF pas na correcte UI-integratie en gedeelde data. |
 | Routes en dashboardregistry | Geen nieuwe route of activatie nodig. |
+
+## 13. Form UX-beoordeling van deze gids
+
+Beoordeling na Form UX- en PDF-controle:
+
+| Onderwerp | Bevinding | Aanpassing in deze gids |
+|---|---|---|
+| Progressive disclosure | De technische mapping is volledig, maar de eindgebruiker mag niet met alle huur-, kind- en opvangvragen tegelijk starten. | Sectie 14 definieert een stapsgewijze publieke intake met conditionele zichtbaarheid. |
+| Vraagvolgorde | De bestaande mappingtabellen beschrijven velden per domein, niet de volgorde waarin een gebruiker ze logisch invult. | Sectie 14 ordent de vragen van algemene situatie naar alleen relevante domeindetails. |
+| Minimale invoerlast | Voor huur en kindgebonden budget zijn extra velden nodig, maar die mogen pas verschijnen wanneer de toeslag relevant is. | Sectie 14 en 15 markeren iedere vraag met zichtbaarheidsregels. |
+| Ontbrekende noodzakelijke vragen | Partnerleeftijd, geboortedata kinderen, servicekosten, hele-jaarstatus, woonland, co-ouderschap en per-medebewonergegevens zijn nog niet volledig formulierklaar. | Sectie 15 maakt deze vragen concreet. |
+| Onnodig vroege vragen | Kinderopvangcontractdetails zijn nodig voor een toekomstige bedragengine, maar nog niet voor publieke bedragweergave. | Sectie 15 markeert kinderopvangbedragvragen als voorbereid en niet actief voor bedragberekening. |
+| Toegankelijke foutafhandeling | De gids noemt validatie, maar nog niet per veld welke fouttekst, focus en ARIA-koppeling nodig zijn. | Sectie 17 beschrijft het validatie- en foutcontract. |
+| Blockers | De reason-codeclassificatie bestaat, maar de gebruikersbehandeling van blockers moet eenduidig zijn. | Sectie 17 en 18 bepalen dat blockers nooit als EUR 0 worden getoond. |
+| EUR 0 versus niet berekend | De bestaande gids bevat de kernregel, maar de samenvatting en PDF hadden nog een expliciete optelregel nodig. | Sectie 18 en 20 borgen dat alleen concrete enginebedragen optellen. |
+| Scherm/PDF-gelijkheid | De gids noemt het reportmodel, maar nog geen veldmatrix. | Sectie 20 legt bron van waarheid, zichtbaarheid en privacy per onderdeel vast. |
+| PDF-rekenpad | De gids verbiedt herberekening, maar specificeerde nog onvoldoende welke data de PDF gebruikt. | Sectie 19 maakt de PDF afhankelijk van canonieke input, centrale resultaten en resultmapper. |
+
+Besluit: deze opdracht blijft documentatie-only. Een typed configuratielaag is pas zinvol in Fase A van de implementatie, zodat tests dan direct tegen executable mapping en schema's kunnen draaien. Deze gids vormt daarvoor het implementatiecontract.
+
+## 14. Definitieve publieke formulierflow
+
+De publieke Toeslagenscan wordt een stapsgewijze intake. `Weet ik niet` is alleen een tijdelijke intakekeuze; de gebruiker krijgt uitleg, vervolgvraag of vindplaats voordat een bedragadapter de centrale engine mag aanroepen. Eerder ingevulde waarden blijven in lokale formstate staan wanneer een stap tijdelijk verborgen wordt, maar hidden stale values worden niet naar engine-input gemapt.
+
+### Stap 1 - Persoonlijke situatie
+
+Doel: bepalen voor welke toeslagen de basisroute relevant kan zijn.
+
+| Eigenschap | Contract |
+|---|---|
+| Titel | `Over jou` |
+| Korte uitleg | `We starten met gegevens die voor meerdere toeslagen bepalen of de scan iets kan berekenen.` |
+| Zichtbare velden | berekeningsjaar 2026 als vaste context, leeftijd, woonland Nederland/anders, Nederlandse zorgverzekering |
+| Conditioneel zichtbaar | woonlandfactor-uitleg wanneer woonland anders dan Nederland; zorgverzekeringuitleg wanneer `Weet ik niet` |
+| Validatie | leeftijd integer 0-120; woonland required; zorgverzekering yes/no vereist voor zorgtoeslagbedrag |
+| Doorgaan mogelijk | leeftijd en woonland zijn concreet; zorgverzekering mag tijdelijk unknown blijven, maar blokkeert zorgtoeslagbedrag totdat opgelost |
+| Foutfocus | eerste fout in stap, met summarylink naar het veld |
+| Terugnavigatie | niet van toepassing vanaf eerste stap |
+| Waardebehoud | alle ingevulde waarden blijven staan bij heen-en-weer navigeren |
+
+### Stap 2 - Partner en huishouden
+
+Doel: bepalen welke inkomens, vermogens en huishoudleden meetellen.
+
+| Eigenschap | Contract |
+|---|---|
+| Titel | `Partner en huishouden` |
+| Korte uitleg | `Toeslagen kijken naar je huishouden. Daarom vragen we alleen wie meetelt voor de berekening.` |
+| Zichtbare velden | toeslagpartner ja/nee/weet ik niet, geldt situatie hele kalenderjaar, medebewoners ja/nee wanneer huurwoning later relevant is of de gebruiker huurtoeslag wil meenemen |
+| Conditioneel zichtbaar | partnerleeftijd bij partner en huurwoning; gezamenlijke partnergegevens bij partner; per-medebewonerrepeater alleen bij medebewoners |
+| Validatie | partnerstatus required; deeljaar `nee, niet hele jaar` is blocker tot tijdvaklogica; partnerleeftijd 0-120 wanneer nodig |
+| Doorgaan mogelijk | partnerstatus concreet of opgelost via unknown-resolution; deeljaar mag doorgaan naar resultaten maar blokkeert bedragkaarten die tijdvaklogica nodig hebben |
+| Foutfocus | partnerstatus voor ontbrekende partnergegevens; eerste medebewonerregel bij repeaterfout |
+| Terugnavigatie | terug naar persoonlijke situatie zonder reset |
+| Waardebehoud | partner- en medebewonerwaarden blijven bewaard, maar worden niet gebruikt wanneer partner/medebewoners later naar `nee` gaan |
+
+### Stap 3 - Kinderen
+
+Doel: kindgebonden budget en toekomstige kinderopvangvragen alleen openen wanneer er kinderen zijn.
+
+| Eigenschap | Contract |
+|---|---|
+| Titel | `Kinderen` |
+| Korte uitleg | `Kindgegevens zijn alleen nodig voor kindgebonden budget en kinderopvangtoeslag.` |
+| Zichtbare velden | kinderen ja/nee, aantal kinderen, geboortedatum per kind, kinderbijslag/onderhoudsvoorwaarde per kind, wonen kinderen in Nederland |
+| Conditioneel zichtbaar | co-ouderschap, samengesteld gezin, situatie hele kalenderjaar, kind woont bij jou |
+| Validatie | aantal kinderen integer >= 0; geboortedatum geen toekomst; ten minste evenveel kindregels als aantal kinderen; kinderbijslag/onderhoud per kind required |
+| Doorgaan mogelijk | zonder kinderen direct door; met kinderen moeten aantal en geboortedata concreet zijn; co-ouderschap of samengesteld gezin mag naar resultaten maar blokkeert KGB-bedrag |
+| Foutfocus | eerste kindregel met ontbrekende of toekomstige geboortedatum |
+| Terugnavigatie | terug naar partner/huishouden zonder verlies van kindregels |
+| Waardebehoud | kindregels blijven bewaard wanneer `kinderen` tijdelijk naar `nee` gaat, maar worden dan niet gemapt |
+
+Leeftijdsverhogingen voor kindgebonden budget worden nooit rechtstreeks gevraagd. De adapter leidt leeftijd en leeftijdscategorie af uit geboortedatum en berekeningsjaar.
+
+### Stap 4 - Inkomen en vermogen
+
+Doel: de verplichte rekenwaarden verzamelen zonder defaults.
+
+| Eigenschap | Contract |
+|---|---|
+| Titel | `Inkomen en vermogen` |
+| Korte uitleg | `Gebruik je verwachte toetsingsinkomen over 2026 en je vermogen op 1 januari 2026.` |
+| Zichtbare velden | toetsingsinkomen aanvrager of gezamenlijk toetsingsinkomen bij partner; vermogen aanvrager; partnervermogen bij partner; per-medebewonervermogen bij huur en medebewoners |
+| Conditioneel zichtbaar | huishoudinkomen of per-persooninkomen bij huur; uitleg bijzondere vermogensbestanddelen |
+| Validatie | geldbedragen >= 0, maximaal twee decimalen in invoer, geen lege verplichte bedragen, partnergegevens required bij partner |
+| Doorgaan mogelijk | alle voor relevante toeslagen vereiste bedragen concreet; unknown activeert help/vindplaats/vraagverfijning en niet de engine |
+| Foutfocus | eerste ontbrekende of negatieve geldinvoer |
+| Terugnavigatie | terug naar kinderen zonder reset |
+| Waardebehoud | bedragen blijven bewaard bij dependencywijzigingen, maar hidden stale values worden uitgesloten |
+
+### Stap 5 - Huurwoning
+
+Doel: huurtoeslag alleen berekenen voor standaard 2026-jaarscenario's.
+
+| Eigenschap | Contract |
+|---|---|
+| Titel | `Huurwoning` |
+| Korte uitleg | `Voor huurtoeslag telt in 2026 de kale huur. Servicekosten tellen niet mee in de rekenhuur.` |
+| Zichtbare velden | huur/koop/anders, zelfstandige woning, kale huur per maand, servicekosten ja/nee en bedrag, hele kalenderjaar in deze woning |
+| Conditioneel zichtbaar | bijzondere woonvorm, aangepaste woning/beperking bij jongerenhuishouden, onderhuur bij medebewoners |
+| Validatie | kale huur >= 0; servicekosten >= 0; servicekosten worden nooit bij kale huur opgeteld; zelfstandige woning required bij huur |
+| Doorgaan mogelijk | geen huur: stap overslaan; huur: kale huur, zelfstandigheid en hele-jaarstatus concreet; bijzondere woonvorm/deeljaar blokkeert bedrag |
+| Foutfocus | kale huur of zelfstandige woning |
+| Terugnavigatie | terug naar inkomen/vermogen zonder reset |
+| Waardebehoud | huurvelden blijven bewaard bij tijdelijk wisselen naar koop, maar worden niet gemapt zolang `tenure` geen huur is |
+
+### Stap 6 - Kinderopvang
+
+Doel: signalering en toekomstige bedragvoorbereiding scheiden.
+
+| Eigenschap | Contract |
+|---|---|
+| Titel | `Kinderopvang` |
+| Korte uitleg | `Deze scan kan kinderopvangtoeslag nu signaleren. Bedragen worden pas geactiveerd als de volledige centrale engine gereed is.` |
+| Zichtbare velden | betaalde opvang, LRK-registratie, eigen bijdrage, rechtgevende activiteit aanvrager, rechtgevende activiteit partner bij partner |
+| Conditioneel zichtbaar | opvangsoort, contract per kind, periode, uren, uurtarief en meerdere contracten alleen in toekomstige bedragfase of verborgen voorbereidingsconfig |
+| Validatie | ja/nee required voor signalering; uren/uurtarief >= 0 wanneer bedragfase later actief wordt |
+| Doorgaan mogelijk | signaleringsvelden concreet of als incomplete signalering; bedragvelden activeren nog geen bedrag |
+| Foutfocus | LRK of eigen bijdrage bij ontbrekende harde voorwaarde |
+| Terugnavigatie | terug naar huurwoning zonder reset |
+| Waardebehoud | contractregels blijven lokaal bewaard wanneer opvang later naar `nee` gaat, maar worden niet gemapt |
+
+### Stap 7 - Controle en berekening
+
+Doel: aannames, blockers en engine-input zichtbaar maken voordat berekening draait.
+
+| Eigenschap | Contract |
+|---|---|
+| Titel | `Controleer je gegevens` |
+| Korte uitleg | `We rekenen alleen met gegevens die concreet genoeg zijn. Onopgeloste of niet-ondersteunde situaties worden als blocker getoond.` |
+| Zichtbare velden | samenvatting per stap, afgeleide waarden, nog te bevestigen waarden, blockers, aanvraag-/controlecontext |
+| Conditioneel zichtbaar | knop `Bereken indicatie` alleen wanneer minimaal een toeslag concrete engine-input heeft of signalering verantwoord is |
+| Validatie | alle stapvalidaties opnieuw; focus naar eerste blocker of fout |
+| Doorgaan mogelijk | voor concrete bedragen: alle essentiële inputs opgelost; voor signalering: incomplete status toegestaan zonder bedrag |
+| Foutfocus | foutsummary bovenaan met links naar stap en veld |
+| Terugnavigatie | iedere stap blijft bewerkbaar |
+| Waardebehoud | geen reset bij berekenen; resetknop vraagt expliciete bevestiging en zet terug naar `defaultValues` |
+
+## 15. Centrale vraagconfiguratie en concrete vraagteksten
+
+Implementeer deze vragen later als centrale `questions`/config-laag of typed contract buiten React. Iedere vraag krijgt minimaal `id`, `stepId`, `label`, `shortHelp`, `detailHelp`, `example`, `whereToFind`, `sourceIds`, `visibleWhen`, `requiredWhen`, `blocksCalculationWhenUnknown`, `ariaDescriptionId` en `validation`.
+
+### Huurtoeslag
+
+| Vraag-id | Vraagtekst | Zichtbaar wanneer | Required voor bedrag | Contract |
+|---|---|---|---|---|
+| `rent.basicRent` | `Wat is uw kale huur per maand?` | `tenure=rent` | Ja | Geldbedrag. Leg expliciet uit: kale huur is de huur zonder servicekosten, voorschotten, energie of gemeentelijke lasten. |
+| `rent.hasServiceCosts` | `Betaalt u servicekosten?` | `tenure=rent` | Nee, maar tonen voor uitleg | Ja/nee. Bij ja verschijnt servicekostenbedrag; servicekosten tellen niet mee in engine-input als kale huur. |
+| `rent.serviceCosts` | `Welk bedrag aan servicekosten betaalt u per maand?` | `hasServiceCosts=yes` | Nee | Geldbedrag >= 0. Alleen toelichting/waarschuwing; niet optellen bij kale huur. |
+| `rent.isIndependentHome` | `Gaat het om een zelfstandige woning?` | `tenure=rent` | Ja | Ja/nee/weet ik niet. Nee of unresolved unknown blokkeert bedrag, tenzij latere uitzondering expliciet wordt ondersteund. |
+| `rent.fullYearResidence` | `Woont u het hele kalenderjaar in deze woning?` | `tenure=rent` | Ja | Ja/nee. Nee geeft `partial-year-not-supported`. |
+| `household.hasPartner` | `Woont er een toeslagpartner bij u?` | altijd | Ja | Centrale partnerstatus. Unknown-resolution verplicht. |
+| `rent.hasCoResidents` | `Wonen er andere personen op het adres?` | `tenure=rent` | Ja | Ja/nee. Bij ja verschijnt medebewonerrepeater. |
+| `rent.householdIncome` | `Wat is het gezamenlijke toetsingsinkomen van het huurtoeslaghuishouden?` | `tenure=rent` | Ja zolang per-persooninkomen niet actief is | Geldbedrag >= 0; later vervangen door per-persoonmapping waar nodig. |
+| `rent.memberAssets` | `Wat is het vermogen per relevante persoon op 1 januari 2026?` | `tenure=rent` | Ja | Per aanvrager, partner en medebewoner concreet; geen totaaldefault. |
+| `rent.specialHousing` | `Is sprake van een bijzondere woonvorm?` | `tenure=rent` | Ja als controle | Ja/nee. Ja geeft manual-review/unsupported. |
+
+### Kindgebonden budget
+
+| Vraag-id | Vraagtekst | Zichtbaar wanneer | Required voor bedrag | Contract |
+|---|---|---|---|---|
+| `children.qualifyingCount` | `Voor hoeveel kinderen bestaat recht op kinderbijslag of voldoet u aan de onderhoudsvoorwaarde?` | `hasChildren=yes` | Ja | Integer >= 0 of per-kind ja/nee. Geen bedrag wanneer 0. |
+| `children.birthDate` | `Wat is de geboortedatum van ieder kind?` | `hasChildren=yes` | Ja | Datum niet in toekomst. Leeftijd en leeftijdsverhogingen worden afgeleid. PDF gebruikt alleen leeftijd/geboortejaar tenzij volledige datum nodig is voor uitleg. |
+| `household.hasPartner` | `Heeft u een toeslagpartner?` | altijd | Ja | Hergebruik centrale partnerstatus. |
+| `children.coParenting` | `Is sprake van co-ouderschap?` | `hasChildren=yes` | Ja | Ja blokkeert KGB-bedrag met `unsupported-co-parenting`. |
+| `children.compositeFamily` | `Is sprake van een samengesteld gezin?` | `hasChildren=yes` | Ja | Ja blokkeert of vraagt handmatige beoordeling. |
+| `children.residenceCountry` | `Wonen de kinderen in Nederland?` | `hasChildren=yes` | Ja | Alleen `ja` is amount-ready. Nee geeft `unsupported-foreign-residence-factor`. |
+| `children.fullYearSituation` | `Geldt de situatie het hele kalenderjaar?` | `hasChildren=yes` | Ja | Nee geeft `partial-year-not-supported`. |
+| `income.assessmentIncome` | `Wat is het gezamenlijke toetsingsinkomen?` | altijd, label past aan op partnerstatus | Ja | Zonder partner individueel, met partner gezamenlijk. Geldbedrag >= 0. |
+| `assets.relevantPersons` | `Wat is het vermogen?` | altijd | Ja | Aanvrager en partner apart waar partner bestaat. |
+
+Vraag geen leeftijdsverhogingen rechtstreeks. De resultmapper toont later welke leeftijdscategorie uit geboortedatum is afgeleid.
+
+### Kinderopvangtoeslag
+
+Deze vragen zijn voorbereid, maar niet te activeren voor bedragberekening totdat de volledige centrale kinderopvangtotaalengine gereed is.
+
+| Vraag-id | Vraagtekst | Zichtbaar wanneer | Status |
+|---|---|---|---|
+| `childcare.organization` | `Bij welke opvangorganisatie heeft u opvang afgenomen?` | toekomstige bedragfase | Voorbereid, niet bedragactief. |
+| `childcare.lrkRegistered` | `Staat de opvang geregistreerd in het Landelijk Register Kinderopvang (LRK)?` | `usesChildcare=yes` | Actief voor signalering; required voor toekomstige bedragfase. |
+| `childcare.careType` | `Om welke opvangsoort gaat het?` | toekomstige bedragfase | Voorbereid. |
+| `childcare.childId` | `Voor welk kind is dit contract?` | toekomstige bedragfase | Voorbereid. |
+| `childcare.period` | `Voor welke periode geldt dit contract?` | toekomstige bedragfase | Voorbereid; deeljaar blijft blocker zonder tijdvaklogica. |
+| `childcare.hoursPerMonth` | `Hoeveel opvanguren per maand betaalt u?` | toekomstige bedragfase | Voorbereid; huidige signalering mag uren tonen zonder bedrag. |
+| `childcare.hourlyRate` | `Wat is het uurtarief?` | toekomstige bedragfase | Voorbereid. |
+| `childcare.ownContribution` | `Betaalt u zelf een deel van de opvangkosten?` | `usesChildcare=yes` | Actief voor signalering. |
+| `childcare.applicantActivity` | `Heeft u een rechtgevende activiteit?` | `usesChildcare=yes` | Actief voor signalering. |
+| `childcare.partnerActivity` | `Heeft uw toeslagpartner een rechtgevende activiteit?` | `usesChildcare=yes` en partner | Actief voor signalering. |
+| `childcare.multipleContracts` | `Heeft u meerdere opvangcontracten?` | toekomstige bedragfase | Voorbereid; voorlopig manual-review/blocker. |
+
+## 16. Helptekstcontract
+
+Elke helptekst heeft korte inline copy, verdiepende copy, voorbeeld, vindplaats en bronverwijzing. De primaire bron is onderbouwing; de gebruiker hoeft de bron niet te openen om de term te begrijpen.
+
+| Begrip | Korte uitleg | Waarom nodig | Waar vindt de gebruiker dit? | Voorbeeld |
+|---|---|---|---|---|
+| Toetsingsinkomen | `Dit is je verwachte jaarinkomen waar Dienst Toeslagen mee rekent.` | Het bepaalt of en hoeveel toeslag afbouwt. | Loonstrook, jaaropgave, aangifte inkomstenbelasting of Mijn Toeslagen. | `Verwacht je in 2026 EUR 32.000 bruto loon en geen ander inkomen, gebruik dan dat verwachte jaarbedrag als startpunt.` |
+| Vermogen | `Dit is je vermogen op 1 januari van het berekeningsjaar.` | Te veel vermogen kan een toeslag blokkeren. | Bank- en beleggingssaldi rond 1 januari, belastingaangifte, administratie van spaargeld en schulden die mogen meetellen. | `Spaargeld en beleggingen tellen meestal mee; gewone maandelijkse uitgaven later in januari veranderen de peildatum niet.` |
+| Kale huur | `Dit is de huur voor de woning zelf, zonder servicekosten.` | Huurtoeslag gebruikt in 2026 de kale huur als rekenhuur in deze engine. | Huurovereenkomst, huurspecificatie of huurverhogingsbrief. | `Betaal je EUR 820 huur en EUR 45 servicekosten, dan is de kale huur EUR 820.` |
+| Zelfstandige woning | `Een woning met eigen toegang, eigen keuken en eigen toilet.` | Huurtoeslagbedrag kan alleen veilig worden berekend voor zelfstandige woningen of ondersteunde uitzonderingen. | Huurovereenkomst, woningbeschrijving of verhuurder. | `Een studio met eigen voordeur, keuken en toilet is meestal zelfstandig; een kamer met gedeelde keuken meestal niet.` |
+| Toeslagpartner | `Een persoon die voor toeslagen als partner meetelt, bijvoorbeeld door huwelijk, geregistreerd partnerschap of bepaalde woonsituaties.` | Partnerinkomen en partnervermogen bepalen grenzen en bedragen. | Mijn Toeslagen, persoonlijke situatie, partnercheck binnen de tool. | `Woon je samen met je echtgenoot, dan is die persoon normaal je toeslagpartner.` |
+| Medebewoner | `Iemand anders die op hetzelfde adres woont en voor huurtoeslag kan meetellen.` | Inkomen en vermogen van medebewoners kunnen huurtoeslag beinvloeden. | BRP-inschrijving, huishouden, huuradres. | `Een volwassen huisgenoot kan meetellen; een onderhuurder kan anders behandeld worden.` |
+| Kinderbijslag/onderhoudsvoorwaarde | `Een kind telt meestal mee als je kinderbijslag krijgt of voldoende bijdraagt aan onderhoud.` | Zonder rechtgevend kind is er geen kindgebonden budget. | SVB/Mijn SVB, beschikking kinderbijslag, eigen administratie van onderhoud. | `Krijg je kinderbijslag voor je kind van 8, dan voldoet dat kind meestal aan deze basisvoorwaarde.` |
+| Co-ouderschap | `Een kind woont of wordt verzorgd door beide ouders volgens een verdeling.` | Co-ouderschap kan het recht of de verdeling wijzigen en is nog geen bedrag-ready scenario. | Ouderschapsplan, afspraken met andere ouder, beschikking. | `Een kind woont afwisselend bij beide ouders; de tool toont dan een blocker in plaats van een bedrag.` |
+| Samengesteld gezin | `Een gezin waarin kinderen of partners uit verschillende eerdere gezinssituaties samenkomen.` | Dit kan partner-, kind- en onderhoudsregels complex maken. | Eigen gezinssituatie, beschikking of Mijn Toeslagen. | `Je woont met je partner en kinderen uit eerdere relaties samen.` |
+| Woonlandfactor | `Een factor die kan gelden wanneer een kind buiten Nederland woont.` | De huidige KGB-bedragengine ondersteunt alleen Nederland. | Woonadres van het kind en officiele beschikking. | `Woont het kind in Nederland, dan gebruikt de engine de Nederlandse factor.` |
+| LRK | `Het Landelijk Register Kinderopvang is het register voor erkende opvanglocaties.` | Kinderopvangtoeslag vereist geregistreerde opvang. | Opvangcontract, factuur of LRK-nummer van de opvang. | `Een LRK-nummer op de factuur wijst op geregistreerde opvang.` |
+| Rechtgevende activiteit | `Werk, opleiding, inburgering of traject naar werk waardoor kinderopvangtoeslag mogelijk kan zijn.` | Aanvrager en meestal partner moeten een activiteit hebben die meetelt. | Arbeidscontract, opleiding, trajectdocumenten, administratie. | `Betaald werk of een erkende opleiding kan een rechtgevende activiteit zijn.` |
+
+## 17. Validatie- en foutcontract
+
+Alle velden koppelen inline hulp en fouttekst via `aria-describedby`. Bij een fout krijgt het veld `aria-invalid="true"`. Na submit focust de foutsummary; de eerste link verplaatst focus naar het eerste foutveld. Statusinformatie wordt nooit alleen met kleur weergegeven.
+
+| Veld | Required | Type en grenzen | Cross-fieldvalidatie | Fouttekst | ARIA-contract |
+|---|---|---|---|---|---|
+| Leeftijd | Ja voor bedrag | Integer 0-120 | Huurjongerenregels gebruiken ook partner/medebewonerleeftijd | `Gebruik een leeftijd tussen 0 en 120 jaar.` | `age-help age-error` |
+| Partnerstatus | Ja | `yes/no`, unknown alleen tijdelijk | Partnergegevens required bij `yes` | `Geef aan of je een toeslagpartner hebt of beantwoord de vervolgvraag.` | `partnerStatus-help partnerStatus-error` |
+| Toetsingsinkomen | Ja | Geldbedrag >= 0, max 2 decimalen | Bij partner gebruikt de scan gezamenlijk inkomen | `Vul een bedrag van 0 of hoger in voor het toetsingsinkomen.` | `assessmentIncome-help assessmentIncome-error` |
+| Partner/gezamenlijk inkomen | Conditioneel | Geldbedrag >= 0 | Required bij partner | `Vul het gezamenlijke toetsingsinkomen in, of ga terug naar partnerstatus.` | `jointAssessmentIncome-help jointAssessmentIncome-error` |
+| Vermogen aanvrager | Ja | Geldbedrag >= 0 | Peildatum 1 januari | `Vul het vermogen op 1 januari in als bedrag van 0 of hoger.` | `assets-help assets-error` |
+| Partnervermogen | Conditioneel | Geldbedrag >= 0 | Required bij partner; geen stil totaal naar partner splitten | `Vul het partnervermogen in; gebruik geen onbekende standaardwaarde.` | `partnerAssets-help partnerAssets-error` |
+| Kale huur | Bij huur | Geldbedrag >= 0 | Servicekosten verhogen de engine-input niet | `Vul de kale huur in zonder servicekosten.` | `basicRent-help basicRent-error` |
+| Servicekosten | Optioneel bij huur | Geldbedrag >= 0 | Nooit optellen bij kale huur | `Gebruik 0 of hoger voor servicekosten.` | `serviceCosts-help serviceCosts-error` |
+| Zelfstandige woning | Bij huur | `yes/no`, unknown tijdelijk | Nee of unresolved unknown blokkeert bedrag | `Geef aan of de woning zelfstandig is, of beantwoord de uitlegvragen.` | `independentHome-help independentHome-error` |
+| Hele kalenderjaar | Ja voor huur/KGB-bedrag | `yes/no` | Nee blokkeert zolang tijdvaklogica ontbreekt | `Deze engine kan alleen een heel kalenderjaar berekenen; kies nee als dit niet zo is.` | `fullYear-help fullYear-error` |
+| Medebewoner aantal | Bij medebewoners | Integer >= 0 | Aantal bepaalt repeaterregels | `Vul het aantal medebewoners in als heel getal.` | `coResidents-help coResidents-error` |
+| Medebewoner vermogen | Bij medebewoners | Geldbedrag >= 0 per persoon | Per-persoonsgrens, geen totaaldefault | `Vul vermogen per medebewoner in; een totaalbedrag is niet genoeg voor een bedragindicatie.` | `coResidentAssets-help coResidentAssets-error` |
+| Geboortedatum kind | Bij kinderen | Datum, niet in toekomst | Aantal regels moet passen bij aantal kinderen | `Gebruik een geboortedatum die niet in de toekomst ligt.` | `childBirthDate-help childBirthDate-error` |
+| Kinderbijslag/onderhoud | Per kind | `yes/no`, unknown tijdelijk | Ten minste een kwalificerend kind nodig | `Geef per kind aan of kinderbijslag of onderhoud geldt.` | `childQualification-help childQualification-error` |
+| Co-ouderschap | Bij kinderen | `yes/no` | Ja blokkeert KGB-bedrag | `Co-ouderschap wordt nog niet berekend; de scan toont hiervoor een vervolgstap.` | `coParenting-help coParenting-error` |
+| Samengesteld gezin | Bij kinderen | `yes/no` | Ja geeft manual review/blocker | `Deze gezinssituatie vraagt een officiele controle.` | `compositeFamily-help compositeFamily-error` |
+| LRK | Bij opvang | `yes/no`, unknown tijdelijk | Nee sluit kinderopvangtoeslag normaal uit; unknown blijft signalering | `Geef aan of de opvang een LRK-registratie heeft.` | `lrk-help lrk-error` |
+| Opvanguren | Toekomstige bedragfase | Getal >= 0, max 230 subsidiabel per maand in engine | Uren boven cap worden begrensd door engine, niet door UI verborgen | `Gebruik een aantal uren van 0 of hoger.` | `childcareHours-help childcareHours-error` |
+| Uurtarief | Toekomstige bedragfase | Geldbedrag >= 0 | Engine past maxuurtarief toe | `Vul het uurtarief in als bedrag van 0 of hoger.` | `hourlyRate-help hourlyRate-error` |
+
+Geen impliciete defaults:
+
+- onbekend inkomen, vermogen, huur, geboortedatum, partnerstatus, woonland of LRK wordt nooit `0`, `nee` of Nederland;
+- hidden stale values blijven bewaard voor de gebruiker, maar worden niet gemapt naar engine-input;
+- een blocker is een status met reden en vervolgstap, geen validatieclamp.
+
+## 18. Resultaatpresentatie
+
+Iedere toeslagkaart gebruikt hetzelfde publieke resultcontract uit sectie 6. De kaart toont status, bedrag alleen waar verantwoord, belangrijkste redenen, aannames, waarschuwingen, bronjaar, bronnen en vervolgstap.
+
+| Resultaatsoort | Schermpresentatie | Bedragregel | Vervolgstap |
+|---|---|---|---|
+| Concrete indicatie | Maandbedrag prominent, jaarbedrag secundair, status `Berekend voor standaardscenario`. | Alleen centrale enginebedragen tonen. | `Controleer of vraag aan in Mijn Toeslagen.` |
+| Waarschijnlijk geen recht | Uitleg welke harde voorwaarde of nuluitkomst doorslaggevend is. | Alleen EUR 0 tonen als centrale engine expliciet `monthlyAmount: 0` of `yearlyAmount: 0` levert. | `Controleer de doorslaggevende invoer.` |
+| Niet berekend door incomplete invoer | Blockerkaart met ontbrekend gegeven, waarom nodig en eerstvolgende vraag. | Geen bedrag, niet optellen. | `Vul dit gegeven aan.` |
+| Niet ondersteunde situatie | Status `Niet ondersteund in deze scan`, reason code in Nederlandse uitleg. | Geen bedrag, niet optellen. | `Gebruik Mijn Toeslagen of officiele proefberekening voor deze situatie.` |
+| Handmatige beoordeling nodig | Waarschuwingskaart met uitleg waarom standaardregels onvoldoende zijn. | Geen bedrag tenzij een centrale standaardberekening naast niet-blokkerende waarschuwing expliciet bestaat. | `Laat de situatie officieel controleren.` |
+| Alleen signalering | Compacte kaart met waarschijnlijk relevant/niet relevant en ontbrekende gegevens. | Geen bedrag. | `Verzamel de genoemde gegevens; bedrag volgt pas na engineactivatie.` |
+
+Gezamenlijke samenvatting:
+
+- `Totaal per maand` telt alleen kaarten met concrete centrale bedragen en status `calculated`.
+- `Totaal per jaar` gebruikt dezelfde kaarten en dezelfde afgeronde jaarbedragen als de resultmapper.
+- `Niet meegerekend` toont incomplete, unsupported, manual-review en signal-only toeslagen apart.
+- Ineligible met expliciet enginebedrag `0` mag als `EUR 0` zichtbaar zijn, maar verhoogt het totaal niet en wordt niet verward met `niet berekend`.
+- De samenvatting toont geen totaal als geen enkele toeslag een concrete enginebedragkaart heeft.
+- Alle bronjaren en reliabilitylabels komen uit centrale resultaten of resultmapper.
+
+## 19. PDF-contract volledige Toeslagenscan
+
+De PDF gebruikt exact dezelfde data als het scherm:
+
+1. canonieke scaninput na validatie en unknown-resolution;
+2. centrale engineresultaten per toeslag;
+3. centrale resultmapper voor bedragen, status, rounding, warnings en reason codes;
+4. centrale bronmetadata;
+5. hetzelfde report/viewmodel dat `Calculator.tsx` rendert of een pure afgeleide daarvan.
+
+De PDF-laag mag geen:
+
+- engine opnieuw aanroepen;
+- bedrag afronden met eigen logica;
+- bronjaar kiezen;
+- hidden stale formvalues gebruiken;
+- unsupported of incomplete resultaat als EUR 0 presenteren.
+
+Minimale PDF-structuur:
+
+| Sectie | Inhoud | Bron van waarheid |
+|---|---|---|
+| Titel en datum | `Toeslagenadvies 2026`, berekeningsdatum | Reportmodel `title`, `generatedAt`, `calculationYear` |
+| Samenvatting | totaal maand/jaar voor concrete bedragen, niet-berekende toeslagen apart | Centrale resultmapper |
+| Indicatie per toeslag | status, maandbedrag, jaarbedrag, reliability, belangrijkste redenen | `PublicAllowanceBenefitResult` of `AllowanceAdvisorReportResult` |
+| Gebruikte invoer | alleen relevante, niet-stale antwoorden | Canonieke scaninput/report `answeredInputs` |
+| Afgeleide invoer | afgeleide waarden met bevestigingsstatus | Inference/reportregels |
+| Ontbrekende invoer | blockers met reden en vervolgstap | Reason codes en missing inputs |
+| Aannames en waarschuwingen | grens, aftopping, servicekosten genegeerd, unsupported situaties | Centrale result warnings/reason codes |
+| Officiele bronnen | bronlabels, dataset, versie, URL | Source metadata |
+| Vervolgstappen | aanvraag-/wijzigingsstappen en aanvraaglinks | Advisor application guidance |
+| Disclaimer | indicatie, geen beschikking, Mijn Toeslagen leidend voor aanvraag/wijziging | Centrale reportdisclaimer |
+
+Privacyregels:
+
+- Gebruik geen volledige geboortedatum in de PDF wanneer leeftijd of geboortejaar voldoende is.
+- Neem geen namen, adressen, BSN's, bankgegevens of opvangcontractnummers op.
+- Toon kindregels als `Kind 1`, `Kind 2` met leeftijd/geboortejaar en relevante status.
+- Toon alleen persoonsgegevens die nodig zijn om de berekening of blocker te begrijpen.
+- Bewaar geen PDF-data buiten de browser tenzij een latere privacy- en securitybeslissing dat expliciet toestaat.
+
+Blockers in PDF:
+
+- status `Niet berekend`;
+- concrete reden in gebruikerstaal;
+- ontbrekend of unsupported gegeven;
+- vervolgstap;
+- geen bedragkolom met EUR 0;
+- niet opgenomen in totaal.
+
+## 20. Scherm/PDF-gelijkheidsmatrix
+
+| Schermveld | PDF-weergave | Resultcomponent | Bron van waarheid | Conditionele zichtbaarheid | Privacybehandeling |
+|---|---|---|---|---|---|
+| Titel scan | Titel rapport | Report header | `AllowanceAdvisorReportModel.title` | Altijd | Geen persoonsgegevens |
+| Berekeningsdatum | Berekeningsdatum | Report header | `generatedAt` uit reportmodel | Altijd | Datum, geen extra input |
+| Berekeningsjaar | Berekeningsjaar | Header/samenvatting | Centrale calculation year | Altijd | Geen persoonsgegevens |
+| Totaal per maand | Totaal per maand | Summary total | Centrale resultmapper, alleen concrete maandbedragen | Alleen bij >= 1 concrete bedragkaart | Geen detailinput |
+| Totaal per jaar | Totaal per jaar | Summary total | Centrale resultmapper, alleen concrete jaarbedragen | Alleen bij >= 1 concrete bedragkaart | Geen detailinput |
+| Toeslagstatus | Status per toeslag | Result card/report result | `PublicAllowanceBenefitResult.status` | Altijd per kaart | Geen persoonsgegevens |
+| Maandbedrag | Maandbedrag | Result amount | Engine-resultaat via mapper | Alleen `calculated` of expliciet engine-`0` | Bedrag is berekeningsuitkomst |
+| Jaarbedrag | Jaarbedrag | Result amount | Engine-resultaat via mapper | Alleen waar maandbedrag ook verantwoord is | Bedrag is berekeningsuitkomst |
+| Redenen | Belangrijkste redenen | Reason list | Centrale reason codes + copyadapter | Altijd wanneer aanwezig | Geen ruwe technische codes |
+| Waarschuwingen | Waarschuwingen | Warning list | Centrale warnings/reason codes | Alleen wanneer aanwezig | Geen ruwe technische codes |
+| Blockers | Niet berekend + vervolgstap | Blocker card/report missing input | Missing fields en reason codes | Alleen incomplete/unsupported/manual-review | Geen EUR 0 |
+| Ingevulde leeftijd | Leeftijd | Input summary | Canonieke scaninput | Alleen relevant voor uitkomst | Leeftijd tonen, geen geboortedatum |
+| Geboortedatum kind | Leeftijd/geboortejaar kind | Input summary | Canonieke scaninput + afleiding | Alleen KGB/KOT relevant | Geen volledige datum tenzij nodig voor foutuitleg |
+| Toetsingsinkomen | Ingevuld inkomen | Input summary | Canonieke scaninput | Alleen relevant voor berekende of geblokkeerde toeslag | Bedrag tonen omdat het uitkomst verklaart |
+| Vermogen | Ingevuld vermogen | Input summary | Canonieke scaninput | Alleen relevant voor toeslag met vermogenstoets | Bedrag tonen omdat het blocker/uitkomst verklaart |
+| Kale huur | Kale huur | Input summary/result details | Canonieke scaninput | Alleen huurtoeslag relevant | Bedrag tonen |
+| Servicekosten | Waarschuwing/servicekostengegeven | Detailregel | Canonieke scaninput + mapperwarning | Alleen ingevuld bij huur | Bedrag tonen, niet optellen |
+| Zelfstandige woning | Woningstatus | Input/blocker | Canonieke scaninput | Alleen huur | Ja/nee tonen |
+| Co-ouderschap | Blocker of bevestigde nee | Blocker/input summary | Canonieke scaninput | Alleen KGB relevant | Geen extra details over ouderschapsregeling |
+| LRK | Signalering/blocker | Childcare card | Canonieke scaninput | Alleen kinderopvang | Geen opvangnaam vereist in PDF |
+| Aanvraaglink | Vervolgstap/link | Next steps | Advisor guidance/source links | Per toeslag | Alleen URL/label |
+| Bronverwijzingen | Bronnenlijst | Source section | Centrale source metadata | Altijd wanneer resultaat of blocker bronbaar is | Geen inputdata in URL |
+
+Borgingsregels:
+
+- De PDF en schermweergave renderen dezelfde mappervelden; labels komen uit dezelfde copyadapter.
+- Afronding vindt uitsluitend in de centrale engine/resultmapper plaats.
+- Iedere waarschuwing in de PDF moet ook op het scherm kunnen verschijnen.
+- De PDF mag details compacter of uitgebreider tonen, maar niet inhoudelijk anders.
+
+## 21. Implementatievolgorde voor publieke aansluiting
+
+1. Voeg in Fase A `apps/toeslagen-scan/engine-adapters.ts` toe met typed scaninput, vraagconfiguratie en pure mapping zonder publieke bedragactivatie.
+2. Voeg adaptertests toe voor conditionele vragen, required-regels, blockers, no-defaults en resultmapping.
+3. Sluit de stapsgewijze intake in `Calculator.tsx` aan zonder routes/manifests te wijzigen.
+4. Activeer huurtoeslagbedragen pas wanneer alle huurvelden uit sectie 15 concreet beschikbaar zijn en blockers uit sectie 17 getest zijn.
+5. Activeer kindgebonden-budgetbedragen pas wanneer geboortedata, per-kind recht, woonland, co-ouderschap en deeljaarblocking getest zijn.
+6. Houd kinderopvangtoeslag bedragloos tot een volledige centrale totaalengine bestaat.
+7. Sluit PDF pas aan op het gedeelde report/resultmodel nadat schermresultaten stabiel zijn.
+8. Draai bij publieke activatie volledige generate-, lint-, typecheck-, test-, build- en browser/UX-checks.
+
+Concrete vervolgprompt voor de Feature Integrator:
+
+```text
+Agentchat: Add feature integrator guide
+
+Doel: voer Fase A uit uit docs/toeslagen-scan-integration-guide.md zonder publieke bedragactivatie.
+
+Werk uitsluitend in de Project Site repository op main. Behoud AGENTS.md en ideetjes.txt als gebruikerswijzigingen.
+
+Implementeer:
+- apps/toeslagen-scan/engine-adapters.ts met typed PublicAllowanceScanInput, PublicAllowanceBenefitResult en pure mapperfuncties;
+- vraagconfiguratie volgens secties 14-17;
+- tests voor conditionele vragen, required-regels, co-ouderschapblocker, deeljaarblocker, partnerafhankelijke velden, geboortedatumvalidatie, kale-huurvalidatie, no-defaults en PDF/scherm-resultmapping;
+- geen React-bedragactivatie, geen routes, geen manifests, geen engine/source wijzigingen.
+
+Commit bij groen:
+feat(allowances): prepare scan form and pdf flow
+```
