@@ -326,7 +326,7 @@ describe("source dataset registry", () => {
     expect(data.amounts.mbo.maximumLivingAway.value).toBe(466.4);
     expect(data.amounts.mbo.maximumLivingAtHome.officialSourceUrl).toContain("duo.nl");
     expect(data.amounts.mbo.parentalContributionTaperPercent.value).toBe(26);
-    expect(data.amounts.mbo.parentalContributionTaperPercent.verificationStatus).toBe("requires-calculation-guardian-review");
+    expect(data.amounts.mbo.parentalContributionTaperPercent.verificationStatus).toBe("verified");
     expect(data.amounts.hboUniversity.maximum.value).toBe(491.08);
     expect(data.amounts.hboUniversity.maximumGrantParentIncomeThreshold.value).toBe(41_500.6);
     expect(data.amounts.hboUniversity.parentalContributionTaperPercent.value).toBe(13.6);

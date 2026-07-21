@@ -16,6 +16,7 @@ export {
 } from "@/lib/duo/calculations";
 export { projectDuoLoan } from "@/lib/duo/project-duo-loan";
 export { determineDuoMortgageAssessmentPayment } from "@/lib/duo/mortgage-assessment";
+export { calculateDuoAdditionalGrant } from "@/lib/duo/additional-grant";
 export type {
   DuoMortgageAssessmentBasis,
   DuoMortgageAssessmentInput,
@@ -51,3 +52,18 @@ export type {
   DuoRepaymentTimelinePoint,
   DuoRepaymentTimelineSummary,
 } from "@/lib/duo/types";
+export type {
+  DuoAdditionalGrantFamilySituation,
+  DuoAdditionalGrantInput,
+  DuoAdditionalGrantMissingInput,
+  DuoAdditionalGrantParentContribution,
+  DuoAdditionalGrantReferenceYearComparison,
+  DuoAdditionalGrantReferenceYearLikelihood,
+  DuoAdditionalGrantResidence,
+  DuoAdditionalGrantResult,
+  DuoAdditionalGrantScenarioInput,
+  DuoAdditionalGrantScenarioResult,
+  DuoAdditionalGrantSpecialCase,
+  DuoAdditionalGrantStatus,
+  DuoAdditionalGrantTraceStep,
+} from "@/lib/duo/additional-grant";
