@@ -427,6 +427,7 @@ export default function DuoAanvullendeBeursCalculator() {
         <ResultCard
           label="Aanvullende beurs per maand"
           value={submittedView.monthlyGrantLabel}
+          className="sm:col-span-3"
           tone={submittedView.result.status === "calculated" ? "pos" : "warn"}
         />
         <ResultCard
@@ -501,10 +502,10 @@ export default function DuoAanvullendeBeursCalculator() {
       startActions={
         <div className="flex flex-wrap gap-2">
           <ToolActionButton type="button" variant="secondary" onClick={() => setValues(defaultValues)}>
-            Voorbeeldwaarden
+            Voorbeeld invullen
           </ToolActionButton>
           <ToolActionButton type="button" variant="secondary" onClick={() => setValues(emptyValues)}>
-            Leeg formulier
+            Wis invoer
           </ToolActionButton>
         </div>
       }
@@ -512,7 +513,7 @@ export default function DuoAanvullendeBeursCalculator() {
       submitAction={
         <div className="space-y-3">
           <ToolActionButton type="button" onClick={handleSubmit} disabled={hasErrors}>
-            Bereken aanvullende beurs
+            Bereken
           </ToolActionButton>
           <ToolActionButton type="button" variant="secondary" onClick={() => reset()}>
             Wis invoer

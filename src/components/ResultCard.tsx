@@ -8,6 +8,7 @@ type ResultCardProps = {
   note?: string;
   /** Kleurt de kaart voor conclusies of onzekerheid. */
   tone?: ResultCardTone;
+  className?: string;
 };
 
 const toneStyles: Record<ResultCardTone, { card: string; value: string }> = {
@@ -26,11 +27,11 @@ const toneStyles: Record<ResultCardTone, { card: string; value: string }> = {
   },
 };
 
-export function ResultCard({ label, value, note, tone = "default" }: ResultCardProps) {
+export function ResultCard({ label, value, note, tone = "default", className }: ResultCardProps) {
   const styles = toneStyles[tone];
 
   return (
-    <article className={`result-panel border p-5 ${styles.card}`}>
+    <article className={`result-panel border p-5 ${styles.card} ${className ?? ""}`.trim()}>
       <p className="text-[13.5px] font-medium text-[var(--muted)]">
         <GlossaryText text={label} />
       </p>

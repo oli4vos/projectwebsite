@@ -425,12 +425,12 @@ function CalculatorContent({
   function applyProfileValues() {
     setValues(
       mergeProfilePatchIntoValues(formValues, profilePatch),
-      "Profielwaarden geladen. Klik op Bereken om de uitkomst te zien.",
+      "Profiel ingevuld. Klik op Bereken om de uitkomst te zien.",
     );
   }
 
   function applyExampleValues() {
-    setValues(exampleValues, "Voorbeeldwaarden geladen. Klik op Bereken om de uitkomst te zien.");
+    setValues(exampleValues, "Voorbeeld ingevuld. Klik op Bereken om de uitkomst te zien.");
   }
 
   function goToResult() {
@@ -470,10 +470,10 @@ function CalculatorContent({
           <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
             <span>Profielwaarden gevonden in deze browser.</span>
             <ToolActionButton type="button" onClick={applyExampleValues} variant="secondary" size="sm">
-              Start met voorbeeldwaarden
+              Voorbeeld invullen
             </ToolActionButton>
             <ToolActionButton type="button" onClick={applyProfileValues} variant="secondary" size="sm">
-              Start met profielwaarden
+              Gebruik profiel
             </ToolActionButton>
           </div>
         ) : null}
@@ -481,7 +481,7 @@ function CalculatorContent({
           <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
             <span>Start leeg en vul snel een voorbeeldscenario in.</span>
             <ToolActionButton type="button" onClick={applyExampleValues} variant="secondary" size="sm">
-              Start met voorbeeldwaarden
+              Voorbeeld invullen
             </ToolActionButton>
           </div>
         ) : null}

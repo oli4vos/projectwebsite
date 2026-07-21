@@ -230,6 +230,17 @@ export default function Calculator() {
             handleSubmit();
           }}
         >
+          <section className="surface-subtle px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
+            <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--soft)]">
+              Wat heb je nodig?
+            </div>
+            <ul className="mt-2 list-disc space-y-1.5 pl-5">
+              <li>Je bruto jaarinkomen en eventueel partnerinkomen.</li>
+              <li>De koopprijs of woningwaarde van het huis.</li>
+              <li>Je studieschuld en het huidige DUO-maandbedrag.</li>
+            </ul>
+          </section>
+
           <section className="grid gap-4">
             <h3 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">
               Inkomsten
@@ -438,7 +449,7 @@ export default function Calculator() {
               full
               disabled={!formValidation.parsed}
             >
-              {submittedValues && hasDirtyChanges ? "Bereken opnieuw" : "Bereken maximale hypotheek"}
+              {submittedValues && hasDirtyChanges ? "Bereken opnieuw" : "Bereken"}
             </ToolActionButton>
           </div>
 
@@ -486,6 +497,7 @@ export default function Calculator() {
                 <ResultCard
                   label="Einduitkomst"
                   value={formatCurrency(result.finalMaxMortgage)}
+                  className="sm:col-span-2 sm:order-first"
                   tone="pos"
                 />
                 <ResultCard

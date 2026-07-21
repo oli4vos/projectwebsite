@@ -450,11 +450,11 @@ function CalculatorContent({ initialValues, hasRelevantProfileValues, profilePat
 
   function applyExampleValues() {
     setFormValues(exampleValues);
-    setSubmitContextMessage("Voorbeeldwaarden geladen. Klik op Bereken om de uitkomst te zien.");
+    setSubmitContextMessage("Voorbeeld ingevuld. Klik op Bereken om de uitkomst te zien.");
   }
   function applyProfileValues() {
     setFormValues((current) => mergeProfilePatchIntoValues(current, profilePatch));
-    setSubmitContextMessage("Profielwaarden geladen. Klik op Bereken om de uitkomst te zien.");
+    setSubmitContextMessage("Profiel ingevuld. Klik op Bereken om de uitkomst te zien.");
   }
 
   function onSubmit(event: React.FormEvent) {
@@ -518,10 +518,10 @@ function CalculatorContent({ initialValues, hasRelevantProfileValues, profilePat
   const startActions = (
     <>
       <div className="flex flex-wrap items-center gap-3 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
-        {hasRelevantProfileValues ? <span>Profielwaarden gevonden in deze browser.</span> : <span>Start leeg of laad voorbeeldwaarden.</span>}
-        <ToolActionButton type="button" onClick={applyExampleValues} variant="secondary" size="sm">Start met voorbeeldwaarden</ToolActionButton>
+        {hasRelevantProfileValues ? <span>Profielwaarden gevonden in deze browser.</span> : <span>Start leeg of gebruik een voorbeeldscenario.</span>}
+        <ToolActionButton type="button" onClick={applyExampleValues} variant="secondary" size="sm">Voorbeeld invullen</ToolActionButton>
         {hasRelevantProfileValues ? (
-          <ToolActionButton type="button" onClick={applyProfileValues} variant="secondary" size="sm">Start met profielwaarden</ToolActionButton>
+          <ToolActionButton type="button" onClick={applyProfileValues} variant="secondary" size="sm">Gebruik profiel</ToolActionButton>
         ) : null}
       </div>
       {submitContextMessage ? <p className="mt-3 text-[12.5px] text-[var(--muted)]">{submitContextMessage}</p> : null}

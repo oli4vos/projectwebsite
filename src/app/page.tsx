@@ -34,6 +34,8 @@ const routeSteps = [
 ];
 
 export default async function HomePage() {
+  const publicToolCount = appRegistry.length;
+
   return (
     <>
       <SiteHeader />
@@ -68,7 +70,7 @@ export default async function HomePage() {
               <div className="section-label">Waarom dit rustig blijft</div>
               <div className="trust-strip mt-5">
                 <div>
-                  <div className="font-mono text-[22px] tabular text-[var(--ink)]">10</div>
+                  <div className="font-mono text-[22px] tabular text-[var(--ink)]">{publicToolCount}</div>
                   <p className="text-[12.5px] leading-5 text-[var(--muted)]">publieke tools, bewust beperkt</p>
                 </div>
                 <div>

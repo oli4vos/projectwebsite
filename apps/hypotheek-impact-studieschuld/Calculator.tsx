@@ -417,14 +417,14 @@ function CalculatorContent({
     setPdfStatus("");
     setValues(
       mergeProfilePatchIntoValues(formValues, profilePatch),
-      "Profielwaarden geladen. Klik op Bereken om de uitkomst te zien.",
+      "Profiel ingevuld. Klik op Bereken om de uitkomst te zien.",
     );
   }
 
   function applyExampleValues() {
     setPdfError("");
     setPdfStatus("");
-    setValues(exampleValues, "Voorbeeldwaarden geladen. Klik op Bereken om de uitkomst te zien.");
+    setValues(exampleValues, "Voorbeeld ingevuld. Klik op Bereken om de uitkomst te zien.");
   }
 
   function clearAllInputs() {
@@ -432,7 +432,7 @@ function CalculatorContent({
     setPdfStatus("");
     setDuoTransferMessage("");
     setPendingDuoCandidate(null);
-    reset("Alle invoervelden zijn gewist. Vul opnieuw in of laad voorbeeldwaarden.");
+    reset("Alle invoervelden zijn gewist. Vul opnieuw in of gebruik een voorbeeldscenario.");
   }
 
   function goToResult() {
@@ -589,10 +589,10 @@ function CalculatorContent({
           <div className="surface-subtle mt-4 flex flex-wrap items-center gap-3 px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
             <span>Profielwaarden gevonden in deze browser.</span>
             <ToolActionButton type="button" onClick={applyExampleValues} variant="secondary" size="sm">
-              Start met voorbeeldwaarden
+              Voorbeeld invullen
             </ToolActionButton>
             <ToolActionButton type="button" onClick={applyProfileValues} variant="secondary" size="sm">
-              Start met profielwaarden
+              Gebruik profiel
             </ToolActionButton>
             <ToolActionButton type="button" onClick={clearAllInputs} variant="secondary" size="sm">
               Wis invoer
@@ -603,7 +603,7 @@ function CalculatorContent({
           <div className="surface-subtle mt-4 flex flex-wrap items-center gap-3 px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
             <span>Start leeg en vul snel een voorbeeldscenario in.</span>
             <ToolActionButton type="button" onClick={applyExampleValues} variant="secondary" size="sm">
-              Start met voorbeeldwaarden
+              Voorbeeld invullen
             </ToolActionButton>
             <ToolActionButton type="button" onClick={clearAllInputs} variant="secondary" size="sm">
               Wis invoer
@@ -623,6 +623,17 @@ function CalculatorContent({
             {duoTransferMessage}
           </p>
         ) : null}
+
+        <section className="surface-subtle mt-5 px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
+          <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--soft)]">
+            Wat heb je nodig?
+          </div>
+          <ul className="mt-2 list-disc space-y-1.5 pl-5">
+            <li>Je bruto jaarinkomen en eventueel partnerinkomen.</li>
+            <li>Je DUO-maandbedrag en studieschuld.</li>
+            <li>Koopprijs, woningwaarde en eigen geld.</li>
+          </ul>
+        </section>
 
         <div className={`mt-7 ${isStepVisible(step1Fields) ? "block" : "hidden"} md:block`}>
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
@@ -757,7 +768,7 @@ function CalculatorContent({
                   variant="secondary"
                   size="sm"
                 >
-                  Bereken eerst mijn DUO-maandbedrag
+                  Open DUO-maandbedrag
                 </ToolActionButton>
               </div>
             </div>

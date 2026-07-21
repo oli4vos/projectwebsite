@@ -35,7 +35,7 @@ const modeCopy: Record<SimpleDuoToolMode, ToolCopy> = {
     title: "Wat wordt mijn studieschuld als ik ga lenen?",
     intro:
       "Vul in hoeveel je per maand verwacht te lenen en hoe lang je nog studeert. De tool laat je verwachte schuld bij diploma en start terugbetaling zien.",
-    primaryLabel: "Bereken mijn schuld",
+    primaryLabel: "Bereken",
     fields: [
       "calculationMonth",
       "monthsUntilDiploma",
@@ -54,7 +54,7 @@ const modeCopy: Record<SimpleDuoToolMode, ToolCopy> = {
     title: "Wat kost stoppen door mijn prestatiebeurs?",
     intro:
       "Vul je openstaande prestatiebeursdelen uit Mijn DUO in. De tool laat zien welk bedrag schuld blijft als je stopt en geen diploma op tijd haalt.",
-    primaryLabel: "Bereken stopkosten",
+    primaryLabel: "Bereken",
     fields: [
       "calculationMonth",
       "currentLoanDebt",
@@ -72,7 +72,7 @@ const modeCopy: Record<SimpleDuoToolMode, ToolCopy> = {
     title: "Wat doet een nieuw leenbedrag per maand?",
     intro:
       "Begin met alleen het bedrag dat je per maand wilt lenen. Daarna kun je de resterende studieduur, huidige schuld en collegegeldkrediet verder specificeren.",
-    primaryLabel: "Bereken impact",
+    primaryLabel: "Bereken",
     fields: ["monthlyLoan"],
     advancedFields: [
       "monthsUntilDiploma",
@@ -491,10 +491,10 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
             Voorbeeld invullen
           </ToolActionButton>
           <ToolActionButton type="button" variant="secondary" onClick={() => setFormValues(emptySimpleDuoValues(mode))}>
-            Leegmaken
+            Wis invoer
           </ToolActionButton>
           <ToolActionButton type="button" variant="secondary" onClick={() => reset("Invoer gewist.")}>
-            Herstel
+            Standaard terugzetten
           </ToolActionButton>
           <ToolActionButton
             type="button"

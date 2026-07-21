@@ -248,14 +248,14 @@ function CalculatorContent({
   function applyExampleValues() {
     setFormValues(exampleValues);
     setSubmittedValues(exampleValues);
-    setSubmitContextMessage("Voorbeeldwaarden geladen. Klik opnieuw op Bereken als je iets wijzigt.");
+    setSubmitContextMessage("Voorbeeld ingevuld. Klik opnieuw op Bereken als je iets wijzigt.");
   }
 
   function applyProfileValues() {
     const nextValues = mergeProfilePatchIntoValues(formValues, profilePatch);
     setFormValues(nextValues);
     setSubmittedValues(nextValues);
-    setSubmitContextMessage("Profielwaarden geladen. Klik opnieuw op Bereken als je iets wijzigt.");
+    setSubmitContextMessage("Profiel ingevuld. Klik opnieuw op Bereken als je iets wijzigt.");
   }
 
   const recurringGiftWarnings = result?.primaryScenario.warnings.filter((warning) =>
@@ -303,6 +303,17 @@ function CalculatorContent({
             submitCalculation();
           }}
         >
+          <section className="surface-subtle px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
+            <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--soft)]">
+              Wat heb je nodig?
+            </div>
+            <ul className="mt-2 list-disc space-y-1.5 pl-5">
+              <li>Je koopprijs, eigen geld en eventuele familielening of schenking.</li>
+              <li>Je bruto jaarinkomen, partnerinkomen en studieschuld.</li>
+              <li>Eventuele vaste woonlasten die de financiering beïnvloeden.</li>
+            </ul>
+          </section>
+
           <DisclosureSection title="Woning en eigen geld" subtitle="Kern van de aankoopfinanciering." defaultOpen>
             <div className="grid gap-4 md:grid-cols-2">
               <TextField
@@ -586,14 +597,14 @@ function CalculatorContent({
 
           <div className="flex flex-wrap gap-3">
             <ToolActionButton type="submit" variant="accent">
-              Bereken scenario
+              Bereken
             </ToolActionButton>
             <ToolActionButton
               type="button"
               variant="secondary"
               onClick={applyExampleValues}
             >
-              Voorbeeldwaarden laden
+              Voorbeeld invullen
             </ToolActionButton>
             {hasRelevantProfileValues ? (
               <ToolActionButton

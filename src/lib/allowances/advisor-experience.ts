@@ -130,7 +130,7 @@ export type AllowanceAdvisorReportResult = {
 };
 
 export type AllowanceAdvisorReportModel = {
-  readonly title: "Toeslagenadvies";
+  readonly title: "Toeslagenscan";
   readonly generatedAt: string;
   readonly calculationYear: number;
   readonly summary: readonly string[];

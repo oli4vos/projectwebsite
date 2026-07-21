@@ -270,7 +270,7 @@ export default function Calculator() {
         <div className="flex flex-wrap items-center gap-3 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
           <span>Start leeg en vul snel een voorbeeldscenario in.</span>
           <ToolActionButton type="button" onClick={applyExampleValues} variant="secondary" size="sm">
-            Start met voorbeeldwaarden
+            Voorbeeld invullen
           </ToolActionButton>
         </div>
       }

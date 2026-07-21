@@ -389,6 +389,17 @@ export default function ToeslagenScanCalculator() {
         </div>
       ) : null}
 
+      <section className="surface-subtle px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
+        <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--soft)]">
+          Wat heb je nodig?
+        </div>
+        <ul className="mt-2 list-disc space-y-1.5 pl-5">
+          <li>Je leeftijd en huishoudsituatie.</li>
+          <li>Je inkomen en woonsituatie.</li>
+          <li>Huur of kinderopvang als dat voor jou speelt.</li>
+        </ul>
+      </section>
+
       <QuestionFlowSummary flow={questionFlowView} />
 
       <section className="space-y-4" aria-labelledby="toeslagen-step-household">
@@ -726,7 +737,7 @@ export default function ToeslagenScanCalculator() {
             className="mt-3 rounded-lg bg-white/10 px-3 py-2 text-[13px] text-white/80"
           >
             Je hebt de invoer gewijzigd na de laatste scan. Klik opnieuw op
-            Bekijk mijn toeslagenadvies voor een actuele uitkomst.
+            Bekijk mijn toeslagenindicatie voor een actuele uitkomst.
           </p>
         ) : null}
       </section>
@@ -753,7 +764,7 @@ export default function ToeslagenScanCalculator() {
       intro={
         <>
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
-            Beta · toeslagenadviseur 2026
+            Beta · toeslagenscan 2026
           </div>
           <h2 className="mt-2 font-serif text-[30px] tracking-[-0.02em] text-[var(--ink)]">
             Welke toeslagen passen mogelijk bij mij?
@@ -767,7 +778,7 @@ export default function ToeslagenScanCalculator() {
       startActions={
         <div className="flex flex-wrap gap-2">
           <ToolActionButton type="button" onClick={() => setValues(exampleValues)}>
-            Voorbeeldwaarden
+            Voorbeeld invullen
           </ToolActionButton>
           <ToolActionButton type="button" onClick={() => reset("Invoer gewist.")}>
             Wis invoer
@@ -783,7 +794,7 @@ export default function ToeslagenScanCalculator() {
           onClick={handleSubmit}
           full
         >
-          Bekijk mijn toeslagenadvies
+          Bekijk mijn toeslagenindicatie
         </ToolActionButton>
       }
       result={result}
@@ -798,8 +809,8 @@ export default function ToeslagenScanCalculator() {
       }
       disclaimer={
         <p className="surface-subtle p-4 text-[12.5px] leading-[1.7] text-[var(--muted)]">
-          Geen advies en geen officiële beschikking. Controleer altijd de officiële voorwaarden
-          en proefberekening van Dienst Toeslagen; die blijven leidend.
+          Geen persoonlijke aanbeveling en geen officiële beschikking. Controleer altijd de
+          officiële voorwaarden en proefberekening van Dienst Toeslagen; die blijven leidend.
         </p>
       }
     />

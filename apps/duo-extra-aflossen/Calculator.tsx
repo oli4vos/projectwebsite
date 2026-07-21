@@ -281,7 +281,7 @@ export default function DuoExtraAflossenCalculator() {
           type="button"
           onClick={() => setFormValues(createDuoExtraRepaymentDefaultValues())}
         >
-          Voorbeeldwaarden
+          Voorbeeld invullen
         </ToolActionButton>
         <ToolActionButton
           type="button"
@@ -314,6 +314,7 @@ export default function DuoExtraAflossenCalculator() {
               ? "Bij strategie lagere maandlast."
               : "Bij kortere looptijd blijft de termijn gelijk."
           }
+          className="sm:col-span-2"
         />
         <ResultCard
           label="Indicatieve rentebesparing"

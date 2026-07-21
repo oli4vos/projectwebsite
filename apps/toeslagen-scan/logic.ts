@@ -592,7 +592,7 @@ function buildReport(input: {
   });
 
   return {
-    title: "Toeslagenadvies",
+    title: "Toeslagenscan",
     generatedAt: input.generatedAt,
     calculationYear: input.calculationYear,
     summary: [input.summary],

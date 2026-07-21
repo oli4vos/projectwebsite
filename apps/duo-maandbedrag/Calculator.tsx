@@ -337,7 +337,7 @@ export default function DuoMaandbedragCalculator() {
           type="button"
           onClick={() => setFormValues(createDuoMonthlyPaymentDefaultValues())}
         >
-          Voorbeeldwaarden
+          Voorbeeld invullen
         </ToolActionButton>
         <ToolActionButton
           type="button"
@@ -383,6 +383,7 @@ export default function DuoMaandbedragCalculator() {
           label="Wettelijke maandtermijn"
           value={formatCurrency(view.statutoryMonthlyPayment)}
           note={`${view.termYears} jaar, ${formatPercent(view.annualInterestRate)}% gewogen DUO-rente. Dit is je verplichte basis; alles daarboven is extra aflossen.`}
+          className="sm:col-span-2"
         />
         <ResultCard
           label={view.incomeBased ? "DUO hanteert indicatief" : "Draagkracht"}
