@@ -47,6 +47,7 @@ export const audienceRoutes: AudienceRoute[] = [
       "duo-schuld-bij-starten-lenen",
       "duo-stoppen-kosten-prestatiebeurs",
       "duo-leenbedrag-impact",
+      "duo-aanvullende-beurs",
       "duo-maandbedrag",
       "duo-extra-aflossen",
       "hypotheek-impact-studieschuld",

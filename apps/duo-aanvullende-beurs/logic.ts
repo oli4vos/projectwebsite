@@ -325,7 +325,7 @@ export function createAdditionalGrantView(values: AdditionalGrantFormValues): Ad
       { label: "Maximale aanvullende beurs per maand", value: formatCurrency(result.appliedMaximumMonthlyGrant) },
       { label: "Berekende ouderbijdrage per maand", value: formatCurrency(trace.parentalMonthlyContribution) },
       { label: "Gezamenlijk ouderinkomen gebruikt", value: formatCurrency(trace.usedJointParentIncome) },
-      { label: "Betrouwbaarheid", value: result.confidence },
+      { label: "Betrouwbaarheid", value: result.confidence === "high" ? "Hoog" : result.confidence === "medium" ? "Middel" : "Laag" },
       { label: "Officiële controle", value: result.officialVerificationRequired ? "Ja" : "Nee" },
       { label: "Inkomensdaling peiljaarverlegging", value: formatNumber(result.referenceYearComparison.incomeDropPercent, "%") },
     ],

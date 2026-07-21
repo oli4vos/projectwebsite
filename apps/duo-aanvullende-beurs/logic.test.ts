@@ -66,6 +66,7 @@ describe("duo-aanvullende-beurs logic", () => {
     expect(view.monthlyGrantLabel).toBe("€ 394,75");
     expect(view.annualGrantLabel).toBe("€ 4.737,00");
     expect(view.probablyEligibleLabel).toBe("Ja, waarschijnlijk");
+    expect(view.explanationRows).toContainEqual({ label: "Betrouwbaarheid", value: "Hoog" });
     expect(view.reasonMessages.join(" ")).not.toContain("duo-additional-grant-calculated");
   });
 
