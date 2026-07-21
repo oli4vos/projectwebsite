@@ -25,12 +25,13 @@ describe("generated app registry", () => {
   });
 
   it("contains expected public tools", () => {
-    expect(appRegistry).toHaveLength(10);
+    expect(appRegistry).toHaveLength(11);
     expect(appRegistryBySlug["artifact-hypotheek-wonen-maximale-hypotheek"]).toBeDefined();
     expect(appRegistryBySlug["duo-doorlenen-of-stoppen"]).toBeUndefined();
     expect(appRegistryBySlug["duo-extra-aflossen"]).toBeDefined();
     expect(appRegistryBySlug["duo-leenbedrag-impact"]).toBeDefined();
     expect(appRegistryBySlug["duo-maandbedrag"]).toBeDefined();
+    expect(appRegistryBySlug["duo-aanvullende-beurs"]).toBeDefined();
     expect(appRegistryBySlug["duo-schuld-bij-starten-lenen"]).toBeDefined();
     expect(appRegistryBySlug["duo-stoppen-kosten-prestatiebeurs"]).toBeDefined();
     expect(appRegistryBySlug["familiehulp-eerste-woning"]).toBeDefined();
@@ -46,6 +47,7 @@ describe("generated app registry", () => {
     expect(appRegistryBySlug["kind-wordt-18-impact"]).toBeUndefined();
     expect(appRegistryBySlug["toeslagen-scan"]).toBeDefined();
     expect(appComponents["toeslagen-scan"]).toBeDefined();
+    expect(appComponents["duo-aanvullende-beurs"]).toBeDefined();
   });
 
   it("publishes allowance scan while keeping other hidden manifests excluded", () => {
@@ -53,8 +55,8 @@ describe("generated app registry", () => {
     const allowanceScan = manifests.find((manifest) => manifest.slug === "toeslagen-scan");
     const hiddenManifests = manifests.filter((manifest) => manifest.visibility === "hidden");
 
-    expect(manifests).toHaveLength(166);
-    expect(appRegistry).toHaveLength(10);
+    expect(manifests).toHaveLength(167);
+    expect(appRegistry).toHaveLength(11);
     expect(hiddenManifests).toHaveLength(156);
     expect(allowanceScan).toMatchObject({
       title: "Welke toeslagen passen mogelijk bij mij?",

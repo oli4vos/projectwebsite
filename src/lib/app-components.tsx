@@ -14,6 +14,13 @@ export const appComponents: Record<string, AppCalculatorComponent> = {
       </div>
     ),
   }),
+  "duo-aanvullende-beurs": dynamic(() => import("../../apps/duo-aanvullende-beurs/Calculator"), {
+    loading: () => (
+      <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">
+        Rekentool laden...
+      </div>
+    ),
+  }),
   "duo-extra-aflossen": dynamic(() => import("../../apps/duo-extra-aflossen/Calculator"), {
     loading: () => (
       <div className="rounded-[2rem] border border-line bg-white/80 p-6 text-sm text-muted">

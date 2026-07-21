@@ -36,6 +36,35 @@ export const appRegistry = [
     "entry": "Calculator.tsx"
   },
   {
+    "slug": "duo-aanvullende-beurs",
+    "title": "Aanvullende beurs berekenen",
+    "description": "Schat je aanvullende beurs voor 2026 met de centrale DUO-rekenlaag en ouderinkomen uit het peiljaar.",
+    "type": "frontend",
+    "category": "Schulden",
+    "tags": [
+      "DUO",
+      "aanvullende beurs",
+      "studiefinanciering",
+      "ouderinkomen"
+    ],
+    "status": "beta",
+    "visibility": "public",
+    "requiredProfileFields": [],
+    "reasonHint": "Handig als je wilt zien welk maandbedrag bij mbo, hbo of universiteit past.",
+    "assumptionsUsed": [
+      "duo"
+    ],
+    "calculationDomains": [
+      "studentDebt",
+      "cashflow"
+    ],
+    "riskLevel": "medium",
+    "disclaimerType": "duoIndicative",
+    "outputType": "singleResult",
+    "version": "1.0.0",
+    "entry": "Calculator.tsx"
+  },
+  {
     "slug": "duo-extra-aflossen",
     "title": "Wat doet extra aflossen?",
     "description": "Bekijk feitelijk wat een extra DUO-aflossing doet met maandtermijn, looptijd en rentelast.",
