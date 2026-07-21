@@ -7,9 +7,11 @@ import { ResultCard } from "@/components/ResultCard";
 import { ResultRow } from "@/components/ResultRow";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
+import { ToolNextSteps } from "@/components/tool/ToolNextSteps";
 import { useMobileFieldFlow } from "@/hooks/useMobileFieldFlow";
 import { useSubmittedCalculation } from "@/hooks/useSubmittedCalculation";
 import { formatDuoRateYearLabel, getAvailableDuoRateYears } from "@/lib/financial-constants";
+import { getToolNextSteps } from "@/lib/tool-journeys";
 import { downloadStudyStopPdfReport } from "../duo-doorlenen-of-stoppen/report";
 import {
   createSimpleDuoView,
@@ -84,6 +86,15 @@ const modeCopy: Record<SimpleDuoToolMode, ToolCopy> = {
     helper:
       "De snelle berekening gebruikt standaard 36 maanden en SF35. Open verder specificeren als je preciezer wilt rekenen.",
   },
+};
+
+const nextStepSlugByMode: Record<
+  SimpleDuoToolMode,
+  "duo-maandbedrag" | "duo-schuld-bij-starten-lenen"
+> = {
+  "start-borrowing": "duo-maandbedrag",
+  "stop-cost": "duo-maandbedrag",
+  "monthly-impact": "duo-schuld-bij-starten-lenen",
 };
 
 /*
@@ -380,6 +391,7 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
       ? submittedView.result.scenarios[0]
       : submittedView.result.scenarios[2]
     : undefined;
+  const nextSteps = getToolNextSteps(nextStepSlugByMode[mode]);
 
   const result = submittedView?.isValid ? (
     <div className="space-y-5">
@@ -448,6 +460,7 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
         <p className="text-[13px] leading-[1.7] text-[var(--soft)]">
           {submittedView.focusScenario.note}
         </p>
+        <ToolNextSteps {...nextSteps} />
         <ToolActionButton
           type="button"
           variant="secondary"

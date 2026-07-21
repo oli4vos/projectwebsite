@@ -9,8 +9,10 @@ import { ResultCard } from "@/components/ResultCard";
 import { ResultRow } from "@/components/ResultRow";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
+import { ToolNextSteps } from "@/components/tool/ToolNextSteps";
 import { useMobileFieldFlow } from "@/hooks/useMobileFieldFlow";
 import { useSubmittedCalculation } from "@/hooks/useSubmittedCalculation";
+import { getToolNextSteps } from "@/lib/tool-journeys";
 import {
   calculateMortgageScenario,
   defaultValues,
@@ -150,6 +152,7 @@ export default function Calculator() {
     "energySavingMeasuresAmount",
     "renovationAmount",
   ]);
+  const nextSteps = getToolNextSteps("artifact-hypotheek-wonen-maximale-hypotheek");
 
   const errors = formValidation.errors;
 
@@ -466,87 +469,90 @@ export default function Calculator() {
         </form>
       }
       result={
-        <div id="tool-result-summary" className="rounded-[1.5rem] bg-[var(--deep)] p-6 text-white shadow-paper-lg">
-          <div className="text-[11px] uppercase tracking-[0.12em] text-white/55">Uitkomst</div>
-          {!result ? (
-            <p className="mt-3 text-[14px] leading-[1.7] text-white/75">
-              Vul de belangrijkste gegevens in en klik op Bereken.
-            </p>
-          ) : (
-            <>
-              <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                <ResultCard
-                  label="Maximale hypotheek op inkomen"
-                  value={formatCurrency(result.maxMortgageByIncome)}
-                  tone="pos"
-                />
-                <ResultCard
-                  label="Impact DUO-schuld"
-                  value={
-                    result.breakdown.studentLoanBorrowingCapacityImpact > 0
-                      ? `− ${formatCurrency(result.breakdown.studentLoanBorrowingCapacityImpact)}`
-                      : formatCurrency(0)
-                  }
-                  note="Indicatief minder leencapaciteit door de gebruteerde DUO-maandlast."
-                  tone={
-                    result.breakdown.studentLoanBorrowingCapacityImpact > 0
-                      ? "neg"
-                      : "default"
-                  }
-                />
-                <ResultCard
-                  label="Einduitkomst"
-                  value={formatCurrency(result.finalMaxMortgage)}
-                  className="sm:col-span-2 sm:order-first"
-                  tone="pos"
-                />
-                <ResultCard
-                  label="Maximaal koopbudget"
-                  value={result.maxHomeBudget === null ? "n.v.t." : formatCurrency(result.maxHomeBudget)}
-                />
-                <ResultCard
-                  label="Hogere hypotheek bij andere toetsrente"
-                  value={
-                    result.breakdown.higherMortgageOpportunity
-                      ? `+ ${formatCurrency(result.breakdown.higherMortgageOpportunity.increaseInMaxMortgage)}`
-                      : "Geen hogere uitkomst"
-                  }
-                  note={
-                    result.breakdown.higherMortgageOpportunity
-                      ? `Bij ${formatPercent(result.breakdown.higherMortgageOpportunity.alternativeTestRate, 3)} toetsrente kom je indicatief uit op ${formatCurrency(result.breakdown.higherMortgageOpportunity.alternativeFinalMaxMortgage)}.`
-                      : "Geen hogere uitkomst binnen de officiële financieringslasttabelbanden."
-                  }
-                  tone={result.breakdown.higherMortgageOpportunity ? "pos" : "default"}
-                />
-                <ResultCard
-                  label="Benodigde eigen middelen"
-                  value={formatCurrency(result.breakdown.requiredOwnFunds)}
-                  tone={result.breakdown.requiredOwnFunds > 0 ? "warn" : "pos"}
-                />
-                <ResultCard
-                  label="Financieringstekort"
-                  value={formatCurrency(result.fundingGap)}
-                  tone={result.fundingGap > 0 ? "neg" : "pos"}
-                />
-                <ResultCard
-                  label="Bruto maandlast"
-                  value={formatCurrency(result.monthlyPaymentGross)}
-                />
-              </div>
-              <p className="mt-4 text-[13px] leading-6 text-white/75">
-                Limiterend:{" "}
-                <span className="font-medium text-white">
-                  {limitingFactorLabels[result.limitingFactor] ?? result.limitingFactor}
-                </span>
-                {" / "}
-                <span className="font-medium text-white">
-                  {limitingFactorLabels[result.limitingFactorDetailed] ?? result.limitingFactorDetailed}
-                </span>
-                .{" "}
-                Betrouwbaarheid: <span className="font-medium text-white">{result.confidence}</span>.
+        <div className="space-y-5">
+          <div id="tool-result-summary" className="rounded-[1.5rem] bg-[var(--deep)] p-6 text-white shadow-paper-lg">
+            <div className="text-[11px] uppercase tracking-[0.12em] text-white/55">Uitkomst</div>
+            {!result ? (
+              <p className="mt-3 text-[14px] leading-[1.7] text-white/75">
+                Vul de belangrijkste gegevens in en klik op Bereken.
               </p>
-            </>
-          )}
+            ) : (
+              <>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  <ResultCard
+                    label="Maximale hypotheek op inkomen"
+                    value={formatCurrency(result.maxMortgageByIncome)}
+                    tone="pos"
+                  />
+                  <ResultCard
+                    label="Impact DUO-schuld"
+                    value={
+                      result.breakdown.studentLoanBorrowingCapacityImpact > 0
+                        ? `− ${formatCurrency(result.breakdown.studentLoanBorrowingCapacityImpact)}`
+                        : formatCurrency(0)
+                    }
+                    note="Indicatief minder leencapaciteit door de gebruteerde DUO-maandlast."
+                    tone={
+                      result.breakdown.studentLoanBorrowingCapacityImpact > 0
+                        ? "neg"
+                        : "default"
+                    }
+                  />
+                  <ResultCard
+                    label="Einduitkomst"
+                    value={formatCurrency(result.finalMaxMortgage)}
+                    className="sm:col-span-2 sm:order-first"
+                    tone="pos"
+                  />
+                  <ResultCard
+                    label="Maximaal koopbudget"
+                    value={result.maxHomeBudget === null ? "n.v.t." : formatCurrency(result.maxHomeBudget)}
+                  />
+                  <ResultCard
+                    label="Hogere hypotheek bij andere toetsrente"
+                    value={
+                      result.breakdown.higherMortgageOpportunity
+                        ? `+ ${formatCurrency(result.breakdown.higherMortgageOpportunity.increaseInMaxMortgage)}`
+                        : "Geen hogere uitkomst"
+                    }
+                    note={
+                      result.breakdown.higherMortgageOpportunity
+                        ? `Bij ${formatPercent(result.breakdown.higherMortgageOpportunity.alternativeTestRate, 3)} toetsrente kom je indicatief uit op ${formatCurrency(result.breakdown.higherMortgageOpportunity.alternativeFinalMaxMortgage)}.`
+                        : "Geen hogere uitkomst binnen de officiële financieringslasttabelbanden."
+                    }
+                    tone={result.breakdown.higherMortgageOpportunity ? "pos" : "default"}
+                  />
+                  <ResultCard
+                    label="Benodigde eigen middelen"
+                    value={formatCurrency(result.breakdown.requiredOwnFunds)}
+                    tone={result.breakdown.requiredOwnFunds > 0 ? "warn" : "pos"}
+                  />
+                  <ResultCard
+                    label="Financieringstekort"
+                    value={formatCurrency(result.fundingGap)}
+                    tone={result.fundingGap > 0 ? "neg" : "pos"}
+                  />
+                  <ResultCard
+                    label="Bruto maandlast"
+                    value={formatCurrency(result.monthlyPaymentGross)}
+                  />
+                </div>
+                <p className="mt-4 text-[13px] leading-6 text-white/75">
+                  Limiterend:{" "}
+                  <span className="font-medium text-white">
+                    {limitingFactorLabels[result.limitingFactor] ?? result.limitingFactor}
+                  </span>
+                  {" / "}
+                  <span className="font-medium text-white">
+                    {limitingFactorLabels[result.limitingFactorDetailed] ?? result.limitingFactorDetailed}
+                  </span>
+                  .{" "}
+                  Betrouwbaarheid: <span className="font-medium text-white">{result.confidence}</span>.
+                </p>
+              </>
+            )}
+          </div>
+          {result ? <ToolNextSteps {...nextSteps} /> : null}
         </div>
       }
       details={

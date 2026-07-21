@@ -37,6 +37,7 @@ import {
   createProfilePrefillState,
   mergeProfilePatchIntoValues,
 } from "@/lib/profile-prefill";
+import { getToolNextSteps } from "@/lib/tool-journeys";
 import { getMortgageImpactDefaultsFromProfile } from "@/lib/profile-tool-mapping";
 import {
   defaultValues,
@@ -289,6 +290,7 @@ function CalculatorContent({
     }[mobileFlow.activeFieldId],
   );
   const canDownloadPdf = Boolean(result && !hasDirtyChanges);
+  const nextSteps = getToolNextSteps("hypotheek-impact-studieschuld");
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -1269,24 +1271,7 @@ function CalculatorContent({
         </div>
 
         {result ? (
-          <ToolNextSteps
-            title="Van DUO-impact naar je volledige woonplaatje"
-            description="Je weet nu hoeveel leencapaciteit je studieschuld indicatief kost. Bereken als volgende stap je totale hypotheekruimte, of bekijk hoe eigen geld en hulp van familie het financieringsplaatje veranderen."
-            primary={{
-              href: "/apps/artifact-hypotheek-wonen-maximale-hypotheek",
-              label: "Bereken mijn maximale hypotheek",
-            }}
-            secondary={[
-              {
-                href: "/apps/familiehulp-eerste-woning",
-                label: "Bekijk familiehulp",
-              },
-              {
-                href: "/apps/duo-extra-aflossen",
-                label: "Vergelijk extra aflossen",
-              },
-            ]}
-          />
+          <ToolNextSteps {...nextSteps} />
         ) : null}
 
         <DisclosureSection

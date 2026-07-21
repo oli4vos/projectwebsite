@@ -144,6 +144,7 @@ Belangrijke UX-principes zijn:
 - resultaatuitleg per onderdeel;
 - duidelijke validatie;
 - reset- en voorbeeldflows waar passend;
+- compacte volgende-stap navigatie tussen verwante tools en kennisroutes;
 - mobiel eerst;
 - toegankelijkheid als basisvoorwaarde.
 

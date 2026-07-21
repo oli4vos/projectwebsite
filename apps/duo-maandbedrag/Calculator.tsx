@@ -8,6 +8,7 @@ import { ResultCard } from "@/components/ResultCard";
 import { ResultRow } from "@/components/ResultRow";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
+import { ToolNextSteps } from "@/components/tool/ToolNextSteps";
 import { getRepaymentRuleLabel } from "@/lib/copy-glossary";
 import {
   formatDuoRateYearLabel,
@@ -34,6 +35,7 @@ import {
   readDuoMortgageTransfer,
   type DuoMortgageTransferRecord,
 } from "@/lib/duo-mortgage-transfer";
+import { getToolNextSteps } from "@/lib/tool-journeys";
 
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("nl-NL", {
@@ -95,6 +97,7 @@ export default function DuoMaandbedragCalculator() {
     useState<DuoMortgageTransferRecord | null>(null);
   const [transferMessage, setTransferMessage] = useState("");
   const view = useMemo(() => calculateDuoMonthlyPaymentView(formValues), [formValues]);
+  const nextSteps = getToolNextSteps("duo-maandbedrag");
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -400,6 +403,7 @@ export default function DuoMaandbedragCalculator() {
           tone={view.incomeBased ? "warn" : "default"}
         />
       </div>
+      <ToolNextSteps {...nextSteps} />
 
       <section className="surface-panel p-5">
         <h2 className="text-lg font-semibold tracking-tight text-[var(--ink)]">

@@ -7,8 +7,10 @@ import { ResultCard } from "@/components/ResultCard";
 import { ResultRow } from "@/components/ResultRow";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
+import { ToolNextSteps } from "@/components/tool/ToolNextSteps";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { createProfilePrefillState, mergeProfilePatchIntoValues } from "@/lib/profile-prefill";
+import { getToolNextSteps } from "@/lib/tool-journeys";
 import { buildProfilePatchFromProfile, calculateFamilyHomeScenario, exampleValues, validateFamilyHomeForm, type FamilyHomeFormState } from "./logic";
 
 type FieldProps = {
@@ -227,6 +229,7 @@ function CalculatorContent({
   const ownFundsUsed = result?.primaryScenario.ownFundsUsed ?? 0;
   const remainingBuffer = result?.primaryScenario.remainingBuffer ?? 0;
   const duoDebtAfterExtraRepayment = result?.primaryScenario.debtsBySource?.duoDebt;
+  const nextSteps = getToolNextSteps("familiehulp-eerste-woning");
 
   function updateField<K extends keyof FamilyHomeFormState>(field: K, value: FamilyHomeFormState[K]) {
     setFormValues((current) => ({ ...current, [field]: value }));
@@ -746,6 +749,8 @@ function CalculatorContent({
               </div>
             ) : null}
           </div>
+
+          <ToolNextSteps {...nextSteps} />
 
           <DisclosureSection title="Hoe je dit leest" subtitle="Korte uitleg bij de belangrijkste uitkomsten.">
             <div className="space-y-3 text-[13px] leading-6 text-[var(--muted)]">

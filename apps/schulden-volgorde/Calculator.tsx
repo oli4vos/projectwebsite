@@ -6,7 +6,9 @@ import { FieldError } from "@/components/forms/FieldError";
 import { GlossaryText } from "@/components/GlossaryText";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
+import { ToolNextSteps } from "@/components/tool/ToolNextSteps";
 import { parseOptionalDecimalInput } from "@/lib/number-input";
+import { getToolNextSteps } from "@/lib/tool-journeys";
 import {
   calculateDebtPriority,
   type DebtKind,
@@ -167,6 +169,7 @@ export default function Calculator() {
     if (!submittedValidation.parsedValues) return null;
     return calculateDebtPriority(submittedValidation.parsedValues);
   }, [submitted]);
+  const nextSteps = getToolNextSteps("schulden-volgorde");
 
   function updateDebt(index: number, patch: Partial<DebtFormRow>) {
     setValues((current) => ({
@@ -297,33 +300,36 @@ export default function Calculator() {
         </form>
       }
       result={
-        <div className="rounded-[1.5rem] bg-[var(--deep)] p-6 text-white shadow-paper-lg">
-          {!result ? (
-            <p className="text-[14px] leading-[1.7] text-white/75">
-              Vul schulden in die voor jou relevant zijn en klik op Bereken.
-            </p>
-          ) : result.steps.length === 0 ? (
-            <p className="text-[14px] leading-[1.7] text-white/75">
-              Er zijn nog geen relevante schulden ingevuld.
-            </p>
-          ) : (
-            <div className="space-y-3">
-              <div className="text-[11px] uppercase tracking-[0.12em] text-white/55">
-                Volgorde
-              </div>
-              {result.steps.slice(0, 3).map((step) => (
-                <div key={step.rank} className="rounded-xl bg-white/10 p-3">
-                  <div className="text-[13px] font-medium text-white">
-                    {step.rank}. {step.label}
-                  </div>
-                  <p className="mt-1 text-[12.5px] leading-[1.5] text-white/70">
-                    Extra inzet: {formatCurrency(step.allocatedAmount)} · rente{" "}
-                    {step.interestRate.toFixed(2)}%
-                  </p>
+        <div className="space-y-5">
+          <div className="rounded-[1.5rem] bg-[var(--deep)] p-6 text-white shadow-paper-lg">
+            {!result ? (
+              <p className="text-[14px] leading-[1.7] text-white/75">
+                Vul schulden in die voor jou relevant zijn en klik op Bereken.
+              </p>
+            ) : result.steps.length === 0 ? (
+              <p className="text-[14px] leading-[1.7] text-white/75">
+                Er zijn nog geen relevante schulden ingevuld.
+              </p>
+            ) : (
+              <div className="space-y-3">
+                <div className="text-[11px] uppercase tracking-[0.12em] text-white/55">
+                  Volgorde
                 </div>
-              ))}
-            </div>
-          )}
+                {result.steps.slice(0, 3).map((step) => (
+                  <div key={step.rank} className="rounded-xl bg-white/10 p-3">
+                    <div className="text-[13px] font-medium text-white">
+                      {step.rank}. {step.label}
+                    </div>
+                    <p className="mt-1 text-[12.5px] leading-[1.5] text-white/70">
+                      Extra inzet: {formatCurrency(step.allocatedAmount)} · rente{" "}
+                      {step.interestRate.toFixed(2)}%
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          {result ? <ToolNextSteps {...nextSteps} /> : null}
         </div>
       }
       details={

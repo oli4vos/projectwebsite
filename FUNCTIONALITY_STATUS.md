@@ -49,6 +49,7 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 | DUO-aanvullende-beurs | experimenteel | `visibility: "public"` | aan | Publieke 2026-tool bovenop `src/lib/duo/additional-grant`; berekent reguliere aanvullende-beursindicatie met concrete ouderinkomens, toont special cases zonder aparte UI-formules en heeft nog geen PDF | n.v.t. |
 | Centrale tax/DUO/pension/constants lagen | actief | n.v.t. | aan | Hergebruikt door meerdere tools | n.v.t. |
 | Submit-driven calculatorflow | actief | n.v.t. | aan | Patroon beschikbaar via `CalculatorShell` + submitlogica | n.v.t. |
+| Volgende-stap navigatie tussen publieke tools | actief | `ToolNextSteps` + journey-map | aan | Compacte vervolgstap per publieke tool, afgestemd op de meest waarschijnlijke vervolgvraag | n.v.t. |
 | DUO-impact in maximale-hypotheektool | actief | n.v.t. | aan | Kernuitkomst toont rechtsboven de indicatieve daling van de leencapaciteit | n.v.t. |
 | Hypotheekrentelink en salarisverhogingsanalyse | actief | centrale linkconfig + salarisadapter | aan | Maximale-hypotheekflow toont externe inspiratielink bij renteveld en vervolganalyse voor extra leenruimte via centrale hypotheekengine; PDF-uitbreiding blijft vervolgwerk | n.v.t. |
 | Hypotheek Regulations-integratieadapter | voorbereid | centrale adapter | uit in UI | Centrale adapterlaag voor hypotheektools richting Regulations-architectuur; nog niet gekoppeld aan calculators en wijzigt geen publieke uitkomsten | koppel per tool pas na UX/PDF- en regressiecontrole |
@@ -69,6 +70,7 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 
 | Datum | Commit | Wijziging | Impact |
 |---|---|---|---|
+| 2026-07-21 | `pending` | Compacte volgende-stap navigatie toegevoegd op alle publieke tools via een centrale journey-map en `ToolNextSteps`-component | UX / conversie / publieke tools |
 | 2026-07-20 | `pending` | Centrale hypotheekadapter richting Regulations-architectuur toegevoegd met inventarisatie, definitions, answer mapping, evaluation/recommendation/estimate-context en regressietests; niet gekoppeld aan publieke UI | Hypotheek / Regulations / voorbereid |
 | 2026-07-21 | `pending` | Publieke `duo-aanvullende-beurs` calculator toegevoegd bovenop de centrale aanvullende-beursengine, met manifest, dashboardregistratie, formulieradapter, resultaatweergave en regressietests | DUO / aanvullende beurs / publieke beta |
 | 2026-07-20 | `pending` | Release-reviewbevindingen Toeslagenscan verwerkt: publieke statuscopy afgestemd op zorgtoeslag-bedragindicatie, machinecodes vervangen door Nederlandse labels, reportmodel gevuld vanuit relevante invoer en `evaluateAllowanceSignals` expliciet vastgelegd als centrale hard-checklaag | Toeslagen / releasefix / publieke beta |

@@ -5,7 +5,9 @@ import { DisclosureSection } from "@/components/DisclosureSection";
 import { FieldError } from "@/components/forms/FieldError";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
+import { ToolNextSteps } from "@/components/tool/ToolNextSteps";
 import { useSubmittedCalculation } from "@/hooks/useSubmittedCalculation";
+import { getToolNextSteps } from "@/lib/tool-journeys";
 import {
   createAllowanceQuestionFlowView,
   createAllowanceScanView,
@@ -342,6 +344,7 @@ export default function ToeslagenScanCalculator() {
     () => (submittedValues ? createAllowanceScanView(submittedValues) : null),
     [submittedValues],
   );
+  const nextSteps = getToolNextSteps("toeslagen-scan");
   const questionFlowView = useMemo(
     () => createAllowanceQuestionFlowView(formValues),
     [formValues],
@@ -746,6 +749,7 @@ export default function ToeslagenScanCalculator() {
           <ResultCard key={card.kind} card={card} />
         ))}
       </div>
+      <ToolNextSteps {...nextSteps} />
     </div>
   ) : (
     <section id="tool-result-summary" className="surface-panel p-5">

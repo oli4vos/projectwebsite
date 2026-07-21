@@ -10,6 +10,7 @@ import { ResultCard } from "@/components/ResultCard";
 import { ResultRow } from "@/components/ResultRow";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
+import { ToolNextSteps } from "@/components/tool/ToolNextSteps";
 import { getRepaymentRuleLabel } from "@/lib/copy-glossary";
 import {
   formatDuoRateYearLabel,
@@ -19,6 +20,7 @@ import {
   createDuoDebtPartFormValue,
   type DuoDebtPartFormValue,
 } from "@/lib/duo/debt-parts-form";
+import { getToolNextSteps } from "@/lib/tool-journeys";
 import {
   calculateDuoExtraRepaymentView,
   createDuoExtraRepaymentDefaultValues,
@@ -84,6 +86,7 @@ export default function DuoExtraAflossenCalculator() {
   );
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
   const view = useMemo(() => calculateDuoExtraRepaymentView(formValues), [formValues]);
+  const nextSteps = getToolNextSteps("duo-extra-aflossen");
 
   function updateField<K extends keyof DuoExtraRepaymentFormValues>(
     field: K,
@@ -323,6 +326,7 @@ export default function DuoExtraAflossenCalculator() {
           tone="pos"
         />
       </div>
+      <ToolNextSteps {...nextSteps} />
 
       <section className="rounded-xl border hair bg-white p-5 shadow-paper">
         <h2 className="text-lg font-semibold tracking-tight text-[var(--ink)]">

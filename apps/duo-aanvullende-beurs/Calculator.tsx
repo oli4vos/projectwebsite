@@ -7,7 +7,9 @@ import { ResultCard } from "@/components/ResultCard";
 import { ResultRow } from "@/components/ResultRow";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
+import { ToolNextSteps } from "@/components/tool/ToolNextSteps";
 import { useSubmittedCalculation } from "@/hooks/useSubmittedCalculation";
+import { getToolNextSteps } from "@/lib/tool-journeys";
 import {
   createAdditionalGrantView,
   defaultValues,
@@ -170,6 +172,7 @@ export default function DuoAanvullendeBeursCalculator() {
     () => (submittedValues ? createAdditionalGrantView(submittedValues) : null),
     [submittedValues],
   );
+  const nextSteps = getToolNextSteps("duo-aanvullende-beurs");
   const hasErrors = Object.keys(errors).length > 0;
   const hasTwoParents = formValues.familySituation === "two-parents";
   const isMbo = formValues.educationType === "mbo-1-2" || formValues.educationType === "mbo-3-4";
@@ -440,6 +443,7 @@ export default function DuoAanvullendeBeursCalculator() {
           tone={submittedView.probablyEligibleLabel === "Waarschijnlijk niet" ? "neg" : "default"}
         />
       </div>
+      <ToolNextSteps {...nextSteps} />
       <section className="surface-panel p-5">
         <h3 className="font-serif text-xl text-[var(--ink)]">Berekeningsuitleg</h3>
         <div className="mt-3">
