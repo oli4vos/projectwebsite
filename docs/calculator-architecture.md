@@ -116,6 +116,7 @@ Belangrijke probleemgebieden:
 
 - `apps/hypotheek-impact-studieschuld/Calculator.tsx` gebruikt inmiddels een pure `form.ts` voor defaults, labels, parsing, validatie en mapping, maar bevat nog veel resultaatweergave, submitorkestratie, profielprefill en PDF-actie.
 - `apps/_artifact_shared/ArtifactCalculator.tsx` is nog steeds groot: tool-/domeinlabels, strict profile configs, validatie, formulierrendering en resultaatrendering staan nog samen. Verdere splitsing moet per verantwoordelijkheid gebeuren, niet op regeltelling.
+- `apps/toeslagen-scan/Calculator.tsx` gebruikt centrale `src/lib/allowances`- en `src/lib/regulations`-lagen via `apps/toeslagen-scan/logic.ts`, maar de facade bevat nog veel formulier- en resultaatpresentatie. Verdere splitsing hoort te gebeuren naar componenten of viewmodelpresentatie zonder nieuwe toeslagenlogica buiten de centrale lagen.
 
 ## Actieve versus inactieve tools
 
@@ -139,6 +140,7 @@ Binnen scope voor actieve-toolrefactors staan de publieke registry-tools:
 | `familiehulp-eerste-woning` | `beta`, `public` | Publieke registry en dashboardroute |
 | `hypotheek-impact-studieschuld` | `beta`, `public` | Publieke registry en dashboardroute |
 | `schulden-volgorde` | `beta`, `public` | Publieke registry en dashboardroute |
+| `toeslagen-scan` | `beta`, `public` | Publieke registry en dashboardroute |
 
 Buiten scope voor proactieve migratie staan hidden, draft, experimentele of niet-gepubliceerde tools, waaronder:
 
