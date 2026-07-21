@@ -36,26 +36,33 @@ function TextField({
   type = "text",
   placeholder,
 }: FieldProps) {
+  const fieldId = String(id);
+  const hintId = hint ? `${fieldId}-hint` : undefined;
+  const errorId = error ? `${fieldId}-error` : undefined;
+  const describedBy = [hintId, errorId].filter(Boolean).join(" ") || undefined;
+
   return (
-    <label className="block space-y-1.5">
+    <label className="block space-y-1.5" htmlFor={fieldId}>
       <div className="flex items-baseline justify-between gap-3">
         <span className="text-[12px] font-medium text-[var(--muted)]">
           {label}
         </span>
-        {hint ? <span className="text-[11px] text-[var(--soft)]">{hint}</span> : null}
+        {hint ? <span id={hintId} className="text-[11px] text-[var(--soft)]">{hint}</span> : null}
       </div>
       <div className="hair flex h-11 items-center rounded-xl border bg-white px-3">
         <input
-          id={String(id)}
+          id={fieldId}
           type={type}
           value={value}
           placeholder={placeholder}
           onChange={(event) => onChange(event.target.value)}
+          aria-invalid={error ? "true" : "false"}
+          aria-describedby={describedBy}
           className="ring-focus flex-1 bg-transparent font-mono text-[15px] tabular outline-none"
         />
         {suffix ? <span className="ml-2 text-[13px] text-[var(--muted)]">{suffix}</span> : null}
       </div>
-      <FieldError message={error} />
+      <FieldError id={errorId} message={error} />
     </label>
   );
 }
@@ -71,19 +78,26 @@ type SelectProps = {
 };
 
 function SelectField({ id, label, value, onChange, error, hint, options }: SelectProps) {
+  const fieldId = String(id);
+  const hintId = hint ? `${fieldId}-hint` : undefined;
+  const errorId = error ? `${fieldId}-error` : undefined;
+  const describedBy = [hintId, errorId].filter(Boolean).join(" ") || undefined;
+
   return (
-    <label className="block space-y-1.5">
+    <label className="block space-y-1.5" htmlFor={fieldId}>
       <div className="flex items-baseline justify-between gap-3">
         <span className="text-[12px] font-medium text-[var(--muted)]">
           {label}
         </span>
-        {hint ? <span className="text-[11px] text-[var(--soft)]">{hint}</span> : null}
+        {hint ? <span id={hintId} className="text-[11px] text-[var(--soft)]">{hint}</span> : null}
       </div>
       <div className="hair flex h-11 items-center rounded-xl border bg-white px-3">
         <select
-          id={String(id)}
+          id={fieldId}
           value={value}
           onChange={(event) => onChange(event.target.value)}
+          aria-invalid={error ? "true" : "false"}
+          aria-describedby={describedBy}
           className="ring-focus w-full bg-transparent text-[15px] outline-none"
         >
           {options.map((option) => (
@@ -93,7 +107,7 @@ function SelectField({ id, label, value, onChange, error, hint, options }: Selec
           ))}
         </select>
       </div>
-      <FieldError message={error} />
+      <FieldError id={errorId} message={error} />
     </label>
   );
 }
@@ -107,18 +121,25 @@ type CheckboxProps = {
 };
 
 function CheckboxField({ id, label, checked, onChange, hint }: CheckboxProps) {
+  const fieldId = String(id);
+  const hintId = hint ? `${fieldId}-hint` : undefined;
+
   return (
-    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3">
+    <label
+      className="flex cursor-pointer items-start gap-3 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3"
+      htmlFor={fieldId}
+    >
       <input
-        id={String(id)}
+        id={fieldId}
         type="checkbox"
         checked={checked}
         onChange={(event) => onChange(event.target.checked)}
+        aria-describedby={hintId}
         className="mt-1 size-4 rounded border-[var(--hair)] text-[var(--deep)]"
       />
       <span className="space-y-1">
         <span className="block text-[14px] font-medium text-[var(--ink)]">{label}</span>
-        {hint ? <span className="block text-[12px] leading-6 text-[var(--muted)]">{hint}</span> : null}
+        {hint ? <span id={hintId} className="block text-[12px] leading-6 text-[var(--muted)]">{hint}</span> : null}
       </span>
     </label>
   );

@@ -118,9 +118,12 @@ export function DuoDebtPartsEditor({
                           }
                           className="ring-focus min-w-0 flex-1 bg-transparent font-mono text-[15px] tabular outline-none"
                           aria-invalid={errors.amount ? "true" : "false"}
+                          aria-describedby={
+                            errors.amount ? `${part.id}-amount-error` : undefined
+                          }
                         />
                       </span>
-                      <FieldError message={errors.amount} />
+                      <FieldError id={`${part.id}-amount-error`} message={errors.amount} />
                     </label>
 
                     <label className="grid gap-2" htmlFor={`${part.id}-rateYear`}>
@@ -135,6 +138,9 @@ export function DuoDebtPartsEditor({
                         }
                         className="ring-focus hair h-12 rounded-md border bg-white px-3 text-[15px] text-[var(--ink)] outline-none"
                         aria-invalid={errors.rateYear ? "true" : "false"}
+                        aria-describedby={
+                          errors.rateYear ? `${part.id}-rateYear-error` : undefined
+                        }
                       >
                         {availableRateYears.map((year) => (
                           <option key={year} value={year}>
@@ -142,7 +148,7 @@ export function DuoDebtPartsEditor({
                           </option>
                         ))}
                       </select>
-                      <FieldError message={errors.rateYear} />
+                      <FieldError id={`${part.id}-rateYear-error`} message={errors.rateYear} />
                     </label>
                   </div>
                 </div>

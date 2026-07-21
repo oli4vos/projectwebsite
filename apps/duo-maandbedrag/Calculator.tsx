@@ -64,26 +64,32 @@ type FieldProps = {
 };
 
 function MoneyField({ id, label, value, error, prefix, hint, onChange }: FieldProps) {
+  const fieldId = String(id);
+  const hintId = hint ? `${fieldId}-hint` : undefined;
+  const errorId = error ? `${fieldId}-error` : undefined;
+  const describedBy = [hintId, errorId].filter(Boolean).join(" ") || undefined;
+
   return (
-    <label className="grid gap-2" htmlFor={String(id)}>
+    <label className="grid gap-2" htmlFor={fieldId}>
       <span className="flex items-baseline justify-between gap-3">
         <span className="text-[12px] font-medium uppercase tracking-[0.04em] text-[var(--muted)]">
           {label}
         </span>
-        {hint ? <span className="text-right text-[11px] text-[var(--soft)]">{hint}</span> : null}
+        {hint ? <span id={hintId} className="text-right text-[11px] text-[var(--soft)]">{hint}</span> : null}
       </span>
       <span className="field-shell flex min-h-12 items-center px-3">
         {prefix ? <span className="mr-2 text-[var(--muted)]">{prefix}</span> : null}
         <input
-          id={String(id)}
+          id={fieldId}
           inputMode="decimal"
           value={value}
           onChange={(event) => onChange(event.target.value)}
           aria-invalid={error ? "true" : "false"}
+          aria-describedby={describedBy}
           className="ring-focus min-w-0 flex-1 bg-transparent font-mono text-[15px] tabular outline-none"
         />
       </span>
-      <FieldError message={error} />
+      <FieldError id={errorId} message={error} />
     </label>
   );
 }
@@ -260,6 +266,8 @@ export default function DuoMaandbedragCalculator() {
               event.target.value as DuoMonthlyPaymentFormValues["repaymentRule"],
             )
           }
+          aria-invalid={view.errors.repaymentRule ? "true" : "false"}
+          aria-describedby={view.errors.repaymentRule ? "repaymentRule-error" : undefined}
           className="field-shell ring-focus h-12 px-3 text-[15px] text-[var(--ink)] outline-none"
         >
           {repaymentRuleOptions.map((option) => (
@@ -268,7 +276,7 @@ export default function DuoMaandbedragCalculator() {
             </option>
           ))}
         </select>
-        <FieldError message={view.errors.repaymentRule} />
+        <FieldError id="repaymentRule-error" message={view.errors.repaymentRule} />
       </label>
 
       {!formValues.useDebtParts ? (
@@ -280,6 +288,10 @@ export default function DuoMaandbedragCalculator() {
             id="duoRateYear"
             value={formValues.duoRateYear}
             onChange={(event) => updateField("duoRateYear", event.target.value)}
+            aria-invalid={view.errors.duoRateYear ? "true" : "false"}
+            aria-describedby={
+              view.errors.duoRateYear ? "duoRateYear-hint duoRateYear-error" : "duoRateYear-hint"
+            }
             className="field-shell ring-focus h-12 px-3 text-[15px] text-[var(--ink)] outline-none"
           >
             {getAvailableDuoRateYears().map((year) => (
@@ -288,10 +300,10 @@ export default function DuoMaandbedragCalculator() {
               </option>
             ))}
           </select>
-          <p className="text-[12px] leading-[1.5] text-[var(--soft)]">
+          <p id="duoRateYear-hint" className="text-[12px] leading-[1.5] text-[var(--soft)]">
             Selecteer het jaar of herken het aan het percentage, bijvoorbeeld 2026 — 2,33%.
           </p>
-          <FieldError message={view.errors.duoRateYear} />
+          <FieldError id="duoRateYear-error" message={view.errors.duoRateYear} />
         </label>
       ) : null}
 

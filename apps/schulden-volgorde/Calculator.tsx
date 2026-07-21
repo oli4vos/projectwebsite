@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { DisclosureSection } from "@/components/DisclosureSection";
 import { FieldError } from "@/components/forms/FieldError";
 import { GlossaryText } from "@/components/GlossaryText";
@@ -160,8 +160,19 @@ export default function Calculator() {
   const [values, setValues] = useState<FormState>(defaultValues);
   const [submitted, setSubmitted] = useState<FormState | null>(null);
   const [didSubmitAttempt, setDidSubmitAttempt] = useState(false);
+  const errorSummaryRef = useRef<HTMLDivElement>(null);
   const validation = validateForm(values);
   const { errors, parsedValues } = validation;
+  const visibleErrors = [
+    didSubmitAttempt ? errors.form : undefined,
+    didSubmitAttempt || values.extraAmount.trim().length > 0 ? errors.extraAmount : undefined,
+    ...values.debts.flatMap((debt, index) => [
+      didSubmitAttempt || debt.amount.trim().length > 0 ? errors.debts[index]?.amount : undefined,
+      didSubmitAttempt || debt.interestRate.trim().length > 0
+        ? errors.debts[index]?.interestRate
+        : undefined,
+    ]),
+  ].filter((error): error is string => Boolean(error));
 
   const result = useMemo(() => {
     if (!submitted) return null;
@@ -212,23 +223,46 @@ export default function Calculator() {
           onSubmit={(event) => {
             event.preventDefault();
             setDidSubmitAttempt(true);
-            if (!parsedValues) return;
+            if (!parsedValues) {
+              requestAnimationFrame(() => errorSummaryRef.current?.focus());
+              return;
+            }
             setSubmitted(values);
           }}
         >
-          <label className="grid gap-2">
+          {visibleErrors.length > 0 ? (
+            <div
+              ref={errorSummaryRef}
+              tabIndex={-1}
+              role="alert"
+              className="rounded-xl border border-[var(--neg)]/30 bg-[var(--neg-soft)] px-4 py-3 text-[13px] leading-6 text-[oklch(35%_0.13_28)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
+            >
+              <p className="font-medium">Controleer je invoer.</p>
+              <ul className="mt-1 list-disc pl-5">
+                {[...new Set(visibleErrors)].map((error) => (
+                  <li key={error}>{error}</li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+
+          <label className="grid gap-2" htmlFor="extraAmount">
             <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
               Extra bedrag dat je wilt inzetten
             </span>
             <input
+              id="extraAmount"
               inputMode="decimal"
               value={values.extraAmount}
               onChange={(event) =>
                 setValues((current) => ({ ...current, extraAmount: event.target.value }))
               }
+              aria-invalid={Boolean(errors.extraAmount)}
+              aria-describedby={errors.extraAmount ? "extraAmount-error" : undefined}
               className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] text-[var(--ink)] outline-none"
             />
             <FieldError
+              id="extraAmount-error"
               message={
                 didSubmitAttempt || values.extraAmount.trim().length > 0
                   ? errors.extraAmount
@@ -249,6 +283,7 @@ export default function Calculator() {
                       Bedrag voor {kindLabels[debt.kind].toLowerCase()}
                     </span>
                     <input
+                      id={`${debt.kind}-amount`}
                       inputMode="decimal"
                       placeholder="€ 0"
                       value={debt.amount}
@@ -256,9 +291,13 @@ export default function Calculator() {
                         updateDebt(index, { amount: event.target.value })
                       }
                       aria-invalid={Boolean(errors.debts[index]?.amount)}
+                      aria-describedby={
+                        errors.debts[index]?.amount ? `${debt.kind}-amount-error` : undefined
+                      }
                       className="ring-focus hair h-11 rounded-md border bg-white px-3 font-mono text-[15px] outline-none"
                     />
                     <FieldError
+                      id={`${debt.kind}-amount-error`}
                       message={
                         didSubmitAttempt || debt.amount.trim().length > 0
                           ? errors.debts[index]?.amount
@@ -271,6 +310,7 @@ export default function Calculator() {
                       Rente voor {kindLabels[debt.kind].toLowerCase()}
                     </span>
                     <input
+                      id={`${debt.kind}-interestRate`}
                       inputMode="decimal"
                       placeholder="0%"
                       value={debt.interestRate}
@@ -278,9 +318,15 @@ export default function Calculator() {
                         updateDebt(index, { interestRate: event.target.value })
                       }
                       aria-invalid={Boolean(errors.debts[index]?.interestRate)}
+                      aria-describedby={
+                        errors.debts[index]?.interestRate
+                          ? `${debt.kind}-interestRate-error`
+                          : undefined
+                      }
                       className="ring-focus hair h-11 rounded-md border bg-white px-3 font-mono text-[15px] outline-none"
                     />
                     <FieldError
+                      id={`${debt.kind}-interestRate-error`}
                       message={
                         didSubmitAttempt || debt.interestRate.trim().length > 0
                           ? errors.debts[index]?.interestRate
@@ -292,7 +338,7 @@ export default function Calculator() {
               </div>
             ))}
           </div>
-          <FieldError message={didSubmitAttempt ? errors.form : undefined} />
+          <FieldError id="debt-priority-form-error" message={didSubmitAttempt ? errors.form : undefined} />
 
           <ToolActionButton type="submit" variant="submit" size="md" full>
             Bereken volgorde
