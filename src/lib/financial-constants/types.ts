@@ -62,11 +62,15 @@ export type SourceDatasetFamily =
   | "mortgage-ltv"
   | "mortgage-energy-loan-space"
   | "mortgage-afm-test-rate"
+  | "mortgage-project-assumptions"
   | "duo-rate-year"
+  | "duo-repayment-terms"
+  | "duo-income-based-repayment-rules"
   | "duo-borrowing-limits"
   | "duo-additional-grant-rules"
   | "allowance-signal-rules"
   | "allowance-calculation-rules"
+  | "planning-debt-priority-rules"
   | "mortgage-provider-rate";
 
 export type SourceDataset<TData = unknown> = {

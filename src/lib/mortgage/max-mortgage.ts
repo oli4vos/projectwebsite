@@ -2,7 +2,7 @@ import {
   getDefaultFinancialYear,
   getFinancialConstants,
   getIndicativeIncomeHousingCostRatio,
-  getMortgageAfmTestRateForQuarter,
+  getMortgageAfmTestRateForDate,
   getMortgageEnergyRules,
   getMortgageFinancingLoadRatio,
   getMortgageFinancingLoadTable,
@@ -124,14 +124,13 @@ function resolveHouseholdIncome(input: MortgageMaxMortgageInput) {
 function resolveMortgageRate(
   input: MortgageMaxMortgageInput,
   defaultMortgageRate: number,
-  normYear: number,
 ) {
   const annualMortgageRate =
     input.annualMortgageRate === undefined || input.annualMortgageRate === null
       ? sanitizePercent(defaultMortgageRate)
       : sanitizePercent(input.annualMortgageRate);
   const fixedRatePeriodMonths = sanitizeMonths(input.fixedRatePeriodMonths ?? 0);
-  const afmTestRate = getMortgageAfmTestRateForQuarter(undefined, normYear);
+  const afmTestRate = getMortgageAfmTestRateForDate();
   const afmStressAnnualRate = sanitizePercent(input.afmStressAnnualRate ?? afmTestRate.rate);
 
   if (fixedRatePeriodMonths > 0 && fixedRatePeriodMonths < 120) {
@@ -499,7 +498,6 @@ export function calculateIndicativeMaxMortgage(
   const mortgageRateResolution = resolveMortgageRate(
     input,
     financialConstants.mortgage.defaultMortgageRate,
-    normYear,
   );
   const nhgRules = getMortgageNhgRules(normYear);
   const ltvRules = getMortgageLtvRules(normYear);

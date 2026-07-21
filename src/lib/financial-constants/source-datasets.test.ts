@@ -12,7 +12,12 @@ import {
 import type { SourceDataset, SourceDatasetMeta } from "@/lib/financial-constants/types";
 import {
   getDuoRateForRule,
+  getDuoBorrowingLimits,
+  getDuoDefaultTermForRule,
+  getDuoIncomeBasedRuleForRepaymentRule,
+  getMortgageAfmTestRateDatasetFreshness,
   getMortgageAfmTestRateForQuarter,
+  getMortgageAfmTestRateForDate,
   getMortgageFinancingLoadRatio,
   getMortgageNhgRules,
 } from "@/lib/financial-constants";
@@ -355,6 +360,80 @@ describe("source dataset registry", () => {
     expect(reference.freshnessStatus).toBe("fresh");
   });
 
+  it("registers DUO repayment terms as a separate official dataset", () => {
+    const dataset = getActiveDataset("duo-repayment-terms", {
+      scenario: "sf35-sf15-sf15-old-lllk",
+      asOf: "2026-07-18",
+    });
+    const terms = dataset.data as Record<string, number>;
+
+    expect(dataset.meta.id).toBe("duo-repayment-terms-2026");
+    expect(dataset.meta.sourceName).toBe("DUO");
+    expect(dataset.meta.sourceType).toBe("official-execution");
+    expect(dataset.meta.effectiveFrom).toBe("2026-01-01");
+    expect(dataset.meta.effectiveTo).toBe("2026-12-31");
+    expect(terms).toMatchObject({ SF35: 35, SF15: 15, SF15_OLD: 15, SF15_LLLK: 15 });
+    expect(getDuoDefaultTermForRule("SF35", 2026)).toBe(35);
+  });
+
+  it("registers DUO income-based repayment rules and keeps SF15_OLD blocker explicit", () => {
+    const dataset = getActiveDataset("duo-income-based-repayment-rules", {
+      scenario: "sf35-sf15-sf15-old-lllk",
+      asOf: "2026-07-18",
+    });
+    const rules = dataset.data as Record<string, { singleAllowance: number; partnerOrSingleParentAllowance: number; percentage: number | null }>;
+
+    expect(dataset.meta.id).toBe("duo-income-based-repayment-rules-2026");
+    expect(dataset.meta.notes).toContain("SF15_OLD heeft percentage null");
+    expect(rules.SF35).toMatchObject({ singleAllowance: 26_819.42, partnerOrSingleParentAllowance: 38_351.77, percentage: 4 });
+    expect(rules.SF15).toMatchObject({ singleAllowance: 22_528.31, partnerOrSingleParentAllowance: 32_183.3, percentage: 12 });
+    expect(rules.SF15_OLD.percentage).toBeNull();
+    expect(getDuoIncomeBasedRuleForRepaymentRule("SF15_OLD", 2026).percentage).toBeNull();
+  });
+
+  it("uses the registered DUO borrowing limits dataset for product limits", () => {
+    const dataset = getActiveDataset("duo-borrowing-limits", {
+      scenario: "monthly-loan-slider",
+      asOf: "2026-07-18",
+    });
+    const limits = dataset.data as ReturnType<typeof getDuoBorrowingLimits>;
+
+    expect(dataset.meta.id).toBe("duo-borrowing-limits-2026");
+    expect(getDuoBorrowingLimits(2026)).toBe(limits);
+    expect(limits.monthlyLoanAmountMax).toBe(1213.95);
+    expect(limits.monthlyLoanAmountStep).toBe(25);
+  });
+
+  it("separates official datasets from project assumptions", () => {
+    const official = getActiveDataset("mortgage-financing-load", {
+      scenario: "before-and-from-aow",
+      asOf: "2026-07-18",
+    });
+    const mortgageAssumptions = getActiveDataset("mortgage-project-assumptions", {
+      scenario: "defaults-income-ratio-and-student-debt-gross-up",
+      asOf: "2026-07-18",
+    });
+    const debtRules = getActiveDataset("planning-debt-priority-rules", {
+      scenario: "project-score-v1",
+      asOf: "2026-07-21",
+    });
+
+    expect(official.meta.methodologyType).toBe("official-norm");
+    expect(mortgageAssumptions.meta.sourceName).toBe("Project Site");
+    expect(mortgageAssumptions.meta.sourceType).toBe("project-assumption");
+    expect(mortgageAssumptions.meta.notes).toContain("project-assumption");
+    expect(debtRules.meta.methodologyType).toBe("project-assumption");
+    expect(debtRules.data).toMatchObject({ highInterestThresholdPercent: 7 });
+  });
+
+  it("reports AFM Q3 2026 freshness as fresh, review-due and expired by date", () => {
+    expect(getMortgageAfmTestRateForDate("2026-07-18").rate).toBe(5);
+    expect(getMortgageAfmTestRateDatasetFreshness("2026-07-18").status).toBe("fresh");
+    expect(getMortgageAfmTestRateDatasetFreshness("2026-09-10").status).toBe("review-due");
+    expect(getMortgageAfmTestRateDatasetFreshness("2026-10-01").status).toBe("expired");
+    expect(() => getMortgageAfmTestRateForDate("2026-10-01")).toThrow("Geen actieve brondata");
+  });
+
   it("validates the production registry without hard failures", () => {
     const result = validateDatasetRegistry();
 
@@ -364,6 +443,8 @@ describe("source dataset registry", () => {
 
   it("keeps existing central constants values stable", () => {
     expect(getDuoRateForRule("SF35", 2026)).toBe(2.33);
+    expect(getDuoDefaultTermForRule("SF15", 2026)).toBe(15);
+    expect(getDuoIncomeBasedRuleForRepaymentRule("SF35", 2026).percentage).toBe(4);
     expect(getMortgageNhgRules(2026).standardLimit).toBe(470_000);
     expect(getMortgageAfmTestRateForQuarter("2026-Q3", 2026).rate).toBe(5);
     expect(

@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import {
   calculateMortgageProviderRateAverage,
+  MORTGAGE_PROVIDER_RATES_ARE_PRODUCTION_INPUT,
+  MORTGAGE_PROVIDER_RATE_USAGE_POLICY,
   TEN_YEAR_ANNUITY_100_PERCENT_MARKET_VALUE_REFERENCE_SCENARIO,
 } from "@/lib/mortgage/provider-rates";
 import type {
@@ -75,6 +77,11 @@ function dataset(
 }
 
 describe("mortgage provider rate average", () => {
+  it("documents that provider rates are not production mortgage-rate input", () => {
+    expect(MORTGAGE_PROVIDER_RATES_ARE_PRODUCTION_INPUT).toBe(false);
+    expect(MORTGAGE_PROVIDER_RATE_USAGE_POLICY).toContain("handmatige hypotheekrente-invoer");
+  });
+
   it("calculates a complete average for comparable grootbank records", () => {
     const result = calculateMortgageProviderRateAverage(
       dataset([

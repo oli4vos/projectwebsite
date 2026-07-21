@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import type { DuoDebtPartInput } from "@/lib/duo";
 import {
@@ -31,6 +32,16 @@ const baseInput: HypotheekImpactInput = {
 };
 
 describe("hypotheek-impact-studieschuld logic", () => {
+  it("keeps the visible source-check date tied to central metadata", () => {
+    const componentSource = readFileSync(
+      new URL("./Calculator.tsx", import.meta.url),
+      "utf8",
+    );
+
+    expect(componentSource).not.toContain("18 mei 2026");
+    expect(componentSource).toContain("formatIsoDateLabel(LAST_CHECKED)");
+  });
+
   it("returns finite non-negative core outputs", () => {
     const result = calculateHypotheekImpact(baseInput);
 

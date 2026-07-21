@@ -1,3 +1,5 @@
+import { DEBT_PRIORITY_RULES_2026 } from "@/lib/planning/debt-priority-rules";
+
 export type DebtKind =
   | "bnpl"
   | "creditCard"
@@ -49,15 +51,6 @@ const kindLabels: Record<DebtKind, string> = {
   other: "Overige schuld",
 };
 
-const kindBaseScore: Record<DebtKind, number> = {
-  bnpl: 80,
-  creditCard: 85,
-  personalLoan: 65,
-  duo: 20,
-  mortgage: 25,
-  other: 45,
-};
-
 function sanitizeNumber(value: number | undefined) {
   if (!Number.isFinite(value)) {
     return 0;
@@ -71,10 +64,13 @@ function roundMoney(value: number) {
 }
 
 function priorityScore(kind: DebtKind, interestRate: number) {
-  const rateScore = interestRate * 10;
-  const duoCorrection = kind === "duo" && interestRate <= 2.5 ? -25 : 0;
+  const rateScore = interestRate * DEBT_PRIORITY_RULES_2026.interestRateScoreMultiplier;
+  const duoCorrection =
+    kind === "duo" && interestRate <= DEBT_PRIORITY_RULES_2026.duoLowRateThresholdPercent
+      ? DEBT_PRIORITY_RULES_2026.duoLowRateCorrection
+      : 0;
 
-  return Math.max(kindBaseScore[kind] + rateScore + duoCorrection, 0);
+  return Math.max(DEBT_PRIORITY_RULES_2026.kindBaseScore[kind] + rateScore + duoCorrection, 0);
 }
 
 function explanationFor(kind: DebtKind, interestRate: number) {
@@ -86,7 +82,7 @@ function explanationFor(kind: DebtKind, interestRate: number) {
     return "Hypotheek aflossen kan rust geven, maar vergelijk renteaftrek, flexibiliteit en alternatief rendement.";
   }
 
-  if (interestRate >= 7) {
+  if (interestRate >= DEBT_PRIORITY_RULES_2026.highInterestThresholdPercent) {
     return "Deze schuld heeft een hoge rente. Aflossen levert een zekere besparing op voordat je risico neemt met andere keuzes.";
   }
 

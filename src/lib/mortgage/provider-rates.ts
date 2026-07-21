@@ -7,6 +7,10 @@ import { getDatasetFreshness } from "@/lib/financial-constants";
 
 export type MortgageProviderId = "abn-amro" | "ing" | "rabobank" | string;
 
+export const MORTGAGE_PROVIDER_RATES_ARE_PRODUCTION_INPUT = false;
+export const MORTGAGE_PROVIDER_RATE_USAGE_POLICY =
+  "Provider-rentedata is uitsluitend onderzoeks- of vergelijkingsdata. Productieberekeningen gebruiken altijd handmatige hypotheekrente-invoer van de gebruiker.";
+
 export type MortgageProviderRateStatus =
   | "valid"
   | "missing"

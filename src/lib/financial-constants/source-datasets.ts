@@ -2,6 +2,7 @@ import { DUO_RATE_HISTORY_BY_YEAR, DUO_RATE_YEAR_METADATA_BY_YEAR } from "@/lib/
 import { DUO_ADDITIONAL_GRANT_RULES_2026 } from "@/lib/financial-constants/duo-additional-grant-rules-2026";
 import { ALLOWANCE_CALCULATION_RULES_2026 } from "@/lib/financial-constants/allowance-calculation-rules-2026";
 import { MORTGAGE_FINANCING_LOAD_DATA } from "@/lib/financial-constants/mortgage-financing-load-data";
+import { DEBT_PRIORITY_RULES_2026 } from "@/lib/planning/debt-priority-rules";
 import type {
   AssumptionMeta,
   AnnualFinancialConstants,
@@ -567,11 +568,50 @@ function validateDatasetSpecificBounds(dataset: SourceDataset) {
       }
       break;
     }
+    case "mortgage-project-assumptions": {
+      const data = dataset.data as AnnualFinancialConstants["mortgage"];
+      if (data.defaultMortgageRate < 0 || data.defaultMortgageRate > 20) {
+        issues.push("Hypotheek-defaultrente valt buiten de verwachte bandbreedte.");
+      }
+      if (data.defaultMortgageTermYears <= 0 || data.defaultMortgageTermYears > 40) {
+        issues.push("Hypotheek-defaultlooptijd valt buiten de verwachte bandbreedte.");
+      }
+      if (data.indicativeIncomeHousingCostRatio <= 0 || data.indicativeIncomeHousingCostRatio > 100) {
+        issues.push("Indicatieve woonlastratio valt buiten de verwachte bandbreedte.");
+      }
+      for (const band of data.studentDebtGrossUpFactors) {
+        if (band.factor <= 0 || band.factor > 3 || band.minRate < 0) {
+          issues.push("Studieschuld-bruteringsfactor valt buiten de verwachte bandbreedte.");
+        }
+      }
+      break;
+    }
     case "duo-rate-year": {
       const rates = dataset.data as Record<string, number>;
       for (const rate of Object.values(rates)) {
         if (rate < 0 || rate > 20) {
           issues.push("DUO-rente valt buiten de verwachte bandbreedte.");
+        }
+      }
+      break;
+    }
+    case "duo-repayment-terms": {
+      const terms = dataset.data as AnnualFinancialConstants["duo"]["defaultTerms"];
+      for (const years of Object.values(terms)) {
+        if (!Number.isInteger(years) || years <= 0 || years > 50) {
+          issues.push("DUO-terugbetaaltermijn valt buiten de verwachte bandbreedte.");
+        }
+      }
+      break;
+    }
+    case "duo-income-based-repayment-rules": {
+      const rules = dataset.data as AnnualFinancialConstants["duo"]["incomeBasedRules"];
+      for (const [rule, data] of Object.entries(rules)) {
+        if (data.singleAllowance < 0 || data.partnerOrSingleParentAllowance < data.singleAllowance) {
+          issues.push(`DUO-draagkrachtvrije voet is inconsistent voor ${rule}.`);
+        }
+        if (data.percentage !== null && (data.percentage < 0 || data.percentage > 100)) {
+          issues.push(`DUO-draagkrachtpercentage valt buiten de verwachte bandbreedte voor ${rule}.`);
         }
       }
       break;
@@ -589,6 +629,25 @@ function validateDatasetSpecificBounds(dataset: SourceDataset) {
       return validateAllowanceSignalRulesDataset(dataset.data);
     case "allowance-calculation-rules":
       return validateAllowanceCalculationRulesDataset(dataset.data);
+    case "planning-debt-priority-rules": {
+      const data = dataset.data as {
+        kindBaseScore?: Record<string, number>;
+        interestRateScoreMultiplier?: number;
+        duoLowRateThresholdPercent?: number;
+        duoLowRateCorrection?: number;
+        highInterestThresholdPercent?: number;
+      };
+      if (!data.kindBaseScore || Object.values(data.kindBaseScore).some((score) => score < 0 || score > 100)) {
+        issues.push("Schuldenprioriteitsscores vallen buiten de verwachte bandbreedte.");
+      }
+      if ((data.interestRateScoreMultiplier ?? 0) <= 0) {
+        issues.push("Renteweging voor schuldenprioriteit moet positief zijn.");
+      }
+      if ((data.highInterestThresholdPercent ?? 0) <= 0) {
+        issues.push("Hoge-rentedrempel voor schuldenprioriteit moet positief zijn.");
+      }
+      break;
+    }
     case "mortgage-provider-rate":
       return validateMortgageProviderRateDataset(dataset.data);
   }
@@ -924,6 +983,37 @@ export const SOURCE_DATASET_REGISTRY: readonly SourceDataset[] = [
     usedBy: ["artifact-hypotheek-wonen-maximale-hypotheek"],
   },
   {
+    family: "mortgage-project-assumptions",
+    scenario: "defaults-income-ratio-and-student-debt-gross-up",
+    meta: {
+      recordType: "dataset",
+      id: "mortgage-project-assumptions-2026",
+      title: "Hypotheekdefaults en studieschuld-brutering Project Site 2026",
+      year: 2026,
+      version: "1.0.0",
+      effectiveFrom: "2026-01-01",
+      effectiveTo: "2026-12-31",
+      retrievedAt: constants2026.mortgage.meta.lastChecked,
+      lastVerifiedAt: constants2026.mortgage.meta.lastChecked,
+      nextReviewAt: "2026-11-15",
+      sourceName: "Project Site",
+      sourceUrl: "https://www.rijksoverheid.nl/onderwerpen/koopwoning/vraag-en-antwoord/hypotheek-studieschuld",
+      sourceType: "project-assumption",
+      methodology:
+        "Projectmatige aannames voor hypotheek-defaults, indicatieve woonlastratio en studieschuld-bruteringsfactoren. Deze waarden zijn geen wettelijke norm en vervangen geen hypotheekacceptatie door een geldverstrekker.",
+      methodologyType: "project-assumption",
+      notes:
+        "Label: project-assumption/indicative-rule. Rationale: uniforme indicatieve scenario's en uitlegbare hypotheekimpact zonder bankacceptatie te simuleren.",
+      status: "active",
+    },
+    data: constants2026.mortgage,
+    usedBy: [
+      "artifact-hypotheek-wonen-maximale-hypotheek",
+      "hypotheek-impact-studieschuld",
+      "familiehulp-eerste-woning",
+    ],
+  },
+  {
     family: "duo-rate-year",
     scenario: "sf35-sf15-sf15-old-lllk",
     meta: {
@@ -958,6 +1048,65 @@ export const SOURCE_DATASET_REGISTRY: readonly SourceDataset[] = [
     ],
   },
   {
+    family: "duo-repayment-terms",
+    scenario: "sf35-sf15-sf15-old-lllk",
+    meta: {
+      recordType: "dataset",
+      id: "duo-repayment-terms-2026",
+      title: "DUO-terugbetaaltermijnen 2026",
+      year: 2026,
+      version: "1.0.0",
+      effectiveFrom: "2026-01-01",
+      effectiveTo: "2026-12-31",
+      retrievedAt: constants2026.duo.meta.lastChecked,
+      lastVerifiedAt: constants2026.duo.meta.lastChecked,
+      nextReviewAt: "2026-11-15",
+      sourceName: "DUO",
+      sourceUrl: constants2026.duo.meta.sourceUrl ?? DUO_RATE_YEAR_METADATA_BY_YEAR[2026].sourceUrl,
+      sourceType: "official-execution",
+      methodology:
+        "Centrale dataset voor wettelijke/uitvoeringsrechtelijke terugbetaalduur per DUO-regeling. De dataset bevat alleen de bestaande termijnen en verandert geen rekenuitkomsten.",
+      methodologyType: "official-norm",
+      notes: "SF35: 35 jaar. SF15, SF15_OLD en SF15_LLLK: 15 jaar. UNKNOWN blijft bestaande fallback op 35 jaar.",
+      status: "active",
+    },
+    data: constants2026.duo.defaultTerms,
+    usedBy: [
+      "duo-maandbedrag",
+      "duo-extra-aflossen",
+      "duo-stoppen-kosten-prestatiebeurs",
+      "hypotheek-impact-studieschuld",
+      "familiehulp-eerste-woning",
+    ],
+  },
+  {
+    family: "duo-income-based-repayment-rules",
+    scenario: "sf35-sf15-sf15-old-lllk",
+    meta: {
+      recordType: "dataset",
+      id: "duo-income-based-repayment-rules-2026",
+      title: "DUO-draagkrachtregels 2026",
+      year: 2026,
+      version: "1.0.0",
+      effectiveFrom: "2026-01-01",
+      effectiveTo: "2026-12-31",
+      retrievedAt: constants2026.duo.meta.lastChecked,
+      lastVerifiedAt: constants2026.duo.meta.lastChecked,
+      nextReviewAt: "2026-11-15",
+      sourceName: "DUO",
+      sourceUrl: constants2026.duo.meta.sourceUrl ?? DUO_RATE_YEAR_METADATA_BY_YEAR[2026].sourceUrl,
+      sourceType: "official-execution",
+      methodology:
+        "Centrale dataset voor bestaande draagkrachtvrije voeten en draagkrachtpercentages per DUO-regeling. SF15_OLD behoudt het bestaande gedrag met ontbrekend percentage als expliciete blocker.",
+      methodologyType: "official-norm",
+      notes:
+        "SF15_OLD heeft percentage null omdat de officiële onderbouwing voor een eenvoudig centraal percentage niet voldoende is genormaliseerd. Bestaande berekeningsfallbacks blijven ongewijzigd.",
+      status: "active",
+    },
+    data: constants2026.duo.incomeBasedRules,
+    usedBy: ["duo-maandbedrag", "duo-extra-aflossen", "duo-stoppen-kosten-prestatiebeurs"],
+  },
+  {
     family: "duo-borrowing-limits",
     scenario: "monthly-loan-slider",
     meta: {
@@ -981,6 +1130,33 @@ export const SOURCE_DATASET_REGISTRY: readonly SourceDataset[] = [
     },
     data: constants2026.duo.borrowingLimits,
     usedBy: ["duo-leenbedrag-impact", "duo-schuld-bij-starten-lenen"],
+  },
+  {
+    family: "planning-debt-priority-rules",
+    scenario: "project-score-v1",
+    meta: {
+      recordType: "dataset",
+      id: "planning-debt-priority-rules-2026",
+      title: "Schuldenprioriteit projectregels 2026",
+      year: 2026,
+      version: "1.0.0",
+      effectiveFrom: "2026-01-01",
+      effectiveTo: "2026-12-31",
+      retrievedAt: "2026-07-21",
+      lastVerifiedAt: "2026-07-21",
+      nextReviewAt: "2026-11-15",
+      sourceName: "Project Site",
+      sourceUrl: "https://www.project-site.local/project-assumptions/planning-debt-priority",
+      sourceType: "project-assumption",
+      methodology:
+        "Indicatieve Project Site-score voor volgorde van extra aflossen. Dit is geen wettelijke norm, geen financieel advies en geen vervanging van contractvoorwaarden of betalingsregelingen.",
+      methodologyType: "project-assumption",
+      notes:
+        "Label: indicative-rule. Rationale: schulden vergelijkbaar maken op rente, flexibiliteit en praktisch risico zonder juridisch recht te claimen.",
+      status: "active",
+    },
+    data: DEBT_PRIORITY_RULES_2026,
+    usedBy: ["schulden-volgorde"],
   },
   {
     family: "duo-additional-grant-rules",

@@ -3,6 +3,12 @@ import {
   FINANCIAL_CONSTANTS_BY_YEAR,
 } from "@/lib/financial-constants/years";
 import {
+  SOURCE_DATASET_REGISTRY,
+  SOURCE_DATA_REFERENCE_DATE,
+  getDatasetForDate as getSourceDatasetForDate,
+  getDatasetFreshness as getSourceDatasetFreshness,
+} from "@/lib/financial-constants/source-datasets";
+import {
   DUO_RATE_HISTORY_META,
   getAvailableDuoRateYears,
   getDuoHistoricalRateForRule,
@@ -57,6 +63,25 @@ function sanitizeYear(year?: number) {
   return Math.round(year);
 }
 
+function datasetReferenceDateForYear(year?: number) {
+  const safeYear = sanitizeYear(year);
+  return safeYear === DEFAULT_FINANCIAL_YEAR
+    ? `${DEFAULT_FINANCIAL_YEAR}-07-01`
+    : `${safeYear}-07-01`;
+}
+
+function getDatasetForYearOrDefault(
+  family: Parameters<typeof getSourceDatasetForDate>[0],
+  year: number | undefined,
+  scenario: string,
+) {
+  try {
+    return getSourceDatasetForDate(family, datasetReferenceDateForYear(year), { scenario });
+  } catch {
+    return getSourceDatasetForDate(family, `${DEFAULT_FINANCIAL_YEAR}-07-01`, { scenario });
+  }
+}
+
 export function getAvailableFinancialYears() {
   return Object.keys(FINANCIAL_CONSTANTS_BY_YEAR)
     .map((value) => Number(value))
@@ -86,23 +111,34 @@ export function getDuoRateForRule(rule: RepaymentRuleKey, year?: number) {
 }
 
 export function getDuoDefaultTermForRule(rule: RepaymentRuleKey, year?: number) {
-  const constants = getFinancialConstants(year);
-  return constants.duo.defaultTerms[rule] ?? constants.duo.defaultTerms.UNKNOWN;
+  const dataset = getDatasetForYearOrDefault(
+    "duo-repayment-terms",
+    year,
+    "sf35-sf15-sf15-old-lllk",
+  );
+  const terms = dataset.data as AnnualFinancialConstants["duo"]["defaultTerms"];
+  return terms[rule] ?? terms.UNKNOWN;
 }
 
 export function getDuoIncomeBasedRuleForRepaymentRule(
   rule: RepaymentRuleKey,
   year?: number,
 ) {
-  const constants = getFinancialConstants(year);
+  const dataset = getDatasetForYearOrDefault(
+    "duo-income-based-repayment-rules",
+    year,
+    "sf35-sf15-sf15-old-lllk",
+  );
+  const incomeBasedRules = dataset.data as AnnualFinancialConstants["duo"]["incomeBasedRules"];
   return (
-    constants.duo.incomeBasedRules[rule] ??
-    constants.duo.incomeBasedRules.UNKNOWN
+    incomeBasedRules[rule] ??
+    incomeBasedRules.UNKNOWN
   );
 }
 
 export function getDuoBorrowingLimits(year?: number) {
-  return getFinancialConstants(year).duo.borrowingLimits;
+  const dataset = getDatasetForYearOrDefault("duo-borrowing-limits", year, "monthly-loan-slider");
+  return dataset.data as AnnualFinancialConstants["duo"]["borrowingLimits"];
 }
 
 export function getDuoRateHistoryMeta() {
@@ -163,11 +199,30 @@ export function getMortgageAfmTestRateForQuarter(
 ): MortgageAfmTestRate {
   const constants = getFinancialConstants(year);
   const targetQuarter = quarter ?? constants.mortgage.defaultAfmTestRateQuarter;
-  const match = constants.mortgage.afmTestRates.find(
-    (testRate) => testRate.quarter === targetQuarter,
+  const dataset = getSourceDatasetForDate(
+    "mortgage-afm-test-rate",
+    targetQuarter === "2026-Q3" ? "2026-07-01" : `${sanitizeYear(year)}-07-01`,
+    { scenario: targetQuarter === "2026-Q3" ? "short-fixed-rate-2026-q3" : undefined },
   );
 
-  return match ?? constants.mortgage.afmTestRates[0];
+  return dataset.data as MortgageAfmTestRate;
+}
+
+export function getMortgageAfmTestRateForDate(asOf = SOURCE_DATA_REFERENCE_DATE): MortgageAfmTestRate {
+  const dataset = getSourceDatasetForDate("mortgage-afm-test-rate", asOf);
+  return dataset.data as MortgageAfmTestRate;
+}
+
+export function getMortgageAfmTestRateDatasetFreshness(asOf?: string) {
+  const dataset = SOURCE_DATASET_REGISTRY.find(
+    (candidate) =>
+      candidate.family === "mortgage-afm-test-rate" &&
+      candidate.scenario === "short-fixed-rate-2026-q3",
+  );
+  if (!dataset) {
+    throw new Error("Geen AFM-toetsrentedataset geregistreerd.");
+  }
+  return getSourceDatasetFreshness(dataset, asOf);
 }
 
 export function getMortgageFinancingLoadRatio(input: MortgageFinancingLoadLookupInput) {

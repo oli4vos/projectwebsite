@@ -42,7 +42,11 @@ export const DEFAULT_DUO_RATES_2026: Record<RepaymentRule, number> = {
 };
 
 export const DEFAULT_TERMS: Record<RepaymentRule, number> = {
-  ...FINANCIAL_CONSTANTS.duo.defaultTerms,
+  SF35: getDuoDefaultTermForRule("SF35", DEFAULT_YEAR),
+  SF15: getDuoDefaultTermForRule("SF15", DEFAULT_YEAR),
+  SF15_OLD: getDuoDefaultTermForRule("SF15_OLD", DEFAULT_YEAR),
+  SF15_LLLK: getDuoDefaultTermForRule("SF15_LLLK", DEFAULT_YEAR),
+  UNKNOWN: getDuoDefaultTermForRule("UNKNOWN", DEFAULT_YEAR),
 };
 
 export const BRUTERING_FACTORS: ReadonlyArray<{

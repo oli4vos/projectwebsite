@@ -2097,11 +2097,11 @@ function CalculatorContent({
             <h3 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
               Belangrijke aannames
             </h3>
-            <Pill tone="dark">Gecontroleerd op 18 mei 2026</Pill>
+            <Pill tone="dark">Gecontroleerd op {formatIsoDateLabel(LAST_CHECKED)}</Pill>
           </div>
           <div className="mt-4 space-y-3 text-[13.5px] leading-[1.7] text-[var(--muted)]">
             <p>
-              Bedragen en aannames gecontroleerd op 18 mei 2026. Controleer altijd
+              Bedragen en aannames gecontroleerd op {formatIsoDateLabel(LAST_CHECKED)}. Controleer altijd
               Mijn DUO en laat een hypotheekadviseur de officiële leencapaciteit berekenen.
             </p>
             <p>Laatste controle van deze aannames: {formatIsoDateLabel(LAST_CHECKED)}.</p>
