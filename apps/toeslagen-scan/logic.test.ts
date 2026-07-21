@@ -367,6 +367,13 @@ describe("toeslagen-scan adapter", () => {
     expect(rentReport?.yearlyAmountLabel).toBe(rentCard?.annualAmountLabel);
     expect(childBudgetReport?.monthlyAmountLabel).toBe(childBudgetCard?.monthlyAmountLabel);
     expect(childBudgetReport?.yearlyAmountLabel).toBe(childBudgetCard?.annualAmountLabel);
+    expect(view.result?.totalMonthlyAmount).toBe(
+      view.result?.cards.reduce((sum, card) => sum + (card.monthlyAmount ?? 0), 0),
+    );
+    expect(view.result?.totalAnnualAmount).toBe(
+      view.result?.cards.reduce((sum, card) => sum + (card.annualAmount ?? 0), 0),
+    );
+    expect(view.result?.totalIncludedAllowanceTitles).not.toContain("Kinderopvangtoeslag");
     expect(healthcareReport?.calculationYear).toBe(view.result?.ruleYear);
     expect(rentReport?.reasons.map((line) => line.value)).toEqual(rentCard?.reasonMessages);
     expect(childBudgetReport?.reasons.map((line) => line.value)).toEqual(childBudgetCard?.reasonMessages);

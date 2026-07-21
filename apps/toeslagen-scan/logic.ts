@@ -634,8 +634,8 @@ function createSummary(statuses: readonly AllowancePublicResultStatus[]) {
 }
 
 function createSummaryFromCards(cards: readonly AllowanceResultCardView[]) {
-  const calculated = cards.filter((card) => card.monthlyAmountLabel || card.annualAmountLabel);
-  const notCalculated = cards.filter((card) => !card.monthlyAmountLabel && card.status !== "ineligible");
+  const calculated = cards.filter((card) => card.monthlyAmount !== undefined || card.annualAmount !== undefined);
+  const notCalculated = cards.filter((card) => card.monthlyAmount === undefined && card.status !== "ineligible");
 
   if (calculated.length > 0 && notCalculated.length > 0) {
     return "De scan toont een totaal van alleen de toeslagen die concreet berekend zijn. Niet-berekende toeslagen staan apart per kaart.";
@@ -645,6 +645,15 @@ function createSummaryFromCards(cards: readonly AllowanceResultCardView[]) {
   }
 
   return createSummary(cards.map((card) => card.status));
+}
+
+function createTotalFromCards(cards: readonly AllowanceResultCardView[]) {
+  const included = cards.filter((card) => card.monthlyAmount !== undefined || card.annualAmount !== undefined);
+  return {
+    totalMonthlyAmount: included.reduce((sum, card) => sum + (card.monthlyAmount ?? 0), 0),
+    totalAnnualAmount: included.reduce((sum, card) => sum + (card.annualAmount ?? 0), 0),
+    totalIncludedAllowanceTitles: included.map((card) => card.title),
+  };
 }
 
 function unknownDesignForField(fieldId: string) {
@@ -848,6 +857,8 @@ function cardForResult(item: OfficialAllowanceCalculationResult) {
     statusLabel: getPublicResultStatusLabel(status),
     summary: publicSummary(item),
     hardExclusion: item.signal.hardExclusion,
+    monthlyAmount: item.amount.monthlyAmount,
+    annualAmount: item.amount.annualAmount,
     monthlyAmountLabel: item.amount.monthlyAmount !== undefined
       ? formatCurrency(item.amount.monthlyAmount)
       : undefined,
@@ -941,6 +952,8 @@ function applyCentralScanResultToCard(
     statusLabel: getPublicResultStatusLabel(status),
     summary: summaryFromScanResult(result),
     hardExclusion: result.status === "no-entitlement",
+    monthlyAmount: result.monthlyAmount,
+    annualAmount: result.yearlyAmount,
     monthlyAmountLabel: result.monthlyAmount !== undefined
       ? formatCurrency(result.monthlyAmount)
       : undefined,
@@ -1001,12 +1014,18 @@ export function createAllowanceScanView(
   );
   const cards = integrateRentAndChildBudgetCards(ordered.map(cardForResult), values);
   const summary = createSummaryFromCards(cards);
+  const total = createTotalFromCards(cards);
 
   return {
     isValid: true,
     errors,
     result: {
       summary,
+      totalMonthlyAmount: total.totalMonthlyAmount,
+      totalAnnualAmount: total.totalAnnualAmount,
+      totalMonthlyAmountLabel: formatCurrency(total.totalMonthlyAmount),
+      totalAnnualAmountLabel: formatCurrency(total.totalAnnualAmount),
+      totalIncludedAllowanceTitles: total.totalIncludedAllowanceTitles,
       ruleYear: calculation.value.calculationYear,
       datasetId: calculation.value.datasetId,
       datasetVersion: calculation.value.datasetVersion,

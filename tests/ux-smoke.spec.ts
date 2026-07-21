@@ -373,13 +373,13 @@ test("toeslagenscan is publiek vindbaar via dashboard en app-overzicht", async (
   await expect(page.locator(`a[href="${allowanceScanRoute}"]`)).toBeVisible();
 
   await page.goto("/v2/apps", { waitUntil: "networkidle" });
-  await expect(page.getByText("10 van 10")).toBeVisible();
+  await expect(page.getByText("11 van 11")).toBeVisible();
   await page.getByLabel("Zoek tool").fill("zorgtoeslag");
   await expect(
     page.getByRole("heading", { name: "Welke toeslagen passen mogelijk bij mij?" }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Regelingen en maandruimte" }).click();
-  await expect(page.getByText("1 van 10")).toBeVisible();
+  await expect(page.getByText("1 van 11")).toBeVisible();
 });
 
 test("publieke toeslagenscan route, formulier en bedragindicatie werken", async ({
@@ -393,9 +393,9 @@ test("publieke toeslagenscan route, formulier en bedragindicatie werken", async 
   await expect(
     page.getByRole("heading", { name: "Welke toeslagen passen mogelijk bij mij?", level: 1 }),
   ).toBeVisible();
-  await expect(page.getByText("Beta · toeslagenadviseur 2026")).toBeVisible();
+  await expect(page.getByText("Beta · toeslagenscan 2026")).toBeVisible();
   await expect(
-    page.getByText("Geen advies en geen officiële beschikking"),
+    page.getByText("Geen persoonlijke aanbeveling en geen officiële beschikking"),
   ).toBeVisible();
   await expect(page.getByText("centrale vraagflow en toeslagenberekening")).toBeVisible();
   await expect(
@@ -409,14 +409,17 @@ test("publieke toeslagenscan route, formulier en bedragindicatie werken", async 
   expect(bodyText).not.toContain("je ontvangt");
   expect(bodyText).not.toContain("gegarandeerd recht");
 
-  await page.getByRole("button", { name: "Voorbeeldwaarden" }).click();
+  await page.getByRole("button", { name: "Voorbeeld invullen" }).click();
   await expect(page.getByText("Niet van toepassing")).toBeVisible();
   await page.getByLabel("Leeftijden kinderen").fill("6");
   await page.getByLabel("Heb je kinderen?", { exact: true }).selectOption("unknown");
   await expect(page.getByLabel("Kale huur per maand")).toBeVisible();
   await expect(page.getByText("Afgeleid uit eerdere antwoorden")).toBeVisible();
-  await page.getByRole("button", { name: "Bekijk mijn toeslagenadvies" }).click();
+  await page.getByRole("button", { name: "Bekijk mijn toeslagenindicatie" }).click();
   await expect(page.locator("#tool-result-summary article")).toHaveCount(4);
+  await expect(page.getByText("Totaal per maand")).toBeVisible();
+  await expect(page.getByText("Totaal per jaar")).toBeVisible();
+  await expect(page.getByText(/Meegeteld: .*Zorgtoeslag/)).toBeVisible();
   await expect(page.getByRole("heading", { name: "Zorgtoeslag" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Huurtoeslag" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Kindgebonden budget" })).toBeVisible();
@@ -451,28 +454,28 @@ test("toeslagenscan kernregressies voor partner, vermogen, special-case en infer
   test.skip(!testInfo.project.name.startsWith("desktop"), "Desktopinteractie controleren");
 
   await page.goto(allowanceScanRoute, { waitUntil: "networkidle" });
-  await page.getByRole("button", { name: "Voorbeeldwaarden" }).click();
+  await page.getByRole("button", { name: "Voorbeeld invullen" }).click();
 
   await page.getByLabel("Heb je een toeslagpartner?", { exact: true }).selectOption("yes");
   await expect(page.getByLabel("Gezamenlijk toetsingsinkomen")).toBeVisible();
   await page.getByLabel("Gezamenlijk toetsingsinkomen").fill("42000");
   await page.getByLabel("Gezamenlijk vermogen op 1 januari").fill("20000");
-  await page.getByRole("button", { name: "Bekijk mijn toeslagenadvies" }).click();
+  await page.getByRole("button", { name: "Bekijk mijn toeslagenindicatie" }).click();
   await expect(page.getByText("Geschatte toeslag").first()).toBeVisible();
 
   await page.getByLabel("Gezamenlijk vermogen op 1 januari").fill("999999");
-  await page.getByRole("button", { name: "Bekijk mijn toeslagenadvies" }).click();
+  await page.getByRole("button", { name: "Bekijk mijn toeslagenindicatie" }).click();
   await expect(page.getByText("Waarschijnlijk geen recht").first()).toBeVisible();
 
   await page.getByLabel("Complexe of uitzonderlijke situatie?", { exact: true }).selectOption("yes");
-  await page.getByRole("button", { name: "Bekijk mijn toeslagenadvies" }).click();
-  await expect(page.getByText("Bijzondere situatie").first()).toBeVisible();
+  await page.getByRole("button", { name: "Bekijk mijn toeslagenindicatie" }).click();
+  await expect(page.getByText(/officiële controle/i).first()).toBeVisible();
 
   await page.getByLabel("Gezamenlijk vermogen op 1 januari").fill("20000");
   await page.getByLabel("Leeftijden kinderen").fill("5");
   await page.getByLabel("Heb je kinderen?", { exact: true }).selectOption("unknown");
   await expect(page.getByText("Afgeleid uit eerdere antwoorden")).toBeVisible();
-  await page.getByRole("button", { name: "Bekijk mijn toeslagenadvies" }).click();
+  await page.getByRole("button", { name: "Bekijk mijn toeslagenindicatie" }).click();
   await expect(page.getByText("Nog te bevestigen")).toBeVisible();
 });
 

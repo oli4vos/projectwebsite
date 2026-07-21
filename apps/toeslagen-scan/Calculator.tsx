@@ -802,6 +802,29 @@ export default function ToeslagenScanCalculator() {
         <p className="mt-3 text-[14px] leading-[1.65] text-white/80">
           {submittedView.result.summary}
         </p>
+        <dl className="mt-4 grid gap-3 sm:grid-cols-2">
+          <div className="rounded-lg bg-white/10 p-3">
+            <dt className="text-[12px] font-medium uppercase tracking-[0.05em] text-white/70">
+              Totaal per maand
+            </dt>
+            <dd className="mt-1 font-mono text-2xl tabular text-white">
+              {submittedView.result.totalMonthlyAmountLabel}
+            </dd>
+          </div>
+          <div className="rounded-lg bg-white/10 p-3">
+            <dt className="text-[12px] font-medium uppercase tracking-[0.05em] text-white/70">
+              Totaal per jaar
+            </dt>
+            <dd className="mt-1 font-mono text-2xl tabular text-white">
+              {submittedView.result.totalAnnualAmountLabel}
+            </dd>
+          </div>
+        </dl>
+        <p className="mt-3 text-[13px] leading-[1.6] text-white/75">
+          Meegeteld: {submittedView.result.totalIncludedAllowanceTitles.length > 0
+            ? submittedView.result.totalIncludedAllowanceTitles.join(", ")
+            : "geen concreet berekende toeslagen"}.
+        </p>
         {hasDirtyChanges ? (
           <p
             role="status"

@@ -92,6 +92,8 @@ export type AllowanceResultCardView = {
   statusLabel: string;
   summary: string;
   hardExclusion: boolean;
+  monthlyAmount?: number;
+  annualAmount?: number;
   monthlyAmountLabel?: string;
   annualAmountLabel?: string;
   reliabilityLabel: AllowanceAdvisorReliabilityLabel;
@@ -122,6 +124,11 @@ export type AllowanceScanView = {
   errors: AllowanceScanErrors;
   result: null | {
     summary: string;
+    totalMonthlyAmount: number;
+    totalAnnualAmount: number;
+    totalMonthlyAmountLabel: string;
+    totalAnnualAmountLabel: string;
+    totalIncludedAllowanceTitles: readonly string[];
     ruleYear: number;
     datasetId: string;
     datasetVersion: string;
