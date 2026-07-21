@@ -766,14 +766,24 @@ function buildReport(input: {
     const guidance = ALLOWANCE_ADVISOR_APPLICATION_GUIDANCE.find((item) =>
       item.allowanceKind === result.allowanceKind,
     );
-    const reasons = result.reasonCodes.map((code) =>
-      reportLine("Reden", getReasonCodeCopy(code), [code]),
+    const reasons = card.reasonMessages.map((message) =>
+      reportLine("Reden", message, result.reasonCodes),
     );
-    const missingInputs = result.missingFields.map((fieldId) =>
-      reportLine("Ontbrekend gegeven", fieldLabel(fieldId), result.reasonCodes, fieldId, "missing"),
-    );
-    const warnings = result.uncertaintyCodes.map((code) =>
-      reportLine("Waarschuwing", getUncertaintyCopy(code), [code]),
+    const missingInputLabels = card.missingInputs.length > 0
+      ? card.missingInputs.map((item) => item.label)
+      : card.missingFieldMessages;
+    const missingInputs = missingInputLabels.map((label, index) => {
+      const sourceFieldId = result.missingFields[index];
+      return reportLine(
+        "Ontbrekend gegeven",
+        label,
+        result.reasonCodes,
+        sourceFieldId && fieldLabel(sourceFieldId) === label ? sourceFieldId : undefined,
+        "missing",
+      );
+    });
+    const warnings = card.uncertaintyMessages.map((message) =>
+      reportLine("Waarschuwing", message, result.uncertaintyCodes),
     );
     const resultFieldIds = new Set(result.assessment.definition.inputDefinitions.map((field) => field.fieldId));
     const resultAnsweredInputs = answeredInputs.filter((line) =>

@@ -152,6 +152,27 @@ describe("allowance scan adapters", () => {
     expect(result.yearlyAmount).toBeUndefined();
   });
 
+  it("does not calculate child budget for children who do not live with the applicant", () => {
+    const mapped = mapScanInputToChildBudgetInput({
+      ...baseInput,
+      children: [
+        {
+          id: "child-1",
+          age: 8,
+          receivesChildBenefitOrMeetsMaintenanceCondition: true,
+          livesWithApplicant: false,
+        },
+      ],
+    });
+
+    expect(mapped.ok).toBe(false);
+    if (mapped.ok) return;
+    expect(mapped.issues.map((issue) => issue.code)).toContain("child-budget-child-residence-excluded");
+    const result = adapterIssuesToScanResult("child-budget", mapped.issues);
+    expect(result.monthlyAmount).toBeUndefined();
+    expect(amountContributesToTotal(result)).toBe(false);
+  });
+
   it("distinguishes true zero outcomes from blockers in totals", () => {
     const zero = mapChildBudgetResultToScanResult(calculateChildBudget2026({
       calculationYear: 2026,

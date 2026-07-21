@@ -134,6 +134,9 @@ export function mapScanInputToChildBudgetInput(
   const income = hasPartner(input) ? input.partner?.assessmentIncome : input.applicant.assessmentIncome;
   if (income === undefined) issues.push(hasPartner(input) ? missing("joint-income") : missing("income"));
   if (input.children.length === 0) issues.push(blocker("child-budget-no-children", "children"));
+  if (input.children.some((child) => child.livesWithApplicant === false)) {
+    issues.push(blocker("child-budget-child-residence-excluded", "children.livesWithApplicant"));
+  }
   if (input.children.some((child) => child.coParenting)) {
     issues.push(blocker("unsupported-co-parenting", "children.coParenting"));
   }

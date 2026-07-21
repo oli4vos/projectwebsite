@@ -356,9 +356,21 @@ describe("toeslagen-scan adapter", () => {
     });
     const healthcareCard = view.result?.cards.find((card) => card.kind === "healthcare");
     const healthcareReport = view.result?.report.results.find((item) => item.allowanceKind === "healthcare");
+    const rentCard = view.result?.cards.find((card) => card.kind === "rent");
+    const rentReport = view.result?.report.results.find((item) => item.allowanceKind === "rent");
+    const childBudgetCard = view.result?.cards.find((card) => card.kind === "child-budget");
+    const childBudgetReport = view.result?.report.results.find((item) => item.allowanceKind === "child-budget");
 
     expect(healthcareReport?.monthlyAmountLabel).toBe(healthcareCard?.monthlyAmountLabel);
     expect(healthcareReport?.yearlyAmountLabel).toBe(healthcareCard?.annualAmountLabel);
+    expect(rentReport?.monthlyAmountLabel).toBe(rentCard?.monthlyAmountLabel);
+    expect(rentReport?.yearlyAmountLabel).toBe(rentCard?.annualAmountLabel);
+    expect(childBudgetReport?.monthlyAmountLabel).toBe(childBudgetCard?.monthlyAmountLabel);
+    expect(childBudgetReport?.yearlyAmountLabel).toBe(childBudgetCard?.annualAmountLabel);
     expect(healthcareReport?.calculationYear).toBe(view.result?.ruleYear);
+    expect(rentReport?.reasons.map((line) => line.value)).toEqual(rentCard?.reasonMessages);
+    expect(childBudgetReport?.reasons.map((line) => line.value)).toEqual(childBudgetCard?.reasonMessages);
+    expect(JSON.stringify(rentReport?.reasons)).not.toContain("huurtoeslag-inkomenstabellen");
+    expect(JSON.stringify(childBudgetReport?.reasons)).not.toContain("kindgebonden budgetbedragen");
   });
 });
