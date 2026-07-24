@@ -12,6 +12,7 @@ import {
 } from "@/lib/allowances/official-calculations";
 import {
   calculateChildBudgetScanResult,
+  calculateChildcareBenefitScanResult,
   calculateRentBenefitScanResult,
 } from "@/lib/allowances/scan-adapters";
 import type {
@@ -51,6 +52,7 @@ import type {
   AllowanceScanField,
   AllowanceScanFormState,
   AllowanceScanView,
+  ChildcareCareTypeChoice,
   ChildResidenceChoice,
   QualifyingActivityChoice,
   YesNoUnknown,
@@ -92,7 +94,9 @@ export const defaultValues: AllowanceScanFormState = {
   usesChildcare: "unknown",
   registeredChildcare: "unknown",
   paysOwnContribution: "unknown",
+  childcareCareType: "unknown",
   childcareHoursPerMonth: "",
+  childcareHourlyRate: "",
   applicantActivity: "unknown",
   partnerActivity: "unknown",
   complexChildcare: "unknown",
@@ -120,7 +124,9 @@ export const exampleValues: AllowanceScanFormState = {
   usesChildcare: "yes",
   registeredChildcare: "yes",
   paysOwnContribution: "yes",
+  childcareCareType: "after-school",
   childcareHoursPerMonth: "80",
+  childcareHourlyRate: "8,50",
   applicantActivity: "work",
 };
 
@@ -156,6 +162,10 @@ function activityToBoolean(value: QualifyingActivityChoice): UnknownableBoolean 
   if (value === "work" || value === "study" || value === "trajectory") return true;
   if (value === "none") return false;
   return "unknown";
+}
+
+function childcareCareTypeToPublic(value: ChildcareCareTypeChoice) {
+  return value === "unknown" ? undefined : value;
 }
 
 function parseChildAges(value: string) {
@@ -212,6 +222,7 @@ export function validateAllowanceScanForm(values: AllowanceScanFormState): Allow
       | "coResidentAssets"
       | "householdIncome"
       | "householdAssets"
+      | "childcareHourlyRate"
       | "childcareHoursPerMonth"
     >,
   ) {
@@ -314,12 +325,21 @@ export function validateAllowanceScanForm(values: AllowanceScanFormState): Allow
 
   if (values.hasChildren === "yes" && values.usesChildcare === "yes") {
     validateMoneyField("childcareHoursPerMonth");
+    validateMoneyField("childcareHourlyRate");
     const hours = parseMoney(values.childcareHoursPerMonth);
+    const hourlyRate = parseMoney(values.childcareHourlyRate);
     if (values.childcareHoursPerMonth.trim().length > 0) {
       if (hours === undefined || !Number.isFinite(hours)) {
         errors.childcareHoursPerMonth = "Gebruik een geldig aantal opvanguren.";
       } else if (hours < 0) {
         errors.childcareHoursPerMonth = "Gebruik 0 of meer opvanguren.";
+      }
+    }
+    if (values.childcareHourlyRate.trim().length > 0) {
+      if (hourlyRate === undefined || !Number.isFinite(hourlyRate)) {
+        errors.childcareHourlyRate = "Gebruik een geldig uurtarief.";
+      } else if (hourlyRate < 0) {
+        errors.childcareHourlyRate = "Gebruik 0 of een hoger uurtarief.";
       }
     }
   }
@@ -434,7 +454,18 @@ export function mapFormToPublicAllowanceScanInput(
       : undefined,
     childcare: {
       usesChildcare: yesNoToBoolean(values.usesChildcare),
-      contracts: [],
+      contracts: hasChildren && values.usesChildcare === "yes" && childAges.length > 0
+        ? [
+            {
+              childId: "child-1",
+              careType: childcareCareTypeToPublic(values.childcareCareType),
+              hoursPerMonth: parseMoney(values.childcareHoursPerMonth),
+              hourlyRate: parseMoney(values.childcareHourlyRate),
+              isLrkRegistered: yesNoToBoolean(values.registeredChildcare),
+              paysOwnContribution: yesNoToBoolean(values.paysOwnContribution),
+            },
+          ]
+        : [],
       applicantHasQualifyingActivity: yesNoToBoolean(
         values.applicantActivity === "none" ? "no" : values.applicantActivity === "unknown" ? "unknown" : "yes",
       ),
@@ -718,6 +749,9 @@ function formatReportValue(value: unknown): string {
   if (value === "study") return "Studie";
   if (value === "trajectory") return "Traject";
   if (value === "none") return "Geen";
+  if (value === "daycare") return "Dagopvang";
+  if (value === "after-school") return "Buitenschoolse opvang";
+  if (value === "childminder") return "Gastouderopvang";
   if (value === undefined || value === null || value === "") return "Ontbreekt";
   return String(value);
 }
@@ -916,6 +950,13 @@ function componentRows(result: PublicAllowanceBenefitResult) {
     singleParentSupplement: "Alleenstaande-ouderdeel",
     maximumYearlyAmount: "Maximum jaarbedrag",
     incomeReduction: "Inkomensafbouw",
+    subsidisableMonthlyCosts: "Subsidiabele opvangkosten",
+    firstChildMonthlyCosts: "Kosten eerste kind",
+    nextChildrenMonthlyCosts: "Kosten volgende kinderen",
+    firstChildReimbursementPercentage: "Vergoedingspercentage eerste kind",
+    nextChildReimbursementPercentage: "Vergoedingspercentage volgende kinderen",
+    cappedContractCount: "Aantal begrensde opvangregels",
+    firstChildId: "Eerste kind volgens opvangregel",
   };
   return Object.entries(result.components).map(([key, value]) => ({
     label: labels[key] ?? key,
@@ -973,19 +1014,21 @@ function applyCentralScanResultToCard(
   };
 }
 
-function integrateRentAndChildBudgetCards(
+function integrateCentralAllowanceCards(
   cards: readonly AllowanceResultCardView[],
   values: AllowanceScanFormState,
 ) {
   const publicInput = mapFormToPublicAllowanceScanInput(values);
   const rentResult = calculateRentBenefitScanResult(publicInput);
   const childBudgetResult = calculateChildBudgetScanResult(publicInput);
+  const childcareResult = calculateChildcareBenefitScanResult(publicInput);
 
   return cards.map((card) => {
     if (card.kind === "rent") return applyCentralScanResultToCard(card, rentResult);
     if (card.kind === "child-budget") {
       return applyCentralScanResultToCard(card, childBudgetResult);
     }
+    if (card.kind === "childcare") return applyCentralScanResultToCard(card, childcareResult);
     return card;
   });
 }
@@ -1012,7 +1055,7 @@ export function createAllowanceScanView(
       ALLOWANCE_SIGNAL_ORDER.indexOf(a.allowanceKind) -
       ALLOWANCE_SIGNAL_ORDER.indexOf(b.allowanceKind),
   );
-  const cards = integrateRentAndChildBudgetCards(ordered.map(cardForResult), values);
+  const cards = integrateCentralAllowanceCards(ordered.map(cardForResult), values);
   const summary = createSummaryFromCards(cards);
   const total = createTotalFromCards(cards);
 

@@ -5,10 +5,13 @@ import { calculateRentBenefit2026 } from "@/lib/allowances/rent-benefit";
 import {
   adapterIssuesToScanResult,
   mapChildBudgetResultToScanResult,
+  mapChildcareBenefitResultToScanResult,
   mapRentBenefitResultToScanResult,
   mapScanInputToChildBudgetInput,
+  mapScanInputToChildcareBenefitInput,
   mapScanInputToRentBenefitInput,
 } from "@/lib/allowances/scan-adapters";
+import { calculateChildcareBenefit2026 } from "@/lib/allowances/childcare-benefit";
 import { amountContributesToTotal, type PublicAllowanceScanInput } from "@/lib/allowances/scan-types";
 
 const baseInput: PublicAllowanceScanInput = {
@@ -47,8 +50,18 @@ const baseInput: PublicAllowanceScanInput = {
     specialSituations: [],
   },
   childcare: {
-    usesChildcare: false,
-    contracts: [],
+    usesChildcare: true,
+    contracts: [
+      {
+        childId: "child-1",
+        careType: "daycare",
+        hoursPerMonth: 122,
+        hourlyRate: 10.5,
+        isLrkRegistered: true,
+        paysOwnContribution: true,
+      },
+    ],
+    applicantHasQualifyingActivity: true,
     partnerHasQualifyingActivity: "not-applicable",
   },
   calculationPeriod: {
@@ -191,5 +204,55 @@ describe("allowance scan adapters", () => {
     expect(amountContributesToTotal(zero)).toBe(true);
     expect(unsupported.monthlyAmount).toBeUndefined();
     expect(amountContributesToTotal(unsupported)).toBe(false);
+  });
+
+  it("maps complete childcare input and official example amounts", () => {
+    const mapped = mapScanInputToChildcareBenefitInput({
+      ...baseInput,
+      applicant: { ...baseInput.applicant, assessmentIncome: 60_000 },
+      household: { ...baseInput.household, householdIncome: 60_000 },
+    });
+
+    expect(mapped.ok).toBe(true);
+    if (!mapped.ok) return;
+    expect(mapped.value.contracts[0]).toMatchObject({
+      careType: "daycare",
+      hoursPerMonth: 122,
+      hourlyRate: 10.5,
+    });
+
+    const result = mapChildcareBenefitResultToScanResult(calculateChildcareBenefit2026(mapped.value));
+    expect(result.status).toBe("calculated");
+    expect(result.monthlyAmount).toBe(1_202);
+    expect(result.yearlyAmount).toBe(14_424);
+    expect(result.reasonCodes).toContain("childcare-calculated");
+    expect(amountContributesToTotal(result)).toBe(true);
+  });
+
+  it("keeps unsupported childcare situations amountless", () => {
+    const mapped = mapScanInputToChildcareBenefitInput({
+      ...baseInput,
+      childcare: {
+        ...baseInput.childcare,
+        contracts: [
+          {
+            childId: "child-1",
+            careType: "daycare",
+            hoursPerMonth: undefined,
+            hourlyRate: 10.5,
+            isLrkRegistered: true,
+            paysOwnContribution: true,
+          },
+        ],
+      },
+    });
+
+    expect(mapped.ok).toBe(false);
+    if (mapped.ok) return;
+    const result = adapterIssuesToScanResult("childcare", mapped.issues);
+    expect(result.status).toBe("incomplete-input");
+    expect(result.monthlyAmount).toBeUndefined();
+    expect(result.reasonCodes).toContain("missing-childcare-hours");
+    expect(amountContributesToTotal(result)).toBe(false);
   });
 });

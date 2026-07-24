@@ -4,6 +4,12 @@ import type {
 } from "@/lib/allowances/child-budget";
 import { calculateChildBudget2026 } from "@/lib/allowances/child-budget";
 import type {
+  ChildcareBenefitInput,
+  ChildcareBenefitResult,
+} from "@/lib/allowances/childcare-benefit";
+import { calculateChildcareBenefit2026 } from "@/lib/allowances/childcare-benefit";
+import type { ChildcareCareType } from "@/lib/allowances/childcare-helpers";
+import type {
   OfficialAllowanceCalculationResult,
 } from "@/lib/allowances/official-calculations";
 import type {
@@ -164,6 +170,103 @@ export function mapScanInputToChildBudgetInput(
   };
 }
 
+function childcareCareType(careType: "daycare" | "after-school" | "childminder" | undefined): ChildcareCareType | undefined {
+  if (careType === "daycare") return "daycare";
+  if (careType === "after-school") return "out-of-school-care";
+  if (careType === "childminder") return "childminder-care";
+  return undefined;
+}
+
+export function mapScanInputToChildcareBenefitInput(
+  input: PublicAllowanceScanInput,
+): AllowanceAdapterResult<ChildcareBenefitInput> {
+  const issues: AllowanceAdapterIssue[] = [];
+  const usesChildcare = input.childcare.usesChildcare;
+  const hasPartnerValue = hasPartner(input);
+  const income = hasPartnerValue ? input.partner?.assessmentIncome : input.applicant.assessmentIncome;
+
+  if (!isFullYear(input)) issues.push(blocker("partial-year-not-supported", "calculationPeriod"));
+  if (input.household.hasPartner === undefined) issues.push(missing("partner-status"));
+  if (income === undefined) issues.push(hasPartnerValue ? missing("joint-income") : missing("income"));
+  if (input.children.length === 0) issues.push(blocker("childcare-no-children", "children"));
+  if (usesChildcare === undefined) issues.push(missing("childcare-care-use"));
+  if (usesChildcare === false) issues.push(blocker("childcare-no-care", "childcare.usesChildcare"));
+  if (input.children.some((child) => child.livesWithApplicant === false)) {
+    issues.push(blocker("childcare-child-residence-excluded", "children.livesWithApplicant"));
+  }
+  if (input.children.some((child) => child.coParenting || child.compositeFamily)) {
+    issues.push(blocker("manual-review-required", "children"));
+  }
+  if (input.childcare.applicantHasQualifyingActivity === undefined) {
+    issues.push(missing("childcare-applicant-activity"));
+  }
+  if (input.childcare.applicantHasQualifyingActivity === false) {
+    issues.push(blocker("childcare-no-qualifying-activity", "childcare.applicantHasQualifyingActivity"));
+  }
+  if (hasPartnerValue && input.childcare.partnerHasQualifyingActivity === undefined) {
+    issues.push(missing("childcare-partner-activity"));
+  }
+  if (hasPartnerValue && input.childcare.partnerHasQualifyingActivity === false) {
+    issues.push(blocker("childcare-partner-no-qualifying-activity", "childcare.partnerHasQualifyingActivity"));
+  }
+  if (input.childcare.contracts.length === 0 && usesChildcare === true) {
+    issues.push(missing("childcare-contracts"));
+  }
+
+  const mappedContracts = input.childcare.contracts.map((contract, index) => {
+    const mappedCareType = childcareCareType(contract.careType);
+    if (!mappedCareType) issues.push(missing(`childcare-contract-${index + 1}-care-type`));
+    if (contract.hoursPerMonth === undefined) issues.push(missing("childcare-hours"));
+    if (contract.hourlyRate === undefined) issues.push(missing("childcare-hourly-rate"));
+    if (contract.isLrkRegistered === undefined) {
+      issues.push(missing("childcare-care-registration"));
+    } else if (!contract.isLrkRegistered) {
+      issues.push(blocker("childcare-care-not-registered", "childcare.contracts.isLrkRegistered"));
+    }
+    if (contract.paysOwnContribution === undefined) {
+      issues.push(missing("childcare-own-contribution"));
+    } else if (!contract.paysOwnContribution) {
+      issues.push(blocker("childcare-no-own-contribution", "childcare.contracts.paysOwnContribution"));
+    }
+    return {
+      childId: contract.childId,
+      careType: mappedCareType,
+      hoursPerMonth: contract.hoursPerMonth,
+      hourlyRate: contract.hourlyRate,
+    };
+  });
+
+  if (issues.length > 0) return { ok: false, issues };
+
+  return {
+    ok: true,
+    value: {
+      calculationYear: input.calculationYear,
+      hasPartner: hasPartnerValue,
+      assessmentIncome: income as number,
+      hasChildren: input.children.length > 0,
+      usesChildcare: usesChildcare as boolean,
+      childrenLivingWithApplicant: input.children.every((child) => child.livesWithApplicant),
+      isLrkRegistered: input.childcare.contracts.every((contract) => contract.isLrkRegistered === true),
+      paysOwnContribution: input.childcare.contracts.every((contract) => contract.paysOwnContribution === true),
+      applicantHasQualifyingActivity: input.childcare.applicantHasQualifyingActivity as boolean,
+      partnerHasQualifyingActivity: hasPartnerValue
+        ? input.childcare.partnerHasQualifyingActivity
+        : "not-applicable",
+      contracts: mappedContracts.map((contract) => ({
+        childId: contract.childId,
+        careType: contract.careType as ChildcareCareType,
+        hoursPerMonth: contract.hoursPerMonth as number,
+        hourlyRate: contract.hourlyRate as number,
+      })),
+      specialSituations: [
+        ...(input.unsupportedSituations.includes("partial-year") ? ["partial-year" as const] : []),
+        ...(input.unsupportedSituations.includes("manual-review-required") ? ["manual-review-required" as const] : []),
+      ],
+    },
+  };
+}
+
 export function mapRentBenefitResultToScanResult(
   result: RentBenefitResult,
 ): PublicAllowanceBenefitResult {
@@ -240,6 +343,45 @@ export function mapChildBudgetResultToScanResult(
   };
 }
 
+export function mapChildcareBenefitResultToScanResult(
+  result: ChildcareBenefitResult,
+): PublicAllowanceBenefitResult {
+  const isNoEntitlement = result.eligibilityStatus === "ineligible";
+  return {
+    allowanceType: "childcare",
+    status: result.eligibilityStatus === "calculated"
+      ? "calculated"
+      : isNoEntitlement
+        ? "no-entitlement"
+        : result.eligibilityStatus === "unsupported"
+          ? "unsupported"
+          : "incomplete-input",
+    monthlyAmount: result.monthlyAmount,
+    yearlyAmount: result.yearlyAmount,
+    reliability: result.reliability,
+    reasonCodes: result.reasonCodes,
+    warnings: result.warnings,
+    components: {
+      subsidisableMonthlyCosts: result.components.subsidisableMonthlyCosts,
+      firstChildMonthlyCosts: result.components.firstChildMonthlyCosts,
+      nextChildrenMonthlyCosts: result.components.nextChildrenMonthlyCosts,
+      firstChildReimbursementPercentage: result.components.firstChildReimbursementPercentage,
+      nextChildReimbursementPercentage: result.components.nextChildReimbursementPercentage,
+      cappedContractCount: result.components.cappedContractCount,
+      ...(result.firstChildId !== undefined ? { firstChildId: result.firstChildId } : {}),
+    },
+    sourceDatasetId: result.sourceDatasetId,
+    calculationYear: result.calculationYear,
+    assumptions: [
+      "Standaardscenario 2026.",
+      "Opvanguren en uurtarief zijn als maandgemiddelde per kind en opvangsoort opgegeven.",
+    ],
+    nextStep: result.eligibilityStatus === "calculated"
+      ? "Controleer de indicatie in Mijn Toeslagen voordat je aanvraagt of wijzigt."
+      : "Controleer de hoofdreden en gebruik bij twijfel de officiele proefberekening.",
+  };
+}
+
 export function mapExistingHealthBenefitResultToScanResult(
   result: OfficialAllowanceCalculationResult,
 ): PublicAllowanceBenefitResult {
@@ -290,4 +432,13 @@ export function calculateChildBudgetScanResult(
   return mapped.ok
     ? mapChildBudgetResultToScanResult(calculateChildBudget2026(mapped.value))
     : adapterIssuesToScanResult("child-budget", mapped.issues);
+}
+
+export function calculateChildcareBenefitScanResult(
+  input: PublicAllowanceScanInput,
+): PublicAllowanceBenefitResult {
+  const mapped = mapScanInputToChildcareBenefitInput(input);
+  return mapped.ok
+    ? mapChildcareBenefitResultToScanResult(calculateChildcareBenefit2026(mapped.value))
+    : adapterIssuesToScanResult("childcare", mapped.issues);
 }

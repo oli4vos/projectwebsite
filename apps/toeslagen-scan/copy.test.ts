@@ -97,6 +97,21 @@ const activeEngineReasonCodes = [
   "child-budget-zero-after-income-reduction",
   "child-budget-income-reduction-applied",
   "child-budget-domestic-residence-factor-applied",
+  "missing-childcare-contracts",
+  "missing-childcare-care-use",
+  "missing-childcare-contract-1-care-type",
+  "missing-childcare-hours",
+  "missing-childcare-hourly-rate",
+  "missing-childcare-care-registration",
+  "missing-childcare-own-contribution",
+  "missing-childcare-applicant-activity",
+  "missing-childcare-partner-activity",
+  "childcare-calculated",
+  "childcare-zero-after-reimbursement",
+  "childcare-first-child-rule-applied",
+  "childcare-hours-or-rate-capped",
+  "childcare-multiple-contracts-calculated",
+  "missing-childcare-percentage-band",
 ];
 
 const activeMissingFields: AllowanceMissingField[] = [

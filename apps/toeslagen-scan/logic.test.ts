@@ -8,6 +8,7 @@ import {
   defaultValues,
   exampleValues,
   mapFormToAllowanceScanInput,
+  mapFormToPublicAllowanceScanInput,
   validateAllowanceScanForm,
 } from "./logic";
 
@@ -46,6 +47,21 @@ describe("toeslagen-scan adapter", () => {
     });
   });
 
+  it("maps childcare contract fields to the public central calculation input", () => {
+    const input = mapFormToPublicAllowanceScanInput(exampleValues);
+
+    expect(input.childcare.contracts).toEqual([
+      {
+        childId: "child-1",
+        careType: "after-school",
+        hoursPerMonth: 80,
+        hourlyRate: 8.5,
+        isLrkRegistered: true,
+        paysOwnContribution: true,
+      },
+    ]);
+  });
+
   it("ignores hidden stale rent, partner and childcare fields", () => {
     const input = mapFormToAllowanceScanInput({
       ...exampleValues,
@@ -61,7 +77,9 @@ describe("toeslagen-scan adapter", () => {
       usesChildcare: "yes",
       registeredChildcare: "yes",
       paysOwnContribution: "yes",
+      childcareCareType: "daycare",
       childcareHoursPerMonth: "80",
+      childcareHourlyRate: "9",
     });
 
     expect(input.jointAssessmentIncome).toBeUndefined();
@@ -88,6 +106,7 @@ describe("toeslagen-scan adapter", () => {
       hasChildren: "no" as const,
       usesChildcare: "yes" as const,
       childcareHoursPerMonth: "veel",
+      childcareHourlyRate: "ook verborgen",
     };
     const errors = validateAllowanceScanForm(values);
     const input = mapFormToAllowanceScanInput(values);
@@ -98,6 +117,7 @@ describe("toeslagen-scan adapter", () => {
     expect(errors.householdIncome).toBeUndefined();
     expect(errors.householdAssets).toBeUndefined();
     expect(errors.childcareHoursPerMonth).toBeUndefined();
+    expect(errors.childcareHourlyRate).toBeUndefined();
     expect(input.jointAssessmentIncome).toBeUndefined();
     expect(input.rent?.householdIncome).toBeUndefined();
     expect(input.childcare?.hoursPerMonth).toBe(0);
@@ -151,11 +171,11 @@ describe("toeslagen-scan adapter", () => {
     expect(view.result?.cards.find((card) => card.kind === "healthcare")?.monthlyAmountLabel).toBeDefined();
     expect(view.result?.cards.find((card) => card.kind === "rent")?.monthlyAmountLabel).toBe("€ 342");
     expect(view.result?.cards.find((card) => card.kind === "child-budget")?.monthlyAmountLabel).toBe("€ 497");
-    expect(view.result?.cards.find((card) => card.kind === "childcare")?.monthlyAmountLabel).toBeUndefined();
+    expect(view.result?.cards.find((card) => card.kind === "childcare")?.monthlyAmountLabel).toBe("€ 652");
     expect(view.result?.report.generatedAt).toBe("2026-07-20T12:34:56.000Z");
   });
 
-  it("keeps manifest copy aligned with public healthcare, rent and child budget amount support", () => {
+  it("keeps manifest copy aligned with public amount support", () => {
     const manifest = JSON.parse(
       readFileSync(join(process.cwd(), "apps/toeslagen-scan/app.json"), "utf8"),
     ) as { description: string; reasonHint: string };
@@ -165,9 +185,10 @@ describe("toeslagen-scan adapter", () => {
     expect(publicCopy).toContain("2026");
     expect(publicCopy).toContain("huurtoeslag");
     expect(publicCopy).toContain("kindgebonden budget");
-    expect(publicCopy).toContain("kinderopvangtoeslag nog zonder totaalbedrag");
+    expect(publicCopy).toContain("kinderopvangtoeslag");
+    expect(publicCopy).toContain("bedragindicatie");
     expect(publicCopy).not.toContain("zonder bedragen");
-    expect(publicCopy).not.toContain("alle vier toeslagen");
+    expect(publicCopy).not.toContain("zonder totaalbedrag");
   });
 
   it("matches the central engine entrypoint output metadata", () => {
@@ -288,6 +309,7 @@ describe("toeslagen-scan adapter", () => {
       hasChildren: "no",
       usesChildcare: "yes",
       childcareHoursPerMonth: "80",
+      childcareHourlyRate: "9",
     }, {
       generatedAt: new Date("2026-07-20T08:00:00.000Z"),
     });
@@ -360,6 +382,8 @@ describe("toeslagen-scan adapter", () => {
     const rentReport = view.result?.report.results.find((item) => item.allowanceKind === "rent");
     const childBudgetCard = view.result?.cards.find((card) => card.kind === "child-budget");
     const childBudgetReport = view.result?.report.results.find((item) => item.allowanceKind === "child-budget");
+    const childcareCard = view.result?.cards.find((card) => card.kind === "childcare");
+    const childcareReport = view.result?.report.results.find((item) => item.allowanceKind === "childcare");
 
     expect(healthcareReport?.monthlyAmountLabel).toBe(healthcareCard?.monthlyAmountLabel);
     expect(healthcareReport?.yearlyAmountLabel).toBe(healthcareCard?.annualAmountLabel);
@@ -367,13 +391,15 @@ describe("toeslagen-scan adapter", () => {
     expect(rentReport?.yearlyAmountLabel).toBe(rentCard?.annualAmountLabel);
     expect(childBudgetReport?.monthlyAmountLabel).toBe(childBudgetCard?.monthlyAmountLabel);
     expect(childBudgetReport?.yearlyAmountLabel).toBe(childBudgetCard?.annualAmountLabel);
+    expect(childcareReport?.monthlyAmountLabel).toBe(childcareCard?.monthlyAmountLabel);
+    expect(childcareReport?.yearlyAmountLabel).toBe(childcareCard?.annualAmountLabel);
     expect(view.result?.totalMonthlyAmount).toBe(
       view.result?.cards.reduce((sum, card) => sum + (card.monthlyAmount ?? 0), 0),
     );
     expect(view.result?.totalAnnualAmount).toBe(
       view.result?.cards.reduce((sum, card) => sum + (card.annualAmount ?? 0), 0),
     );
-    expect(view.result?.totalIncludedAllowanceTitles).not.toContain("Kinderopvangtoeslag");
+    expect(view.result?.totalIncludedAllowanceTitles).toContain("Kinderopvangtoeslag");
     expect(healthcareReport?.calculationYear).toBe(view.result?.ruleYear);
     expect(rentReport?.reasons.map((line) => line.value)).toEqual(rentCard?.reasonMessages);
     expect(childBudgetReport?.reasons.map((line) => line.value)).toEqual(childBudgetCard?.reasonMessages);

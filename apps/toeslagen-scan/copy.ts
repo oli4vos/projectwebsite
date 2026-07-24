@@ -118,6 +118,15 @@ export const reasonCodeCopy: Record<string, string> = {
   "childcare-missing-applicant-activity": "Je kwalificerende activiteit ontbreekt nog.",
   "childcare-missing-partner-activity": "De activiteit van je toeslagpartner ontbreekt nog.",
   "childcare-missing-hours": "Het aantal opvanguren per maand ontbreekt nog.",
+  "missing-childcare-contracts": "Er ontbreekt nog een opvangregel met kind, opvangsoort, uren en uurtarief.",
+  "missing-childcare-care-use": "Het is nog onbekend of je betaalde kinderopvang gebruikt.",
+  "missing-childcare-contract-1-care-type": "De soort kinderopvang ontbreekt nog.",
+  "missing-childcare-hours": "Het aantal opvanguren per maand ontbreekt nog.",
+  "missing-childcare-hourly-rate": "Het betaalde uurtarief ontbreekt nog.",
+  "missing-childcare-care-registration": "Het is nog onbekend of de opvang geregistreerd is.",
+  "missing-childcare-own-contribution": "Het is nog onbekend of je zelf een deel van de opvang betaalt.",
+  "missing-childcare-applicant-activity": "Je kwalificerende activiteit ontbreekt nog.",
+  "missing-childcare-partner-activity": "De activiteit van je toeslagpartner ontbreekt nog.",
   "childcare-no-children": "Zonder kinderen is kinderopvangtoeslag normaal niet van toepassing.",
   "childcare-no-care": "Zonder betaalde kinderopvang is kinderopvangtoeslag normaal niet van toepassing.",
   "childcare-care-not-registered": "Kinderopvangtoeslag vraagt normaal om geregistreerde opvang.",
@@ -127,6 +136,12 @@ export const reasonCodeCopy: Record<string, string> = {
   "childcare-child-residence-excluded": "Als het kind niet bij jou woont, is kinderopvangtoeslag meestal niet van toepassing.",
   "childcare-situation-complex": "De opvang- of activiteitensituatie vraagt om officiële controle.",
   "childcare-possible": "De bekende harde voorwaarden voor kinderopvangtoeslag sluiten dit signaal niet uit.",
+  "childcare-calculated": "De kinderopvangtoeslag is berekend met de centrale 2026-engine.",
+  "childcare-zero-after-reimbursement": "De vergoeding komt op basis van de ingevulde kosten uit op nul.",
+  "childcare-first-child-rule-applied": "De officiële eerste-kindregel is toegepast op opvanguren en kosten.",
+  "childcare-hours-or-rate-capped": "Uren of uurtarief zijn begrensd op de officiële maxima.",
+  "childcare-multiple-contracts-calculated": "Meerdere opvangregels zijn centraal doorgerekend.",
+  "missing-childcare-percentage-band": "Er is geen passende vergoedingstabelregel gevonden voor het inkomen.",
 };
 
 export const missingFieldCopy: Record<AllowanceMissingField, string> = {

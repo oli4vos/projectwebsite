@@ -25,6 +25,11 @@ export type QualifyingActivityChoice =
   | "trajectory"
   | "none"
   | "unknown";
+export type ChildcareCareTypeChoice =
+  | "daycare"
+  | "after-school"
+  | "childminder"
+  | "unknown";
 
 export type AllowanceScanFormState = {
   age: string;
@@ -62,7 +67,9 @@ export type AllowanceScanFormState = {
   usesChildcare: YesNoUnknown;
   registeredChildcare: YesNoUnknown;
   paysOwnContribution: YesNoUnknown;
+  childcareCareType: ChildcareCareTypeChoice;
   childcareHoursPerMonth: string;
+  childcareHourlyRate: string;
   applicantActivity: QualifyingActivityChoice;
   partnerActivity: QualifyingActivityChoice;
   complexChildcare: YesNoUnknown;

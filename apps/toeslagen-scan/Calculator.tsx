@@ -741,12 +741,32 @@ export default function ToeslagenScanCalculator() {
                 value={formValues.paysOwnContribution}
                 onChange={(value) => updateField("paysOwnContribution", value)}
               />
+              <SelectField
+                id="childcareCareType"
+                label="Soort opvang"
+                value={formValues.childcareCareType}
+                options={[
+                  { value: "unknown", label: "Weet ik niet" },
+                  { value: "daycare", label: "Dagopvang" },
+                  { value: "after-school", label: "Buitenschoolse opvang" },
+                  { value: "childminder", label: "Gastouderopvang" },
+                ]}
+                onChange={(value) => updateField("childcareCareType", value)}
+              />
               <TextInput
                 id="childcareHoursPerMonth"
                 label="Opvanguren per maand"
                 value={formValues.childcareHoursPerMonth}
                 error={errors.childcareHoursPerMonth}
                 onChange={(value) => updateField("childcareHoursPerMonth", value)}
+              />
+              <TextInput
+                id="childcareHourlyRate"
+                label="Betaald uurtarief"
+                value={formValues.childcareHourlyRate}
+                error={errors.childcareHourlyRate}
+                hint="Gebruik het tarief van contract of factuur voor deze opvangsoort."
+                onChange={(value) => updateField("childcareHourlyRate", value)}
               />
               <SelectField
                 id="applicantActivity"

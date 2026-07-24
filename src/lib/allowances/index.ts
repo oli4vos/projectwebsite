@@ -17,15 +17,19 @@ export {
 export {
   adapterIssuesToScanResult,
   calculateChildBudgetScanResult,
+  calculateChildcareBenefitScanResult,
   calculateRentBenefitScanResult,
   mapChildBudgetResultToScanResult,
+  mapChildcareBenefitResultToScanResult,
   mapExistingHealthBenefitResultToScanResult,
   mapRentBenefitResultToScanResult,
   mapScanInputToChildBudgetInput,
+  mapScanInputToChildcareBenefitInput,
   mapScanInputToRentBenefitInput,
 } from "@/lib/allowances/scan-adapters";
 export { calculateRentBenefit2026 } from "@/lib/allowances/rent-benefit";
 export { calculateChildBudget2026 } from "@/lib/allowances/child-budget";
+export { calculateChildcareBenefit2026 } from "@/lib/allowances/childcare-benefit";
 export {
   capChildcareContract2026,
   lookupChildcarePercentageBand2026,
@@ -92,6 +96,14 @@ export type {
   ChildBudgetResult,
   ChildBudgetSpecialSituation,
 } from "@/lib/allowances/child-budget";
+export type {
+  ChildcareBenefitComponents,
+  ChildcareBenefitContractResult,
+  ChildcareBenefitEligibilityStatus,
+  ChildcareBenefitInput,
+  ChildcareBenefitResult,
+  ChildcareBenefitSpecialSituation,
+} from "@/lib/allowances/childcare-benefit";
 export type {
   AllowanceAdapterIssue,
   AllowanceAdapterResult,
