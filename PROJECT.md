@@ -72,6 +72,8 @@ Voor toeslagen blijft `evaluateAllowanceSignals` de centrale hard-check- en elig
 
 Voor hypotheektools start deze adapterlaag als voorbereidende centrale integratie: bestaande `MortgageMaxMortgageInput`- en `MortgageMaxMortgageResult`-data kan naar Regulations-context worden vertaald voor definitions, question flow, unknowns, recommendations, estimates en reportingbeschikbaarheid, terwijl hypotheekformules en publieke uitkomsten in de bestaande centrale mortgage-domeinlaag blijven.
 
+Slimme toolkoppelingen blijven client-side en allowlist-gebaseerd. De DUO-maandbedragreturnflow bewaart hypotheekdrafts tijdelijk in `sessionStorage`, opent de DUO-maandbedragtool en zet alleen een bevestigd wettelijk DUO-maandbedrag terug in de bron-hypotheektool; financiële gegevens komen niet in de URL.
+
 ## 4. Domeinen
 
 De Project Site ondersteunt nu en in de toekomst meerdere financiële domeinen. Elk domein behoudt zijn eigen centrale rekenlaag, brondata en testbare aannames, terwijl gedeelde primitives voor evaluatie, uitleg en rapportage herbruikbaar blijven.

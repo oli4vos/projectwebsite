@@ -27,6 +27,20 @@ export function useSubmittedCalculation<T>(initialValues: T) {
     }
   }, [formValues]);
 
+  const submitValues = useCallback((nextValues: T, message?: string) => {
+    setFormValues(nextValues);
+    setSubmittedValues(nextValues);
+    setSubmitContextMessage(message ?? null);
+    if (typeof window !== "undefined") {
+      window.requestAnimationFrame(() => {
+        document.getElementById("tool-result-summary")?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      });
+    }
+  }, []);
+
   const setValues = useCallback((nextValues: T, message?: string) => {
     setFormValues(nextValues);
     if (message) {
@@ -45,6 +59,7 @@ export function useSubmittedCalculation<T>(initialValues: T) {
     setFormValues,
     submittedValues,
     submit,
+    submitValues,
     hasDirtyChanges,
     submitContextMessage,
     setSubmitContextMessage,

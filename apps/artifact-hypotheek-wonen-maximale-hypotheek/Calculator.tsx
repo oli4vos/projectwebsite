@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DisclosureSection } from "@/components/DisclosureSection";
 import { FieldError } from "@/components/forms/FieldError";
 import { MobileFieldFlowControls } from "@/components/MobileFieldFlowControls";
@@ -14,6 +14,13 @@ import { useMobileFieldFlow } from "@/hooks/useMobileFieldFlow";
 import { useSubmittedCalculation } from "@/hooks/useSubmittedCalculation";
 import { getToolNextSteps } from "@/lib/tool-journeys";
 import {
+  consumeDuoMortgageTransfer,
+  createDuoMortgageTransfer,
+  getDuoMortgageTransferIdFromUrl,
+  getDuoMortgageTransferUrl,
+  readDuoMortgageTransfer,
+} from "@/lib/duo-mortgage-transfer";
+import {
   calculateMortgageScenario,
   defaultValues,
   exampleValues,
@@ -22,6 +29,10 @@ import {
 } from "./logic";
 import { downloadMortgagePdfReport } from "./report";
 import { SalaryBorrowingPowerExplorer } from "./SalaryBorrowingPowerExplorer";
+import {
+  applyDuoMortgageCandidateToMaxMortgageForm,
+  isMaxMortgageFormStateDraft,
+} from "./duo-transfer";
 
 function formatCurrency(value: number, maximumFractionDigits = 0) {
   return new Intl.NumberFormat("nl-NL", {
@@ -128,7 +139,17 @@ function SelectField({
 
 export default function Calculator() {
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
-  const { formValues, setFormValues, submittedValues, submit, hasDirtyChanges, reset } =
+  const [duoTransferMessage, setDuoTransferMessage] = useState("");
+  const {
+    formValues,
+    setFormValues,
+    submittedValues,
+    submit,
+    hasDirtyChanges,
+    submitContextMessage,
+    submitValues,
+    reset,
+  } =
     useSubmittedCalculation<MortgageFormState>(defaultValues);
   const formValidation = validateMortgageForm(formValues);
   const submittedValidation = submittedValues ? validateMortgageForm(submittedValues) : null;
@@ -156,6 +177,39 @@ export default function Calculator() {
 
   const errors = formValidation.errors;
 
+  useEffect(() => {
+    queueMicrotask(() => {
+      const transferId = getDuoMortgageTransferIdFromUrl(window.location.search);
+      if (!transferId) return;
+
+      const transfer = readDuoMortgageTransfer<MortgageFormState>(transferId, {
+        sourceTool: "artifact-hypotheek-wonen-maximale-hypotheek",
+        targetTool: "duo-maandbedrag",
+        allowCandidateReady: true,
+      });
+
+      if (!transfer.ok || !transfer.data.candidate || !isMaxMortgageFormStateDraft(transfer.data.draft)) {
+        setDuoTransferMessage(
+          "De koppeling met de DUO-tool is verlopen of niet compleet. Je hypotheekinvoer is niet aangepast.",
+        );
+        return;
+      }
+
+      const nextValues = applyDuoMortgageCandidateToMaxMortgageForm(
+        transfer.data.draft,
+        transfer.data.candidate,
+      );
+      submitValues(
+        nextValues,
+        "Het wettelijke DUO-maandbedrag is ingevuld vanuit de DUO-tool. De hypotheek is opnieuw berekend.",
+      );
+      setDuoTransferMessage(
+        "Het wettelijke DUO-maandbedrag is overgenomen. Banken kunnen met dit wettelijke bedrag rekenen; je actuele DUO-incasso kan lager zijn door draagkracht, pauze of tijdelijke verlaging.",
+      );
+      consumeDuoMortgageTransfer<MortgageFormState>(transfer.data.transferId);
+    });
+  }, [submitValues]);
+
   function updateField<K extends keyof MortgageFormState>(field: K, value: MortgageFormState[K]) {
     setFormValues((current) => ({ ...current, [field]: value }));
   }
@@ -178,6 +232,30 @@ export default function Calculator() {
     } finally {
       setIsDownloadingPdf(false);
     }
+  }
+
+  function handleOpenDuoMonthlyPaymentTool() {
+    const transfer = createDuoMortgageTransfer({
+      sourceTool: "artifact-hypotheek-wonen-maximale-hypotheek",
+      targetTool: "duo-maandbedrag",
+      returnPath: "/apps/artifact-hypotheek-wonen-maximale-hypotheek",
+      returnAnchor: "duo-bedragen",
+      draft: formValues,
+    });
+
+    if (!transfer.ok) {
+      setDuoTransferMessage(
+        "Je hypotheekinvoer kan in deze browser niet tijdelijk worden bewaard. Open de DUO-tool los en vul het wettelijke maandbedrag daarna handmatig in.",
+      );
+      return;
+    }
+
+    window.location.assign(
+      getDuoMortgageTransferUrl(
+        "/apps/duo-maandbedrag",
+        transfer.data.transferId,
+      ),
+    );
   }
 
   return (
@@ -409,7 +487,10 @@ export default function Calculator() {
               </span>
             </label>
             {formValues.hasStudentLoan ? (
-              <div className="grid gap-4 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)]/50 p-4">
+              <div
+                id="duo-bedragen"
+                className="grid gap-4 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)]/50 p-4"
+              >
                 <SelectField
                   label="DUO-status"
                   value={formValues.studentLoanStatus}
@@ -440,6 +521,31 @@ export default function Calculator() {
                     suffix="per maand"
                   />
                 )}
+                <div className="rounded-xl border border-[var(--hair)] bg-white px-4 py-3 text-[13px] leading-6 text-[var(--muted)]">
+                  <p>
+                    Banken kijken bij studieschuld niet altijd naar het bedrag dat DUO nu
+                    incasseert. Bij draagkrachtverlaging, pauze of een nog niet gestarte
+                    aflosfase kan het wettelijke DUO-maandbedrag hoger zijn dan je actuele
+                    maandbedrag.
+                  </p>
+                  <ToolActionButton
+                    type="button"
+                    variant="secondary"
+                    onClick={handleOpenDuoMonthlyPaymentTool}
+                  >
+                    Weet je jouw wettelijke DUO-maandbedrag niet? Bereken het in ongeveer 1 minuut.
+                  </ToolActionButton>
+                </div>
+                {duoTransferMessage ? (
+                  <p className="text-[13px] leading-6 text-[var(--ink-2)]" role="status">
+                    {duoTransferMessage}
+                  </p>
+                ) : null}
+                {submitContextMessage ? (
+                  <p className="text-[13px] leading-6 text-[var(--ink-2)]" role="status">
+                    {submitContextMessage}
+                  </p>
+                ) : null}
               </div>
             ) : null}
           </section>

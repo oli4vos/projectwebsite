@@ -113,7 +113,6 @@ export default function DuoMaandbedragCalculator() {
       }
 
       const transfer = readDuoMortgageTransfer(transferId, {
-        sourceTool: "hypotheek-impact-studieschuld",
         targetTool: "duo-maandbedrag",
       });
 

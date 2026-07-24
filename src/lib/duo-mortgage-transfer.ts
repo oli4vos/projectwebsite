@@ -8,8 +8,14 @@ export const DUO_MORTGAGE_TRANSFER_SCHEMA_VERSION = 1;
 export const DUO_MORTGAGE_TRANSFER_TTL_MS = 45 * 60 * 1000;
 
 const STORAGE_KEY_PREFIX = "project-site:duo-mortgage-transfer:v1:";
-const ALLOWED_RETURN_PATHS = ["/apps/hypotheek-impact-studieschuld"] as const;
-const ALLOWED_SOURCE_TOOLS = ["hypotheek-impact-studieschuld"] as const;
+const ALLOWED_RETURN_PATHS = [
+  "/apps/hypotheek-impact-studieschuld",
+  "/apps/artifact-hypotheek-wonen-maximale-hypotheek",
+] as const;
+const ALLOWED_SOURCE_TOOLS = [
+  "hypotheek-impact-studieschuld",
+  "artifact-hypotheek-wonen-maximale-hypotheek",
+] as const;
 const ALLOWED_TARGET_TOOLS = ["duo-maandbedrag"] as const;
 
 export type DuoMortgageTransferSourceTool = (typeof ALLOWED_SOURCE_TOOLS)[number];
@@ -163,7 +169,6 @@ export function consumeDuoMortgageTransfer<TDraft>(
   const current = readDuoMortgageTransfer<TDraft>(
     transferId,
     {
-      sourceTool: "hypotheek-impact-studieschuld",
       targetTool: "duo-maandbedrag",
       allowCandidateReady: true,
     },
@@ -187,7 +192,6 @@ export function cancelDuoMortgageTransfer<TDraft>(
   const current = readDuoMortgageTransfer<TDraft>(
     transferId,
     {
-      sourceTool: "hypotheek-impact-studieschuld",
       targetTool: "duo-maandbedrag",
       allowCandidateReady: true,
     },

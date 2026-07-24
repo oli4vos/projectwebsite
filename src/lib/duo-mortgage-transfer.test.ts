@@ -81,6 +81,28 @@ describe("duo mortgage transfer", () => {
     expect(loaded.data.returnPath).toBe("/apps/hypotheek-impact-studieschuld");
   });
 
+  it("allows the public maximum mortgage tool as a source and return target", () => {
+    const windowMock = installWindowMock();
+    windowMock.location.pathname = "/apps/artifact-hypotheek-wonen-maximale-hypotheek";
+
+    const created = createDuoMortgageTransfer({
+      sourceTool: "artifact-hypotheek-wonen-maximale-hypotheek",
+      targetTool: "duo-maandbedrag",
+      returnPath: "/apps/artifact-hypotheek-wonen-maximale-hypotheek",
+      returnAnchor: "duo-bedragen",
+      draft: { hasStudentLoan: true, statutoryMonthlyPayment: "" },
+    });
+
+    expect(created.ok).toBe(true);
+    if (!created.ok) throw new Error("expected transfer");
+    expect(
+      getDuoMortgageTransferUrl(
+        "/apps/duo-maandbedrag",
+        created.data.transferId,
+      ),
+    ).toBe(`/apps/duo-maandbedrag?duoMortgageTransfer=${created.data.transferId}`);
+  });
+
   it("rejects corrupt JSON and missing storage", () => {
     const windowMock = installWindowMock();
     windowMock.__values.set("project-site:duo-mortgage-transfer:v1:transfer-corrupt", "{nope");
@@ -137,6 +159,51 @@ describe("duo mortgage transfer", () => {
     expect(consumedRead.error).toBe(
       "consumed-transfer",
     );
+  });
+
+  it("consumes candidate-ready transfers from any allowlisted mortgage source", () => {
+    installWindowMock();
+    const now = new Date("2026-07-19T10:00:00.000Z");
+    const created = createDuoMortgageTransfer(
+      {
+        sourceTool: "artifact-hypotheek-wonen-maximale-hypotheek",
+        targetTool: "duo-maandbedrag",
+        returnPath: "/apps/artifact-hypotheek-wonen-maximale-hypotheek",
+        draft: {},
+      },
+      now,
+    );
+    expect(created.ok).toBe(true);
+    if (!created.ok) throw new Error("expected transfer");
+
+    const updated = attachDuoMortgageTransferCandidate(
+      created.data.transferId,
+      {
+        createdAt: "2026-07-19T10:00:00.000Z",
+        sourceSituation: "statutory-payment",
+        recommendedMonthlyAssessmentPayment: 123.45,
+        assessment: {
+          recommendedMonthlyAssessmentPayment: 123.45,
+          basis: "statutoryPayment",
+          situation: "statutory-payment",
+          reasonCode: "collected-equals-statutory",
+          usedDebtParts: false,
+          warnings: [],
+          missingFields: [],
+          uncertainty: "low",
+          providerDependent: true,
+          userConfirmationRequired: ["confirm-statutory-payment-in-mijn-duo"],
+          assumptions: [],
+        },
+      },
+      now,
+    );
+    expect(updated.ok).toBe(true);
+
+    const consumed = consumeDuoMortgageTransfer(created.data.transferId, now);
+    expect(consumed.ok).toBe(true);
+    if (!consumed.ok) throw new Error("expected consumed transfer");
+    expect(consumed.data.sourceTool).toBe("artifact-hypotheek-wonen-maximale-hypotheek");
   });
 
   it("attaches a candidate only after a valid active transfer", () => {
