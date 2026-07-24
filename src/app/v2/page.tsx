@@ -45,6 +45,9 @@ export default function V2HomePage() {
   const featuredApps = featuredSlugs
     .map((slug) => appRegistryBySlug[slug])
     .filter((app): app is AppManifest => Boolean(app));
+  const firstHomeApp =
+    appRegistryBySlug["familiehulp-eerste-woning"] ??
+    appRegistryBySlug["artifact-hypotheek-wonen-maximale-hypotheek"];
   const duoRate = getDuoRateForRule("SF35");
 
   const tickerItems = [
@@ -75,9 +78,11 @@ export default function V2HomePage() {
                 <Link href="/v2/apps" className="v2-btn v2-btn--primary">
                   Bekijk alle tools
                 </Link>
-                <Link href="/v2/apps/familiehulp-eerste-woning" className="v2-btn v2-btn--dark">
-                  Start met eerste woning
-                </Link>
+                {firstHomeApp ? (
+                  <Link href={`/v2/apps/${firstHomeApp.slug}`} className="v2-btn v2-btn--dark">
+                    Start met wonen
+                  </Link>
+                ) : null}
               </div>
             </div>
 

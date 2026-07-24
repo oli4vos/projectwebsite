@@ -1,5 +1,6 @@
 {
   "slug": "artifact-kalender-vrije-tijd-feestdagen",
+  "enabled": true,
   "title": "Feestdagen (Artifacts)",
   "description": "Toon Nederlandse feestdagen voor een gekozen jaar, inclusief vaste en beweeglijke dagen.",
   "type": "frontend",

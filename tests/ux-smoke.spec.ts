@@ -4,6 +4,7 @@ import { expect, test } from "@playwright/test";
 
 type AppManifest = {
   slug: string;
+  enabled?: boolean;
   visibility?: "public" | "hidden";
 };
 
@@ -23,7 +24,7 @@ function getPublicToolRoutes() {
         fs.readFileSync(manifestPath, "utf8"),
       ) as AppManifest;
 
-      return (manifest.visibility ?? "public") === "public"
+      return manifest.enabled !== false && (manifest.visibility ?? "public") === "public"
         ? [`/apps/${manifest.slug}`]
         : [];
     })
@@ -352,7 +353,8 @@ test("dashboard toont publieke toolkaarten met centrale surface-stijl", async ({
   const uniqueToolRoutes = await cards.evaluateAll((links) => [
     ...new Set(links.map((link) => link.getAttribute("href")).filter(Boolean)),
   ]);
-  expect(uniqueToolRoutes).toHaveLength(10);
+  expect(uniqueToolRoutes).toHaveLength(9);
+  expect(uniqueToolRoutes).not.toContain("/apps/familiehulp-eerste-woning");
   expect(uniqueToolRoutes).not.toContain(allowanceScanRoute);
   await expect(page.getByText("Waarom dit rustig blijft")).toBeVisible();
 
@@ -373,13 +375,13 @@ test("toeslagenscan is publiek vindbaar via dashboard en app-overzicht", async (
   await expect(page.locator(`a[href="${allowanceScanRoute}"]`)).toBeVisible();
 
   await page.goto("/v2/apps", { waitUntil: "networkidle" });
-  await expect(page.getByText("11 van 11")).toBeVisible();
+  await expect(page.getByText("10 van 10")).toBeVisible();
   await page.getByLabel("Zoek tool").fill("zorgtoeslag");
   await expect(
     page.getByRole("heading", { name: "Welke toeslagen passen mogelijk bij mij?" }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Regelingen en maandruimte" }).click();
-  await expect(page.getByText("1 van 11")).toBeVisible();
+  await expect(page.getByText("1 van 10")).toBeVisible();
 });
 
 test("publieke toeslagenscan route, formulier en bedragindicatie werken", async ({
@@ -493,6 +495,10 @@ test("toeslagenscan v2-route werkt en verborgen routes blijven 404", async ({
 
   const hiddenResponse = await page.goto("/apps/volgende-euro", { waitUntil: "networkidle" });
   expect(hiddenResponse?.status()).toBe(404);
+  const disabledResponse = await page.goto("/apps/familiehulp-eerste-woning", {
+    waitUntil: "networkidle",
+  });
+  expect(disabledResponse?.status()).toBe(404);
   const response404 = await page.goto("/apps/bestaat-niet", {
     waitUntil: "networkidle",
   });

@@ -1,5 +1,6 @@
 {
   "slug": "artifact-pensioen-aow-netto-aow-pensioen-of-lijfrente-uitkering",
+  "enabled": true,
   "title": "Netto AOW-, pensioen- of lijfrente-uitkering (Artifacts)",
   "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
   "type": "frontend",

@@ -1,5 +1,6 @@
 {
   "slug": "artifact-hypotheek-wonen-restschuld-berekenen-aflossen",
+  "enabled": true,
   "title": "Restschuld berekenen & aflossen (Artifacts)",
   "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
   "type": "frontend",

@@ -1,5 +1,6 @@
 {
   "slug": "artifact-kalender-vrije-tijd-wisselkoers-valuta",
+  "enabled": true,
   "title": "Wisselkoers valuta (Artifacts)",
   "description": "Reken bedragen om tussen valuta met optionele koersopslag en vaste kosten.",
   "type": "frontend",

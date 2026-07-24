@@ -1,5 +1,6 @@
 {
   "slug": "artifact-geld-lenen-financiering-hoogte-lening",
+  "enabled": true,
   "title": "Hoogte lening (Artifacts)",
   "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
   "type": "frontend",

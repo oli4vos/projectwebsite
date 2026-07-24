@@ -1,5 +1,6 @@
 {
   "slug": "artifact-hypotheek-wonen-boeterente-berekenen",
+  "enabled": true,
   "title": "Boeterente berekenen (Artifacts)",
   "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
   "type": "frontend",

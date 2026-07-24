@@ -1,5 +1,6 @@
 {
   "slug": "artifact-gezin-relatie-partneralimentatie",
+  "enabled": true,
   "title": "Partneralimentatie (Artifacts)",
   "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
   "type": "frontend",

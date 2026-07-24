@@ -1,5 +1,6 @@
 {
   "slug": "artifact-kalender-vrije-tijd-begin-of-einddatum",
+  "enabled": true,
   "title": "Begin- of einddatum (Artifacts)",
   "description": "Bereken een begin- of einddatum op basis van een bekende datum en periodecomponenten.",
   "type": "frontend",

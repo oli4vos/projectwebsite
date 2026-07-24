@@ -1,10 +1,17 @@
 {
   "slug": "hypotheek-aflossen-vs-beleggen",
+  "enabled": true,
   "title": "Hypotheek aflossen of beleggen?",
   "description": "Vergelijk extra aflossen op je hypotheek met vrij beleggen, inclusief renteaftrek en box 3-effect.",
   "type": "frontend",
   "category": "Hypotheek",
-  "tags": ["hypotheek", "aflossen", "beleggen", "box 3", "renteaftrek"],
+  "tags": [
+    "hypotheek",
+    "aflossen",
+    "beleggen",
+    "box 3",
+    "renteaftrek"
+  ],
   "status": "beta",
   "visibility": "hidden",
   "requiredProfileFields": [
@@ -20,8 +27,18 @@
     "savingInvesting.monthlyFreeCashflow"
   ],
   "reasonHint": "Handig als je extra geld wilt vergelijken tussen hypotheek aflossen en vrij beleggen.",
-  "assumptionsUsed": ["tax", "box3", "mortgage", "investment"],
-  "calculationDomains": ["mortgage", "investing", "tax", "saving"],
+  "assumptionsUsed": [
+    "tax",
+    "box3",
+    "mortgage",
+    "investment"
+  ],
+  "calculationDomains": [
+    "mortgage",
+    "investing",
+    "tax",
+    "saving"
+  ],
   "riskLevel": "high",
   "disclaimerType": "mortgageIndicative",
   "outputType": "scenarioComparison",

@@ -37,8 +37,9 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 |---|---|---|---|---|---|
 | Toolbibliotheek + categorie-navigatie | actief | n.v.t. | aan | Homepage en routes draaien publiek | n.v.t. |
 | Financiële kennisbank (`/kennisbank`) | actief | n.v.t. | aan | Centrale studieschuld-kennislaag met DUO-bronnen, hidden oude horizon-/beleggingskaders | n.v.t. |
-| Publieke calculators (app-registry) | actief | `visibility: "public"` | aan | 11 publieke tools in de huidige registry | n.v.t. |
-| Draft tools (concept) | hidden-draft | `visibility: "hidden"` | uit | Alle tools en flows die niet meer actief aangeroepen worden blijven hier verborgen totdat er expliciet heractivatie is | zet manifest op `public` + checks draaien |
+| Publieke calculators (app-registry) | actief | `enabled: true` + `visibility: "public"` | aan | 10 publieke tools in de huidige registry; disabled tools tellen niet mee | n.v.t. |
+| Draft tools (concept) | hidden-draft | `enabled: true` + `visibility: "hidden"` | uit | Alle tools en flows die niet meer actief aangeroepen worden blijven hier verborgen totdat er expliciet heractivatie is | zet manifest op `public` + checks draaien |
+| Disabled tools | uitgeschakeld | `enabled: false` | uit | Manifestgestuurde technische uitschakeling; tool komt niet in registry, routes, dashboard, lazy bundle of publieke lijsten | zet `enabled` op `true`, genereer registry opnieuw en draai checks |
 | Studieschuld-vs-beleggen | hidden-draft | `visibility: "hidden"` | uit | Bewust uit zichtbare positionering; code behouden voor mogelijke latere heractivatie | alleen heractiveren met nieuwe productbeslissing + copycheck |
 | Volgende euro | hidden-draft | `visibility: "hidden"` | uit | Bewust uit zichtbare positionering; route niet meer gelinkt vanuit publieke UI | alleen heractiveren met nieuwe productbeslissing + copycheck |
 | DUO-doorlenen-of-stoppen | hidden-draft | `visibility: "hidden"` | uit | Stopscenario-tool technisch aanwezig, maar niet in huidige publieke registry | zet manifest op `public` + volledige blueprint-check |
@@ -52,6 +53,7 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 | Volgende-stap navigatie tussen publieke tools | actief | `ToolNextSteps` + journey-map | aan | Compacte vervolgstap per publieke tool, afgestemd op de meest waarschijnlijke vervolgvraag | n.v.t. |
 | DUO-impact in maximale-hypotheektool | actief | n.v.t. | aan | Kernuitkomst toont rechtsboven de indicatieve daling van de leencapaciteit | n.v.t. |
 | Hypotheekrentelink en salarisverhogingsanalyse | actief | centrale linkconfig + salarisadapter | aan | Maximale-hypotheekflow toont externe inspiratielink bij renteveld en vervolganalyse voor extra leenruimte via centrale hypotheekengine; PDF-uitbreiding blijft vervolgwerk | n.v.t. |
+| Familiehulp eerste woning | uitgeschakeld | `apps/familiehulp-eerste-woning/app.json -> enabled: false` | uit | Bewust buiten eerste-livegangscope; code blijft bestaan, maar publieke registry, routes, dashboard, zoekresultaten, lazy loading en journey-links sluiten de tool uit | zet alleen na scopebesluit `enabled: true` en draai volledige blueprint-/releasechecks |
 | Hypotheek Regulations-integratieadapter | voorbereid | centrale adapter | uit in UI | Centrale adapterlaag voor hypotheektools richting Regulations-architectuur; nog niet gekoppeld aan calculators en wijzigt geen publieke uitkomsten | koppel per tool pas na UX/PDF- en regressiecontrole |
 | DUO-maandbedrag-returnflow naar hypotheektools | actief | sessionStorage-transfer | aan | `hypotheek-impact-studieschuld` en `artifact-hypotheek-wonen-maximale-hypotheek` kunnen een concept bewaren, `duo-maandbedrag` laten rekenen en een bevestigbaar wettelijk DUO-bedrag teruggeven zonder financiële data in de URL | n.v.t. |
 | Centrale toeslagen-hard-checks | actief | n.v.t. | aan via publieke beta | `evaluateAllowanceSignals` is de blijvende centrale eligibility- en hard-checklaag voor 2026-voorwaarden; officiële bedraglogica blijft apart in de calculation engine | 2027-dataset vereist vóór gebruik in 2027 |
@@ -70,6 +72,7 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 
 | Datum | Commit | Wijziging | Impact |
 |---|---|---|---|
+| 2026-07-24 | `pending` | Manifestgestuurde `enabled`-laag toegevoegd voor tools; alle manifests hebben expliciet `enabled`, en `familiehulp-eerste-woning` is centraal uitgeschakeld voor de eerste livegang | Architectuur / registry / routes |
 | 2026-07-24 | `pending` | Kinderopvangtoeslag is voor ondersteunde standaardscenario's bedraggevend aangesloten op een centrale 2026-engine met LRK/eigen-bijdrage/activiteit-blockers, officiële uurtarief- en urencaps en regressietests tegen officiële voorbeelden | Toeslagen / publieke beta / kinderopvangtoeslag |
 | 2026-07-24 | `pending` | DUO-maandbedrag-returnflow uitgebreid naar maximale-hypotheektool, inclusief sessieherstel, automatisch invullen van wettelijk DUO-maandbedrag en uitleg over banktoetsing versus actuele DUO-incasso | Hypotheek / DUO / toolkoppeling |
 | 2026-07-21 | `pending` | Huurtoeslag en kindgebonden budget publiek geïntegreerd in de Toeslagenscan via centrale adapters bovenop `calculateRentBenefit2026` en `calculateChildBudget2026`; kinderopvangtoeslag blijft zonder totaalbedrag | Toeslagen / publieke beta / bedragindicatie |

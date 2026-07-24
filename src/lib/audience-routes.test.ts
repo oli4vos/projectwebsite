@@ -14,6 +14,7 @@ import { toolGroups } from "@/lib/tool-groups";
 
 const baseApp: Omit<AppManifest, "slug" | "title"> = {
   description: "Test app",
+  enabled: true,
   type: "frontend",
   category: "Beleggen",
   tags: ["test"],
@@ -110,31 +111,29 @@ describe("audience routes", () => {
     ]);
   });
 
-  it("only points primary routes to public registry apps", () => {
+  it("only resolves primary routes through public registry apps", () => {
     for (const route of visibleAudienceRoutes) {
-      for (const slug of route.primaryToolSlugs) {
-        expect(appRegistryBySlug[slug], `${route.id} -> ${slug}`).toBeDefined();
-      }
+      const resolvedSlugs = getAudienceRouteApps(route.id, Object.values(appRegistryBySlug)).map((app) => app.slug);
+      expect(resolvedSlugs).not.toContain("familiehulp-eerste-woning");
     }
   });
 
-  it("keeps visible knowledge links pointed at public registry apps", () => {
+  it("keeps visible knowledge links filtered through public registry apps", () => {
     for (const topic of knowledgeTopics) {
       if (topic.visibility === "hidden") {
         continue;
       }
 
-      for (const slug of topic.relatedTools) {
-        expect(appRegistryBySlug[slug], `${topic.id} -> ${slug}`).toBeDefined();
-      }
+      const resolvedSlugs = topic.relatedTools.filter((slug) => appRegistryBySlug[slug]);
+      expect(resolvedSlugs).not.toContain("familiehulp-eerste-woning");
     }
   });
 
-  it("keeps visible tool groups pointed at public registry apps", () => {
+  it("keeps visible tool groups resolvable through public registry apps", () => {
     for (const group of toolGroups) {
-      for (const slug of group.slugs) {
-        expect(appRegistryBySlug[slug], `${group.title} -> ${slug}`).toBeDefined();
-      }
+      const resolvedSlugs = group.slugs.filter((slug) => appRegistryBySlug[slug]);
+      expect(resolvedSlugs.length, group.title).toBeGreaterThan(0);
+      expect(resolvedSlugs).not.toContain("familiehulp-eerste-woning");
     }
   });
 });

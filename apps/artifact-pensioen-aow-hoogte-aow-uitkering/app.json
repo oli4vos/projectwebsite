@@ -1,5 +1,6 @@
 {
   "slug": "artifact-pensioen-aow-hoogte-aow-uitkering",
+  "enabled": true,
   "title": "Hoogte AOW-uitkering (Artifacts)",
   "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
   "type": "frontend",

@@ -1,10 +1,16 @@
 {
   "slug": "duo-maandbedrag",
+  "enabled": true,
   "title": "Wat wordt mijn DUO-maandbedrag?",
   "description": "Bereken je wettelijke DUO-maandtermijn en bekijk optioneel een draagkrachtindicatie.",
   "type": "frontend",
   "category": "Schulden",
-  "tags": ["DUO", "studieschuld", "maandbedrag", "draagkracht"],
+  "tags": [
+    "DUO",
+    "studieschuld",
+    "maandbedrag",
+    "draagkracht"
+  ],
   "status": "beta",
   "visibility": "public",
   "requiredProfileFields": [
@@ -14,8 +20,13 @@
     "income.householdType"
   ],
   "reasonHint": "Handig als je wilt begrijpen welk DUO-maandbedrag bij je schuld hoort.",
-  "assumptionsUsed": ["duo"],
-  "calculationDomains": ["studentDebt", "cashflow"],
+  "assumptionsUsed": [
+    "duo"
+  ],
+  "calculationDomains": [
+    "studentDebt",
+    "cashflow"
+  ],
   "riskLevel": "medium",
   "disclaimerType": "duoIndicative",
   "outputType": "singleResult",

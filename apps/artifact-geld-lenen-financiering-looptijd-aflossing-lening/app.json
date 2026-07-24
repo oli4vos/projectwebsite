@@ -1,5 +1,6 @@
 {
   "slug": "artifact-geld-lenen-financiering-looptijd-aflossing-lening",
+  "enabled": true,
   "title": "Looptijd aflossing lening (Artifacts)",
   "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
   "type": "frontend",

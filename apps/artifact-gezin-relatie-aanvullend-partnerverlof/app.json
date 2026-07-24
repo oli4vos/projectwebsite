@@ -1,5 +1,6 @@
 {
   "slug": "artifact-gezin-relatie-aanvullend-partnerverlof",
+  "enabled": true,
   "title": "Aanvullend partnerverlof (Artifacts)",
   "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
   "type": "frontend",

@@ -1,5 +1,6 @@
 {
   "slug": "artifact-hypotheek-wonen-hypotheek-extra-aflossen",
+  "enabled": true,
   "title": "Hypotheek extra aflossen (Artifacts)",
   "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
   "type": "frontend",

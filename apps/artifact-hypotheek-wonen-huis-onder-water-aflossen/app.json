@@ -1,5 +1,6 @@
 {
   "slug": "artifact-hypotheek-wonen-huis-onder-water-aflossen",
+  "enabled": true,
   "title": "Huis onder water aflossen (Artifacts)",
   "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
   "type": "frontend",

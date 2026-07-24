@@ -1,10 +1,17 @@
 {
   "slug": "volgende-euro",
+  "enabled": true,
   "title": "Wat doe ik met mijn volgende euro?",
   "description": "Ontdek of extra geld logischer naar buffer, aflossen, pensioen, woning of beleggen kan.",
   "type": "frontend",
   "category": "Persoonlijke financiën",
-  "tags": ["buffer", "beleggen", "aflossen", "pensioen", "FIRE"],
+  "tags": [
+    "buffer",
+    "beleggen",
+    "aflossen",
+    "pensioen",
+    "FIRE"
+  ],
   "status": "beta",
   "visibility": "hidden",
   "requiredProfileFields": [
@@ -21,8 +28,22 @@
     "housing.ownFunds"
   ],
   "reasonHint": "Handig als je niet zeker weet of extra geld beter naar buffer, aflossen, pensioen of beleggen kan.",
-  "assumptionsUsed": ["duo", "tax", "box3", "mortgage", "investment"],
-  "calculationDomains": ["saving", "investing", "studentDebt", "mortgage", "tax", "cashflow", "pension"],
+  "assumptionsUsed": [
+    "duo",
+    "tax",
+    "box3",
+    "mortgage",
+    "investment"
+  ],
+  "calculationDomains": [
+    "saving",
+    "investing",
+    "studentDebt",
+    "mortgage",
+    "tax",
+    "cashflow",
+    "pension"
+  ],
   "riskLevel": "high",
   "disclaimerType": "financialEducation",
   "outputType": "scenarioComparison",

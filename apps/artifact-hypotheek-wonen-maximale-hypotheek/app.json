@@ -1,5 +1,6 @@
 {
   "slug": "artifact-hypotheek-wonen-maximale-hypotheek",
+  "enabled": true,
   "title": "Maximale hypotheek",
   "description": "Indicatieve tool voor starters zonder bestaande hypotheek: schat je maximale hypotheek op basis van inkomen, woningwaarde, studieschuld en NHG.",
   "type": "frontend",
@@ -14,8 +15,15 @@
   "status": "active",
   "visibility": "public",
   "reasonHint": "Indicatieve tool voor starters zonder bestaande hypotheek die hun maximale hypotheek willen inschatten.",
-  "assumptionsUsed": ["mortgage"],
-  "calculationDomains": ["mortgage", "housing", "studentDebt", "cashflow"],
+  "assumptionsUsed": [
+    "mortgage"
+  ],
+  "calculationDomains": [
+    "mortgage",
+    "housing",
+    "studentDebt",
+    "cashflow"
+  ],
   "riskLevel": "high",
   "disclaimerType": "mortgageIndicative",
   "outputType": "mixed",

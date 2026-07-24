@@ -1,5 +1,6 @@
 {
   "slug": "artifact-gezin-relatie-kosten-kinderopvang",
+  "enabled": true,
   "title": "Kosten kinderopvang (Artifacts)",
   "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
   "type": "frontend",

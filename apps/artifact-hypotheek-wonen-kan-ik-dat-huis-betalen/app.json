@@ -1,5 +1,6 @@
 {
   "slug": "artifact-hypotheek-wonen-kan-ik-dat-huis-betalen",
+  "enabled": true,
   "title": "Kan ik dat huis betalen? (Artifacts)",
   "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
   "type": "frontend",

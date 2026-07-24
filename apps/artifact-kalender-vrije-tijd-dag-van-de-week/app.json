@@ -1,5 +1,6 @@
 {
   "slug": "artifact-kalender-vrije-tijd-dag-van-de-week",
+  "enabled": true,
   "title": "Dag van de week (Artifacts)",
   "description": "Bepaal op welke weekdag een datum valt, inclusief ISO-weeknummer en dagnummer in het jaar.",
   "type": "frontend",

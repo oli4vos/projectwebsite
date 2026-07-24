@@ -1,15 +1,29 @@
 {
   "slug": "schulden-volgorde",
+  "enabled": true,
   "title": "Welke schuld eerst?",
   "description": "Zet dure schulden, DUO, hypotheek en achteraf betalen in een extra-aflosvolgorde.",
   "type": "frontend",
   "category": "Schulden",
-  "tags": ["schulden", "BNPL", "DUO", "hypotheek", "aflossen"],
+  "tags": [
+    "schulden",
+    "BNPL",
+    "DUO",
+    "hypotheek",
+    "aflossen"
+  ],
   "status": "beta",
   "visibility": "public",
   "reasonHint": "Handig als je wilt zien welke schuld bij extra geld waarschijnlijk eerst aandacht vraagt.",
-  "assumptionsUsed": ["duo", "mortgage"],
-  "calculationDomains": ["cashflow", "studentDebt", "mortgage"],
+  "assumptionsUsed": [
+    "duo",
+    "mortgage"
+  ],
+  "calculationDomains": [
+    "cashflow",
+    "studentDebt",
+    "mortgage"
+  ],
   "riskLevel": "high",
   "disclaimerType": "financialEducation",
   "outputType": "checklist",

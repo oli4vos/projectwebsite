@@ -1,5 +1,6 @@
 {
   "slug": "artifact-hypotheek-wonen-netto-voordeel-hypotheekrenteaftrek",
+  "enabled": true,
   "title": "Netto voordeel hypotheekrenteaftrek (Artifacts)",
   "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
   "type": "frontend",

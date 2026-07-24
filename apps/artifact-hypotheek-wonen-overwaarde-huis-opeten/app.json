@@ -1,5 +1,6 @@
 {
   "slug": "artifact-hypotheek-wonen-overwaarde-huis-opeten",
+  "enabled": true,
   "title": "Overwaarde huis opeten (Artifacts)",
   "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
   "type": "frontend",

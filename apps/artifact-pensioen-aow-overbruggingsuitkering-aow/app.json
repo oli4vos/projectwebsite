@@ -1,5 +1,6 @@
 {
   "slug": "artifact-pensioen-aow-overbruggingsuitkering-aow",
+  "enabled": true,
   "title": "Overbruggingsuitkering AOW (Artifacts)",
   "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
   "type": "frontend",

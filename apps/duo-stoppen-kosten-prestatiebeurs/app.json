@@ -1,16 +1,27 @@
 {
   "slug": "duo-stoppen-kosten-prestatiebeurs",
+  "enabled": true,
   "title": "Wat kost stoppen met studeren?",
   "description": "Bereken wat stoppen kost door basisbeurs, aanvullende beurs en studentenreisproduct die geen gift worden.",
   "type": "frontend",
   "category": "Schulden",
-  "tags": ["DUO", "stoppen", "prestatiebeurs", "studieschuld"],
+  "tags": [
+    "DUO",
+    "stoppen",
+    "prestatiebeurs",
+    "studieschuld"
+  ],
   "status": "beta",
   "visibility": "public",
   "requiredProfileFields": [],
   "reasonHint": "Handig als je wilt weten welk prestatiebeursbedrag schuld blijft als je stopt zonder diploma.",
-  "assumptionsUsed": ["duo"],
-  "calculationDomains": ["studentDebt", "cashflow"],
+  "assumptionsUsed": [
+    "duo"
+  ],
+  "calculationDomains": [
+    "studentDebt",
+    "cashflow"
+  ],
   "riskLevel": "medium",
   "disclaimerType": "duoIndicative",
   "outputType": "singleResult",

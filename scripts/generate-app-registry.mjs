@@ -158,7 +158,27 @@ function validateOptionalEnumArray(value, fieldName, slug, validValues) {
   });
 }
 
-function validateManifest(manifest, directoryName) {
+function formatManifestPath(manifestPath) {
+  return path.relative(rootDir, manifestPath).replace(/\\/g, "/");
+}
+
+function validateEnabled(value, slug, manifestPath) {
+  const readablePath = formatManifestPath(manifestPath);
+  if (value === undefined) {
+    fail(
+      `App "${slug}" (${readablePath}): veld "enabled" ontbreekt; zet "enabled": true of "enabled": false.`,
+    );
+  }
+  if (typeof value !== "boolean") {
+    fail(
+      `App "${slug}" (${readablePath}): veld "enabled" moet een boolean zijn; gebruik true of false.`,
+    );
+  }
+
+  return value;
+}
+
+function validateManifest(manifest, directoryName, manifestPath) {
   const slug = ensureString(manifest.slug, "slug", directoryName);
   if (slug !== directoryName) {
     fail(`App "${directoryName}": slug moet gelijk zijn aan de mapnaam.`);
@@ -171,6 +191,7 @@ function validateManifest(manifest, directoryName) {
 
   const title = ensureString(manifest.title, "title", slug);
   const description = ensureString(manifest.description, "description", slug);
+  const enabled = validateEnabled(manifest.enabled, slug, manifestPath);
   const type = ensureString(manifest.type, "type", slug);
   const category = ensureString(manifest.category, "category", slug);
   const entry = ensureString(manifest.entry, "entry", slug);
@@ -250,7 +271,7 @@ function validateManifest(manifest, directoryName) {
     validOutputTypes,
   );
 
-  if (visibility === "public") {
+  if (enabled && visibility === "public") {
     for (const field of publicRequiredManifestFields) {
       const value = manifest[field];
       if (Array.isArray(value)) {
@@ -271,6 +292,7 @@ function validateManifest(manifest, directoryName) {
     slug,
     title,
     description,
+    enabled,
     type,
     category,
     tags,
@@ -359,7 +381,7 @@ async function main() {
 
     const manifestContent = await fs.readFile(manifestPath, "utf8");
     const manifest = JSON.parse(manifestContent);
-    const validatedManifest = validateManifest(manifest, directoryName);
+    const validatedManifest = validateManifest(manifest, directoryName, manifestPath);
     const entryPath = path.join(appsDir, directoryName, validatedManifest.entry);
 
     try {
@@ -370,7 +392,7 @@ async function main() {
       );
     }
 
-    if (validatedManifest.visibility === "public") {
+    if (validatedManifest.enabled && validatedManifest.visibility === "public") {
       const requiredFiles = [
         "logic.ts",
         "Calculator.tsx",
@@ -393,7 +415,7 @@ async function main() {
   }
 
   const publicManifests = manifests.filter(
-    (manifest) => manifest.visibility !== "hidden",
+    (manifest) => manifest.enabled && manifest.visibility !== "hidden",
   );
 
   await fs.mkdir(libDir, { recursive: true });

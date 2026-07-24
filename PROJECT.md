@@ -54,6 +54,8 @@ Apps vallen grofweg in twee typen:
 
 Static hosting, lage runtimekosten en uitlegbare client-side flows zijn de standaard. Backendcomplexiteit is een uitzondering, geen uitgangspunt.
 
+Toolbeschikbaarheid is manifestgestuurd. `enabled` bepaalt of een tool technisch door het platform mag worden geladen; `visibility` bepaalt of een enabled tool publiek zichtbaar is. Alleen `enabled: true` plus `visibility: "public"` komt in de gegenereerde publieke registry, dashboard, lazy component-map en statische app-routes. `enabled: false` schakelt een tool volledig uit zonder broncode te verwijderen; heractivatie gebeurt door het manifest terug op `enabled: true` te zetten en de registry/tests/build opnieuw te draaien.
+
 ## 3. Centrale Bouwstenen
 
 De Project Site is opgebouwd rond centrale bouwstenen die meerdere domeinen kunnen dragen zonder formules of beslisregels per app te dupliceren.

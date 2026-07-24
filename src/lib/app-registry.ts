@@ -8,6 +8,7 @@ export const appRegistry = [
     "slug": "artifact-hypotheek-wonen-maximale-hypotheek",
     "title": "Maximale hypotheek",
     "description": "Indicatieve tool voor starters zonder bestaande hypotheek: schat je maximale hypotheek op basis van inkomen, woningwaarde, studieschuld en NHG.",
+    "enabled": true,
     "type": "frontend",
     "category": "Hypotheek",
     "tags": [
@@ -39,6 +40,7 @@ export const appRegistry = [
     "slug": "duo-aanvullende-beurs",
     "title": "Aanvullende beurs berekenen",
     "description": "Schat je aanvullende beurs voor 2026 met de centrale DUO-rekenlaag en ouderinkomen uit het peiljaar.",
+    "enabled": true,
     "type": "frontend",
     "category": "Schulden",
     "tags": [
@@ -68,6 +70,7 @@ export const appRegistry = [
     "slug": "duo-extra-aflossen",
     "title": "Wat doet extra aflossen?",
     "description": "Bekijk feitelijk wat een extra DUO-aflossing doet met maandtermijn, looptijd en rentelast.",
+    "enabled": true,
     "type": "frontend",
     "category": "Schulden",
     "tags": [
@@ -102,6 +105,7 @@ export const appRegistry = [
     "slug": "duo-leenbedrag-impact",
     "title": "Impact van mijn leenbedrag",
     "description": "Bereken simpel wat een nieuw leenbedrag per maand doet met je eindschuld terwijl je al studeert.",
+    "enabled": true,
     "type": "frontend",
     "category": "Schulden",
     "tags": [
@@ -131,6 +135,7 @@ export const appRegistry = [
     "slug": "duo-maandbedrag",
     "title": "Wat wordt mijn DUO-maandbedrag?",
     "description": "Bereken je wettelijke DUO-maandtermijn en bekijk optioneel een draagkrachtindicatie.",
+    "enabled": true,
     "type": "frontend",
     "category": "Schulden",
     "tags": [
@@ -165,6 +170,7 @@ export const appRegistry = [
     "slug": "duo-schuld-bij-starten-lenen",
     "title": "Wat wordt mijn studieschuld?",
     "description": "Bereken simpel wat je schuld wordt als je nu begint met studeren en per maand gaat lenen.",
+    "enabled": true,
     "type": "frontend",
     "category": "Schulden",
     "tags": [
@@ -194,6 +200,7 @@ export const appRegistry = [
     "slug": "duo-stoppen-kosten-prestatiebeurs",
     "title": "Wat kost stoppen met studeren?",
     "description": "Bereken wat stoppen kost door basisbeurs, aanvullende beurs en studentenreisproduct die geen gift worden.",
+    "enabled": true,
     "type": "frontend",
     "category": "Schulden",
     "tags": [
@@ -220,57 +227,10 @@ export const appRegistry = [
     "entry": "Calculator.tsx"
   },
   {
-    "slug": "familiehulp-eerste-woning",
-    "title": "Lenen of schenken voor eerste woning",
-    "description": "Vergelijk studieschuld, bankhypotheek, eigen geld, familielening en schenkingen voor een eerste woning.",
-    "type": "frontend",
-    "category": "Studieschuld & wonen",
-    "tags": [
-      "familielening",
-      "schenking",
-      "studieschuld",
-      "hypotheek",
-      "starter"
-    ],
-    "status": "beta",
-    "visibility": "public",
-    "requiredProfileFields": [
-      "income.grossAnnualIncome",
-      "income.partnerGrossAnnualIncome",
-      "studentDebt.remainingDebt",
-      "studentDebt.currentMonthlyPayment",
-      "studentDebt.statutoryMonthlyPayment",
-      "studentDebt.repaymentRule",
-      "studentDebt.duoSituation",
-      "studentDebt.duoInterestRate",
-      "studentDebt.remainingTermYears",
-      "housing.targetHomePrice",
-      "housing.ownFunds",
-      "housing.mortgageRate",
-      "housing.mortgageTermYears",
-      "savingInvesting.targetEmergencyFund"
-    ],
-    "reasonHint": "Handig als je door studieschuld wilt zien hoe bankhypotheek, eigen geld, familielening en schenking samen uitpakken.",
-    "assumptionsUsed": [
-      "duo",
-      "mortgage"
-    ],
-    "calculationDomains": [
-      "studentDebt",
-      "mortgage",
-      "housing",
-      "cashflow"
-    ],
-    "riskLevel": "high",
-    "disclaimerType": "financialEducation",
-    "outputType": "scenarioComparison",
-    "version": "1.0.0",
-    "entry": "Calculator.tsx"
-  },
-  {
     "slug": "hypotheek-impact-studieschuld",
     "title": "Hypotheek-impact studieschuld",
     "description": "Zie welk DUO-bedrag kan meetellen en wat dat indicatief doet met je hypotheekruimte.",
+    "enabled": true,
     "type": "frontend",
     "category": "Hypotheek",
     "tags": [
@@ -319,6 +279,7 @@ export const appRegistry = [
     "slug": "schulden-volgorde",
     "title": "Welke schuld eerst?",
     "description": "Zet dure schulden, DUO, hypotheek en achteraf betalen in een extra-aflosvolgorde.",
+    "enabled": true,
     "type": "frontend",
     "category": "Schulden",
     "tags": [
@@ -351,6 +312,7 @@ export const appRegistry = [
     "slug": "toeslagen-scan",
     "title": "Welke toeslagen passen mogelijk bij mij?",
     "description": "Bekijk of zorgtoeslag, huurtoeslag, kindgebonden budget of kinderopvangtoeslag mogelijk relevant is. Voor ondersteunde 2026-standaardscenario's toont de scan een euro-indicatie per maand en jaar.",
+    "enabled": true,
     "type": "frontend",
     "category": "Regelingen en maandruimte",
     "tags": [

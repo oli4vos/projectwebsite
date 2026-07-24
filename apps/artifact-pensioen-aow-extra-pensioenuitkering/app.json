@@ -1,5 +1,6 @@
 {
   "slug": "artifact-pensioen-aow-extra-pensioenuitkering",
+  "enabled": true,
   "title": "Extra pensioenuitkering (Artifacts)",
   "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
   "type": "frontend",

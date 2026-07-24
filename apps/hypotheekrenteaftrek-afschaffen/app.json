@@ -1,10 +1,16 @@
 {
   "slug": "hypotheekrenteaftrek-afschaffen",
+  "enabled": true,
   "title": "Wat als hypotheekrenteaftrek stopt?",
   "description": "Zie wat afschaffing van hypotheekrenteaftrek indicatief doet met je netto rentelasten.",
   "type": "frontend",
   "category": "Hypotheek",
-  "tags": ["hypotheek", "renteaftrek", "belasting", "wonen"],
+  "tags": [
+    "hypotheek",
+    "renteaftrek",
+    "belasting",
+    "wonen"
+  ],
   "status": "beta",
   "visibility": "hidden",
   "requiredProfileFields": [
@@ -13,8 +19,15 @@
     "tax.preferredTaxYear"
   ],
   "reasonHint": "Handig als je wilt zien hoe je netto hypotheeklast verandert zonder renteaftrek.",
-  "assumptionsUsed": ["tax", "mortgage"],
-  "calculationDomains": ["mortgage", "tax", "cashflow"],
+  "assumptionsUsed": [
+    "tax",
+    "mortgage"
+  ],
+  "calculationDomains": [
+    "mortgage",
+    "tax",
+    "cashflow"
+  ],
   "riskLevel": "high",
   "disclaimerType": "mortgageIndicative",
   "outputType": "scenarioComparison",

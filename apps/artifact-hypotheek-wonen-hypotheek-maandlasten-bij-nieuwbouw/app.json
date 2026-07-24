@@ -1,5 +1,6 @@
 {
   "slug": "artifact-hypotheek-wonen-hypotheek-maandlasten-bij-nieuwbouw",
+  "enabled": true,
   "title": "Hypotheek maandlasten bij nieuwbouw (Artifacts)",
   "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
   "type": "frontend",

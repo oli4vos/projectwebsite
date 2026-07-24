@@ -1,5 +1,6 @@
 {
   "slug": "artifact-kalender-vrije-tijd-schoolvakanties",
+  "enabled": true,
   "title": "Schoolvakanties (Artifacts)",
   "description": "Toon schoolvakantieperiodes per schooljaar en regio op basis van een interne dataset.",
   "type": "frontend",

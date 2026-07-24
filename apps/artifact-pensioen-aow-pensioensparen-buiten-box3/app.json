@@ -1,5 +1,6 @@
 {
   "slug": "artifact-pensioen-aow-pensioensparen-buiten-box3",
+  "enabled": true,
   "title": "Pensioensparen buiten box3 (Artifacts)",
   "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
   "type": "frontend",

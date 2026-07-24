@@ -1,5 +1,6 @@
 {
   "slug": "artifact-hypotheek-wonen-maximale-hypotheek-ondernemer",
+  "enabled": true,
   "title": "Maximale hypotheek ondernemer (Artifacts)",
   "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
   "type": "frontend",

@@ -1,5 +1,6 @@
 {
   "slug": "artifact-geld-lenen-financiering-kopen-op-afbetaling",
+  "enabled": true,
   "title": "Kopen op afbetaling (Artifacts)",
   "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
   "type": "frontend",

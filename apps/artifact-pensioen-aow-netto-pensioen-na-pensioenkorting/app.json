@@ -1,5 +1,6 @@
 {
   "slug": "artifact-pensioen-aow-netto-pensioen-na-pensioenkorting",
+  "enabled": true,
   "title": "Netto pensioen na pensioenkorting (Artifacts)",
   "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
   "type": "frontend",

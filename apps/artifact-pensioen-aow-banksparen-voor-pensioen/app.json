@@ -1,5 +1,6 @@
 {
   "slug": "artifact-pensioen-aow-banksparen-voor-pensioen",
+  "enabled": true,
   "title": "Banksparen voor Pensioen (Artifacts)",
   "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
   "type": "frontend",

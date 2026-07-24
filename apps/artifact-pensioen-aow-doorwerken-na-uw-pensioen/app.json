@@ -1,5 +1,6 @@
 {
   "slug": "artifact-pensioen-aow-doorwerken-na-uw-pensioen",
+  "enabled": true,
   "title": "Doorwerken na uw pensioen (Artifacts)",
   "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
   "type": "frontend",

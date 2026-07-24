@@ -38,6 +38,7 @@ export type AppManifest = {
   slug: string;
   title: string;
   description: string;
+  enabled: boolean;
   type: AppType;
   category: string;
   tags: string[];

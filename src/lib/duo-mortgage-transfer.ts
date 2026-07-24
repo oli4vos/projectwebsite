@@ -2,6 +2,7 @@ import type {
   DuoMortgageAssessmentResult,
   DuoMortgageAssessmentSituation,
 } from "@/lib/duo";
+import { appRegistryBySlug } from "@/lib/app-registry";
 
 export const DUO_MORTGAGE_TRANSFER_QUERY_PARAM = "duoMortgageTransfer";
 export const DUO_MORTGAGE_TRANSFER_SCHEMA_VERSION = 1;
@@ -83,6 +84,9 @@ export function createDuoMortgageTransfer<TDraft>(
   const storage = getSessionStorage();
   if (!storage) {
     return { ok: false, error: "storage-unavailable" };
+  }
+  if (!isEnabledToolSlug(input.sourceTool) || !isEnabledToolSlug(input.targetTool)) {
+    return { ok: false, error: "invalid-transfer" };
   }
 
   const record: DuoMortgageTransferRecord<TDraft> = {
@@ -261,6 +265,9 @@ function validateRecord<TDraft>(
     !isAllowedDuoMortgageReturnPath(record.returnPath) ||
     !(ALLOWED_SOURCE_TOOLS as readonly string[]).includes(record.sourceTool) ||
     !(ALLOWED_TARGET_TOOLS as readonly string[]).includes(record.targetTool) ||
+    !isEnabledToolSlug(record.sourceTool) ||
+    !isEnabledToolSlug(record.targetTool) ||
+    !isEnabledReturnPath(record.returnPath) ||
     record.expectedResultType !== "duoMortgageAssessmentPayment" ||
     !["active", "candidate-ready", "consumed", "cancelled"].includes(record.status)
   ) {
@@ -292,6 +299,15 @@ function validateRecord<TDraft>(
   }
 
   return { ok: true, data: record };
+}
+
+function isEnabledToolSlug(value: string) {
+  return Boolean(appRegistryBySlug[value]);
+}
+
+function isEnabledReturnPath(path: DuoMortgageTransferReturnPath) {
+  const slug = /^\/apps\/([^/?#]+)/.exec(path)?.[1];
+  return !slug || isEnabledToolSlug(slug);
 }
 
 function parseRecord<TDraft>(raw: string): DuoMortgageTransferRecord<TDraft> | null {

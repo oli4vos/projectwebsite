@@ -256,6 +256,35 @@ describe("duo mortgage transfer", () => {
     ).toBe(true);
   });
 
+  it("rejects transfers whose stored source, target or return route is not enabled in the public registry", () => {
+    const windowMock = installWindowMock();
+    windowMock.__values.set(
+      "project-site:duo-mortgage-transfer:v1:transfer-disabled-source",
+      JSON.stringify({
+        schemaVersion: 1,
+        transferId: "transfer-disabled-source",
+        createdAt: "2026-07-19T10:00:00.000Z",
+        expiresAt: "2026-07-19T10:45:00.000Z",
+        sourceTool: "familiehulp-eerste-woning",
+        targetTool: "duo-maandbedrag",
+        returnPath: "/apps/familiehulp-eerste-woning",
+        draft: {},
+        expectedResultType: "duoMortgageAssessmentPayment",
+        status: "active",
+      }),
+    );
+
+    const loaded = readDuoMortgageTransfer(
+      "transfer-disabled-source",
+      undefined,
+      new Date("2026-07-19T10:10:00.000Z"),
+    );
+
+    expect(loaded.ok).toBe(false);
+    if (loaded.ok) throw new Error("expected disabled transfer rejection");
+    expect(loaded.error).toBe("invalid-transfer");
+  });
+
   it("reports storage write failures", () => {
     installWindowMock({
       setItem: () => {

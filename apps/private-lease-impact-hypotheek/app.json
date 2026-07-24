@@ -1,5 +1,6 @@
 {
   "slug": "private-lease-impact-hypotheek",
+  "enabled": true,
   "title": "Impact private lease op hypotheek (concept)",
   "description": "Concepttool om indicatief te zien wat een maandelijkse private lease kan doen met je hypotheekruimte.",
   "type": "frontend",
@@ -26,4 +27,3 @@
   "version": "1.0.0",
   "entry": "Calculator.tsx"
 }
-

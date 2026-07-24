@@ -1,5 +1,6 @@
 {
   "slug": "artifact-hypotheek-wonen-effectieve-hypotheekrente",
+  "enabled": true,
   "title": "Effectieve hypotheekrente (Artifacts)",
   "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
   "type": "frontend",

@@ -1,15 +1,27 @@
 {
   "slug": "kind-wordt-18-impact",
+  "enabled": true,
   "title": "Kind wordt 18: maandimpact",
   "description": "Bekijk kinderbijslag, kindgebonden budget, zorgverzekering, zorgtoeslag en studiekosten als maandimpact.",
   "type": "frontend",
   "category": "Persoonlijke financiën",
-  "tags": ["gezin", "kind 18", "toeslagen", "zorgverzekering", "studiekosten"],
+  "tags": [
+    "gezin",
+    "kind 18",
+    "toeslagen",
+    "zorgverzekering",
+    "studiekosten"
+  ],
   "status": "beta",
   "visibility": "hidden",
   "reasonHint": "Handig als je wilt zien wat er in je maandruimte verandert rond de 18e verjaardag van je kind.",
-  "assumptionsUsed": ["tax"],
-  "calculationDomains": ["cashflow", "tax"],
+  "assumptionsUsed": [
+    "tax"
+  ],
+  "calculationDomains": [
+    "cashflow",
+    "tax"
+  ],
   "riskLevel": "medium",
   "disclaimerType": "indicative",
   "outputType": "singleResult",

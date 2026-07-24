@@ -1,5 +1,6 @@
 {
   "slug": "artifact-kalender-vrije-tijd-eerstvolgende-of-vorige-weekdag",
+  "enabled": true,
   "title": "Eerstvolgende of vorige weekdag (Artifacts)",
   "description": "Bereken de eerstvolgende of vorige weekdag vanaf een opgegeven datum.",
   "type": "frontend",

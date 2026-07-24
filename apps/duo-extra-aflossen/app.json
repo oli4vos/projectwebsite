@@ -1,10 +1,16 @@
 {
   "slug": "duo-extra-aflossen",
+  "enabled": true,
   "title": "Wat doet extra aflossen?",
   "description": "Bekijk feitelijk wat een extra DUO-aflossing doet met maandtermijn, looptijd en rentelast.",
   "type": "frontend",
   "category": "Schulden",
-  "tags": ["DUO", "studieschuld", "extra aflossen", "looptijd"],
+  "tags": [
+    "DUO",
+    "studieschuld",
+    "extra aflossen",
+    "looptijd"
+  ],
   "status": "beta",
   "visibility": "public",
   "requiredProfileFields": [
@@ -13,8 +19,14 @@
     "studentDebt.repaymentRule"
   ],
   "reasonHint": "Handig als je wilt zien wat extra aflossen bij DUO verandert in maandlast en looptijd.",
-  "assumptionsUsed": ["duo", "charts"],
-  "calculationDomains": ["studentDebt", "cashflow"],
+  "assumptionsUsed": [
+    "duo",
+    "charts"
+  ],
+  "calculationDomains": [
+    "studentDebt",
+    "cashflow"
+  ],
   "riskLevel": "medium",
   "disclaimerType": "duoIndicative",
   "outputType": "timeline",

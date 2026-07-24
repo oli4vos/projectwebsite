@@ -1,16 +1,27 @@
 {
   "slug": "duo-leenbedrag-impact",
+  "enabled": true,
   "title": "Impact van mijn leenbedrag",
   "description": "Bereken simpel wat een nieuw leenbedrag per maand doet met je eindschuld terwijl je al studeert.",
   "type": "frontend",
   "category": "Schulden",
-  "tags": ["DUO", "leenbedrag", "eindschuld", "studieschuld"],
+  "tags": [
+    "DUO",
+    "leenbedrag",
+    "eindschuld",
+    "studieschuld"
+  ],
   "status": "beta",
   "visibility": "public",
   "requiredProfileFields": [],
   "reasonHint": "Handig als je al studeert en wilt zien wat meer of minder lenen per maand doet.",
-  "assumptionsUsed": ["duo"],
-  "calculationDomains": ["studentDebt", "cashflow"],
+  "assumptionsUsed": [
+    "duo"
+  ],
+  "calculationDomains": [
+    "studentDebt",
+    "cashflow"
+  ],
   "riskLevel": "medium",
   "disclaimerType": "duoIndicative",
   "outputType": "singleResult",

@@ -118,12 +118,45 @@ Belangrijke probleemgebieden:
 - `apps/_artifact_shared/ArtifactCalculator.tsx` is nog steeds groot: tool-/domeinlabels, strict profile configs, validatie, formulierrendering en resultaatrendering staan nog samen. Verdere splitsing moet per verantwoordelijkheid gebeuren, niet op regeltelling.
 - `apps/toeslagen-scan/Calculator.tsx` gebruikt centrale `src/lib/allowances`- en `src/lib/regulations`-lagen via `apps/toeslagen-scan/logic.ts`, maar de facade bevat nog veel formulier- en resultaatpresentatie. Verdere splitsing hoort te gebeuren naar componenten of viewmodelpresentatie zonder nieuwe toeslagenlogica buiten de centrale lagen.
 
+## Enabled versus visibility
+
+`apps/<slug>/app.json` bevat twee afzonderlijke publicatieconcepten:
+
+- `enabled`: technische beschikbaarheid. `enabled: false` schakelt de tool volledig uit.
+- `visibility`: publieke zichtbaarheid. `visibility: "hidden"` houdt een technisch beschikbare tool buiten dashboard en publieke registry.
+
+De centrale beslisregel:
+
+| enabled | visibility | Gedrag |
+|---|---|---|
+| `true` | `public` | Tool komt in publieke registry, dashboard, lazy component-map en statisch gegenereerde app-routes. |
+| `true` | `hidden` | Tool blijft beschikbaar als code en manifest, maar komt niet in publieke registry, dashboard of publieke routes. |
+| `false` | `public` of `hidden` | Tool is volledig uitgeschakeld: niet in registry, niet lazy-loaded, geen publieke route en geen dashboard-/zoek-/journey-link. |
+
+`enabled: false` heeft altijd voorrang op `visibility`, `status` en overige manifestvelden. Na de migratie is `enabled` verplicht en moet het een boolean zijn. Een ontbrekende of ongeldige waarde blokkeert `npm run generate:apps`.
+
+Tool uitschakelen:
+
+1. Open `apps/<tool>/app.json`.
+2. Zet `"enabled": false`.
+3. Voer `npm run generate:apps` uit.
+4. Voer de relevante tests en `npm run build` uit.
+
+Tool opnieuw inschakelen:
+
+1. Zet `"enabled": true`.
+2. Controleer `visibility`: gebruik `"public"` voor publieke publicatie en `"hidden"` voor verborgen ontwikkeling.
+3. Voer `npm run generate:apps` uit.
+4. Voer de relevante tests en `npm run build` uit.
+
+`status` blijft productstatus (`active`, `beta`, `draft`) en bepaalt niet of een tool technisch geladen wordt. Audience- en journey-lijsten mogen voorkeursslugs bevatten, maar publieke rendering en routegeneratie filteren altijd via de gegenereerde registry.
+
 ## Actieve versus inactieve tools
 
 Statuscriteria:
 
-- `app.json` is de bron voor `status` en `visibility`.
-- `scripts/generate-app-registry.mjs` neemt alleen `visibility: "public"` op in `src/lib/app-registry.ts` en `src/lib/app-components.tsx`.
+- `app.json` is de bron voor `enabled`, `status` en `visibility`.
+- `scripts/generate-app-registry.mjs` neemt alleen `enabled: true` plus `visibility: "public"` op in `src/lib/app-registry.ts` en `src/lib/app-components.tsx`.
 - Dashboard en directe app-routes gebruiken de gegenereerde registry.
 - `FUNCTIONALITY_STATUS.md` is de functionele SSOT en moet aansluiten op manifests en registry.
 
@@ -137,7 +170,7 @@ Binnen scope voor actieve-toolrefactors staan de publieke registry-tools:
 | `duo-maandbedrag` | `beta`, `public` | Publieke registry en dashboardroute |
 | `duo-schuld-bij-starten-lenen` | `beta`, `public` | Publieke registry en dashboardroute |
 | `duo-stoppen-kosten-prestatiebeurs` | `beta`, `public` | Publieke registry en dashboardroute |
-| `familiehulp-eerste-woning` | `beta`, `public` | Publieke registry en dashboardroute |
+| `familiehulp-eerste-woning` | `beta`, `public`, `enabled: false` | Bewust uitgeschakeld voor eerste livegang; heractiveer alleen via manifest + volledige checks |
 | `hypotheek-impact-studieschuld` | `beta`, `public` | Publieke registry en dashboardroute |
 | `schulden-volgorde` | `beta`, `public` | Publieke registry en dashboardroute |
 | `toeslagen-scan` | `beta`, `public` | Publieke registry en dashboardroute |

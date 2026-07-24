@@ -1,5 +1,6 @@
 {
   "slug": "artifact-pensioen-aow-levensverwachting-bij-geboorte",
+  "enabled": true,
   "title": "Levensverwachting bij geboorte (Artifacts)",
   "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
   "type": "frontend",

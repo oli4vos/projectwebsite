@@ -1,5 +1,6 @@
 {
   "slug": "artifact-hypotheek-wonen-familiebank-hypotheek",
+  "enabled": true,
   "title": "Familiebank hypotheek (Artifacts)",
   "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
   "type": "frontend",

@@ -1,3 +1,5 @@
+import { appRegistryBySlug } from "@/lib/app-registry";
+
 export type ToolNextStepLink = {
   href: string;
   label: string;
@@ -216,6 +218,34 @@ export const publicToolJourneys = {
 
 export type PublicToolSlug = keyof typeof publicToolJourneys;
 
+function appSlugFromHref(href: string) {
+  const match = /^\/apps\/([^/?#]+)/.exec(href);
+  return match?.[1];
+}
+
+function isEnabledToolHref(href: string) {
+  const slug = appSlugFromHref(href);
+  return !slug || Boolean(appRegistryBySlug[slug]);
+}
+
 export function getToolNextSteps(slug: PublicToolSlug): ToolNextStepsConfig {
-  return publicToolJourneys[slug];
+  const config = publicToolJourneys[slug];
+  const availableSecondary = (config.secondary ?? []).filter((link) =>
+    isEnabledToolHref(link.href),
+  );
+  if (isEnabledToolHref(config.primary.href)) {
+    return {
+      ...config,
+      secondary: availableSecondary,
+    };
+  }
+  const [primary, ...secondary] = availableSecondary;
+  return {
+    ...config,
+    primary: primary ?? {
+      href: "/apps",
+      label: "Bekijk alle tools",
+    },
+    secondary,
+  };
 }

@@ -1,5 +1,6 @@
 {
   "slug": "artifact-gezin-relatie-eigen-bijdrage-wmo-ivb",
+  "enabled": true,
   "title": "Eigen bijdrage Wmo (ivb) (Artifacts)",
   "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
   "type": "frontend",

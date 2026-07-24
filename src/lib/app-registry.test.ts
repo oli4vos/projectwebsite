@@ -25,7 +25,7 @@ describe("generated app registry", () => {
   });
 
   it("contains expected public tools", () => {
-    expect(appRegistry).toHaveLength(11);
+    expect(appRegistry).toHaveLength(10);
     expect(appRegistryBySlug["artifact-hypotheek-wonen-maximale-hypotheek"]).toBeDefined();
     expect(appRegistryBySlug["duo-doorlenen-of-stoppen"]).toBeUndefined();
     expect(appRegistryBySlug["duo-extra-aflossen"]).toBeDefined();
@@ -34,7 +34,7 @@ describe("generated app registry", () => {
     expect(appRegistryBySlug["duo-aanvullende-beurs"]).toBeDefined();
     expect(appRegistryBySlug["duo-schuld-bij-starten-lenen"]).toBeDefined();
     expect(appRegistryBySlug["duo-stoppen-kosten-prestatiebeurs"]).toBeDefined();
-    expect(appRegistryBySlug["familiehulp-eerste-woning"]).toBeDefined();
+    expect(appRegistryBySlug["familiehulp-eerste-woning"]).toBeUndefined();
     expect(appRegistryBySlug["hypotheek-impact-studieschuld"]).toBeDefined();
     expect(appRegistryBySlug["schulden-volgorde"]).toBeDefined();
     expect(appRegistryBySlug["studieschuld-vs-beleggen"]).toBeUndefined();
@@ -48,24 +48,33 @@ describe("generated app registry", () => {
     expect(appRegistryBySlug["toeslagen-scan"]).toBeDefined();
     expect(appComponents["toeslagen-scan"]).toBeDefined();
     expect(appComponents["duo-aanvullende-beurs"]).toBeDefined();
+    expect(appComponents["familiehulp-eerste-woning"]).toBeUndefined();
   });
 
-  it("publishes allowance scan while keeping other hidden manifests excluded", () => {
+  it("publishes enabled public manifests while keeping hidden and disabled manifests excluded", () => {
     const manifests = getManifestFiles().map(readManifest);
     const allowanceScan = manifests.find((manifest) => manifest.slug === "toeslagen-scan");
+    const familyHelp = manifests.find((manifest) => manifest.slug === "familiehulp-eerste-woning");
     const hiddenManifests = manifests.filter((manifest) => manifest.visibility === "hidden");
 
     expect(manifests).toHaveLength(167);
-    expect(appRegistry).toHaveLength(11);
+    expect(manifests.every((manifest) => typeof manifest.enabled === "boolean")).toBe(true);
+    expect(appRegistry).toHaveLength(10);
     expect(hiddenManifests).toHaveLength(156);
+    expect(familyHelp).toMatchObject({
+      enabled: false,
+      visibility: "public",
+    });
     expect(allowanceScan).toMatchObject({
       title: "Welke toeslagen passen mogelijk bij mij?",
+      enabled: true,
       status: "beta",
       visibility: "public",
       type: "frontend",
       entry: "Calculator.tsx",
     });
     expect(appRegistryBySlug["toeslagen-scan"]).toMatchObject({
+      enabled: true,
       status: "beta",
       visibility: "public",
       outputType: "checklist",

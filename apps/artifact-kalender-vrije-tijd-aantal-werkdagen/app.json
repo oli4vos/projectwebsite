@@ -1,5 +1,6 @@
 {
   "slug": "artifact-kalender-vrije-tijd-aantal-werkdagen",
+  "enabled": true,
   "title": "Aantal werkdagen (Artifacts)",
   "description": "Bereken werkdagen in een periode met optionele uitsluiting van Nederlandse feestdagen.",
   "type": "frontend",

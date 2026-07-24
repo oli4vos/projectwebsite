@@ -1,5 +1,6 @@
 {
   "slug": "artifact-pensioen-aow-bruto-netto-eerste-pensioenjaar",
+  "enabled": true,
   "title": "Bruto-netto eerste pensioenjaar (Artifacts)",
   "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
   "type": "frontend",

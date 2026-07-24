@@ -1,5 +1,6 @@
 {
   "slug": "artifact-gezin-relatie-partner-uitkopen-uit-eigen-woning",
+  "enabled": true,
   "title": "Partner uitkopen uit eigen woning (Artifacts)",
   "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
   "type": "frontend",

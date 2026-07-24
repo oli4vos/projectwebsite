@@ -2,7 +2,7 @@ import { AppDashboard } from "@/components/AppDashboard";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { BtnLink } from "@/components/ui";
-import { appRegistry } from "@/lib/app-registry";
+import { appRegistry, appRegistryBySlug } from "@/lib/app-registry";
 
 const routeSteps = [
   {
@@ -35,6 +35,13 @@ const routeSteps = [
 
 export default async function HomePage() {
   const publicToolCount = appRegistry.length;
+  const availableRouteSteps = routeSteps.map((step) => ({
+    ...step,
+    links: step.links.filter((link) => {
+      const slug = /^\/apps\/([^/?#]+)/.exec(link.href)?.[1];
+      return !slug || Boolean(appRegistryBySlug[slug]);
+    }),
+  }));
 
   return (
     <>
@@ -97,7 +104,7 @@ export default async function HomePage() {
           </div>
 
           <div className="mt-7 grid gap-4 lg:grid-cols-[1.1fr_0.95fr_1.05fr]">
-            {routeSteps.map((step, index) => (
+            {availableRouteSteps.map((step, index) => (
               <article
                 key={step.title}
                 className="surface-panel flex min-h-full flex-col p-5"

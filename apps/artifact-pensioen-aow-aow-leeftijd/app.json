@@ -1,5 +1,6 @@
 {
   "slug": "artifact-pensioen-aow-aow-leeftijd",
+  "enabled": true,
   "title": "AOW-leeftijd (Artifacts)",
   "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
   "type": "frontend",

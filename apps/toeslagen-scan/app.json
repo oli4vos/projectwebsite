@@ -1,5 +1,6 @@
 {
   "slug": "toeslagen-scan",
+  "enabled": true,
   "title": "Welke toeslagen passen mogelijk bij mij?",
   "description": "Bekijk of zorgtoeslag, huurtoeslag, kindgebonden budget of kinderopvangtoeslag mogelijk relevant is. Voor ondersteunde 2026-standaardscenario's toont de scan een euro-indicatie per maand en jaar.",
   "type": "frontend",
@@ -17,8 +18,13 @@
   "visibility": "public",
   "requiredProfileFields": [],
   "reasonHint": "2026-scan: zorgtoeslag, huurtoeslag, kindgebonden budget en kinderopvangtoeslag kunnen voor ondersteunde standaardscenario's een bedragindicatie tonen.",
-  "assumptionsUsed": ["tax"],
-  "calculationDomains": ["tax", "cashflow"],
+  "assumptionsUsed": [
+    "tax"
+  ],
+  "calculationDomains": [
+    "tax",
+    "cashflow"
+  ],
   "riskLevel": "high",
   "disclaimerType": "taxIndicative",
   "outputType": "checklist",

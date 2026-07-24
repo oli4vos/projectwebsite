@@ -1,5 +1,6 @@
 {
   "slug": "artifact-kalender-vrije-tijd-periode-duur",
+  "enabled": true,
   "title": "Periode duur (Artifacts)",
   "description": "Bereken de duur tussen twee datums in dagen, weken en kalendercomponenten.",
   "type": "frontend",

@@ -1,16 +1,31 @@
 {
   "slug": "duo-doorlenen-of-stoppen",
+  "enabled": true,
   "title": "Studeren stoppen en DUO",
   "description": "Vergelijk starten met lenen, stoppen door wegvallende prestatiebeurs en een nieuw maandbedrag tijdens je studie.",
   "type": "frontend",
   "category": "Schulden",
-  "tags": ["DUO", "studieschuld", "diploma", "prestatiebeurs", "scenario"],
+  "tags": [
+    "DUO",
+    "studieschuld",
+    "diploma",
+    "prestatiebeurs",
+    "scenario"
+  ],
   "status": "beta",
   "visibility": "hidden",
-  "requiredProfileFields": ["studentDebt.remainingDebt", "studentDebt.repaymentRule"],
+  "requiredProfileFields": [
+    "studentDebt.remainingDebt",
+    "studentDebt.repaymentRule"
+  ],
   "reasonHint": "Handig als je wilt zien wat beginnen met lenen, stoppen of meer/minder lenen per maand doet met je DUO-schuld.",
-  "assumptionsUsed": ["duo"],
-  "calculationDomains": ["studentDebt", "cashflow"],
+  "assumptionsUsed": [
+    "duo"
+  ],
+  "calculationDomains": [
+    "studentDebt",
+    "cashflow"
+  ],
   "riskLevel": "medium",
   "disclaimerType": "duoIndicative",
   "outputType": "scenarioComparison",

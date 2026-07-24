@@ -1,10 +1,17 @@
 {
   "slug": "zzp-uurtarief",
+  "enabled": true,
   "title": "Welk ZZP-uurtarief heb ik nodig?",
   "description": "Bereken een indicatief uurtarief inclusief belasting, buffer, pensioen, AOV en kosten.",
   "type": "frontend",
   "category": "Werk",
-  "tags": ["ZZP", "uurtarief", "AOV", "pensioen", "inkomen"],
+  "tags": [
+    "ZZP",
+    "uurtarief",
+    "AOV",
+    "pensioen",
+    "inkomen"
+  ],
   "status": "beta",
   "visibility": "hidden",
   "requiredProfileFields": [
@@ -18,8 +25,16 @@
     "employment.pensionContributionAnnual"
   ],
   "reasonHint": "Handig als je wilt weten welk uurtarief past bij inkomen, belasting, pensioen, AOV en buffer.",
-  "assumptionsUsed": ["tax", "box1"],
-  "calculationDomains": ["employment", "cashflow", "pension", "tax"],
+  "assumptionsUsed": [
+    "tax",
+    "box1"
+  ],
+  "calculationDomains": [
+    "employment",
+    "cashflow",
+    "pension",
+    "tax"
+  ],
   "riskLevel": "high",
   "disclaimerType": "taxIndicative",
   "outputType": "singleResult",

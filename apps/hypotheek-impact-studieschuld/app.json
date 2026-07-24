@@ -1,10 +1,18 @@
 {
   "slug": "hypotheek-impact-studieschuld",
+  "enabled": true,
   "title": "Hypotheek-impact studieschuld",
   "description": "Zie welk DUO-bedrag kan meetellen en wat dat indicatief doet met je hypotheekruimte.",
   "type": "frontend",
   "category": "Hypotheek",
-  "tags": ["studieschuld", "hypotheek", "DUO", "brutering", "starter", "pechgeneratie"],
+  "tags": [
+    "studieschuld",
+    "hypotheek",
+    "DUO",
+    "brutering",
+    "starter",
+    "pechgeneratie"
+  ],
   "status": "beta",
   "visibility": "public",
   "requiredProfileFields": [
@@ -24,8 +32,15 @@
     "housing.maxMortgageWithoutStudentDebt"
   ],
   "reasonHint": "Handig als je wilt weten welk DUO-bedrag kan meetellen bij je hypotheekruimte.",
-  "assumptionsUsed": ["duo", "mortgage"],
-  "calculationDomains": ["studentDebt", "mortgage", "housing"],
+  "assumptionsUsed": [
+    "duo",
+    "mortgage"
+  ],
+  "calculationDomains": [
+    "studentDebt",
+    "mortgage",
+    "housing"
+  ],
   "riskLevel": "medium",
   "disclaimerType": "mortgageIndicative",
   "outputType": "scenarioComparison",

@@ -1,5 +1,6 @@
 {
   "slug": "artifact-pensioen-aow-uitkeringen-uit-een-bancaire-lijfrente",
+  "enabled": true,
   "title": "Uitkeringen uit een bancaire lijfrente (Artifacts)",
   "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
   "type": "frontend",

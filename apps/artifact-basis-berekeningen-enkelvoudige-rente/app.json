@@ -1,5 +1,6 @@
 {
   "slug": "artifact-basis-berekeningen-enkelvoudige-rente",
+  "enabled": true,
   "title": "Enkelvoudige rente (Artifacts)",
   "description": "Geimporteerde rekentool op basis van ingevuld logic-invulblad. Nog in artifacts-fase.",
   "type": "frontend",
