@@ -958,10 +958,43 @@ function componentRows(result: PublicAllowanceBenefitResult) {
     cappedContractCount: "Aantal begrensde opvangregels",
     firstChildId: "Eerste kind volgens opvangregel",
   };
+
+  const valueFormatters: Record<string, (value: unknown) => string> = {
+    firstChildReimbursementPercentage: formatPercentageComponent,
+    nextChildReimbursementPercentage: formatPercentageComponent,
+    cappedContractCount: formatCountComponent,
+    firstChildId: formatChildReferenceComponent,
+  };
+
   return Object.entries(result.components).map(([key, value]) => ({
     label: labels[key] ?? key,
-    value: typeof value === "number" ? formatCurrency(value) : String(value),
+    value: valueFormatters[key]?.(value) ?? formatCurrencyComponent(value),
   }));
+}
+
+function formatCurrencyComponent(value: unknown) {
+  return typeof value === "number" ? formatCurrency(value) : String(value);
+}
+
+function formatPercentageComponent(value: unknown) {
+  if (typeof value !== "number") return String(value);
+  return `${new Intl.NumberFormat("nl-NL", {
+    maximumFractionDigits: 2,
+  }).format(value)}%`;
+}
+
+function formatCountComponent(value: unknown) {
+  if (typeof value !== "number") return String(value);
+  return new Intl.NumberFormat("nl-NL", {
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+function formatChildReferenceComponent(value: unknown) {
+  if (typeof value !== "string") return String(value);
+  const match = /^child-(\d+)$/.exec(value);
+  if (!match) return "Kind in de opvangberekening";
+  return `Kind ${match[1]}`;
 }
 
 function summaryFromScanResult(result: PublicAllowanceBenefitResult) {

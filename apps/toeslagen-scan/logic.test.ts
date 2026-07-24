@@ -62,6 +62,29 @@ describe("toeslagen-scan adapter", () => {
     ]);
   });
 
+  it("formats public component rows without currency for percentages, counts or internal ids", () => {
+    const view = createAllowanceScanView(exampleValues, {
+      generatedAt: "2026-07-24T10:00:00.000Z",
+    });
+    const childcareCard = view.result?.cards.find((card) => card.kind === "childcare");
+
+    expect(childcareCard?.components).toEqual(
+      expect.arrayContaining([
+        { label: "Vergoedingspercentage eerste kind", value: "96%" },
+        { label: "Vergoedingspercentage volgende kinderen", value: "96%" },
+        { label: "Aantal begrensde opvangregels", value: "0" },
+        { label: "Eerste kind volgens opvangregel", value: "Kind 1" },
+      ]),
+    );
+    expect(JSON.stringify(childcareCard?.components)).not.toContain("child-1");
+    expect(
+      childcareCard?.components.find((row) => row.label === "Vergoedingspercentage eerste kind")?.value,
+    ).not.toContain("€");
+    expect(
+      childcareCard?.components.find((row) => row.label === "Aantal begrensde opvangregels")?.value,
+    ).not.toContain("€");
+  });
+
   it("ignores hidden stale rent, partner and childcare fields", () => {
     const input = mapFormToAllowanceScanInput({
       ...exampleValues,
