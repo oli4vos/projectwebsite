@@ -67,8 +67,9 @@ describe("toeslagen-scan adapter", () => {
       generatedAt: "2026-07-24T10:00:00.000Z",
     });
     const childcareCard = view.result?.cards.find((card) => card.kind === "childcare");
+    const components = childcareCard?.components ?? [];
 
-    expect(childcareCard?.components).toEqual(
+    expect(components).toEqual(
       expect.arrayContaining([
         { label: "Vergoedingspercentage eerste kind", value: "96%" },
         { label: "Vergoedingspercentage volgende kinderen", value: "96%" },
@@ -76,12 +77,12 @@ describe("toeslagen-scan adapter", () => {
         { label: "Eerste kind volgens opvangregel", value: "Kind 1" },
       ]),
     );
-    expect(JSON.stringify(childcareCard?.components)).not.toContain("child-1");
+    expect(JSON.stringify(components)).not.toContain("child-1");
     expect(
-      childcareCard?.components.find((row) => row.label === "Vergoedingspercentage eerste kind")?.value,
+      components.find((row) => row.label === "Vergoedingspercentage eerste kind")?.value,
     ).not.toContain("€");
     expect(
-      childcareCard?.components.find((row) => row.label === "Aantal begrensde opvangregels")?.value,
+      components.find((row) => row.label === "Aantal begrensde opvangregels")?.value,
     ).not.toContain("€");
   });
 
