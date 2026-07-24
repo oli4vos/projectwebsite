@@ -103,7 +103,7 @@ test("DUO-impact staat rechtsboven in de hypotheekuitkomst", async ({ page }, te
     waitUntil: "networkidle",
   });
   await page.getByRole("button", { name: "Voorbeeld invullen" }).click();
-  await page.getByRole("button", { name: "Bereken maximale hypotheek" }).click();
+  await page.getByRole("button", { name: "Bereken", exact: true }).click();
 
   const summary = page.locator("#tool-result-summary");
   const incomeCard = summary.locator("article").filter({
@@ -168,7 +168,7 @@ test("maximale hypotheek toont rentelink en salarisverhogingsanalyse", async ({
   });
 
   await page.getByRole("button", { name: "Voorbeeld invullen" }).click();
-  await page.getByRole("button", { name: "Bereken maximale hypotheek" }).click();
+  await page.getByRole("button", { name: "Bereken", exact: true }).click();
   await expect(page.locator("#tool-result-summary").getByText("Einduitkomst")).toBeVisible();
 
   await page
@@ -235,7 +235,7 @@ test("hypotheek-impact maakt een PDF vanuit de laatst berekende invoer", async (
   });
   await expect(pdfButton).toHaveCount(0);
 
-  await page.getByRole("button", { name: "Start met voorbeeldwaarden" }).click();
+  await page.getByRole("button", { name: "Voorbeeld invullen" }).click();
   await page.getByRole("button", { name: "Bereken", exact: true }).click();
   await expect(pdfButton).toBeVisible();
   await expect(page.getByText("Verplicht DUO-bedrag:")).toBeVisible();
@@ -274,9 +274,9 @@ test("hypotheek-impact haalt DUO-maandbedrag op via expliciete returnflow", asyn
   await page.goto("/apps/hypotheek-impact-studieschuld", {
     waitUntil: "networkidle",
   });
-  await page.getByRole("button", { name: "Start met voorbeeldwaarden" }).click();
+  await page.getByRole("button", { name: "Voorbeeld invullen" }).click();
   await page
-    .getByRole("button", { name: "Bereken eerst mijn DUO-maandbedrag" })
+    .getByRole("button", { name: "Open DUO-maandbedrag" })
     .click();
 
   await expect(page).toHaveURL(/\/apps\/duo-maandbedrag\?duoMortgageTransfer=/);
@@ -352,7 +352,7 @@ test("dashboard toont publieke toolkaarten met centrale surface-stijl", async ({
   const uniqueToolRoutes = await cards.evaluateAll((links) => [
     ...new Set(links.map((link) => link.getAttribute("href")).filter(Boolean)),
   ]);
-  expect(uniqueToolRoutes).toHaveLength(9);
+  expect(uniqueToolRoutes).toHaveLength(10);
   expect(uniqueToolRoutes).not.toContain(allowanceScanRoute);
   await expect(page.getByText("Waarom dit rustig blijft")).toBeVisible();
 
@@ -547,7 +547,7 @@ test("losse DUO-tools tonen simpele scenario-uitkomst en schuldenvrije datum", a
   await expect(page.getByLabel("Lening per maand slider")).toBeVisible();
   await page.getByLabel("Lening per maand slider").fill("250");
   await page.getByRole("button", { name: "Voorbeeld invullen" }).first().click();
-  await page.getByRole("button", { name: "Bereken impact" }).first().click();
+  await page.getByRole("button", { name: "Bereken", exact: true }).first().click();
 
   await expect(page.getByRole("heading", { name: "Ik studeer al: impact nieuw leenbedrag per maand" })).toBeVisible();
   await expect(page.getByText("Schuldenvrij rond")).toBeVisible();
