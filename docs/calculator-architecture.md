@@ -79,6 +79,14 @@ Configuratiecalculators gebruiken een gedeelde runtime of renderer met toolprofi
 
 Maatwerkcalculators hebben eigen formulierflows, scenario's, profielprefill, resultaatframing of PDF-output. Voorbeelden zijn `hypotheek-impact-studieschuld`, `familiehulp-eerste-woning`, `schulden-volgorde` en de DUO-tools. Ook maatwerkcalculators volgen hetzelfde laagmodel: `Calculator.tsx` blijft compositie, applicatie- en reportmodules zijn pure TypeScript waar mogelijk, en domeinformules blijven centraal.
 
+## Actieve ontwerpversie
+
+Versie 1 is voorlopig de enige publieke en actieve ontwerpversie. Alle design-, UX-, performance- en inhoudelijke optimalisatie vindt plaats in de bestaande v1-routes, v1-componenten en publieke toolflows.
+
+Versie 2 is gepauzeerd en maakt geen deel uit van de eerste livegang. Bestaande v2-code mag als private broncode behouden blijven, maar mag niet als `/v2`-route onder `src/app` staan, niet publiek worden gelinkt, niet in sitemap- of SEO-output verschijnen en niet worden meegenomen in publieke dashboard-, journey-, onboarding- of profielpaden.
+
+Heractivatie van v2 vereist een expliciet scopebesluit en dezelfde releasecontrole als een nieuwe publieke route: routegeneratie, navigatie, directe URL, browser-refresh, sitemap, build-output, bundling en regressietests moeten dan opnieuw worden beoordeeld.
+
 ## Gedeeld calculatorcontract
 
 Gebruik bestaande helpers eerst:

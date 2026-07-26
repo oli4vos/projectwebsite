@@ -561,7 +561,7 @@ function CalculatorContent({
       <section className="surface-panel order-1 min-w-0 p-6">
         <div>
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
-            Rekentool v2
+            Rekentool
           </div>
           <h2 className="mt-2 font-serif text-[30px] tracking-[-0.02em] text-[var(--ink)]">
             Hypotheek-impact van je studieschuld

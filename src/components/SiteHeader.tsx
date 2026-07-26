@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { VersionSwitcher } from "@/components/VersionSwitcher";
 import { BtnLink, Logo } from "@/components/ui";
 import { ENABLE_PROFILE } from "@/lib/feature-flags";
 
@@ -70,7 +69,6 @@ export function SiteHeader() {
           </nav>
 
           <div className="hidden md:flex items-center gap-2">
-            <VersionSwitcher currentVersion="v1" />
             <BtnLink href="/#route" kind="primary" size="sm">
               Begin bij stap 1
             </BtnLink>

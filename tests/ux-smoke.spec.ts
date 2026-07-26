@@ -316,27 +316,13 @@ test("hypotheek-impact haalt DUO-maandbedrag op via expliciete returnflow", asyn
   ).not.toHaveValue("150");
 });
 
-test("v2 routes houden mobiele breedtes zonder horizontale overflow", async ({
+test("v2 routes zijn gepauzeerd voor de publieke livegang", async ({
   page,
 }) => {
-  for (const route of ["/v2", "/v2/apps"]) {
-    for (const width of [320, 375, 390, 430]) {
-      await page.setViewportSize({ width, height: 844 });
-      await page.goto(route, { waitUntil: "networkidle" });
-
-      const audit = await page.evaluate(() => ({
-        bodyWidth: document.body.scrollWidth,
-        documentWidth: document.documentElement.scrollWidth,
-        viewportWidth: document.documentElement.clientWidth,
-      }));
-
-      expect(audit.documentWidth, `${route} document @ ${width}px`).toBeLessThanOrEqual(
-        audit.viewportWidth + 1,
-      );
-      expect(audit.bodyWidth, `${route} body @ ${width}px`).toBeLessThanOrEqual(
-        audit.viewportWidth + 1,
-      );
-    }
+  for (const route of ["/v2", "/v2/apps", "/v2/apps/toeslagen-scan"]) {
+    const response = await page.goto(route, { waitUntil: "networkidle" });
+    expect(response?.status(), `${route} should not be public`).toBe(404);
+    expect(page.url()).toContain(route);
   }
 });
 
@@ -352,10 +338,12 @@ test("dashboard toont publieke toolkaarten met centrale surface-stijl", async ({
   expect(cardClass).toContain("surface-panel");
   const uniqueToolRoutes = await cards.evaluateAll((links) => [
     ...new Set(links.map((link) => link.getAttribute("href")).filter(Boolean)),
-  ]);
+  ] as string[]);
   expect(uniqueToolRoutes).toHaveLength(9);
   expect(uniqueToolRoutes).not.toContain("/apps/familiehulp-eerste-woning");
   expect(uniqueToolRoutes).not.toContain(allowanceScanRoute);
+  expect(uniqueToolRoutes.every((route) => !route.startsWith("/v2"))).toBe(true);
+  await expect(page.locator('a[href^="/v2"]')).toHaveCount(0);
   await expect(page.getByText("Familiehulp")).toHaveCount(0);
   await expect(page.getByText("Waarom dit rustig blijft")).toBeVisible();
 
@@ -375,15 +363,13 @@ test("toeslagenscan is publiek vindbaar via dashboard en app-overzicht", async (
   await page.getByRole("button", { name: "Alle tools" }).click();
   await expect(page.locator(`a[href="${allowanceScanRoute}"]`)).toBeVisible();
 
-  await page.goto("/v2/apps", { waitUntil: "networkidle" });
-  await expect(page.getByText("10 van 10")).toBeVisible();
-  await expect(page.getByText("Familiehulp")).toHaveCount(0);
-  await page.getByLabel("Zoek tool").fill("zorgtoeslag");
+  await page.goto("/apps", { waitUntil: "networkidle" });
+  await page.getByRole("button", { name: "Alle tools" }).click();
+  await expect(page.locator('a[href^="/v2"]')).toHaveCount(0);
   await expect(
     page.getByRole("heading", { name: "Welke toeslagen passen mogelijk bij mij?" }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Regelingen en maandruimte" }).click();
-  await expect(page.getByText("1 van 10")).toBeVisible();
+  await expect(page.locator(`a[href="${allowanceScanRoute}"]`)).toBeVisible();
 });
 
 test("publieke toeslagenscan route, formulier en bedragindicatie werken", async ({
@@ -483,17 +469,10 @@ test("toeslagenscan kernregressies voor partner, vermogen, special-case en infer
   await expect(page.getByText("Nog te bevestigen")).toBeVisible();
 });
 
-test("toeslagenscan v2-route werkt en verborgen routes blijven 404", async ({
+test("verborgen, uitgeschakelde en v2-routes blijven buiten publieke routes", async ({
   page,
 }, testInfo) => {
   test.skip(!testInfo.project.name.startsWith("desktop"), "Desktop routecontrole");
-
-  const response = await page.goto("/v2/apps/toeslagen-scan", { waitUntil: "networkidle" });
-  expect(response?.status()).toBe(200);
-  await page.reload({ waitUntil: "networkidle" });
-  await expect(
-    page.getByRole("heading", { name: "Welke toeslagen passen mogelijk bij mij?", level: 1 }),
-  ).toBeVisible();
 
   const hiddenResponse = await page.goto("/apps/volgende-euro", { waitUntil: "networkidle" });
   expect(hiddenResponse?.status()).toBe(404);
@@ -505,6 +484,24 @@ test("toeslagenscan v2-route werkt en verborgen routes blijven 404", async ({
     waitUntil: "networkidle",
   });
   expect(response404?.status()).toBe(404);
+
+  const v2Response = await page.goto("/v2/apps/toeslagen-scan", {
+    waitUntil: "networkidle",
+  });
+  expect(v2Response?.status()).toBe(404);
+  expect(page.url()).toContain("/v2/apps/toeslagen-scan");
+});
+
+test("sitemap publiceert geen v2 routes", async ({ request }) => {
+  const response = await request.get("/sitemap.xml");
+  if (response.status() === 404) {
+    expect(response.status()).toBe(404);
+    return;
+  }
+
+  expect(response.status()).toBe(200);
+  const sitemap = await response.text();
+  expect(sitemap).not.toContain("/v2");
 });
 
 test("mobiele toeslagenscan houdt 390px zonder horizontale overflow en focusbasis", async ({
