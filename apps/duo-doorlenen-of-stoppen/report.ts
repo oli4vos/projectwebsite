@@ -851,18 +851,21 @@ export function buildStudyStopPdfReport(
   };
 }
 
-export function studyStopReportFileName(result: StudyStopCalculationResult) {
-  const month = result.calculationMonth.replace("-", "");
-  return `studeren-stoppen-duo-${month}.pdf`;
+export function studyStopReportFileName(
+  result: StudyStopCalculationResult,
+  subject = "studeren-stoppen-duo",
+) {
+  return `${subject}-${result.calculationMonth}.pdf`;
 }
 
 export async function downloadStudyStopPdfReport(
   input: StudyStopInput,
   result: StudyStopCalculationResult,
+  subject?: string,
 ) {
   const { jsPDF } = await import("jspdf");
   const report = buildStudyStopPdfReport(input, result);
   const doc = new jsPDF({ unit: "pt", format: "a4", compress: true });
   renderStudyStopPdfDocument(doc as unknown as PdfDocument, report);
-  doc.save(studyStopReportFileName(result));
+  doc.save(studyStopReportFileName(result, subject));
 }

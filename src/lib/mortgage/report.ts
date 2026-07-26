@@ -647,5 +647,5 @@ export function mortgageReportFileName(result: MortgageMaxMortgageResult) {
   const amount = Math.round(
     Number.isFinite(result.finalMaxMortgage) ? result.finalMaxMortgage : 0,
   );
-  return `hypotheek-rapport-${result.normYear}-${amount}.pdf`;
+  return `maximale-hypotheek-${result.normYear}-${amount}.pdf`;
 }

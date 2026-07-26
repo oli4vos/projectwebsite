@@ -49,7 +49,7 @@ export const reliabilityLabels: Record<AllowanceAdvisorReliabilityLabel, string>
 
 export const reliabilityDescriptions: Record<AllowanceAdvisorReliabilityLabel, string> = {
   "sterke-indicatie": "De belangrijkste brondata en invoer zijn compleet genoeg voor een sterke Project Site-inschatting.",
-  "redelijke-indicatie": "De inschatting gebruikt centrale brondata, maar officiële controle blijft belangrijk.",
+  "redelijke-indicatie": "De inschatting gebruikt de regels voor 2026, maar officiële controle blijft belangrijk.",
   "voorlopige-indicatie": "Er ontbreken gegevens, uitzonderingen of volledige bedragregels. Gebruik dit vooral als vervolgstap.",
 };
 
@@ -88,7 +88,7 @@ export const reasonCodeCopy: Record<string, string> = {
   "rent-household-complex": "Medebewoners of bijzondere woonsituaties maken de huurtoeslagbeoordeling complexer.",
   "rent-subsidiable-rent-uncertain": "Het is onzeker welke huurcomponenten voor de officiële berekening meetellen.",
   "rent-possible": "De bekende harde huurtoeslagvoorwaarden sluiten dit signaal niet uit.",
-  "rent-benefit-calculated": "De huurtoeslag is berekend met de centrale 2026-engine.",
+  "rent-benefit-calculated": "De huurtoeslag is berekend met de regels voor 2026.",
   "rent-benefit-zero-after-income-correction": "Door het inkomen blijft er geen huurtoeslag over.",
   "rent-calculation-rent-capped": "De huur is voor de berekening begrensd op de officiële huurgrens.",
   "rent-service-costs-ignored-2026": "Servicekosten zijn apart gehouden en tellen niet mee als kale huur.",
@@ -106,7 +106,7 @@ export const reasonCodeCopy: Record<string, string> = {
   "child-budget-possible": "De bekende harde voorwaarden voor kindgebonden budget sluiten dit signaal niet uit.",
   "unsupported-foreign-residence-factor": "Wonen buiten Nederland vraagt een woonlandfactor die deze publieke berekening nog blokkeert.",
   "unsupported-co-parenting": "Co-ouderschap wordt nog niet als standaardbedrag berekend.",
-  "child-budget-calculated": "Het kindgebonden budget is berekend met de centrale 2026-engine.",
+  "child-budget-calculated": "Het kindgebonden budget is berekend met de regels voor 2026.",
   "child-budget-zero-after-income-reduction": "Door het inkomen blijft er geen kindgebonden budget over.",
   "child-budget-income-reduction-applied": "Het bedrag is verlaagd door de inkomensafbouw.",
   "child-budget-domestic-residence-factor-applied": "De Nederlandse woonlandfactor is toegepast.",
@@ -136,7 +136,7 @@ export const reasonCodeCopy: Record<string, string> = {
   "childcare-child-residence-excluded": "Als het kind niet bij jou woont, is kinderopvangtoeslag meestal niet van toepassing.",
   "childcare-situation-complex": "De opvang- of activiteitensituatie vraagt om officiële controle.",
   "childcare-possible": "De bekende harde voorwaarden voor kinderopvangtoeslag sluiten dit signaal niet uit.",
-  "childcare-calculated": "De kinderopvangtoeslag is berekend met de centrale 2026-engine.",
+  "childcare-calculated": "De kinderopvangtoeslag is berekend met de regels voor 2026.",
   "childcare-zero-after-reimbursement": "De vergoeding komt op basis van de ingevulde kosten uit op nul.",
   "childcare-first-child-rule-applied": "De officiële eerste-kindregel is toegepast op opvanguren en kosten.",
   "childcare-hours-or-rate-capped": "Uren of uurtarief zijn begrensd op de officiële maxima.",
@@ -193,7 +193,7 @@ export const uncertaintyCopy: Record<AllowanceUncertaintyCode, string> = {
   "variable-childcare-hours": "Wisselende opvanguren vragen om officiële controle.",
   "multiple-childcare-types": "Meerdere opvangvormen vragen om officiële controle.",
   "lrk-registration-uncertain": "Onzekerheid over LRK-registratie vraagt om officiële controle.",
-  "dataset-not-fresh": "De brondata vraagt om hercontrole voordat je op dit signaal vertrouwt.",
+  "dataset-not-fresh": "De gebruikte gegevens moeten opnieuw worden gecontroleerd voordat je op dit signaal vertrouwt.",
 };
 
 export function getReasonCodeCopy(code: string) {

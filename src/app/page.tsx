@@ -34,7 +34,6 @@ const routeSteps = [
 ];
 
 export default async function HomePage() {
-  const publicToolCount = appRegistry.length;
   const availableRouteSteps = routeSteps.map((step) => ({
     ...step,
     links: step.links.filter((link) => {
@@ -48,8 +47,7 @@ export default async function HomePage() {
       <SiteHeader />
       <main id="main-content" className="page-shell min-h-[100dvh] pb-10 pt-8 lg:pb-14">
         <section className="pb-10 pt-2">
-          <div className="grid gap-8 lg:grid-cols-[minmax(0,1.08fr)_minmax(19rem,0.72fr)] lg:items-end">
-            <div className="max-w-3xl">
+          <div className="max-w-3xl">
             <div className="section-label">
               Voor starters met een studieschuld
             </div>
@@ -72,24 +70,6 @@ export default async function HomePage() {
               Geen advies. Je ziet scenario&apos;s met jouw eigen cijfers. Wat je
               ermee doet, bepaal jij.
             </p>
-          </div>
-            <aside className="surface-panel p-5">
-              <div className="section-label">Waarom dit rustig blijft</div>
-              <div className="trust-strip mt-5">
-                <div>
-                  <div className="font-mono text-[22px] tabular text-[var(--ink)]">{publicToolCount}</div>
-                  <p className="text-[12.5px] leading-5 text-[var(--muted)]">publieke tools, bewust beperkt</p>
-                </div>
-                <div>
-                  <div className="font-mono text-[22px] tabular text-[var(--ink)]">DUO</div>
-                  <p className="text-[12.5px] leading-5 text-[var(--muted)]">velden verwijzen naar primaire gegevens</p>
-                </div>
-                <div>
-                  <div className="font-mono text-[22px] tabular text-[var(--ink)]">PDF</div>
-                  <p className="text-[12.5px] leading-5 text-[var(--muted)]">rapporten volgen dezelfde uitkomstdata</p>
-                </div>
-              </div>
-            </aside>
           </div>
         </section>
 

@@ -50,6 +50,9 @@ describe("duo-doorlenen-of-stoppen pdf report", () => {
   it("uses a stable download filename", () => {
     const result = calculateStudyStopScenarios(INPUT);
 
-    expect(studyStopReportFileName(result)).toBe("studeren-stoppen-duo-202607.pdf");
+    expect(studyStopReportFileName(result)).toBe("studeren-stoppen-duo-2026-07.pdf");
+    expect(studyStopReportFileName(result, "verwachte-studieschuld")).toBe(
+      "verwachte-studieschuld-2026-07.pdf",
+    );
   });
 });

@@ -97,6 +97,12 @@ const nextStepSlugByMode: Record<
   "monthly-impact": "duo-schuld-bij-starten-lenen",
 };
 
+const pdfSubjectByMode: Record<SimpleDuoToolMode, string> = {
+  "start-borrowing": "verwachte-studieschuld",
+  "stop-cost": "kosten-stoppen-met-studeren",
+  "monthly-impact": "impact-leenbedrag",
+};
+
 /*
  * Deliberately no repayment-rule selector in the simple tools: these three tools show SF35,
  * because the user question is explicitly about aflossen vanaf terugbetalen in 35 jaar.
@@ -328,7 +334,11 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
 
     setIsDownloadingPdf(true);
     try {
-      await downloadStudyStopPdfReport(submittedView.input, submittedView.result);
+      await downloadStudyStopPdfReport(
+        submittedView.input,
+        submittedView.result,
+        pdfSubjectByMode[mode],
+      );
     } finally {
       setIsDownloadingPdf(false);
     }
@@ -391,7 +401,22 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
       ? submittedView.result.scenarios[0]
       : submittedView.result.scenarios[2]
     : undefined;
-  const nextSteps = getToolNextSteps(nextStepSlugByMode[mode]);
+  const baseNextSteps = getToolNextSteps(nextStepSlugByMode[mode]);
+  const nextSteps = mode === "start-borrowing"
+    ? {
+        ...baseNextSteps,
+        title: "Van verwachte studieschuld naar woningruimte",
+        description:
+          "Je weet nu wat je studieschuld ongeveer wordt. Bekijk vervolgens wat een DUO-maandbedrag voor je woningruimte kan betekenen.",
+      }
+    : mode === "stop-cost"
+      ? {
+          ...baseNextSteps,
+          title: "Van stopkosten naar woningruimte",
+          description:
+            "Je ziet nu welk prestatiebeursdeel schuld blijft. Bekijk vervolgens wat een DUO-maandbedrag voor je woningruimte kan betekenen.",
+        }
+      : baseNextSteps;
 
   const result = submittedView?.isValid ? (
     <div className="space-y-5">
@@ -467,7 +492,7 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
           onClick={() => void handleDownloadPdf()}
           disabled={isDownloadingPdf}
         >
-          {isDownloadingPdf ? "PDF wordt gemaakt..." : "Download uitgebreid PDF-overzicht"}
+          {isDownloadingPdf ? "PDF wordt gemaakt..." : "Download overzicht"}
         </ToolActionButton>
       </section>
     </div>
@@ -477,7 +502,7 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
         Nog niet berekend
       </div>
       <h3 className="text-[18px] font-semibold tracking-[-0.02em] text-[var(--ink)]">
-        Vul alleen deze vraag in
+        Vul je gegevens in
       </h3>
       <p className="text-[13px] leading-[1.7] text-[var(--soft)]">{copy.helper}</p>
     </section>
@@ -515,7 +540,7 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
             onClick={() => void handleDownloadPdf()}
             disabled={!submittedView?.isValid || isDownloadingPdf}
           >
-            {isDownloadingPdf ? "PDF wordt gemaakt..." : "Download uitgebreid PDF-overzicht"}
+            {isDownloadingPdf ? "PDF wordt gemaakt..." : "Download overzicht"}
           </ToolActionButton>
         </div>
       }

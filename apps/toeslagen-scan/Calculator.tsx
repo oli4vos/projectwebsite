@@ -186,7 +186,7 @@ function ResultCard({ card }: { card: AllowanceResultCardView }) {
             {card.title}
           </h3>
           <p className="mt-1 text-[12px] text-[var(--muted)]">
-            Bronjaar {card.ruleYear} · {card.datasetId} v{card.datasetVersion}
+            Regels voor {card.ruleYear}
           </p>
         </div>
         <span className="rounded-full border border-[var(--hair)] bg-[var(--paper-soft)] px-3 py-1 text-[12px] font-medium text-[var(--ink)]">
@@ -284,7 +284,6 @@ function QuestionFlowSummary({ flow }: { flow: AllowanceQuestionFlowView }) {
   }
 
   const { reporting } = flow;
-  const progressDescriptionId = "toeslagen-question-flow-progress-description";
   const nextStepText = flow.decisionReason === "blocked"
     ? reporting.blockingFieldLabels.length > 0
       ? `Nog nodig: ${reporting.blockingFieldLabels.join(", ")}.`
@@ -295,50 +294,19 @@ function QuestionFlowSummary({ flow }: { flow: AllowanceQuestionFlowView }) {
 
   return (
     <section className="surface-panel p-4" aria-labelledby="toeslagen-question-flow-title">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h3 id="toeslagen-question-flow-title" className="text-base font-semibold text-[var(--ink)]">
-            Voortgang
-          </h3>
-          <p
-            id={progressDescriptionId}
-            className="mt-1 text-[13px] leading-[1.55] text-[var(--muted)]"
-          >
-            {flow.completed} van {flow.totalRelevant} relevante vragen verwerkt. Daarvan zijn
-            er {flow.answered} rechtstreeks ingevuld en {flow.inferred} afgeleid.
-          </p>
-        </div>
-        <span
-          className="rounded-full border border-[var(--hair)] bg-[var(--paper-soft)] px-3 py-1 text-[12px] font-medium text-[var(--ink)]"
-          aria-hidden="true"
-        >
-          {flow.percentage}%
-        </span>
-      </div>
-      <div
-        role="progressbar"
-        aria-label="Voortgang van relevante toeslagenvragen"
-        aria-describedby={progressDescriptionId}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={flow.percentage}
-        aria-valuetext={`${flow.percentage}% verwerkt`}
-        className="mt-3 h-2 overflow-hidden rounded-full bg-[var(--paper-soft)]"
-      >
-        <div className="h-full bg-[var(--accent)]" style={{ width: `${flow.percentage}%` }} />
-      </div>
-      <p className="mt-3 text-[13px] leading-[1.6] text-[var(--ink-2)]">
+      <h3 id="toeslagen-question-flow-title" className="text-base font-semibold text-[var(--ink)]">
+        Wat is je volgende stap?
+      </h3>
+      <p className="mt-2 text-[13px] leading-[1.6] text-[var(--ink-2)]">
         {nextStepText}
       </p>
       {flow.blocked > 0 ? (
         <p className="mt-2 text-[13px] leading-[1.6] text-[oklch(35%_0.13_28)]">
-          De voortgang is nog geen volledige invoer zolang verplichte gegevens ontbreken.
+          Vul de verplichte gegevens aan voordat je de toeslagenindicatie bekijkt.
         </p>
       ) : null}
       <ResultList title="Nog verplicht onbekend" items={reporting.blockingFieldLabels} />
       <ResultList title="Afgeleid uit eerdere antwoorden" items={reporting.inferredFieldLabels} />
-      <ResultList title="Niet gevraagd in deze route" items={reporting.skippedFieldLabels} />
-      <ResultList title="Niet van toepassing" items={reporting.notApplicableFieldLabels} />
     </section>
   );
 }
@@ -402,7 +370,7 @@ export default function ToeslagenScanCalculator() {
           tabIndex={-1}
           className="rounded-xl border border-[var(--neg-soft)] bg-[var(--neg-soft)]/55 px-4 py-3 text-sm text-[oklch(35%_0.13_28)]"
         >
-          Controleer de technisch ongeldige invoer. Onbekende inhoudelijke gegevens mag je als
+          Controleer de gemarkeerde invoer. Onbekende gegevens mag je als
           “Weet ik niet” laten staan.
         </div>
       ) : null}
@@ -869,7 +837,7 @@ export default function ToeslagenScanCalculator() {
         Nog geen scan uitgevoerd
       </h2>
       <p className="mt-2 text-[13px] leading-[1.65] text-[var(--muted)]">
-        Vul in wat je weet. “Weet ik niet” mag; de centrale vraagflow toont dan
+        Vul in wat je weet. “Weet ik niet” mag; de scan toont dan
         vervolgstappen, alternatieve vragen en ontbrekende informatie.
       </p>
     </section>
@@ -880,14 +848,14 @@ export default function ToeslagenScanCalculator() {
       intro={
         <>
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
-            Beta · toeslagenscan 2026
+            Toeslagenindicatie 2026
           </div>
           <h2 className="mt-2 font-serif text-[30px] tracking-[-0.02em] text-[var(--ink)]">
             Welke toeslagen passen mogelijk bij mij?
           </h2>
           <p className="mt-3 text-[14px] leading-[1.7] text-[var(--ink-2)]">
-            Deze scan gebruikt de centrale vraagflow en toeslagenberekening voor vier toeslagen.
-            Bedragen verschijnen alleen waar de centrale engine ze verantwoord kan geven.
+            Bekijk zorgtoeslag, huurtoeslag, kindgebonden budget en
+            kinderopvangtoeslag. Je krijgt een bedrag waar je gegevens dat toelaten.
           </p>
         </>
       }
@@ -917,7 +885,7 @@ export default function ToeslagenScanCalculator() {
       details={
         <DisclosureSection title="Afbakening">
           <ul className="list-disc space-y-2 pl-5 text-[13px] leading-[1.65] text-[var(--muted)]">
-            <li>Deze beta gebruikt de centrale 2026-vraagflow, brondata en berekeningslaag.</li>
+            <li>De scan gebruikt de regels en bedragen voor 2026.</li>
             <li>Complexe of onvolledige situaties tonen ontbrekende gegevens en officiële vervolgstappen.</li>
             <li>Deze scan is geen officiële beschikking; Mijn Toeslagen blijft leidend.</li>
           </ul>

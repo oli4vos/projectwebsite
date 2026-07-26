@@ -39,7 +39,7 @@ export const toolGroups: ToolGroup[] = [
   {
     title: "Regelingen en maandruimte",
     description:
-      "Check welke regelingen mogelijk relevant zijn voor je maandruimte, zonder bedrag- of rechtclaim.",
+      "Bekijk welke toeslagen mogelijk passen en krijg voor ondersteunde situaties een bedragindicatie.",
     slugs: ["toeslagen-scan"],
   },
 ];

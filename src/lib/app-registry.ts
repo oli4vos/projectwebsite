@@ -7,7 +7,7 @@ export const appRegistry = [
   {
     "slug": "artifact-hypotheek-wonen-maximale-hypotheek",
     "title": "Maximale hypotheek",
-    "description": "Indicatieve tool voor starters zonder bestaande hypotheek: schat je maximale hypotheek op basis van inkomen, woningwaarde, studieschuld en NHG.",
+    "description": "Schat je maximale hypotheek met je inkomen, woningwaarde, studieschuld en NHG.",
     "enabled": true,
     "type": "frontend",
     "category": "Hypotheek",
@@ -39,7 +39,7 @@ export const appRegistry = [
   {
     "slug": "duo-aanvullende-beurs",
     "title": "Aanvullende beurs berekenen",
-    "description": "Schat je aanvullende beurs voor 2026 met de centrale DUO-rekenlaag en ouderinkomen uit het peiljaar.",
+    "description": "Schat je aanvullende beurs voor 2026 met het ouderinkomen uit het peiljaar.",
     "enabled": true,
     "type": "frontend",
     "category": "Schulden",
@@ -199,7 +199,7 @@ export const appRegistry = [
   {
     "slug": "duo-stoppen-kosten-prestatiebeurs",
     "title": "Wat kost stoppen met studeren?",
-    "description": "Bereken wat stoppen kost door basisbeurs, aanvullende beurs en studentenreisproduct die geen gift worden.",
+    "description": "Bekijk welk deel van je prestatiebeurs schuld blijft als je stopt zonder diploma.",
     "enabled": true,
     "type": "frontend",
     "category": "Schulden",
@@ -311,7 +311,7 @@ export const appRegistry = [
   {
     "slug": "toeslagen-scan",
     "title": "Welke toeslagen passen mogelijk bij mij?",
-    "description": "Bekijk of zorgtoeslag, huurtoeslag, kindgebonden budget of kinderopvangtoeslag mogelijk relevant is. Voor ondersteunde 2026-standaardscenario's toont de scan een euro-indicatie per maand en jaar.",
+    "description": "Bekijk welke van vier toeslagen mogelijk passen en krijg waar mogelijk een bedragindicatie voor 2026.",
     "enabled": true,
     "type": "frontend",
     "category": "Regelingen en maandruimte",

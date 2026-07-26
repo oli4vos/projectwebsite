@@ -127,7 +127,7 @@ describe("hypotheek-impact-studieschuld PDF report", () => {
 
   it("has a stable report file name", () => {
     expect(hypotheekImpactReportFileName(new Date("2026-07-18T10:15:00.000Z"))).toBe(
-      "hypotheek-impact-studieschuld-2026-07.pdf",
+      "impact-studieschuld-op-hypotheek-2026-07.pdf",
     );
   });
 

@@ -21,7 +21,7 @@ export default function AppsPage() {
             Alle tools.
           </h1>
           <p className="text-fluid-lead mt-5 max-w-[58ch] leading-[1.75] text-[var(--ink-2)]">
-            Kies een publieke tool uit de registry. Concepten en hidden tools blijven buiten dit overzicht.
+            Kies het hulpmiddel dat past bij je vraag. Je rekent direct in je browser.
           </p>
         </section>
         <AppDashboard apps={appRegistry} />

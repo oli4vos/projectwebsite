@@ -60,8 +60,8 @@ export default function AppError({
           versie van de site.
         </p>
         <p className="text-[13px] leading-[1.65] text-[var(--muted)]">
-          Blijft dit gebeuren? Ververs hard met Cmd+Shift+R of wis de
-          sitegegevens voor deze website.
+          Blijft dit gebeuren? Ververs de pagina of wis de opgeslagen
+          websitegegevens in je browser.
         </p>
         <div className="flex flex-wrap gap-3">
           <Btn type="button" kind="primary" size="md" onClick={handleReload}>
@@ -81,4 +81,3 @@ export default function AppError({
     </main>
   );
 }
-

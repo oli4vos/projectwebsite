@@ -6,12 +6,14 @@ import { BtnLink, Logo } from "@/components/ui";
 import { ENABLE_PROFILE } from "@/lib/feature-flags";
 
 const navItems = [
-  { href: "/#route", label: "Stappenplan", mobileLabel: "Stappen" },
-  { href: "/#apps", label: "Alle tools", mobileLabel: "Tools" },
-  { href: "/kennisbank", label: "Kennisbank", mobileLabel: "Kennis" },
+  { href: "/#route", label: "Stappenplan", mobileLabel: "Stappenplan" },
+  { href: "/#apps", label: "Alle tools", mobileLabel: "Alle tools" },
+  { href: "/kennisbank", label: "Kennisbank", mobileLabel: "Kennisbank" },
   { href: "/variabelen", label: "Aannames", mobileLabel: "Aannames" },
   { href: "/over", label: "Over", mobileLabel: "Over" },
 ] as const;
+
+const mobileNavItems = navItems.slice(0, 3);
 
 function navClassName(active: boolean) {
   return `touch-link inline-flex min-h-11 shrink-0 items-center rounded-lg px-3 py-2 text-[13px] font-medium focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 ${
@@ -68,18 +70,20 @@ export function SiteHeader() {
             ) : null}
           </nav>
 
-          <div className="hidden md:flex items-center gap-2">
-            <BtnLink href="/#route" kind="primary" size="sm">
-              Begin bij stap 1
-            </BtnLink>
-          </div>
+          {pathname === "/" ? (
+            <div className="hidden items-center gap-2 md:flex">
+              <BtnLink href="/#route" kind="primary" size="sm">
+                Begin bij stap 1
+              </BtnLink>
+            </div>
+          ) : null}
         </div>
 
         <nav
           aria-label="Mobiele navigatie"
           className="mt-3 flex min-h-11 items-center gap-2 overflow-x-auto pb-1 text-[13px] md:hidden"
         >
-          {navItems.map((item) => (
+          {mobileNavItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}

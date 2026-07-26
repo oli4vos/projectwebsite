@@ -497,7 +497,7 @@ export function buildHypotheekImpactPdfReport(
     generatedAt: formatDateTime(generatedAt),
     sourceVersion: LAST_CHECKED,
     disclaimer:
-      "Deze PDF is een indicatieve berekening op basis van de ingevoerde gegevens en centrale brondata. Het is geen hypotheekadvies, geen DUO-beschikking en geen bindende acceptatie van een geldverstrekker.",
+      "Deze PDF is een indicatieve berekening op basis van de ingevoerde gegevens en gebruikte brongegevens. Het is geen hypotheekadvies, geen DUO-beschikking en geen bindende acceptatie van een geldverstrekker.",
     summaryLines: [
       {
         label: "Verplicht DUO-bedrag",
@@ -606,7 +606,7 @@ export function hypotheekImpactReportFileName(generatedAt = new Date()) {
   const year = parts.find((part) => part.type === "year")?.value ?? "0000";
   const month = parts.find((part) => part.type === "month")?.value ?? "00";
   const yearMonth = `${year}-${month}`;
-  return `hypotheek-impact-studieschuld-${yearMonth}.pdf`;
+  return `impact-studieschuld-op-hypotheek-${yearMonth}.pdf`;
 }
 
 export async function downloadHypotheekImpactPdfReport(

@@ -17,7 +17,7 @@ export default function NotFound() {
           <div>
             <Pill tone="accent">Pagina niet gevonden</Pill>
             <h1 className="mt-5 max-w-3xl font-serif text-[40px] leading-[1.05] tracking-[-0.03em] text-[var(--ink)] sm:text-[54px]">
-              Deze route geeft nu geen grip, maar je zit niet vast.
+              Deze pagina is niet gevonden.
             </h1>
             <p className="mt-5 max-w-[60ch] text-[15px] leading-[1.7] text-[var(--ink-2)]">
               De pagina die je zoekt bestaat niet of is verplaatst. Ga terug naar het

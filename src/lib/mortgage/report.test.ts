@@ -95,6 +95,6 @@ describe("mortgage PDF report", () => {
 
   it("creates a stable filename from the final mortgage amount", () => {
     const result = calculateIndicativeMaxMortgage(input);
-    expect(mortgageReportFileName(result)).toMatch(/^hypotheek-rapport-\d{4}-\d+\.pdf$/);
+    expect(mortgageReportFileName(result)).toMatch(/^maximale-hypotheek-\d{4}-\d+\.pdf$/);
   });
 });

@@ -299,7 +299,7 @@ export default function Calculator() {
             onClick={() => void handleDownloadPdf()}
             disabled={!result || isDownloadingPdf}
           >
-            {isDownloadingPdf ? "PDF wordt gemaakt..." : "PDF-rapport downloaden"}
+            {isDownloadingPdf ? "PDF wordt gemaakt..." : "Download overzicht"}
           </ToolActionButton>
         </div>
       }

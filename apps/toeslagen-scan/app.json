@@ -2,7 +2,7 @@
   "slug": "toeslagen-scan",
   "enabled": true,
   "title": "Welke toeslagen passen mogelijk bij mij?",
-  "description": "Bekijk of zorgtoeslag, huurtoeslag, kindgebonden budget of kinderopvangtoeslag mogelijk relevant is. Voor ondersteunde 2026-standaardscenario's toont de scan een euro-indicatie per maand en jaar.",
+  "description": "Bekijk welke van vier toeslagen mogelijk passen en krijg waar mogelijk een bedragindicatie voor 2026.",
   "type": "frontend",
   "category": "Regelingen en maandruimte",
   "tags": [

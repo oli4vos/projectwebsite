@@ -999,13 +999,13 @@ function formatChildReferenceComponent(value: unknown) {
 
 function summaryFromScanResult(result: PublicAllowanceBenefitResult) {
   if (result.status === "calculated") {
-    return "Deze toeslag is indicatief berekend met de centrale 2026-engine voor ondersteunde standaardscenario's.";
+    return "Deze toeslag is indicatief berekend met de regels voor 2026 voor ondersteunde standaardsituaties.";
   }
   if (result.status === "no-entitlement") {
-    return "De centrale engine geeft voor deze invoer een echte nuluitkomst of geen recht terug.";
+    return "Met deze invoer komt de berekening uit op €0 of waarschijnlijk geen recht.";
   }
   if (result.status === "incomplete-input") {
-    return "Er ontbreken nog concrete gegevens voordat de centrale engine een bedrag mag berekenen.";
+    return "Er ontbreken nog gegevens voordat een bedrag kan worden berekend.";
   }
   if (result.status === "unsupported" || result.status === "manual-review") {
     return "Deze situatie wordt niet als standaardscenario berekend. Gebruik de officiële proefberekening.";

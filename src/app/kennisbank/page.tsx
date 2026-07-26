@@ -122,12 +122,9 @@ export default function KnowledgeBasePage() {
                 key={topic.id}
                 className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper"
               >
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <h2 className="font-serif text-[clamp(1.2rem,1.02rem+0.75vw,1.6rem)] tracking-[-0.02em] text-[var(--ink)]">
-                    {topic.title}
-                  </h2>
-                  <Pill>Kader</Pill>
-                </div>
+                <h2 className="font-serif text-[clamp(1.2rem,1.02rem+0.75vw,1.6rem)] tracking-[-0.02em] text-[var(--ink)]">
+                  {topic.title}
+                </h2>
                 <p className="mt-3 max-w-[68ch] text-[14px] leading-[1.7] text-[var(--ink-2)]">
                   <GlossaryText text={topic.summary} />
                 </p>
@@ -242,19 +239,14 @@ export default function KnowledgeBasePage() {
         </section>
 
         <section className="mt-8 rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <h2 className="font-serif text-[clamp(1.25rem,1.05rem+0.8vw,1.7rem)] tracking-[-0.02em] text-[var(--ink)]">
-                Bronnen die de kennisbank dragen
-              </h2>
-              <p className="mt-2 max-w-[72ch] text-[14px] leading-[1.7] text-[var(--ink-2)]">
-                Deze bronnen zijn de basis voor de uitleg op de kennisbank en
-                voor toekomstige artikelen. Wet en normadvies staan bovenaan;
-                praktijkbronnen zijn alleen aanvullend.
-              </p>
-            </div>
-            <Pill tone="dark">Centrale bronlaag</Pill>
-          </div>
+          <h2 className="font-serif text-[clamp(1.25rem,1.05rem+0.8vw,1.7rem)] tracking-[-0.02em] text-[var(--ink)]">
+            Bronnen die de kennisbank dragen
+          </h2>
+          <p className="mt-2 max-w-[72ch] text-[14px] leading-[1.7] text-[var(--ink-2)]">
+            Deze bronnen zijn de basis voor de uitleg op de kennisbank en
+            voor toekomstige artikelen. Wet en normadvies staan bovenaan;
+            praktijkbronnen zijn alleen aanvullend.
+          </p>
 
           <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {knowledgeSourceEntries.map(([id, source]) => (

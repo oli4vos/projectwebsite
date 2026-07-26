@@ -28,7 +28,7 @@ export function ToolDisclosure({
           ) : null}
         </div>
         <span className="shrink-0 rounded-md border border-[var(--hair)] bg-white/72 px-2 py-1 text-[12px] text-[var(--soft)]">
-          Open / sluit
+          Details
         </span>
       </summary>
       <div className="hair-t px-5 pb-5 pt-4">{children}</div>

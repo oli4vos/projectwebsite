@@ -389,7 +389,7 @@ export default function DuoMaandbedragCalculator() {
           onClick={handleDownloadPdf}
           disabled={isDownloadingPdf}
         >
-          {isDownloadingPdf ? "PDF wordt gemaakt..." : "Download uitgebreid PDF-overzicht"}
+          {isDownloadingPdf ? "PDF wordt gemaakt..." : "Download overzicht"}
         </ToolActionButton>
       </div>
       <div className="grid gap-3 sm:grid-cols-2">

@@ -386,7 +386,7 @@ function renderMortgagePdfDocument(doc: PdfDocument, report: MortgagePdfReport) 
   y = renderSectionTitle(
     doc,
     "Berekeningsvolgorde",
-    "De stappen hieronder staan in dezelfde volgorde als waarin de engine de hypotheekindicatie opbouwt.",
+    "De stappen hieronder staan in dezelfde volgorde als de hypotheekberekening.",
     y,
   );
 

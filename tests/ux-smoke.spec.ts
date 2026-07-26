@@ -218,7 +218,37 @@ test("DUO-tools tonen de uitgebreide PDF-download", async ({ page }, testInfo) =
     "/apps/duo-extra-aflossen",
   ]) {
     await page.goto(route, { waitUntil: "networkidle" });
-    await expect(page.getByRole("button", { name: "Download uitgebreid PDF-overzicht" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Download overzicht" })).toBeVisible();
+  }
+});
+
+test("gerichte DUO-tools gebruiken begrijpelijke PDF-bestandsnamen", async ({
+  page,
+}, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "Desktopdownload controleren");
+
+  for (const { route, filename } of [
+    {
+      route: "/apps/duo-schuld-bij-starten-lenen",
+      filename: /^verwachte-studieschuld-\d{4}-\d{2}\.pdf$/,
+    },
+    {
+      route: "/apps/duo-stoppen-kosten-prestatiebeurs",
+      filename: /^kosten-stoppen-met-studeren-\d{4}-\d{2}\.pdf$/,
+    },
+    {
+      route: "/apps/duo-leenbedrag-impact",
+      filename: /^impact-leenbedrag-\d{4}-\d{2}\.pdf$/,
+    },
+  ]) {
+    await page.goto(route, { waitUntil: "networkidle" });
+    await page.getByRole("button", { name: "Voorbeeld invullen" }).click();
+    await page.getByRole("button", { name: "Bereken", exact: true }).click();
+
+    const downloadPromise = page.waitForEvent("download");
+    await page.getByRole("button", { name: "Download overzicht" }).last().click();
+    const download = await downloadPromise;
+    expect(download.suggestedFilename()).toMatch(filename);
   }
 });
 
@@ -232,7 +262,7 @@ test("hypotheek-impact maakt een PDF vanuit de laatst berekende invoer", async (
   });
 
   const pdfButton = page.getByRole("button", {
-    name: "Download uitgebreid PDF-overzicht",
+    name: "Download overzicht",
   });
   await expect(pdfButton).toHaveCount(0);
 
@@ -245,7 +275,7 @@ test("hypotheek-impact maakt een PDF vanuit de laatst berekende invoer", async (
   await pdfButton.click();
   const download = await downloadPromise;
   expect(download.suggestedFilename()).toMatch(
-    /^hypotheek-impact-studieschuld-\d{4}-\d{2}\.pdf$/,
+    /^impact-studieschuld-op-hypotheek-\d{4}-\d{2}\.pdf$/,
   );
   await expect(
     page.getByText("PDF-overzicht gemaakt met de laatst berekende invoer."),
@@ -331,7 +361,7 @@ test("dashboard toont publieke toolkaarten met centrale surface-stijl", async ({
 
   await page.goto("/", { waitUntil: "networkidle" });
 
-  const cards = page.locator('a[href^="/apps/"]').filter({ hasText: "Openen" });
+  const cards = page.locator('a[href^="/apps/"]').filter({ hasText: "Open tool" });
   await expect(cards.first()).toBeVisible();
 
   const cardClass = await cards.first().getAttribute("class");
@@ -345,7 +375,7 @@ test("dashboard toont publieke toolkaarten met centrale surface-stijl", async ({
   expect(uniqueToolRoutes.every((route) => !route.startsWith("/v2"))).toBe(true);
   await expect(page.locator('a[href^="/v2"]')).toHaveCount(0);
   await expect(page.getByText("Familiehulp")).toHaveCount(0);
-  await expect(page.getByText("Waarom dit rustig blijft")).toBeVisible();
+  await expect(page.getByText("Waarom dit rustig blijft")).toHaveCount(0);
 
   await page.getByRole("button", { name: "Alle tools" }).click();
   await expect(page.locator(`a[href="${allowanceScanRoute}"]`)).toBeVisible();
@@ -383,14 +413,12 @@ test("publieke toeslagenscan route, formulier en bedragindicatie werken", async 
   await expect(
     page.getByRole("heading", { name: "Welke toeslagen passen mogelijk bij mij?", level: 1 }),
   ).toBeVisible();
-  await expect(page.getByText("Beta · toeslagenscan 2026")).toBeVisible();
+  await expect(page.getByText("Toeslagenindicatie 2026")).toBeVisible();
   await expect(
     page.getByText("Geen persoonlijke aanbeveling en geen officiële beschikking"),
   ).toBeVisible();
-  await expect(page.getByText("centrale vraagflow en toeslagenberekening")).toBeVisible();
-  await expect(
-    page.getByRole("progressbar", { name: "Voortgang van relevante toeslagenvragen" }),
-  ).toBeVisible();
+  await expect(page.getByText("Je krijgt een bedrag waar je gegevens dat toelaten.")).toBeVisible();
+  await expect(page.getByRole("progressbar")).toHaveCount(0);
   await expect(page.getByText("Volgende stap: vul leeftijd in.")).toBeVisible();
   await expect(page.getByRole("button", { name: "Download uitgebreid PDF-overzicht" })).toHaveCount(0);
 
@@ -400,7 +428,7 @@ test("publieke toeslagenscan route, formulier en bedragindicatie werken", async 
   expect(bodyText).not.toContain("gegarandeerd recht");
 
   await page.getByRole("button", { name: "Voorbeeld invullen" }).click();
-  await expect(page.getByText("Niet van toepassing")).toBeVisible();
+  await expect(page.getByText("Niet van toepassing")).toHaveCount(0);
   await page.getByLabel("Leeftijden kinderen").fill("6");
   await page.getByLabel("Heb je kinderen?", { exact: true }).selectOption("unknown");
   await expect(page.getByLabel("Kale huur per maand")).toBeVisible();
@@ -430,7 +458,7 @@ test("publieke toeslagenscan route, formulier en bedragindicatie werken", async 
 
   await page.getByLabel("Woonsituatie", { exact: true }).selectOption("owner");
   await expect(page.getByLabel("Kale huur per maand")).toHaveCount(0);
-  await expect(page.getByText("Niet gevraagd in deze route")).toBeVisible();
+  await expect(page.getByText("Niet gevraagd in deze route")).toHaveCount(0);
   await page.getByLabel("Heb je kinderen?", { exact: true }).selectOption("no");
   await expect(page.getByLabel("Opvanguren per maand")).toHaveCount(0);
 
@@ -510,9 +538,7 @@ test("mobiele toeslagenscan houdt 390px zonder horizontale overflow en focusbasi
   test.skip(!testInfo.project.name.startsWith("mobile"), "Mobiele controle");
 
   await page.goto(allowanceScanRoute, { waitUntil: "networkidle" });
-  await expect(
-    page.getByRole("progressbar", { name: "Voortgang van relevante toeslagenvragen" }),
-  ).toBeVisible();
+  await expect(page.getByRole("progressbar")).toHaveCount(0);
   await expect(page.getByText("Volgende stap: vul leeftijd in.")).toBeVisible();
   await page.keyboard.press("Tab");
   const activeTag = await page.evaluate(() => document.activeElement?.tagName.toLowerCase());

@@ -577,9 +577,6 @@ function CalculatorContent({
             maar tijdelijke verlagingen of betaalpauzes tellen niet altijd als
             structureel lagere last.
           </p>
-          <p className="mt-3 text-[13px] leading-[1.65] text-[var(--muted)]">
-            Pech gehad met het leenstelsel? Deze tool helpt je niet klagen, maar rekenen.
-          </p>
         </div>
 
         <div className="surface-subtle mt-6 px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
@@ -1210,7 +1207,7 @@ function CalculatorContent({
                     onClick={handleDownloadPdf}
                     disabled={isDownloadingPdf}
                   >
-                    {isDownloadingPdf ? "PDF wordt gemaakt..." : "Download uitgebreid PDF-overzicht"}
+                    {isDownloadingPdf ? "PDF wordt gemaakt..." : "Download overzicht"}
                   </ToolActionButton>
                 ) : (
                   <span
@@ -2145,18 +2142,6 @@ function CalculatorContent({
           {formValues.showAdvancedAssumptions ? (
             <InfoList items={result?.assumptions ?? []} />
           ) : null}
-        </div>
-
-        <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
-          <h3 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
-            Waarom geen snelle vuistregel meer?
-          </h3>
-          <p className="mt-3 text-[13.5px] leading-[1.65] text-[var(--muted)]">
-            Deze tool gebruikt bewust geen losse jaarfactor meer als hoofdroute.
-            De uitkomst komt uit netto DUO-last, indicatieve brutering en daarna
-            annuïtaire vertaling naar hoofdsom-impact. Dat geeft een betrouwbaardere
-            ordegrootte dan een vaste vuistregel.
-          </p>
         </div>
 
         <InfoList items={result?.warnings ?? []} tone="warning" />

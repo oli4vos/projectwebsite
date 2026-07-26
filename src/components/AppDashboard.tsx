@@ -13,7 +13,6 @@ import {
 } from "@/lib/audience-routes";
 import { ENABLE_PROFILE } from "@/lib/feature-flags";
 import { toolGroups } from "@/lib/tool-groups";
-import { BtnLink } from "@/components/ui";
 import { AppCard } from "./AppCard";
 import { GlossaryText } from "./GlossaryText";
 import { KnowledgeLevelSelector } from "./KnowledgeLevelSelector";
@@ -150,9 +149,6 @@ export function AppDashboard({ apps }: AppDashboardProps) {
           <p className="mt-2 text-[13px] leading-[1.6] text-[var(--muted)]">
             <GlossaryText text={activeAudiencePreset.summary} />
           </p>
-          <p className="mt-2 text-[12.5px] leading-[1.55] text-[var(--soft)]">
-            <GlossaryText text={activeAudiencePreset.researchSignal} />
-          </p>
           {recommendedRouteApps.length > 0 ? (
             <div className="mt-4 grid gap-2 md:grid-cols-3">
               {recommendedRouteApps.map((app) => (
@@ -161,12 +157,8 @@ export function AppDashboard({ apps }: AppDashboardProps) {
                   href={`/apps/${app.slug}`}
                   className="touch-link group rounded-lg border hair bg-white/82 p-3 focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
                 >
-                  <div className="text-[11px] font-medium text-[var(--soft)]">Startpunt</div>
-                  <div className="mt-1 text-[13px] font-medium leading-[1.35] text-[var(--ink)]">
+                  <div className="text-[13px] font-medium leading-[1.35] text-[var(--ink)]">
                     {app.title}
-                  </div>
-                  <div className="mt-2 text-[12px] text-[var(--muted)] transition group-hover:text-[var(--ink)]">
-                    Open tool
                   </div>
                 </Link>
               ))}
@@ -196,9 +188,6 @@ export function AppDashboard({ apps }: AppDashboardProps) {
                   <GlossaryText text={group.description} />
                 </p>
               </div>
-              <span className="text-[12px] text-[var(--soft)]">
-                {group.apps.length} {group.apps.length === 1 ? "tool" : "tools"}
-              </span>
             </div>
             <div className="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-[1fr_1fr_1.08fr]">
               {group.apps.map((app) => (
@@ -220,13 +209,12 @@ export function AppDashboard({ apps }: AppDashboardProps) {
           id="apps-artifacts"
           className="surface-panel p-6"
         >
-          <div className="text-[13px] font-medium text-[var(--muted)]">Aparte categorie</div>
+          <div className="text-[13px] font-medium text-[var(--muted)]">Extra hulpmiddel</div>
           <h4 className="mt-2 font-serif text-[clamp(1.2rem,1.05rem+0.7vw,1.5rem)] tracking-[-0.015em] text-[var(--ink)]">
-            Artifacts tools (invulbladen)
+            Maximale hypotheek
           </h4>
           <p className="mt-2 max-w-[70ch] text-[13.5px] leading-[1.65] text-[var(--muted)]">
-            Deze tools komen rechtstreeks uit ingevulde artifacts en staan bewust
-            los van de reguliere toolgroepen.
+            Schat wat je op basis van inkomen, woningwaarde en studieschuld kunt lenen.
           </p>
           <div className="mt-5 space-y-5">
             {artifactGroups.map((group) => (
@@ -234,10 +222,6 @@ export function AppDashboard({ apps }: AppDashboardProps) {
                 key={group.category}
                 className="surface-subtle p-4"
               >
-                <div className="text-[12px] font-medium text-[var(--soft)]">Artifact-categorie</div>
-                <h5 className="mt-1 font-serif text-[1.05rem] tracking-[-0.01em] text-[var(--ink)]">
-                  {group.category}
-                </h5>
                 <div className="mt-3 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
                   {group.apps.map((app) => (
                     <AppCard key={app.slug} app={app} />
@@ -249,40 +233,6 @@ export function AppDashboard({ apps }: AppDashboardProps) {
         </section>
       ) : null}
 
-      <section
-        id="aannames"
-        className={`surface-panel grid gap-4 p-6 ${
-          ENABLE_PROFILE ? "md:grid-cols-2" : ""
-        }`}
-      >
-        {ENABLE_PROFILE ? (
-          <div>
-            <div className="text-[13px] font-medium text-[var(--muted)]">Maak het persoonlijker</div>
-            <p className="mt-2 text-[14px] leading-[1.65] text-[var(--ink-2)]">
-              Profiel is optioneel en blijft lokaal in je browser. Tools kunnen daarmee velden voorinvullen.
-            </p>
-            <div className="mt-3">
-              <BtnLink href="/profiel" kind="outline" size="md">
-                Naar profiel
-              </BtnLink>
-            </div>
-          </div>
-        ) : null}
-        <div>
-          <div className="text-[13px] font-medium text-[var(--muted)]">Controleer aannames</div>
-          <p className="mt-2 text-[14px] leading-[1.65] text-[var(--ink-2)]">
-            Bekijk met welke percentages en standaardwaarden de site rekent.
-          </p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <BtnLink href="/variabelen" kind="outline" size="md">
-              Naar aannames
-            </BtnLink>
-            <BtnLink href="/kennisbank" kind="outline" size="md">
-              Naar kennisbank
-            </BtnLink>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

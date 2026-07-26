@@ -235,7 +235,7 @@ function statusLabel(result: DuoAdditionalGrantResult) {
 
 function conclusion(result: DuoAdditionalGrantResult) {
   if (result.status === "calculated" && (result.estimatedMonthlyGrant ?? 0) > 0) {
-    return "Op basis van deze concrete gegevens schat de centrale DUO-rekenlaag een aanvullende beurs.";
+    return "Op basis van deze gegevens is dit je geschatte aanvullende beurs.";
   }
   if (result.status === "calculated") {
     return "De berekende ouderbijdrage is minstens zo hoog als het maximale maandbedrag. Daardoor komt de schatting uit op €0.";
@@ -246,7 +246,7 @@ function conclusion(result: DuoAdditionalGrantResult) {
   if (result.status === "official-verification-required") {
     return "De berekening gebruikt een schatting of onzekere input. DUO kan later corrigeren zodra definitieve gegevens bekend zijn.";
   }
-  return "Vul eerst de ontbrekende concrete gegevens aan voordat de centrale rekenlaag kan rekenen.";
+  return "Vul eerst de ontbrekende gegevens aan voordat de berekening kan worden gemaakt.";
 }
 
 function probablyEligibleLabel(result: DuoAdditionalGrantResult) {
@@ -269,12 +269,12 @@ function reasonMessage(code: string) {
     return "Er is een bijzondere oudersituatie gekozen; DUO moet dit apart beoordelen.";
   }
   if (code.startsWith("missing-")) {
-    return "Er ontbreekt nog concrete invoer voor de centrale berekening.";
+    return "Er ontbreekt nog invoer voor de berekening.";
   }
   if (code.startsWith("invalid-")) {
-    return "Een ingevulde waarde past niet binnen het centrale invoercontract.";
+    return "Controleer de gemarkeerde ingevulde waarde.";
   }
-  return reasonCodeMessages[code] ?? "Deze engine-melding vraagt om controle in de toelichting.";
+  return reasonCodeMessages[code] ?? "Bekijk de toelichting bij deze uitkomst.";
 }
 
 function sourceLinks(result: DuoAdditionalGrantResult) {
@@ -326,7 +326,12 @@ export function createAdditionalGrantView(values: AdditionalGrantFormValues): Ad
       { label: "Berekende ouderbijdrage per maand", value: formatCurrency(trace.parentalMonthlyContribution) },
       { label: "Gezamenlijk ouderinkomen gebruikt", value: formatCurrency(trace.usedJointParentIncome) },
       { label: "Betrouwbaarheid", value: result.confidence === "high" ? "Hoog" : result.confidence === "medium" ? "Middel" : "Laag" },
-      { label: "Officiële controle", value: result.officialVerificationRequired ? "Ja" : "Nee" },
+      {
+        label: "Controle door DUO",
+        value: result.officialVerificationRequired
+          ? "Nodig door onzekere of bijzondere invoer"
+          : "DUO stelt het officiële bedrag vast na je aanvraag",
+      },
       { label: "Inkomensdaling peiljaarverlegging", value: formatNumber(result.referenceYearComparison.incomeDropPercent, "%") },
     ],
     reasonMessages: result.reasonCodes.map(reasonMessage),

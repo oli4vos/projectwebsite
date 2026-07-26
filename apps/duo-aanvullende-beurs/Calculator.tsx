@@ -251,7 +251,7 @@ export default function DuoAanvullendeBeursCalculator() {
                 error={errors.calculationMonth}
                 prefix=""
                 inputMode="numeric"
-                hint="De centrale engine ondersteunt de gevalideerde mbo-periode."
+                hint="De berekening ondersteunt de gecontroleerde mbo-periode."
                 onChange={(value) => updateField("calculationMonth", value)}
               />
               <SelectField
@@ -347,7 +347,7 @@ export default function DuoAanvullendeBeursCalculator() {
 
       <DisclosureSection title="Aftrekposten en broers of zussen">
         <p className="text-[13px] leading-[1.65] text-[var(--muted)]">
-          Laat deze velden leeg als ze niet spelen. De centrale engine gebruikt ze alleen als je
+          Laat deze velden leeg als ze niet spelen. De berekening gebruikt ze alleen als je
           concrete waarden invult.
         </p>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -455,12 +455,12 @@ export default function DuoAanvullendeBeursCalculator() {
       <section className="surface-panel space-y-5 p-5">
         <BulletList title="Aannames" items={submittedView.assumptionMessages} />
         <BulletList title="Waarschuwingen" items={submittedView.warningMessages} />
-        <BulletList title="Engine-meldingen vertaald" items={submittedView.reasonMessages} />
+        <BulletList title="Toelichting" items={submittedView.reasonMessages} />
       </section>
       <section className="surface-panel p-5">
         <h3 className="font-serif text-xl text-[var(--ink)]">Bronnen</h3>
         <p className="mt-2 text-[13px] leading-[1.6] text-[var(--muted)]">
-          De tool past de centrale DUO-brondata zelf toe. Deze links zijn er voor controle en verdieping.
+          De berekening gebruikt de DUO-regels voor 2026. Deze links zijn er voor controle en verdieping.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           {submittedView.sourceLinks.map((link) => (
@@ -481,8 +481,8 @@ export default function DuoAanvullendeBeursCalculator() {
     <div className="surface-panel p-5">
       <h3 className="font-serif text-xl text-[var(--ink)]">Nog geen berekening</h3>
       <p className="mt-2 text-[14px] leading-[1.65] text-[var(--muted)]">
-        Vul concrete opleiding-, woon- en ouderinkomensgegevens in. Daarna rekent de centrale
-        aanvullende-beursengine het maand- en jaarbedrag uit.
+        Vul je opleiding, woonsituatie en het ouderinkomen in. Daarna zie je een
+        bedrag per maand en per jaar.
       </p>
     </div>
   );
@@ -532,8 +532,8 @@ export default function DuoAanvullendeBeursCalculator() {
       result={result}
       disclaimer={
         <p className="text-[12px] leading-[1.6] text-[var(--muted)]">
-          Deze tool geeft een indicatieve Project Site-berekening en geen DUO-beschikking.
-          Ouderinkomens blijven in de browser en worden niet in URL&apos;s of analytics verwerkt.
+          Deze tool geeft een indicatie en geen DUO-beschikking.
+          Ouderinkomens blijven alleen in je browser.
         </p>
       }
     />

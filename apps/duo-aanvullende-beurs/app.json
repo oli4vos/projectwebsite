@@ -2,7 +2,7 @@
   "slug": "duo-aanvullende-beurs",
   "enabled": true,
   "title": "Aanvullende beurs berekenen",
-  "description": "Schat je aanvullende beurs voor 2026 met de centrale DUO-rekenlaag en ouderinkomen uit het peiljaar.",
+  "description": "Schat je aanvullende beurs voor 2026 met het ouderinkomen uit het peiljaar.",
   "type": "frontend",
   "category": "Schulden",
   "tags": [
