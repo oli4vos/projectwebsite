@@ -74,7 +74,7 @@ export function V2Dashboard({ apps }: V2DashboardProps) {
               className="v2-input"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Bijvoorbeeld: studieschuld, hypotheek, familiehulp"
+              placeholder="Bijvoorbeeld: studieschuld, hypotheek, eigen geld"
               type="search"
             />
           </label>

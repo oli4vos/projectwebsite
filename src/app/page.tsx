@@ -24,7 +24,7 @@ const routeSteps = [
   },
   {
     title: "Wat betekent dit voor een huis?",
-    body: "Bekijk de impact van je studieschuld op hypotheekruimte, eigen geld en familiehulp.",
+    body: "Bekijk de impact van je studieschuld op hypotheekruimte, eigen geld en woningwaarde.",
     links: [
       { href: "/apps/hypotheek-impact-studieschuld", label: "Impact op hypotheek" },
       { href: "/apps/artifact-hypotheek-wonen-maximale-hypotheek", label: "Maximale hypotheek" },

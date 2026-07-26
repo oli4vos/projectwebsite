@@ -38,7 +38,7 @@ const generalReasonsBySlug: Record<string, string> = {
   "artifact-hypotheek-wonen-maximale-hypotheek":
     "Handig als je daarna je maximale hypotheek indicatief wilt inschatten.",
   "familiehulp-eerste-woning":
-    "Handig als je eigen geld, DUO en hulp van familie samen wilt bekijken.",
+    "Handig als je eigen geld, DUO en woningruimte samen wilt bekijken.",
   "schulden-volgorde":
     "Handig als je meerdere schulden feitelijk naast elkaar wilt zetten.",
 };

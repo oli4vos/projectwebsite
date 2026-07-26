@@ -41,7 +41,7 @@ export const audienceRoutes: AudienceRoute[] = [
       "Begin bij stoppen, schuldopbouw, maandbedrag en wat je studieschuld later betekent.",
     userQuestion: "Wat doet mijn studieschuld met mijn ruimte per maand?",
     researchSignal:
-      "Eerst grip op DUO, daarna pas wonen en familiehulp.",
+      "Eerst grip op DUO, daarna pas wonen en eigen geld.",
     groups: ["Studieschuld", "Wonen"],
     primaryToolSlugs: [
       "duo-schuld-bij-starten-lenen",
@@ -57,11 +57,11 @@ export const audienceRoutes: AudienceRoute[] = [
     id: "koopstarter-familiehulp",
     label: "Daarna wonen",
     summary:
-      "Vergelijk woningprijs, eigen geld, DUO, bankhypotheek, familielening en schenking.",
+      "Vergelijk woningprijs, eigen geld, DUO en bankhypotheek.",
     userQuestion:
-      "Kan ik kopen met studieschuld, eigen geld en hulp van familie?",
+      "Kan ik kopen met studieschuld, eigen geld en bankhypotheek?",
     researchSignal:
-      "Wonen is een verdiepingslaag: familielening, schenking en contractuele lasten blijven apart.",
+      "Wonen is een verdiepingslaag: studieschuld, eigen geld en contractuele lasten blijven apart.",
     groups: ["Studieschuld", "Wonen"],
     primaryToolSlugs: [
       "hypotheek-impact-studieschuld",

@@ -356,6 +356,7 @@ test("dashboard toont publieke toolkaarten met centrale surface-stijl", async ({
   expect(uniqueToolRoutes).toHaveLength(9);
   expect(uniqueToolRoutes).not.toContain("/apps/familiehulp-eerste-woning");
   expect(uniqueToolRoutes).not.toContain(allowanceScanRoute);
+  await expect(page.getByText("Familiehulp")).toHaveCount(0);
   await expect(page.getByText("Waarom dit rustig blijft")).toBeVisible();
 
   await page.getByRole("button", { name: "Alle tools" }).click();
@@ -376,6 +377,7 @@ test("toeslagenscan is publiek vindbaar via dashboard en app-overzicht", async (
 
   await page.goto("/v2/apps", { waitUntil: "networkidle" });
   await expect(page.getByText("10 van 10")).toBeVisible();
+  await expect(page.getByText("Familiehulp")).toHaveCount(0);
   await page.getByLabel("Zoek tool").fill("zorgtoeslag");
   await expect(
     page.getByRole("heading", { name: "Welke toeslagen passen mogelijk bij mij?" }),

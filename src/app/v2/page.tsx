@@ -65,7 +65,7 @@ export default function V2HomePage() {
         <section className="v2-section">
           <div className="v2-container grid gap-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(280px,0.8fr)] lg:items-end">
             <div className="space-y-6">
-              <div className="v2-kicker">Studieschuld, hypotheek en familiehulp</div>
+              <div className="v2-kicker">Studieschuld, hypotheek en eigen geld</div>
               <h1 className="max-w-3xl">
                 Je keuzes helder maken zonder eerst door een warboel aan tools te gaan.
               </h1>

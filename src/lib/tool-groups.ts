@@ -24,7 +24,7 @@ export const toolGroups: ToolGroup[] = [
   },
   {
     title: "Wonen",
-    description: "Verdieping voor kopen: hypotheekruimte, woningwaarde, eigen geld en hulp van familie.",
+    description: "Verdieping voor kopen: hypotheekruimte, woningwaarde, eigen geld en studieschuld.",
     slugs: [
       "hypotheek-impact-studieschuld",
       "artifact-hypotheek-wonen-maximale-hypotheek",

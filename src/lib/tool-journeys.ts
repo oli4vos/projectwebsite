@@ -130,7 +130,7 @@ export const publicToolJourneys = {
   "hypotheek-impact-studieschuld": {
     title: "Van studieschuld naar volledige hypotheek",
     description:
-      "Je weet nu hoeveel leencapaciteit je studieschuld indicatief kost. De volgende vraag is meestal wat je totale hypotheekruimte is en of familiehulp nodig is.",
+      "Je weet nu hoeveel leencapaciteit je studieschuld indicatief kost. De volgende vraag is meestal wat je totale hypotheekruimte is en hoeveel eigen geld daarbij past.",
     primary: {
       href: "/apps/artifact-hypotheek-wonen-maximale-hypotheek",
       label: "Bereken maximale hypotheek",
@@ -147,9 +147,9 @@ export const publicToolJourneys = {
     ],
   },
   "artifact-hypotheek-wonen-maximale-hypotheek": {
-    title: "Van maximale hypotheek naar hulp uit familie",
+    title: "Van maximale hypotheek naar woningruimte",
     description:
-      "Je ziet nu wat je bank op inkomen en woningwaarde kan lenen. De volgende vraag is vaak hoe familiehulp of schenking het gat kan dichten.",
+      "Je ziet nu wat je bank op inkomen en woningwaarde kan lenen. De volgende vraag is vaak hoe studieschuld en eigen geld de resterende ruimte beinvloeden.",
     primary: {
       href: "/apps/familiehulp-eerste-woning",
       label: "Bekijk familiehulp",

@@ -389,7 +389,7 @@ export const knowledgeDocumentTitles = {
   "maximale-hypotheek-berekenen": "Maximale hypotheek berekenen",
   "studieschuld-en-hypotheek": "Studieschuld en hypotheek",
   "waarom-calculators-verschillen": "Waarom calculators verschillen",
-  "eigen-geld-familiehulp-schenking": "Eigen geld, familiehulp en schenking",
+  "eigen-geld-familiehulp-schenking": "Eigen geld en woningruimte",
   "energielabel-en-extra-hypotheekruimte": "Energielabel en extra hypotheekruimte",
   "starter-of-doorstromer": "Starter of doorstromer",
   "indicatieve-berekening": "Indicatieve berekening",
