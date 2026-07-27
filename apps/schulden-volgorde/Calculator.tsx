@@ -195,14 +195,11 @@ export default function Calculator() {
     <CalculatorShell
       intro={
         <>
-          <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
-            Beta-rekentool
-          </div>
-          <h1 className="mt-2 font-serif text-[28px] tracking-[-0.02em] text-[var(--ink)]">
+          <h1 className="font-serif text-[28px] tracking-[-0.02em] text-[var(--ink)]">
             Vergelijk mijn schulden
           </h1>
           <p className="mt-3 text-[14px] leading-[1.7] text-[var(--ink-2)]">
-            <GlossaryText text="Zet achteraf betalen, creditcard, DUO en hypotheek in een logische volgorde voor extra aflossen." />
+            <GlossaryText text="Zet je studieschuld naast achteraf betalen, creditcard, hypotheek en andere schulden. Zo zie je waar extra aflossen waarschijnlijk het meeste verschil maakt." />
           </p>
         </>
       }

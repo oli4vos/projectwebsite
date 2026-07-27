@@ -233,7 +233,7 @@ export default function VariabelenPage() {
 
           <ToolDisclosure
             title="Hypotheek"
-            subtitle="Standaard rente, looptijd en bruteringsstaffel."
+            subtitle="Standaard rente, looptijd en omrekening van de DUO-maandlast."
           >
             <ValueRow
               name="Standaard hypotheekrente"
@@ -250,75 +250,11 @@ export default function VariabelenPage() {
             {constants.mortgage.studentDebtGrossUpFactors.map((band) => (
               <ValueRow
                 key={`${band.minRate}-${band.maxRate ?? "plus"}`}
-                name={`Brutering ${band.label}`}
+                name={`Omrekening ${band.label}`}
                 value={`${formatPercent(band.factor)}x`}
               />
             ))}
             <MetaBlock year={year} {...constants.mortgage.meta} />
-          </ToolDisclosure>
-
-          <ToolDisclosure
-            title="Box 1"
-            subtitle="Indicatieve schijven en tarieven voor dit jaar."
-          >
-            {constants.box1.brackets.map((bracket) => (
-              <ValueRow
-                key={bracket.label}
-                name={bracket.label}
-                value={`${formatPercent(bracket.rate)}%`}
-              />
-            ))}
-            <MetaBlock year={year} {...constants.box1.meta} />
-          </ToolDisclosure>
-
-          <ToolDisclosure
-            title="Box 3"
-            subtitle="Forfaits, tarief en vrijstellingen die in de tools gebruikt worden."
-          >
-            <ValueRow
-              name="Box 3-tarief"
-              value={`${formatPercent(constants.box3.taxRate)}%`}
-            />
-            <ValueRow
-              name="Vrijstelling box 3 (alleenstaand)"
-              value={formatCurrency(constants.box3.taxFreeAllowanceSingle)}
-            />
-            <ValueRow
-              name="Vrijstelling box 3 (partners)"
-              value={formatCurrency(constants.box3.taxFreeAllowancePartners)}
-            />
-            <ValueRow
-              name="Forfait banktegoeden"
-              value={`${formatPercent(constants.box3.deemedReturns.bankDeposits)}%`}
-            />
-            <ValueRow
-              name="Forfait overige bezittingen"
-              value={`${formatPercent(constants.box3.deemedReturns.investmentsAndOtherAssets)}%`}
-            />
-            <ValueRow
-              name="Forfait schulden"
-              value={`${formatPercent(constants.box3.deemedReturns.debts)}%`}
-            />
-            <ValueRow
-              name="Standaardmethode in tools"
-              value="Werkelijke opbrengst (aanpasbaar naar forfaitair)"
-            />
-            <MetaBlock year={year} {...constants.box3.meta} />
-          </ToolDisclosure>
-
-          <ToolDisclosure
-            title="Grafieken en presentatie"
-            subtitle="Valuta en tijdseenheid voor grafieken en tabellen."
-          >
-            <ValueRow
-              name="Standaard valuta"
-              value={constants.charts.defaultCurrency}
-            />
-            <ValueRow
-              name="Standaard tijdseenheid"
-              value={constants.charts.defaultTimeUnit}
-            />
-            <MetaBlock year={year} {...constants.charts.meta} />
           </ToolDisclosure>
         </section>
       </main>

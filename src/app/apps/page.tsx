@@ -7,7 +7,7 @@ import { appRegistry } from "@/lib/app-registry";
 export const metadata: Metadata = {
   title: "Alle tools | Project Site",
   description:
-    "Overzicht van alle publieke tools, waaronder de toeslagenscan zonder bedragberekening.",
+    "Overzicht van alle publieke tools voor studieschuld, wonen, schulden en toeslagen.",
 };
 
 export default function AppsPage() {

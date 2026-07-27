@@ -679,10 +679,32 @@ function createSummaryFromCards(cards: readonly AllowanceResultCardView[]) {
 }
 
 function createTotalFromCards(cards: readonly AllowanceResultCardView[]) {
-  const included = cards.filter((card) => card.monthlyAmount !== undefined || card.annualAmount !== undefined);
+  const monthlyIncluded = cards.filter(
+    (card) => card.monthlyAmount !== undefined,
+  );
+  const annualIncluded = cards.filter(
+    (card) => card.annualAmount !== undefined,
+  );
+  const included = cards.filter(
+    (card) =>
+      card.monthlyAmount !== undefined || card.annualAmount !== undefined,
+  );
+
   return {
-    totalMonthlyAmount: included.reduce((sum, card) => sum + (card.monthlyAmount ?? 0), 0),
-    totalAnnualAmount: included.reduce((sum, card) => sum + (card.annualAmount ?? 0), 0),
+    totalMonthlyAmount:
+      monthlyIncluded.length > 0
+        ? monthlyIncluded.reduce(
+            (sum, card) => sum + (card.monthlyAmount ?? 0),
+            0,
+          )
+        : undefined,
+    totalAnnualAmount:
+      annualIncluded.length > 0
+        ? annualIncluded.reduce(
+            (sum, card) => sum + (card.annualAmount ?? 0),
+            0,
+          )
+        : undefined,
     totalIncludedAllowanceTitles: included.map((card) => card.title),
   };
 }
@@ -1017,6 +1039,16 @@ function applyCentralScanResultToCard(
   base: AllowanceResultCardView,
   result: PublicAllowanceBenefitResult,
 ): AllowanceResultCardView {
+  if (base.status === "incomplete" || base.missingInputs.length > 0) {
+    return {
+      ...base,
+      monthlyAmount: undefined,
+      annualAmount: undefined,
+      monthlyAmountLabel: undefined,
+      annualAmountLabel: undefined,
+    };
+  }
+
   const status = publicStatusFromScanResult(result);
   const reliabilityLabel = reliabilityFromScanResult(result);
 
@@ -1047,6 +1079,35 @@ function applyCentralScanResultToCard(
   };
 }
 
+function applyCalculationPeriodToCards(
+  cards: readonly AllowanceResultCardView[],
+  values: AllowanceScanFormState,
+): AllowanceResultCardView[] {
+  if (values.isFullYear === "yes") {
+    return [...cards];
+  }
+
+  const periodMessage =
+    values.isFullYear === "unknown"
+      ? "Het jaarbedrag is niet getoond omdat nog niet bekend is of deze situatie het hele jaar geldt."
+      : "Het jaarbedrag is niet getoond omdat deze situatie niet het hele jaar geldt.";
+
+  return cards.map((card) => {
+    if (card.annualAmount === undefined) {
+      return card;
+    }
+
+    return {
+      ...card,
+      annualAmount: undefined,
+      annualAmountLabel: undefined,
+      uncertaintyMessages: [
+        ...new Set([...card.uncertaintyMessages, periodMessage]),
+      ],
+    };
+  });
+}
+
 function integrateCentralAllowanceCards(
   cards: readonly AllowanceResultCardView[],
   values: AllowanceScanFormState,
@@ -1056,7 +1117,7 @@ function integrateCentralAllowanceCards(
   const childBudgetResult = calculateChildBudgetScanResult(publicInput);
   const childcareResult = calculateChildcareBenefitScanResult(publicInput);
 
-  return cards.map((card) => {
+  const integrated = cards.map((card) => {
     if (card.kind === "rent") return applyCentralScanResultToCard(card, rentResult);
     if (card.kind === "child-budget") {
       return applyCentralScanResultToCard(card, childBudgetResult);
@@ -1064,6 +1125,8 @@ function integrateCentralAllowanceCards(
     if (card.kind === "childcare") return applyCentralScanResultToCard(card, childcareResult);
     return card;
   });
+
+  return applyCalculationPeriodToCards(integrated, values);
 }
 
 export function createAllowanceScanView(
@@ -1089,7 +1152,11 @@ export function createAllowanceScanView(
       ALLOWANCE_SIGNAL_ORDER.indexOf(b.allowanceKind),
   );
   const cards = integrateCentralAllowanceCards(ordered.map(cardForResult), values);
-  const summary = createSummaryFromCards(cards);
+  const cardSummary = createSummaryFromCards(cards);
+  const summary =
+    values.isFullYear === "yes"
+      ? cardSummary
+      : `${cardSummary} Jaarbedragen zijn alleen zichtbaar als je bevestigt dat de situatie het hele jaar geldt.`;
   const total = createTotalFromCards(cards);
 
   return {
@@ -1099,8 +1166,14 @@ export function createAllowanceScanView(
       summary,
       totalMonthlyAmount: total.totalMonthlyAmount,
       totalAnnualAmount: total.totalAnnualAmount,
-      totalMonthlyAmountLabel: formatCurrency(total.totalMonthlyAmount),
-      totalAnnualAmountLabel: formatCurrency(total.totalAnnualAmount),
+      totalMonthlyAmountLabel:
+        total.totalMonthlyAmount !== undefined
+          ? formatCurrency(total.totalMonthlyAmount)
+          : "Niet berekend",
+      totalAnnualAmountLabel:
+        total.totalAnnualAmount !== undefined
+          ? formatCurrency(total.totalAnnualAmount)
+          : "Niet berekend",
       totalIncludedAllowanceTitles: total.totalIncludedAllowanceTitles,
       ruleYear: calculation.value.calculationYear,
       datasetId: calculation.value.datasetId,

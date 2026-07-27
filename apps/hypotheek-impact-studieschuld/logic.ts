@@ -354,7 +354,7 @@ export function calculateMortgageImpact(
     optimisticPrincipalImpact: principalImpact,
     conservativePrincipalImpact: principalImpact,
     assumptions: [
-      "We gebruiken een indicatieve bruteringsstaffel om de annuïtaire DUO-maandlast naar een bruto vergelijkbare maandlast om te rekenen.",
+      "We gebruiken een indicatieve omrekening om de annuïtaire DUO-maandlast vergelijkbaar te maken met een hypotheeklast.",
       "Voor de brutering nemen we het annuïtaire DUO-bedrag dat nodig is om de studieschuld aan het einde van de looptijd op nul te brengen.",
       `Voor de hypotheekimpact rekenen we met ${mortgageRate.toFixed(2).replace(".", ",")}% hypotheekrente en ${mortgageTermYears} jaar looptijd.`,
       "De hoofdsom-impact volgt uit de contante waarde van die gebruteerde maandlast als annuïteit.",

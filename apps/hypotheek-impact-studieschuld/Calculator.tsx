@@ -78,6 +78,14 @@ type PendingDuoMortgageCandidate = {
   candidate: DuoMortgageTransferCandidate;
 };
 
+function hasHousingTargetInput(values: FormState) {
+  return [
+    values.desiredHomePrice,
+    values.ownMoney,
+    values.maxMortgageWithoutStudentDebt,
+  ].some((value) => value.trim().length > 0);
+}
+
 function formatIsoDateLabel(value: string) {
   const date = new Date(`${value}T00:00:00`);
 
@@ -202,6 +210,9 @@ function CalculatorContent({
   const [duoTransferMessage, setDuoTransferMessage] = useState("");
   const [pendingDuoCandidate, setPendingDuoCandidate] =
     useState<PendingDuoMortgageCandidate | null>(null);
+  const [showHousingTarget, setShowHousingTarget] = useState(() =>
+    hasHousingTargetInput(initialValues),
+  );
   const {
     formValues,
     setFormValues,
@@ -243,9 +254,10 @@ function CalculatorContent({
     "extraRepayment",
     "grossIncomeUser",
     "grossIncomePartner",
-    "desiredHomePrice",
-    "ownMoney",
-    "maxMortgageWithoutStudentDebt",
+    "housingTargetChoice",
+    ...(showHousingTarget
+      ? ["desiredHomePrice", "ownMoney", "maxMortgageWithoutStudentDebt"]
+      : []),
     "mortgageRate",
     "mortgageTermYears",
     "showAdvancedAssumptions",
@@ -263,9 +275,10 @@ function CalculatorContent({
   const step3Fields = [
     "grossIncomeUser",
     "grossIncomePartner",
-    "desiredHomePrice",
-    "ownMoney",
-    "maxMortgageWithoutStudentDebt",
+    "housingTargetChoice",
+    ...(showHousingTarget
+      ? ["desiredHomePrice", "ownMoney", "maxMortgageWithoutStudentDebt"]
+      : []),
   ];
   const step4Fields = ["mortgageRate", "mortgageTermYears", "showAdvancedAssumptions"];
   const isStepVisible = (fieldIds: string[]) =>
@@ -324,6 +337,7 @@ function CalculatorContent({
 
       setPdfError("");
       setPdfStatus("");
+      setShowHousingTarget(hasHousingTargetInput(transfer.data.draft));
       setValues(
         transfer.data.draft,
         "Je hypotheekinvoer is hersteld. Bevestig het DUO-bedrag hieronder en klik daarna opnieuw op Bereken.",
@@ -417,8 +431,10 @@ function CalculatorContent({
   function applyProfileValues() {
     setPdfError("");
     setPdfStatus("");
+    const nextValues = mergeProfilePatchIntoValues(formValues, profilePatch);
+    setShowHousingTarget(hasHousingTargetInput(nextValues));
     setValues(
-      mergeProfilePatchIntoValues(formValues, profilePatch),
+      nextValues,
       "Profiel ingevuld. Klik op Bereken om de uitkomst te zien.",
     );
   }
@@ -426,6 +442,7 @@ function CalculatorContent({
   function applyExampleValues() {
     setPdfError("");
     setPdfStatus("");
+    setShowHousingTarget(true);
     setValues(exampleValues, "Voorbeeld ingevuld. Klik op Bereken om de uitkomst te zien.");
   }
 
@@ -434,7 +451,20 @@ function CalculatorContent({
     setPdfStatus("");
     setDuoTransferMessage("");
     setPendingDuoCandidate(null);
+    setShowHousingTarget(false);
     reset("Alle invoervelden zijn gewist. Vul opnieuw in of gebruik een voorbeeldscenario.");
+  }
+
+  function toggleHousingTarget(enabled: boolean) {
+    setShowHousingTarget(enabled);
+    if (!enabled) {
+      setFormValues((current) => ({
+        ...current,
+        desiredHomePrice: "",
+        ownMoney: "",
+        maxMortgageWithoutStudentDebt: "",
+      }));
+    }
   }
 
   function goToResult() {
@@ -573,9 +603,9 @@ function CalculatorContent({
             indicatief met je hypotheekruimte kan doen.
           </p>
           <p className="mt-3 text-[13px] leading-[1.65] text-[var(--muted)]">
-            Je hebt je DUO-maandbedrag, resterende schuld, inkomen en woningdoel
-            nodig. Tijdelijke verlagingen of betaalpauzes tellen niet altijd als
-            structureel lagere last.
+            Je hebt je DUO-maandbedrag, resterende schuld en inkomen nodig. Een
+            woningdoel kun je optioneel toevoegen. Tijdelijke verlagingen of
+            betaalpauzes tellen niet altijd als structureel lagere last.
           </p>
         </div>
 
@@ -931,7 +961,7 @@ function CalculatorContent({
             Stap 3
           </div>
           <h3 className="mt-1 font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
-            Woningdoel
+            Inkomen en woningdoel
           </h3>
           <div className="mt-4 grid gap-5">
             <label className={mobileFlow.getFieldClassName("grossIncomeUser")}>
@@ -976,71 +1006,101 @@ function CalculatorContent({
               <FieldError message={errors.grossIncomePartner} />
             </label>
 
-            <label className={mobileFlow.getFieldClassName("desiredHomePrice")}>
-              <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-                Gewenste woningprijs
-              </span>
-              <input
-                inputMode="decimal"
-                value={formValues.desiredHomePrice}
-                onChange={(event) =>
-                  updateField("desiredHomePrice", event.target.value)
-                }
-                onKeyDown={mobileFlow.handleEnterAdvance(
-                  "desiredHomePrice",
-                  Boolean(errors.desiredHomePrice),
-                )}
-                aria-invalid={Boolean(errors.desiredHomePrice)}
-                placeholder="Bijvoorbeeld 375000"
-                className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-              />
-              <FieldError message={errors.desiredHomePrice} />
-            </label>
-
-            <label className={mobileFlow.getFieldClassName("ownMoney")}>
-              <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-                Eigen geld
-              </span>
-              <input
-                inputMode="decimal"
-                value={formValues.ownMoney}
-                onChange={(event) => updateField("ownMoney", event.target.value)}
-                onKeyDown={mobileFlow.handleEnterAdvance(
-                  "ownMoney",
-                  Boolean(errors.ownMoney),
-                )}
-                aria-invalid={Boolean(errors.ownMoney)}
-                placeholder="Bijvoorbeeld 25000"
-                className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-              />
-              <FieldError message={errors.ownMoney} />
-            </label>
-
             <label
-              className={mobileFlow.getFieldClassName("maxMortgageWithoutStudentDebt")}
+              className={`${mobileFlow.getFieldClassName("housingTargetChoice")} rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3`}
             >
-              <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-                Maximale hypotheek zonder studieschuld (optioneel)
+              <span className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  checked={showHousingTarget}
+                  onChange={(event) => toggleHousingTarget(event.target.checked)}
+                  className="mt-1 h-4 w-4 rounded border-[var(--hair)] text-[var(--deep)]"
+                />
+                <span>
+                  <span className="block text-[14px] font-medium text-[var(--ink)]">
+                    Vergelijk ook met mijn woningdoel
+                  </span>
+                  <span className="mt-1 block text-[12px] leading-[1.5] text-[var(--soft)]">
+                    Voeg woningprijs, eigen geld en een bestaande hypotheekindicatie toe.
+                  </span>
+                </span>
               </span>
-              <input
-                inputMode="decimal"
-                value={formValues.maxMortgageWithoutStudentDebt}
-                onChange={(event) =>
-                  updateField("maxMortgageWithoutStudentDebt", event.target.value)
-                }
-                onKeyDown={mobileFlow.handleEnterAdvance(
-                  "maxMortgageWithoutStudentDebt",
-                  Boolean(errors.maxMortgageWithoutStudentDebt),
-                )}
-                aria-invalid={Boolean(errors.maxMortgageWithoutStudentDebt)}
-                placeholder="Volgens adviseur of rekenhulp"
-                className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-              />
-              <p className="text-[12px] leading-[1.5] text-[var(--soft)]">
-                Praktisch als je al een eerste hypotheekindicatie zonder studieschuld hebt.
-              </p>
-              <FieldError message={errors.maxMortgageWithoutStudentDebt} />
             </label>
+
+            {showHousingTarget ? (
+              <>
+                <label className={mobileFlow.getFieldClassName("desiredHomePrice")}>
+                  <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                    Gewenste woningprijs
+                  </span>
+                  <input
+                    inputMode="decimal"
+                    value={formValues.desiredHomePrice}
+                    onChange={(event) =>
+                      updateField("desiredHomePrice", event.target.value)
+                    }
+                    onKeyDown={mobileFlow.handleEnterAdvance(
+                      "desiredHomePrice",
+                      Boolean(errors.desiredHomePrice),
+                    )}
+                    aria-invalid={Boolean(errors.desiredHomePrice)}
+                    placeholder="Bijvoorbeeld 375000"
+                    className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
+                  />
+                  <FieldError message={errors.desiredHomePrice} />
+                </label>
+
+                <label className={mobileFlow.getFieldClassName("ownMoney")}>
+                  <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                    Eigen geld
+                  </span>
+                  <input
+                    inputMode="decimal"
+                    value={formValues.ownMoney}
+                    onChange={(event) => updateField("ownMoney", event.target.value)}
+                    onKeyDown={mobileFlow.handleEnterAdvance(
+                      "ownMoney",
+                      Boolean(errors.ownMoney),
+                    )}
+                    aria-invalid={Boolean(errors.ownMoney)}
+                    placeholder="Bijvoorbeeld 25000"
+                    className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
+                  />
+                  <FieldError message={errors.ownMoney} />
+                </label>
+
+                <label
+                  className={mobileFlow.getFieldClassName(
+                    "maxMortgageWithoutStudentDebt",
+                  )}
+                >
+                  <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+                    Maximale hypotheek zonder studieschuld (optioneel)
+                  </span>
+                  <input
+                    inputMode="decimal"
+                    value={formValues.maxMortgageWithoutStudentDebt}
+                    onChange={(event) =>
+                      updateField(
+                        "maxMortgageWithoutStudentDebt",
+                        event.target.value,
+                      )
+                    }
+                    onKeyDown={mobileFlow.handleEnterAdvance(
+                      "maxMortgageWithoutStudentDebt",
+                      Boolean(errors.maxMortgageWithoutStudentDebt),
+                    )}
+                    aria-invalid={Boolean(errors.maxMortgageWithoutStudentDebt)}
+                    placeholder="Volgens adviseur of rekenhulp"
+                    className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
+                  />
+                  <p className="text-[12px] leading-[1.5] text-[var(--soft)]">
+                    Praktisch als je al een eerste hypotheekindicatie zonder studieschuld hebt.
+                  </p>
+                  <FieldError message={errors.maxMortgageWithoutStudentDebt} />
+                </label>
+              </>
+            ) : null}
           </div>
         </div>
 

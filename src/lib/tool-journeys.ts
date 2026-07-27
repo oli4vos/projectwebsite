@@ -181,19 +181,14 @@ export const publicToolJourneys = {
     ],
   },
   "toeslagen-scan": {
-    title: "Van toeslagen naar uitleg",
+    title: "Na je toeslagenindicatie",
     description:
-      "Je hebt nu een indicatie voor de mogelijke toeslagen. De volgende vraag is meestal waarom een toeslag wel of niet voorkomt en wat de officiële regels zijn.",
+      "Je hebt nu een indicatie voor de mogelijke toeslagen. Controleer je gegevens en gebruik Mijn Toeslagen voor een aanvraag of wijziging.",
     primary: {
-      href: "/kennisbank",
-      label: "Lees de kennisbank",
+      href: "/apps",
+      label: "Bekijk alle tools",
     },
-    secondary: [
-      {
-        href: "/apps/duo-maandbedrag",
-        label: "Naar DUO-maandbedrag",
-      },
-    ],
+    secondary: [],
   },
   "schulden-volgorde": {
     title: "Van schuldvolgorde naar concrete maandruimte",

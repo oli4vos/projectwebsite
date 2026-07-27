@@ -70,7 +70,7 @@ export const FINANCIAL_CONSTANTS_BY_YEAR: Record<number, AnnualFinancialConstant
       },
       mortgage: {
         meta: {
-          sourceLabel: "Indicatieve bruteringsstaffel studieschuld",
+          sourceLabel: "Indicatieve omrekening studieschuld",
           lastChecked: "2026-07-18",
           status: "indicatief",
           sourceUrl: "https://www.rijksoverheid.nl/onderwerpen/huis-kopen/vraag-en-antwoord/hoe-zwaar-telt-mijn-studieschuld-mee-voor-mijn-hypotheek",
@@ -81,7 +81,7 @@ export const FINANCIAL_CONSTANTS_BY_YEAR: Record<number, AnnualFinancialConstant
             "Indicatieve omzetting van DUO-maandlast naar hypotheektoetslast; geldverstrekkers kunnen acceptatiebeleid anders invullen.",
           ruleType: "projectaanname",
           uncertainties:
-            "De bruteringsstaffel is geen wettelijke tabel. Gebruik als projectmatige benadering totdat exact acceptatiebeleid of wettelijke norm is gecentraliseerd.",
+            "De omrekening is geen wettelijke tabel. Gebruik haar als projectmatige benadering totdat exact acceptatiebeleid of een wettelijke norm centraal is vastgelegd.",
         },
         defaultMortgageRate: 4.0,
         defaultMortgageTermYears: 30,

@@ -5,6 +5,7 @@ import {
   createAdditionalGrantView,
   defaultValues,
   emptyValues,
+  getAdditionalGrantSpecialCaseGuidance,
   mapFormToAdditionalGrantInput,
   validateAdditionalGrantForm,
 } from "./logic";
@@ -85,15 +86,39 @@ describe("duo-aanvullende-beurs logic", () => {
   });
 
   it("passes special cases to the central engine instead of applying the regular formula", () => {
-    const view = createAdditionalGrantView({
+    const values = {
       ...defaultValues,
       specialCase: "parent-deceased",
-    });
+      familySituation: "",
+      parent1Income: "",
+      parent2Income: "",
+    } as const;
+    const view = createAdditionalGrantView(values);
+    const input = mapFormToAdditionalGrantInput(values);
 
     expect(view.isValid).toBe(true);
     if (!view.isValid) throw new Error("expected valid view");
     expect(view.result.status).toBe("special-case");
     expect(view.monthlyGrantLabel).toBe("Niet berekend");
     expect(view.warningMessages.join(" ")).toContain("DUO blijft leidend");
+    expect(input.familySituation).toBeUndefined();
+    expect(input.standardReferenceYearInput).toBeUndefined();
+  });
+
+  it("provides concrete official guidance for every public special case", () => {
+    for (const specialCase of [
+      "parent-deceased",
+      "parent-unknown",
+      "parent-abroad",
+      "parent-ignored",
+      "no-contact-or-conflict",
+    ] as const) {
+      const guidance = getAdditionalGrantSpecialCaseGuidance(specialCase);
+
+      expect(guidance?.explanation.length).toBeGreaterThan(40);
+      expect(guidance?.steps).toHaveLength(3);
+      expect(guidance?.sourceUrl).toMatch(/^https:\/\/(www\.)?duo\.nl\//);
+    }
+    expect(getAdditionalGrantSpecialCaseGuidance("none")).toBeNull();
   });
 });

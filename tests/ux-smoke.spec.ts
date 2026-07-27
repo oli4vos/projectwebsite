@@ -91,7 +91,7 @@ test("mobiele hypotheekflow kan naar veld 2", async ({ page }, testInfo) => {
     waitUntil: "networkidle",
   });
 
-  await expect(page.getByText("Veld 1 van 15")).toBeVisible();
+  await expect(page.getByText("Veld 1 van 13")).toBeVisible();
   await page.getByRole("button", { name: "Volgende veld" }).click();
   await expect(page.getByText(/Veld 2 van \d+/)).toBeVisible();
   await expect(page.getByLabel("Terugbetalingsregel")).toBeVisible();
@@ -365,7 +365,6 @@ test("homepage verwijst één keer naar het volledige tooloverzicht", async ({ p
   await expect(page.locator('a[href^="/apps/"]').filter({ hasText: "Open tool" })).toHaveCount(0);
 
   await page.goto("/apps", { waitUntil: "networkidle" });
-  await page.getByRole("button", { name: "Alle tools" }).click();
   const cards = page.locator('a[href^="/apps/"]').filter({ hasText: "Open tool" });
   await expect(cards.first()).toBeVisible();
 
@@ -395,11 +394,9 @@ test("toeslagenscan is publiek vindbaar via dashboard en app-overzicht", async (
   test.skip(!testInfo.project.name.startsWith("desktop"), "Desktop routecontrole");
 
   await page.goto("/apps", { waitUntil: "networkidle" });
-  await page.getByRole("button", { name: "Alle tools" }).click();
   await expect(page.locator(`a[href="${allowanceScanRoute}"]`)).toBeVisible();
 
   await page.goto("/apps", { waitUntil: "networkidle" });
-  await page.getByRole("button", { name: "Alle tools" }).click();
   await expect(page.locator('a[href^="/v2"]')).toHaveCount(0);
   await expect(
     page.getByRole("heading", { name: "Welke toeslagen passen mogelijk bij mij?" }),
@@ -471,6 +468,74 @@ test("publieke toeslagenscan route, formulier en bedragindicatie werken", async 
 
   await page.getByRole("button", { name: "Wis invoer" }).click();
   await expect(page.getByText("Nog geen scan uitgevoerd")).toBeVisible();
+});
+
+test("toeslagenscan toont geen bedragen zonder toetsingsinkomen", async ({
+  page,
+}, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "Desktopinteractie controleren");
+
+  await page.goto(allowanceScanRoute, { waitUntil: "networkidle" });
+  await page.getByRole("button", { name: "Voorbeeld invullen" }).click();
+  await page.getByLabel("Geschat toetsingsinkomen").fill("");
+  await page.getByRole("button", { name: "Bekijk mijn toeslagenindicatie" }).click();
+
+  await expect(
+    page.getByText("Meegeteld: geen concreet berekende toeslagen."),
+  ).toBeVisible();
+  await expect(
+    page.locator("#tool-result-summary").getByText("Niet berekend"),
+  ).toHaveCount(2);
+  await expect(
+    page.locator("#tool-result-summary").getByText(/€\s*490/),
+  ).toHaveCount(0);
+});
+
+test("aanvullende beurs vraagt bij bijzondere oudersituaties geen regulier inkomen", async ({
+  page,
+}, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "Desktopinteractie controleren");
+
+  await page.goto("/apps/duo-aanvullende-beurs", {
+    waitUntil: "networkidle",
+  });
+  await page
+    .getByLabel("Bijzondere oudersituatie?")
+    .selectOption("parent-deceased");
+
+  await expect(page.getByLabel("Hoeveel ouders tellen mee?")).toHaveCount(0);
+  await expect(page.getByLabel("Ouderinkomen 2024 ouder 1")).toHaveCount(0);
+  await expect(
+    page.getByText("Een overleden ouder telt niet altijd meer mee"),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Bereken", exact: true }).click();
+  await expect(page.getByText("Bijzondere DUO-situatie")).toBeVisible();
+  await expect(page.getByText("Niet berekend").first()).toBeVisible();
+});
+
+test("hypotheek-impact toont woningdoel alleen na een expliciete keuze", async ({
+  page,
+}, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "Desktopinteractie controleren");
+
+  await page.goto("/apps/hypotheek-impact-studieschuld", {
+    waitUntil: "networkidle",
+  });
+
+  const choice = page.getByRole("checkbox", {
+    name: /Vergelijk ook met mijn woningdoel/,
+  });
+  await expect(choice).not.toBeChecked();
+  await expect(page.getByLabel("Gewenste woningprijs")).toHaveCount(0);
+
+  await choice.check();
+  await expect(page.getByLabel("Gewenste woningprijs")).toBeVisible();
+  await page.getByLabel("Gewenste woningprijs").fill("375000");
+  await choice.uncheck();
+  await expect(page.getByLabel("Gewenste woningprijs")).toHaveCount(0);
+
+  await choice.check();
+  await expect(page.getByLabel("Gewenste woningprijs")).toHaveValue("");
 });
 
 test("toeslagenscan kernregressies voor partner, vermogen, special-case en inferred bevestiging", async ({

@@ -131,8 +131,8 @@ export type AllowanceScanView = {
   errors: AllowanceScanErrors;
   result: null | {
     summary: string;
-    totalMonthlyAmount: number;
-    totalAnnualAmount: number;
+    totalMonthlyAmount?: number;
+    totalAnnualAmount?: number;
     totalMonthlyAmountLabel: string;
     totalAnnualAmountLabel: string;
     totalIncludedAllowanceTitles: readonly string[];

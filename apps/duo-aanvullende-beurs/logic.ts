@@ -85,6 +85,102 @@ export const emptyValues: AdditionalGrantFormValues = {
   calculationMonth: "",
 };
 
+type PublicAdditionalGrantSpecialCase =
+  | "parent-deceased"
+  | "parent-unknown"
+  | "parent-abroad"
+  | "parent-ignored"
+  | "no-contact-or-conflict";
+
+export type AdditionalGrantSpecialCaseGuidance = {
+  title: string;
+  explanation: string;
+  steps: readonly string[];
+  sourceLabel: string;
+  sourceUrl: string;
+};
+
+const specialCaseGuidance: Record<
+  PublicAdditionalGrantSpecialCase,
+  AdditionalGrantSpecialCaseGuidance
+> = {
+  "parent-deceased": {
+    title: "Een overleden ouder telt niet altijd meer mee",
+    explanation:
+      "DUO verwerkt een overlijden in Nederland normaal via de gemeente. Woonde de ouder in het buitenland, dan moet je het overlijden zelf doorgeven. De tool berekent daarom geen regulier bedrag.",
+    steps: [
+      "Vraag aanvullende beurs aan als je dat nog niet hebt gedaan.",
+      "Controleer in Mijn DUO of het overlijden is verwerkt.",
+      "Geef een overlijden in het buitenland zelf door; DUO kan om een overlijdensakte vragen.",
+    ],
+    sourceLabel: "Lees wat DUO doet als een ouder is overleden",
+    sourceUrl:
+      "https://duo.nl/particulier/aanvullende-beurs-studiefinanciering/vader-of-moeder-overleden.jsp",
+  },
+  "parent-unknown": {
+    title: "DUO moet vaststellen welke ouder meetelt",
+    explanation:
+      "Als DUO niet weet wie of waar een ouder is, kun je na je aanvraag mogelijk vragen om het inkomen van die ouder buiten beschouwing te laten. DUO beoordeelt je situatie en bewijsstukken.",
+    steps: [
+      "Vraag eerst studiefinanciering met aanvullende beurs aan.",
+      "Open in Mijn DUO je situatie bij Studiefinanciering.",
+      "Gebruik zo nodig het verzoekformulier en stuur de gevraagde bewijsstukken mee.",
+    ],
+    sourceLabel: "Lees wat DUO vraagt bij problemen met oudergegevens",
+    sourceUrl:
+      "https://duo.nl/particulier/aanvullende-beurs-studiefinanciering/problemen-met-ouders.jsp",
+  },
+  "parent-abroad": {
+    title: "Buitenlands ouderinkomen moet meestal worden aangeleverd",
+    explanation:
+      "DUO kan buitenlands inkomen meestal niet automatisch bij de Belastingdienst opvragen. De ouder geeft het bruto jaarinkomen door met bewijs van de buitenlandse belastingdienst. Tot die controle toont de tool geen regulier bedrag.",
+    steps: [
+      "Controleer welke inkomensbrief de ouder van DUO heeft gekregen.",
+      "Geef het inkomen en de bewijsstukken door via Mijn DUO.",
+      "Gebruik het formulier voor buitenlands inkomen als Mijn DUO niet beschikbaar is.",
+    ],
+    sourceLabel: "Lees hoe je buitenlands ouderinkomen doorgeeft",
+    sourceUrl:
+      "https://duo.nl/particulier/aanvullende-beurs-studiefinanciering/inkomen-ouders.jsp",
+  },
+  "parent-ignored": {
+    title: "Buiten beschouwing laten vraagt een apart verzoek",
+    explanation:
+      "DUO laat ouderinkomen alleen in specifieke situaties buiten beschouwing. Je moet aanvullende beurs hebben aangevraagd en DUO beoordeelt daarna je verzoek en bewijsstukken.",
+    steps: [
+      "Vraag eerst studiefinanciering met aanvullende beurs aan.",
+      "Kies in Mijn DUO de situatie die op jou van toepassing is.",
+      "Stuur het verzoek en alle gevraagde verklaringen of bewijsstukken mee.",
+    ],
+    sourceLabel: "Bekijk de voorwaarden en aanvraagroute bij DUO",
+    sourceUrl:
+      "https://duo.nl/particulier/aanvullende-beurs-studiefinanciering/problemen-met-ouders.jsp",
+  },
+  "no-contact-or-conflict": {
+    title: "Geen contact is niet automatisch genoeg",
+    explanation:
+      "DUO kan het inkomen van een ouder buiten beschouwing laten bij een erkende bijzondere situatie, bijvoorbeeld een ernstig en structureel conflict dat over meer dan geld gaat. DUO beoordeelt de omstandigheden en bewijsstukken.",
+    steps: [
+      "Vraag eerst studiefinanciering met aanvullende beurs aan.",
+      "Controleer of jouw situatie onder de voorwaarden van DUO valt.",
+      "Dien via Mijn DUO of het verzoekformulier je uitleg en bewijsstukken in.",
+    ],
+    sourceLabel: "Bekijk wanneer DUO ouderinkomen buiten beschouwing kan laten",
+    sourceUrl:
+      "https://duo.nl/particulier/aanvullende-beurs-studiefinanciering/problemen-met-ouders.jsp",
+  },
+};
+
+export function getAdditionalGrantSpecialCaseGuidance(
+  value: AdditionalGrantFormValues["specialCase"],
+): AdditionalGrantSpecialCaseGuidance | null {
+  if (value === "none" || !(value in specialCaseGuidance)) {
+    return null;
+  }
+
+  return specialCaseGuidance[value as PublicAdditionalGrantSpecialCase];
+}
+
 function parseMoney(value: string) {
   return parseOptionalDecimalInput(value);
 }
@@ -112,6 +208,7 @@ function hasInvalidWholeNumber(value: string) {
 
 export function validateAdditionalGrantForm(values: AdditionalGrantFormValues): AdditionalGrantErrors {
   const errors: AdditionalGrantErrors = {};
+  const usesRegularParentCalculation = values.specialCase === "none";
 
   if (!values.educationType) {
     errors.educationType = "Kies mbo, hbo of universiteit.";
@@ -119,15 +216,18 @@ export function validateAdditionalGrantForm(values: AdditionalGrantFormValues): 
   if (!values.residence) {
     errors.residence = "Kies thuiswonend of uitwonend.";
   }
-  if (!values.familySituation) {
+  if (usesRegularParentCalculation && !values.familySituation) {
     errors.familySituation = "Kies of één of twee ouders meetellen.";
   }
-  if (values.parent1Income.trim().length === 0) {
+  if (usesRegularParentCalculation && values.parent1Income.trim().length === 0) {
     errors.parent1Income = "Vul het ouderinkomen 2024 van ouder 1 in.";
-  } else if (hasInvalidMoney(values.parent1Income, true)) {
+  } else if (
+    usesRegularParentCalculation &&
+    hasInvalidMoney(values.parent1Income, true)
+  ) {
     errors.parent1Income = "Gebruik een geldig bedrag voor ouder 1. Negatief inkomen mag als DUO dat zo verwerkt.";
   }
-  if (values.familySituation === "two-parents") {
+  if (usesRegularParentCalculation && values.familySituation === "two-parents") {
     if (values.parent2Income.trim().length === 0) {
       errors.parent2Income = "Vul het ouderinkomen 2024 van ouder 2 in.";
     } else if (hasInvalidMoney(values.parent2Income, true)) {
@@ -135,22 +235,24 @@ export function validateAdditionalGrantForm(values: AdditionalGrantFormValues): 
     }
   }
 
-  for (const field of [
-    "parent1AnnualDuoRepaymentTerms",
-    "parent2AnnualDuoRepaymentTerms",
-  ] as const) {
-    if (hasInvalidMoney(values[field])) {
-      errors[field] = "Gebruik 0 of een hoger jaarbedrag.";
+  if (usesRegularParentCalculation) {
+    for (const field of [
+      "parent1AnnualDuoRepaymentTerms",
+      "parent2AnnualDuoRepaymentTerms",
+    ] as const) {
+      if (hasInvalidMoney(values[field])) {
+        errors[field] = "Gebruik 0 of een hoger jaarbedrag.";
+      }
     }
-  }
-  for (const field of [
-    "parent1OtherQualifyingChildren",
-    "parent2OtherQualifyingChildren",
-    "parent1ChildrenWithAdditionalGrant",
-    "parent2ChildrenWithAdditionalGrant",
-  ] as const) {
-    if (hasInvalidWholeNumber(values[field])) {
-      errors[field] = "Gebruik een heel aantal van 0 of hoger.";
+    for (const field of [
+      "parent1OtherQualifyingChildren",
+      "parent2OtherQualifyingChildren",
+      "parent1ChildrenWithAdditionalGrant",
+      "parent2ChildrenWithAdditionalGrant",
+    ] as const) {
+      if (hasInvalidWholeNumber(values[field])) {
+        errors[field] = "Gebruik een heel aantal van 0 of hoger.";
+      }
     }
   }
   if (values.calculationMonth.trim().length > 0) {
@@ -164,26 +266,41 @@ export function validateAdditionalGrantForm(values: AdditionalGrantFormValues): 
 }
 
 export function mapFormToAdditionalGrantInput(values: AdditionalGrantFormValues): DuoAdditionalGrantInput {
-  const familySituation = values.familySituation || undefined;
+  const usesRegularParentCalculation = values.specialCase === "none";
+  const familySituation = usesRegularParentCalculation
+    ? values.familySituation || undefined
+    : undefined;
   const parent2Required = familySituation === "two-parents";
-  const standardReferenceYearInput = {
-    parent1Income: parseMoney(values.parent1Income),
-    parent2Income: parent2Required ? parseMoney(values.parent2Income) : undefined,
-    parent1IncomeReliability: values.parent1IncomeReliability,
-    parent2IncomeReliability: parent2Required ? values.parent2IncomeReliability : undefined,
-    parent1AnnualDuoRepaymentTerms: parseMoney(values.parent1AnnualDuoRepaymentTerms),
-    parent2AnnualDuoRepaymentTerms: parent2Required
-      ? parseMoney(values.parent2AnnualDuoRepaymentTerms)
-      : undefined,
-    parent1OtherQualifyingChildren: parseOptionalWholeNumber(values.parent1OtherQualifyingChildren),
-    parent2OtherQualifyingChildren: parent2Required
-      ? parseOptionalWholeNumber(values.parent2OtherQualifyingChildren)
-      : undefined,
-    parent1ChildrenWithAdditionalGrant: parseOptionalWholeNumber(values.parent1ChildrenWithAdditionalGrant),
-    parent2ChildrenWithAdditionalGrant: parent2Required
-      ? parseOptionalWholeNumber(values.parent2ChildrenWithAdditionalGrant)
-      : undefined,
-  };
+  const standardReferenceYearInput = usesRegularParentCalculation
+    ? {
+        parent1Income: parseMoney(values.parent1Income),
+        parent2Income: parent2Required
+          ? parseMoney(values.parent2Income)
+          : undefined,
+        parent1IncomeReliability: values.parent1IncomeReliability,
+        parent2IncomeReliability: parent2Required
+          ? values.parent2IncomeReliability
+          : undefined,
+        parent1AnnualDuoRepaymentTerms: parseMoney(
+          values.parent1AnnualDuoRepaymentTerms,
+        ),
+        parent2AnnualDuoRepaymentTerms: parent2Required
+          ? parseMoney(values.parent2AnnualDuoRepaymentTerms)
+          : undefined,
+        parent1OtherQualifyingChildren: parseOptionalWholeNumber(
+          values.parent1OtherQualifyingChildren,
+        ),
+        parent2OtherQualifyingChildren: parent2Required
+          ? parseOptionalWholeNumber(values.parent2OtherQualifyingChildren)
+          : undefined,
+        parent1ChildrenWithAdditionalGrant: parseOptionalWholeNumber(
+          values.parent1ChildrenWithAdditionalGrant,
+        ),
+        parent2ChildrenWithAdditionalGrant: parent2Required
+          ? parseOptionalWholeNumber(values.parent2ChildrenWithAdditionalGrant)
+          : undefined,
+      }
+    : undefined;
 
   return {
     calculationYear,

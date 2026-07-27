@@ -156,6 +156,154 @@ describe("toeslagen-scan adapter", () => {
     expect(view.result?.cards.some((card) => card.status === "incomplete")).toBe(true);
   });
 
+  it("does not show any allowance amount when assessment income is unresolved", () => {
+    const view = createAllowanceScanView({
+      ...exampleValues,
+      assessmentIncome: "",
+    });
+
+    expect(
+      view.result?.cards.every(
+        (card) =>
+          card.monthlyAmount === undefined &&
+          card.annualAmount === undefined &&
+          card.monthlyAmountLabel === undefined &&
+          card.annualAmountLabel === undefined,
+      ),
+    ).toBe(true);
+    expect(view.result?.totalMonthlyAmount).toBeUndefined();
+    expect(view.result?.totalAnnualAmount).toBeUndefined();
+    expect(view.result?.totalMonthlyAmountLabel).toBe("Niet berekend");
+    expect(view.result?.totalAnnualAmountLabel).toBe("Niet berekend");
+  });
+
+  it("blocks asset-dependent amounts without blocking childcare", () => {
+    const view = createAllowanceScanView({
+      ...exampleValues,
+      assets: "",
+    });
+    const cards = view.result?.cards ?? [];
+
+    for (const kind of ["healthcare", "rent", "child-budget"] as const) {
+      expect(cards.find((card) => card.kind === kind)?.monthlyAmount).toBeUndefined();
+    }
+    const childcare = cards.find((card) => card.kind === "childcare");
+    expect(childcare?.monthlyAmount).toBeDefined();
+    expect(view.result?.totalMonthlyAmount).toBe(childcare?.monthlyAmount);
+    expect(view.result?.totalIncludedAllowanceTitles).toEqual([
+      "Kinderopvangtoeslag",
+    ]);
+  });
+
+  it("blocks only healthcare when insurance is unresolved", () => {
+    const view = createAllowanceScanView({
+      ...exampleValues,
+      hasDutchHealthInsurance: "unknown",
+    });
+    const cards = view.result?.cards ?? [];
+
+    expect(
+      cards.find((card) => card.kind === "healthcare")?.monthlyAmount,
+    ).toBeUndefined();
+    expect(
+      cards.find((card) => card.kind === "rent")?.monthlyAmount,
+    ).toBeDefined();
+    expect(
+      cards.find((card) => card.kind === "childcare")?.monthlyAmount,
+    ).toBeDefined();
+  });
+
+  it("keeps monthly indications but suppresses annual amounts for an unknown period", () => {
+    const view = createAllowanceScanView({
+      ...exampleValues,
+      isFullYear: "unknown",
+    });
+    const cardsWithMonthlyAmount =
+      view.result?.cards.filter((card) => card.monthlyAmount !== undefined) ?? [];
+
+    expect(cardsWithMonthlyAmount.length).toBeGreaterThan(0);
+    expect(
+      cardsWithMonthlyAmount.every(
+        (card) =>
+          card.annualAmount === undefined &&
+          card.annualAmountLabel === undefined,
+      ),
+    ).toBe(true);
+    expect(view.result?.totalMonthlyAmount).toBeDefined();
+    expect(view.result?.totalAnnualAmount).toBeUndefined();
+    expect(view.result?.totalAnnualAmountLabel).toBe("Niet berekend");
+    expect(view.result?.summary).toContain(
+      "Jaarbedragen zijn alleen zichtbaar",
+    );
+  });
+
+  it.each([
+    {
+      name: "onbekende partnerstatus",
+      values: { partnerStatus: "unknown" as const },
+      blockedKind: "healthcare" as const,
+      unaffectedKind: undefined,
+    },
+    {
+      name: "onbekende zelfstandige woonruimte",
+      values: { independentHome: "unknown" as const },
+      blockedKind: "rent" as const,
+      unaffectedKind: "healthcare" as const,
+    },
+    {
+      name: "ontbrekende kale huur",
+      values: { basicRent: "" },
+      blockedKind: "rent" as const,
+      unaffectedKind: "healthcare" as const,
+    },
+    {
+      name: "onbekende LRK-registratie",
+      values: { registeredChildcare: "unknown" as const },
+      blockedKind: "childcare" as const,
+      unaffectedKind: "rent" as const,
+    },
+    {
+      name: "ontbrekende opvanguren",
+      values: { childcareHoursPerMonth: "" },
+      blockedKind: "childcare" as const,
+      unaffectedKind: "rent" as const,
+    },
+    {
+      name: "ontbrekend opvanguurtarief",
+      values: { childcareHourlyRate: "" },
+      blockedKind: "childcare" as const,
+      unaffectedKind: "rent" as const,
+    },
+    {
+      name: "onbekende activiteit van de aanvrager",
+      values: { applicantActivity: "unknown" as const },
+      blockedKind: "childcare" as const,
+      unaffectedKind: "rent" as const,
+    },
+  ])(
+    "blocks the affected amount for $name",
+    ({ values, blockedKind, unaffectedKind }) => {
+      const view = createAllowanceScanView({
+        ...exampleValues,
+        ...values,
+      });
+      const cards = view.result?.cards ?? [];
+
+      expect(
+        cards.find((card) => card.kind === blockedKind)?.monthlyAmount,
+      ).toBeUndefined();
+      if (unaffectedKind) {
+        expect(
+          cards.find((card) => card.kind === unaffectedKind)?.monthlyAmount,
+        ).toBeDefined();
+      } else {
+        expect(
+          cards.every((card) => card.monthlyAmount === undefined),
+        ).toBe(true);
+      }
+    },
+  );
+
   it("blocks technically invalid input without silently clamping", () => {
     const errors = validateAllowanceScanForm({
       ...defaultValues,

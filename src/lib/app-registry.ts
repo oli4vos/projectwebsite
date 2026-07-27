@@ -278,7 +278,7 @@ export const appRegistry = [
   {
     "slug": "schulden-volgorde",
     "title": "Vergelijk mijn schulden",
-    "description": "Vergelijk dure schulden, DUO, hypotheek en achteraf betalen voor extra aflossen.",
+    "description": "Vergelijk je studieschuld met andere schulden en zie waar extra aflossen waarschijnlijk het meeste verschil maakt.",
     "enabled": true,
     "type": "frontend",
     "category": "Schulden",
@@ -292,7 +292,7 @@ export const appRegistry = [
     "status": "beta",
     "visibility": "public",
     "requiredProfileFields": [],
-    "reasonHint": "Handig als je wilt zien welke schuld bij extra geld waarschijnlijk eerst aandacht vraagt.",
+    "reasonHint": "Handig als je DUO naast andere schulden wilt zetten zonder verplichte betalingen uit het oog te verliezen.",
     "assumptionsUsed": [
       "duo",
       "mortgage"

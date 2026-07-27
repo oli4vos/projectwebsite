@@ -1,14 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import type { AppManifest } from "@/lib/app-types";
 import { toAnchorId } from "@/lib/anchor-ids";
-import {
-  filterGroupsForAudience,
-  getAudienceRoute,
-  getAudienceRouteAnchorId,
-  visibleAudienceRoutes,
-} from "@/lib/audience-routes";
 import { ENABLE_PROFILE } from "@/lib/feature-flags";
 import { toolGroups } from "@/lib/tool-groups";
 import { AppCard } from "./AppCard";
@@ -25,7 +19,6 @@ function isArtifactImportedApp(app: AppManifest) {
 }
 
 export function AppDashboard({ apps }: AppDashboardProps) {
-  const [activeAudience, setActiveAudience] = useState<string>("starter-studieschuld");
   const artifactApps = useMemo(
     () => apps.filter(isArtifactImportedApp),
     [apps],
@@ -77,76 +70,12 @@ export function AppDashboard({ apps }: AppDashboardProps) {
     [appsBySlug],
   );
 
-  const filteredGroupedApps = useMemo(() => {
-    return filterGroupsForAudience(groupedApps, activeAudience);
-  }, [activeAudience, groupedApps]);
-
-  const activeAudiencePreset = useMemo(
-    () => getAudienceRoute(activeAudience),
-    [activeAudience],
-  );
-
-  function applyAudienceFilter(nextAudienceId: string) {
-    setActiveAudience(nextAudienceId);
-
-    const targetId = getAudienceRouteAnchorId(nextAudienceId);
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-
-    requestAnimationFrame(() => {
-      document
-        .getElementById(targetId)
-        ?.scrollIntoView({
-          behavior: prefersReducedMotion ? "auto" : "smooth",
-          block: "start",
-        });
-    });
-  }
-
   return (
     <div className="space-y-8">
       <KnowledgeLevelSelector />
 
-      <section id="apps" className="surface-panel p-6">
-        <div className="section-label">Alle tools</div>
-        <h2 className="mt-2 font-serif text-[clamp(1.35rem,1.1rem+1vw,1.9rem)] tracking-[-0.02em] text-[var(--ink)]">
-          Kies je volgende vraag
-        </h2>
-        <p className="mt-3 max-w-[62ch] text-[14px] leading-[1.65] text-[var(--ink-2)]">
-          Gebruik het stappenplan hierboven als startpunt, of kies hier direct
-          een tool. Uitleg en details staan standaard rustig opgeborgen.
-        </p>
-        <div className="mt-5 flex flex-wrap gap-2">
-          {visibleAudienceRoutes.map((preset) => (
-            <button
-              key={preset.id}
-              type="button"
-              aria-pressed={activeAudience === preset.id}
-              onClick={() => applyAudienceFilter(preset.id)}
-              className={`touch-link min-h-11 rounded-full border px-3 py-2 text-[12px] font-medium focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 ${
-                activeAudience === preset.id
-                  ? "border-[var(--ink)] bg-[var(--deep)] text-white"
-                  : "border-[var(--hair)] bg-white/78 text-[var(--ink)] hover:bg-white"
-              }`}
-            >
-              {preset.label}
-            </button>
-          ))}
-        </div>
-        <div className="surface-subtle mt-5 p-4">
-          <div className="section-label">Jouw volgende vraag</div>
-          <p className="mt-2 text-[14px] font-medium leading-[1.55] text-[var(--ink)]">
-            {activeAudiencePreset.userQuestion}
-          </p>
-          <p className="mt-2 text-[13px] leading-[1.6] text-[var(--muted)]">
-            <GlossaryText text={activeAudiencePreset.summary} />
-          </p>
-        </div>
-      </section>
-
-      <section className="space-y-6">
-        {filteredGroupedApps.map((group) => (
+      <section id="apps" className="space-y-6">
+        {groupedApps.map((group) => (
           <section
             id={toAnchorId(group.title, "groep")}
             key={group.title}

@@ -2,7 +2,7 @@
   "slug": "schulden-volgorde",
   "enabled": true,
   "title": "Vergelijk mijn schulden",
-  "description": "Vergelijk dure schulden, DUO, hypotheek en achteraf betalen voor extra aflossen.",
+  "description": "Vergelijk je studieschuld met andere schulden en zie waar extra aflossen waarschijnlijk het meeste verschil maakt.",
   "type": "frontend",
   "category": "Schulden",
   "tags": [
@@ -14,7 +14,7 @@
   ],
   "status": "beta",
   "visibility": "public",
-  "reasonHint": "Handig als je wilt zien welke schuld bij extra geld waarschijnlijk eerst aandacht vraagt.",
+  "reasonHint": "Handig als je DUO naast andere schulden wilt zetten zonder verplichte betalingen uit het oog te verliezen.",
   "assumptionsUsed": [
     "duo",
     "mortgage"

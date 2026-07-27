@@ -35,7 +35,7 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 
 | Onderdeel | Status | Schakelaar | Default | Opmerking | Heractivatie |
 |---|---|---|---|---|---|
-| Toolbibliotheek + categorie-navigatie | actief | n.v.t. | aan | Homepage en routes draaien publiek | n.v.t. |
+| Toolbibliotheek + categorie-navigatie | actief | n.v.t. | aan | `/apps` toont alle 10 publieke tools direct in taakgerichte groepen, zonder doelgroepfilter | n.v.t. |
 | Financiële kennisbank (`/kennisbank`) | actief | n.v.t. | aan | Centrale studieschuld-kennislaag met DUO-bronnen, hidden oude horizon-/beleggingskaders | n.v.t. |
 | Versie 1 publieke website | actief | route-oppervlak zonder `/v2` | aan | Enige publieke en actieve ontwerp-, UX-, performance- en optimalisatielijn voor de eerste livegang | n.v.t. |
 | Versie 2 presentatie | uitgeschakeld | private routecode onder `src/app/_v2-paused` | uit | Code behouden als gepauzeerde bron, maar geen publieke routes, navigatie, sitemap, SEO-output, dashboard, journey of livegangoppervlak | alleen heractiveren via expliciet scopebesluit + blueprint-/releasecheck |
@@ -49,7 +49,7 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 | DUO-stoppen-kosten-prestatiebeurs | experimenteel | `visibility: "public"` | aan | Eenvoudige tool voor prestatiebeursbedragen die schuld blijven bij stoppen zonder diploma | n.v.t. |
 | DUO-maandbedrag | experimenteel | `visibility: "public"` | aan | Nieuwe fase-2-tool voor wettelijke maandtermijn, optionele draagkrachtindicatie en uitgebreide PDF | n.v.t. |
 | DUO-extra-aflossen | experimenteel | `visibility: "public"` | aan | Nieuwe fase-2-tool voor extra DUO-aflossing, looptijd/maandbedrag, afloscurve en uitgebreide PDF | n.v.t. |
-| DUO-aanvullende-beurs | experimenteel | `visibility: "public"` | aan | Publieke 2026-tool bovenop `src/lib/duo/additional-grant`; berekent reguliere aanvullende-beursindicatie met concrete ouderinkomens, toont special cases zonder aparte UI-formules en heeft nog geen PDF | n.v.t. |
+| DUO-aanvullende-beurs | experimenteel | `visibility: "public"` | aan | Publieke 2026-tool bovenop `src/lib/duo/additional-grant`; berekent reguliere aanvullende-beursindicatie met concrete ouderinkomens en toont bij bijzondere oudersituaties conditionele officiële uitleg zonder regulier bedrag; nog geen PDF | n.v.t. |
 | Centrale tax/DUO/pension/constants lagen | actief | n.v.t. | aan | Hergebruikt door meerdere tools | n.v.t. |
 | Submit-driven calculatorflow | actief | n.v.t. | aan | Patroon beschikbaar via `CalculatorShell` + submitlogica | n.v.t. |
 | Volgende-stap navigatie tussen publieke tools | actief | `ToolNextSteps` + journey-map | aan | Compacte vervolgstap per publieke tool, afgestemd op de meest waarschijnlijke vervolgvraag | n.v.t. |
@@ -59,7 +59,7 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 | Hypotheek Regulations-integratieadapter | voorbereid | centrale adapter | uit in UI | Centrale adapterlaag voor hypotheektools richting Regulations-architectuur; nog niet gekoppeld aan calculators en wijzigt geen publieke uitkomsten | koppel per tool pas na UX/PDF- en regressiecontrole |
 | DUO-maandbedrag-returnflow naar hypotheektools | actief | sessionStorage-transfer | aan | `hypotheek-impact-studieschuld` en `artifact-hypotheek-wonen-maximale-hypotheek` kunnen een concept bewaren, `duo-maandbedrag` laten rekenen en een bevestigbaar wettelijk DUO-bedrag teruggeven zonder financiële data in de URL | n.v.t. |
 | Centrale toeslagen-hard-checks | actief | n.v.t. | aan via publieke beta | `evaluateAllowanceSignals` is de blijvende centrale eligibility- en hard-checklaag voor 2026-voorwaarden; officiële bedraglogica blijft apart in de calculation engine | 2027-dataset vereist vóór gebruik in 2027 |
-| Toeslagenscan publieke beta | experimenteel | `visibility: "public"` | aan | `apps/toeslagen-scan` gebruikt centrale allowances-engines; zorgtoeslag, huurtoeslag, kindgebonden budget en kinderopvangtoeslag tonen voor ondersteunde 2026-standaardscenario's een euro-indicatie. Geen opslag/backend/analytics | 2027-dataset vereist vóór gebruik in 2027 |
+| Toeslagenscan publieke beta | experimenteel | `visibility: "public"` | aan | `apps/toeslagen-scan` gebruikt centrale allowances-engines; ondersteunde 2026-standaardscenario's tonen alleen een euro-indicatie wanneer de beslissende invoer voor die toeslag concreet is. Geen opslag/backend/analytics | 2027-dataset vereist vóór gebruik in 2027 |
 | Doorstap vanaf DUO-doorlenen-of-stoppen | actief | n.v.t. | aan | Resultaat toont scenariovergelijking, schuldenvrije datum en uitgebreide PDF | n.v.t. |
 | Chart-standaardisatie (jaar/euro/tooltips) | actief | n.v.t. | aan | Centrale charthelpers/componenten | n.v.t. |
 | Profielfunctie (`/profiel`, prefillpad) | uitgeschakeld | `NEXT_PUBLIC_ENABLE_PROFILE` | `false` | UI/CTA's verborgen, code blijft intact | zet op `1` en valideer profiel + tools |
@@ -74,6 +74,7 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 
 | Datum | Commit | Wijziging | Impact |
 |---|---|---|---|
+| 2026-07-27 | `pending` | Resterende categorie A/B-vereenvoudigingen uitgevoerd: alle publieke tools direct zichtbaar, optionele woningdoelvelden conditioneel, bijzondere DUO-oudersituaties taakgericht uitgelegd en toeslagbedragen per regeling geblokkeerd bij onopgeloste noodzakelijke invoer | UX / DUO / hypotheek / toeslagenveiligheid |
 | 2026-07-26 | `pending` | Versie 2 publiek gepauzeerd; v1 is de enige actieve ontwerp- en livegangversie, v2-routecode blijft alleen als private broncode bestaan | Architectuur / routing / livegangscope |
 | 2026-07-24 | `pending` | Manifestgestuurde `enabled`-laag toegevoegd voor tools; alle manifests hebben expliciet `enabled`, en `familiehulp-eerste-woning` is centraal uitgeschakeld voor de eerste livegang | Architectuur / registry / routes |
 | 2026-07-24 | `pending` | Kinderopvangtoeslag is voor ondersteunde standaardscenario's bedraggevend aangesloten op een centrale 2026-engine met LRK/eigen-bijdrage/activiteit-blockers, officiële uurtarief- en urencaps en regressietests tegen officiële voorbeelden | Toeslagen / publieke beta / kinderopvangtoeslag |
