@@ -12,8 +12,8 @@ function classesFor(variant: ToolActionButtonVariant, size: ToolActionButtonSize
     variant === "secondary"
       ? "border hair bg-white/80 text-[var(--ink)] shadow-[inset_0_1px_0_rgba(255,255,255,0.75)] hover:border-[var(--accent-line)] hover:bg-white"
       : variant === "accent"
-        ? "bg-[var(--accent)] text-white shadow-[0_14px_34px_-28px_rgba(72,105,155,0.75)] hover:brightness-105"
-        : "ring-focus hair h-12 border bg-[var(--deep)] px-4 text-[14px] text-white shadow-[0_14px_34px_-28px_rgba(22,22,22,0.7)]";
+        ? "bg-[var(--accent)] text-[var(--button-text-on-dark)] shadow-[0_14px_34px_-28px_rgba(72,105,155,0.75)] hover:brightness-105"
+        : "ring-focus hair h-12 border bg-[var(--deep)] px-4 text-[14px] text-[var(--button-text-on-dark)] shadow-[0_14px_34px_-28px_rgba(22,22,22,0.7)]";
 
   const widthClass = full ? "w-full justify-center" : "";
   const base =

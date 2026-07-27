@@ -65,10 +65,11 @@ function btnClassName(kind: BtnKind, size: BtnSize, full?: boolean, className?: 
 
   const kinds: Record<BtnKind, string> = {
     primary:
-      "bg-[var(--deep)] text-white shadow-[0_14px_34px_-28px_rgba(22,22,22,0.7)] hover:bg-[var(--ink-2)] hover:text-white visited:text-white",
+      "bg-[var(--deep)] text-[var(--button-text-on-dark)] shadow-[0_14px_34px_-28px_rgba(22,22,22,0.7)] hover:bg-[var(--ink-2)] hover:text-[var(--button-text-on-dark)] visited:text-[var(--button-text-on-dark)]",
     ghost: "bg-transparent text-[var(--ink)] hover:bg-white/70",
     outline: "border hair bg-white/76 text-[var(--ink)] shadow-[inset_0_1px_0_rgba(255,255,255,0.75)] hover:border-[var(--accent-line)] hover:bg-white",
-    accent: "bg-[var(--accent)] text-white shadow-[0_14px_34px_-28px_rgba(72,105,155,0.75)] hover:brightness-105",
+    accent:
+      "bg-[var(--accent)] text-[var(--button-text-on-dark)] shadow-[0_14px_34px_-28px_rgba(72,105,155,0.75)] hover:brightness-105",
   };
 
   return `touch-link inline-flex items-center justify-center gap-2 rounded-[10px] font-medium tracking-[-0.005em] transition duration-150 focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:active:translate-y-0 ${sizes[size]} ${kinds[kind]} ${
@@ -78,7 +79,7 @@ function btnClassName(kind: BtnKind, size: BtnSize, full?: boolean, className?: 
 
 function btnStyle(kind: BtnKind) {
   if (kind === "primary" || kind === "accent") {
-    return { color: "#ffffff" };
+    return { color: "var(--button-text-on-dark)" };
   }
 
   return undefined;
