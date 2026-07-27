@@ -179,20 +179,23 @@ function ResultList({ title, items }: { title: string; items: readonly string[] 
 
 function ResultCard({ card }: { card: AllowanceResultCardView }) {
   return (
-    <article className="surface-panel p-5" aria-labelledby={`${card.kind}-title`}>
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
+    <details className="surface-panel p-5" data-allowance-result={card.kind}>
+      <summary className="cursor-pointer list-none">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
           <h3 id={`${card.kind}-title`} className="text-lg font-semibold text-[var(--ink)]">
             {card.title}
           </h3>
-          <p className="mt-1 text-[12px] text-[var(--muted)]">
-            Regels voor {card.ruleYear}
-          </p>
+            <p className="mt-1 text-[12px] text-[var(--muted)]">{card.statusLabel}</p>
+            {card.monthlyAmountLabel ? (
+              <p className="mt-2 font-mono text-xl tabular text-[var(--ink)]">
+                {card.monthlyAmountLabel} per maand
+              </p>
+            ) : null}
+          </div>
+          <span className="text-[13px] font-medium text-[var(--ink)]">Bekijk uitleg</span>
         </div>
-        <span className="rounded-full border border-[var(--hair)] bg-[var(--paper-soft)] px-3 py-1 text-[12px] font-medium text-[var(--ink)]">
-          {card.statusLabel}
-        </span>
-      </div>
+      </summary>
       {card.monthlyAmountLabel || card.annualAmountLabel ? (
         <dl className="mt-4 grid gap-3 sm:grid-cols-2">
           {card.monthlyAmountLabel ? (
@@ -219,7 +222,7 @@ function ResultCard({ card }: { card: AllowanceResultCardView }) {
       ) : null}
       <p className="mt-3 text-[14px] leading-[1.65] text-[var(--ink-2)]">{card.summary}</p>
       <p className="mt-2 text-[13px] leading-[1.6] text-[var(--muted)]">
-        Betrouwbaarheid: {card.reliabilityDisplayLabel}. {card.reliabilityDescription}
+        {card.reliabilityDescription}
       </p>
       {card.components && card.components.length > 0 ? (
         <dl className="mt-3 grid gap-2 text-[13px] sm:grid-cols-2">
@@ -261,20 +264,7 @@ function ResultCard({ card }: { card: AllowanceResultCardView }) {
       <ResultList title="Afgeleid uit je invoer" items={card.inferredInputMessages} />
       <ResultList title="Nog te bevestigen" items={card.confirmationMessages} />
       <ResultList title="Onzekerheden" items={card.uncertaintyMessages} />
-      <div className="mt-4 flex flex-wrap gap-2">
-        {card.sourceLinks.map((link) => (
-          <a
-            key={link.href}
-            href={link.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="touch-link ring-focus inline-flex min-h-11 items-center rounded-lg border border-[var(--hair)] bg-white px-3 py-2 text-[12px] font-medium text-[var(--ink)] underline-offset-4 hover:underline"
-          >
-            {link.label} <span className="sr-only">(opent extern)</span>
-          </a>
-        ))}
-      </div>
-    </article>
+    </details>
   );
 }
 
@@ -328,6 +318,15 @@ export default function ToeslagenScanCalculator() {
     [submittedValues],
   );
   const nextSteps = getToolNextSteps("toeslagen-scan");
+  const resultSourceLinks = submittedView?.result
+    ? [
+        ...new Map(
+          submittedView.result.cards
+            .flatMap((card) => card.sourceLinks)
+            .map((link) => [link.href, link]),
+        ).values(),
+      ]
+    : [];
   const questionFlowView = useMemo(
     () => createAllowanceQuestionFlowView(formValues),
     [formValues],
@@ -374,17 +373,6 @@ export default function ToeslagenScanCalculator() {
           “Weet ik niet” laten staan.
         </div>
       ) : null}
-
-      <section className="surface-subtle px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
-        <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--soft)]">
-          Wat heb je nodig?
-        </div>
-        <ul className="mt-2 list-disc space-y-1.5 pl-5">
-          <li>Je leeftijd en huishoudsituatie.</li>
-          <li>Je inkomen en woonsituatie.</li>
-          <li>Huur of kinderopvang als dat voor jou speelt.</li>
-        </ul>
-      </section>
 
       <QuestionFlowSummary flow={questionFlowView} />
 
@@ -472,8 +460,10 @@ export default function ToeslagenScanCalculator() {
         </div>
         <DisclosureSection title="Wanneer heb je een toeslagpartner?">
           <p className="text-[13px] leading-[1.65] text-[var(--muted)]">
-            Dienst Toeslagen bepaalt dit aan de hand van je persoonlijke situatie. Kies
-            “Weet ik niet” als je twijfelt en controleer de officiële uitleg.
+            Je hebt meestal een toeslagpartner als je getrouwd bent, een
+            geregistreerd partner hebt of volgens de toeslagregels samenwoont.
+            Kies “Weet ik niet” als je twijfelt; de scan laat dan zien wat nog
+            moet worden opgehelderd.
           </p>
           <a
             href="https://www.belastingdienst.nl/wps/wcm/connect/nl/toeslagen/content/toeslagpartner"
@@ -484,32 +474,37 @@ export default function ToeslagenScanCalculator() {
             Officiële uitleg over toeslagpartner <span className="sr-only">(opent extern)</span>
           </a>
         </DisclosureSection>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <YesNoUnknownField
-            id="complexSituation"
-            label="Complexe of uitzonderlijke situatie?"
-            value={formValues.complexSituation}
-            onChange={(value) => updateField("complexSituation", value)}
-          />
-          <YesNoUnknownField
-            id="foreignOrResidenceSituation"
-            label="Buitenland of verblijfsstatus relevant?"
-            value={formValues.foreignOrResidenceSituation}
-            onChange={(value) => updateField("foreignOrResidenceSituation", value)}
-          />
-          <YesNoUnknownField
-            id="specialAssets"
-            label="Bijzonder vermogen?"
-            value={formValues.specialAssets}
-            onChange={(value) => updateField("specialAssets", value)}
-          />
-          <YesNoUnknownField
-            id="partYearPartner"
-            label="Partner voor deel van het jaar?"
-            value={formValues.partYearPartner}
-            onChange={(value) => updateField("partYearPartner", value)}
-          />
-        </div>
+        <details className="surface-subtle p-4">
+          <summary className="cursor-pointer text-[13px] font-medium text-[var(--ink)]">
+            Bijzondere situatie toevoegen
+          </summary>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <YesNoUnknownField
+              id="complexSituation"
+              label="Complexe of uitzonderlijke situatie?"
+              value={formValues.complexSituation}
+              onChange={(value) => updateField("complexSituation", value)}
+            />
+            <YesNoUnknownField
+              id="foreignOrResidenceSituation"
+              label="Buitenland of verblijfsstatus relevant?"
+              value={formValues.foreignOrResidenceSituation}
+              onChange={(value) => updateField("foreignOrResidenceSituation", value)}
+            />
+            <YesNoUnknownField
+              id="specialAssets"
+              label="Bijzonder vermogen?"
+              value={formValues.specialAssets}
+              onChange={(value) => updateField("specialAssets", value)}
+            />
+            <YesNoUnknownField
+              id="partYearPartner"
+              label="Partner voor deel van het jaar?"
+              value={formValues.partYearPartner}
+              onChange={(value) => updateField("partYearPartner", value)}
+            />
+          </div>
+        </details>
       </section>
 
       <section className="space-y-4" aria-labelledby="toeslagen-step-healthcare">
@@ -829,6 +824,26 @@ export default function ToeslagenScanCalculator() {
           <ResultCard key={card.kind} card={card} />
         ))}
       </div>
+      {resultSourceLinks.length > 0 ? (
+        <DisclosureSection
+          title="Gebruikte bronnen"
+          subtitle="Open de officiële onderbouwing van de scan."
+        >
+          <div className="flex flex-wrap gap-2">
+            {resultSourceLinks.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="touch-link ring-focus inline-flex min-h-11 items-center rounded-lg border border-[var(--hair)] bg-white px-3 py-2 text-[12px] font-medium text-[var(--ink)] underline-offset-4 hover:underline"
+              >
+                {link.label} <span className="sr-only">(opent extern)</span>
+              </a>
+            ))}
+          </div>
+        </DisclosureSection>
+      ) : null}
       <ToolNextSteps {...nextSteps} />
     </div>
   ) : (
@@ -850,9 +865,9 @@ export default function ToeslagenScanCalculator() {
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
             Toeslagenindicatie 2026
           </div>
-          <h2 className="mt-2 font-serif text-[30px] tracking-[-0.02em] text-[var(--ink)]">
+          <h1 className="mt-2 font-serif text-[30px] tracking-[-0.02em] text-[var(--ink)]">
             Welke toeslagen passen mogelijk bij mij?
-          </h2>
+          </h1>
           <p className="mt-3 text-[14px] leading-[1.7] text-[var(--ink-2)]">
             Bekijk zorgtoeslag, huurtoeslag, kindgebonden budget en
             kinderopvangtoeslag. Je krijgt een bedrag waar je gegevens dat toelaten.
@@ -882,19 +897,11 @@ export default function ToeslagenScanCalculator() {
         </ToolActionButton>
       }
       result={result}
-      details={
-        <DisclosureSection title="Afbakening">
-          <ul className="list-disc space-y-2 pl-5 text-[13px] leading-[1.65] text-[var(--muted)]">
-            <li>De scan gebruikt de regels en bedragen voor 2026.</li>
-            <li>Complexe of onvolledige situaties tonen ontbrekende gegevens en officiële vervolgstappen.</li>
-            <li>Deze scan is geen officiële beschikking; Mijn Toeslagen blijft leidend.</li>
-          </ul>
-        </DisclosureSection>
-      }
       disclaimer={
         <p className="surface-subtle p-4 text-[12.5px] leading-[1.7] text-[var(--muted)]">
-          Geen persoonlijke aanbeveling en geen officiële beschikking. Controleer altijd de
-          officiële voorwaarden en proefberekening van Dienst Toeslagen; die blijven leidend.
+          De scan gebruikt de regels en bedragen voor 2026 en is geen officiële
+          beschikking. Bij een onvolledige situatie zie je welke gegevens nog
+          nodig zijn.
         </p>
       }
     />

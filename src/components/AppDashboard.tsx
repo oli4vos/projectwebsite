@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { AppManifest } from "@/lib/app-types";
 import { toAnchorId } from "@/lib/anchor-ids";
@@ -8,7 +7,6 @@ import {
   filterGroupsForAudience,
   getAudienceRoute,
   getAudienceRouteAnchorId,
-  getAudienceRouteApps,
   visibleAudienceRoutes,
 } from "@/lib/audience-routes";
 import { ENABLE_PROFILE } from "@/lib/feature-flags";
@@ -88,11 +86,6 @@ export function AppDashboard({ apps }: AppDashboardProps) {
     [activeAudience],
   );
 
-  const recommendedRouteApps = useMemo(
-    () => getAudienceRouteApps(activeAudience, primaryApps),
-    [activeAudience, primaryApps],
-  );
-
   function applyAudienceFilter(nextAudienceId: string) {
     setActiveAudience(nextAudienceId);
 
@@ -149,26 +142,6 @@ export function AppDashboard({ apps }: AppDashboardProps) {
           <p className="mt-2 text-[13px] leading-[1.6] text-[var(--muted)]">
             <GlossaryText text={activeAudiencePreset.summary} />
           </p>
-          {recommendedRouteApps.length > 0 ? (
-            <div className="mt-4 grid gap-2 md:grid-cols-3">
-              {recommendedRouteApps.map((app) => (
-                <Link
-                  key={app.slug}
-                  href={`/apps/${app.slug}`}
-                  className="touch-link group rounded-lg border hair bg-white/82 p-3 focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
-                >
-                  <div className="text-[13px] font-medium leading-[1.35] text-[var(--ink)]">
-                    {app.title}
-                  </div>
-                </Link>
-              ))}
-            </div>
-          ) : null}
-          {activeAudiencePreset.futureOpportunity ? (
-            <p className="mt-3 text-[12.5px] leading-[1.55] text-[var(--muted)]">
-              <GlossaryText text={activeAudiencePreset.futureOpportunity} />
-            </p>
-          ) : null}
         </div>
       </section>
 
@@ -189,7 +162,13 @@ export function AppDashboard({ apps }: AppDashboardProps) {
                 </p>
               </div>
             </div>
-            <div className="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-[1fr_1fr_1.08fr]">
+            <div
+              className={`mt-5 grid gap-5 md:grid-cols-2 ${
+                group.apps.length >= 3 && group.apps.length % 3 === 0
+                  ? "xl:grid-cols-3"
+                  : ""
+              }`}
+            >
               {group.apps.map((app) => (
                 <AppCard key={app.slug} app={app} />
               ))}

@@ -198,9 +198,9 @@ export default function Calculator() {
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
             Beta-rekentool
           </div>
-          <h2 className="mt-2 font-serif text-[28px] tracking-[-0.02em] text-[var(--ink)]">
-            Welke schuld eerst?
-          </h2>
+          <h1 className="mt-2 font-serif text-[28px] tracking-[-0.02em] text-[var(--ink)]">
+            Vergelijk mijn schulden
+          </h1>
           <p className="mt-3 text-[14px] leading-[1.7] text-[var(--ink-2)]">
             <GlossaryText text="Zet achteraf betalen, creditcard, DUO en hypotheek in een logische volgorde voor extra aflossen." />
           </p>
@@ -271,12 +271,26 @@ export default function Calculator() {
             />
           </label>
 
-          <div className="grid gap-3">
-            {values.debts.map((debt, index) => (
-              <div key={debt.kind} className="rounded-xl border hair bg-[var(--paper)] p-3">
-                <div className="text-[12px] font-medium text-[var(--ink)]">
+          <fieldset className="grid gap-3">
+            <legend className="text-[12px] font-medium uppercase tracking-[0.04em] text-[var(--muted)]">
+              Open alleen de schulden die je wilt vergelijken
+            </legend>
+            {values.debts.map((debt, index) => {
+              const hasValue =
+                debt.amount.trim().length > 0 || debt.interestRate.trim().length > 0;
+              const hasRowError = Boolean(
+                errors.debts[index]?.amount || errors.debts[index]?.interestRate,
+              );
+
+              return (
+              <details
+                key={debt.kind}
+                open={hasValue || hasRowError}
+                className="rounded-xl border hair bg-[var(--paper)] p-3"
+              >
+                <summary className="cursor-pointer text-[13px] font-medium text-[var(--ink)]">
                   {kindLabels[debt.kind]}
-                </div>
+                </summary>
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
                   <label className="grid gap-1">
                     <span className="text-[11px] font-medium text-[var(--muted)]">
@@ -335,9 +349,10 @@ export default function Calculator() {
                     />
                   </label>
                 </div>
-              </div>
-            ))}
-          </div>
+              </details>
+              );
+            })}
+          </fieldset>
           <FieldError id="debt-priority-form-error" message={didSubmitAttempt ? errors.form : undefined} />
 
           <ToolActionButton type="submit" variant="submit" size="md" full>
@@ -347,7 +362,10 @@ export default function Calculator() {
       }
       result={
         <div className="space-y-5">
-          <div className="rounded-[1.5rem] bg-[var(--deep)] p-6 text-white shadow-paper-lg">
+          <div
+            id="tool-result-summary"
+            className="rounded-[1.5rem] bg-[var(--deep)] p-6 text-white shadow-paper-lg"
+          >
             {!result ? (
               <p className="text-[14px] leading-[1.7] text-white/75">
                 Vul schulden in die voor jou relevant zijn en klik op Bereken.

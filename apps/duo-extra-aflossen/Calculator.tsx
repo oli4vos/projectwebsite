@@ -328,11 +328,11 @@ export default function DuoExtraAflossenCalculator() {
       </div>
       <ToolNextSteps {...nextSteps} />
 
-      <section className="rounded-xl border hair bg-white p-5 shadow-paper">
-        <h2 className="text-lg font-semibold tracking-tight text-[var(--ink)]">
-          Effect van extra aflossen
-        </h2>
-        <div className="mt-3">
+      <DisclosureSection
+        title="Volledige berekening"
+        subtitle="Bekijk bedragen, looptijd en de gebruikte schuldgegevens."
+      >
+        <div>
           <ResultRow label="DUO-rentejaar" value={String(view.duoRateYear)} />
           <ResultRow
             label="Gewogen DUO-rente"
@@ -363,8 +363,8 @@ export default function DuoExtraAflossenCalculator() {
             value={formatCurrency(view.result.newRemainingDebt)}
           />
           <ResultRow
-            label="Oude einddatum"
-            value={view.result.timelineBefore.payoffDate ?? "Onzeker"}
+            label="Verwachte einddatum zonder extra aflossen"
+            value={view.result.timelineBefore.payoffDate ?? "Niet te bepalen"}
           />
           <ResultRow
             label="Nieuwe einddatum"
@@ -377,13 +377,13 @@ export default function DuoExtraAflossenCalculator() {
             strong
           />
         </div>
-      </section>
+      </DisclosureSection>
 
       {view.chart.labels.length > 1 ? (
-        <section className="rounded-xl border hair bg-white p-5 shadow-paper">
-          <h2 className="text-lg font-semibold tracking-tight text-[var(--ink)]">
-            Afloscurve vóór en na
-          </h2>
+        <DisclosureSection
+          title="Afloscurve vóór en na"
+          subtitle="Open de grafiek als je het verloop door de tijd wilt vergelijken."
+        >
           <ChartContainer
             xValues={view.chart.labels.map(Number)}
             chart={
@@ -408,28 +408,18 @@ export default function DuoExtraAflossenCalculator() {
               </div>
             }
           />
-        </section>
+        </DisclosureSection>
       ) : null}
     </div>
-  ) : (
-    <section id="tool-result-summary" className="rounded-xl border hair bg-white p-5 shadow-paper">
-      <h2 className="text-lg font-semibold tracking-tight text-[var(--ink)]">
-        Vul je studieschuld in
-      </h2>
-      <p className="mt-2 text-[13px] leading-[1.7] text-[var(--muted)]">
-        Vul minimaal een openstaande schuld in. Een huidig maandbedrag is
-        optioneel; anders berekent de tool de wettelijke termijn.
-      </p>
-    </section>
-  );
+  ) : null;
 
   return (
     <CalculatorShell
       intro={
         <>
-          <h2 className="text-2xl font-semibold tracking-tight text-[var(--ink)]">
+          <h1 className="text-2xl font-semibold tracking-tight text-[var(--ink)]">
             Wat doet extra aflossen?
-          </h2>
+          </h1>
           <p className="mt-3 text-[15px] leading-[1.7] text-[var(--muted)]">
             Bekijk feitelijk wat een eenmalige of maandelijkse extra DUO-aflossing
             doet met je maandtermijn, einddatum en rentelast. Je wettelijke
@@ -443,7 +433,7 @@ export default function DuoExtraAflossenCalculator() {
       details={
         view.isValid ? (
           <div className="space-y-4">
-            <DisclosureSection title="Aannames" defaultOpen>
+            <DisclosureSection title="Aannames">
               <ul className="list-disc space-y-2 pl-5 text-[13px] leading-[1.7] text-[var(--muted)]">
                 <li>Gebruikte normversie: {view.normVersion}.</li>
                 <li>

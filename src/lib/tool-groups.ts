@@ -16,10 +16,6 @@ export const toolGroups: ToolGroup[] = [
       "duo-stoppen-kosten-prestatiebeurs",
       "duo-leenbedrag-impact",
       "duo-aanvullende-beurs",
-      "duo-maandbedrag",
-      "duo-extra-aflossen",
-      "schulden-volgorde",
-      "hypotheek-impact-studieschuld",
     ],
   },
   {
@@ -33,7 +29,7 @@ export const toolGroups: ToolGroup[] = [
   },
   {
     title: "Terugbetalen",
-    description: "Bekijk aflossen als volgorde- en maandruimte-vraag, zonder adviesclaim.",
+    description: "Bereken je maandbedrag, het effect van extra aflossen en een logische schuldvolgorde.",
     slugs: ["duo-extra-aflossen", "duo-maandbedrag", "schulden-volgorde"],
   },
   {

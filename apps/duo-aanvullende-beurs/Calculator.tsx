@@ -165,7 +165,6 @@ export default function DuoAanvullendeBeursCalculator() {
     submit,
     hasDirtyChanges,
     setValues,
-    reset,
   } = useSubmittedCalculation<AdditionalGrantFormValues>(defaultValues);
   const errors = validateAdditionalGrantForm(formValues);
   const submittedView = useMemo(
@@ -426,43 +425,35 @@ export default function DuoAanvullendeBeursCalculator() {
           {submittedView.conclusion}
         </h3>
       </section>
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3">
         <ResultCard
           label="Aanvullende beurs per maand"
           value={submittedView.monthlyGrantLabel}
-          className="sm:col-span-3"
           tone={submittedView.result.status === "calculated" ? "pos" : "warn"}
         />
-        <ResultCard
-          label="Aanvullende beurs per jaar"
-          value={submittedView.annualGrantLabel}
-        />
-        <ResultCard
-          label="Waarschijnlijk recht"
-          value={submittedView.probablyEligibleLabel}
-          tone={submittedView.probablyEligibleLabel === "Waarschijnlijk niet" ? "neg" : "default"}
-        />
       </div>
+      {submittedView.warningMessages.length > 0 ? (
+        <section className="surface-panel p-5">
+          <BulletList title="Let op" items={submittedView.warningMessages} />
+        </section>
+      ) : null}
       <ToolNextSteps {...nextSteps} />
-      <section className="surface-panel p-5">
-        <h3 className="font-serif text-xl text-[var(--ink)]">Berekeningsuitleg</h3>
-        <div className="mt-3">
+      <DisclosureSection
+        title="Berekening, aannames en bronnen"
+        subtitle="Open de onderbouwing als je de uitkomst wilt controleren."
+      >
+        <ResultRow label="Aanvullende beurs per jaar" value={submittedView.annualGrantLabel} />
+        <ResultRow label="Waarschijnlijk recht" value={submittedView.probablyEligibleLabel} />
+        <div className="mt-4">
           {submittedView.explanationRows.map((row) => (
             <ResultRow key={row.label} label={row.label} value={row.value} />
           ))}
         </div>
-      </section>
-      <section className="surface-panel space-y-5 p-5">
-        <BulletList title="Aannames" items={submittedView.assumptionMessages} />
-        <BulletList title="Waarschuwingen" items={submittedView.warningMessages} />
-        <BulletList title="Toelichting" items={submittedView.reasonMessages} />
-      </section>
-      <section className="surface-panel p-5">
-        <h3 className="font-serif text-xl text-[var(--ink)]">Bronnen</h3>
-        <p className="mt-2 text-[13px] leading-[1.6] text-[var(--muted)]">
-          De berekening gebruikt de DUO-regels voor 2026. Deze links zijn er voor controle en verdieping.
-        </p>
-        <div className="mt-4 flex flex-wrap gap-2">
+        <div className="mt-5 space-y-5">
+          <BulletList title="Aannames" items={submittedView.assumptionMessages} />
+          <BulletList title="Toelichting" items={submittedView.reasonMessages} />
+        </div>
+        <div className="mt-5 flex flex-wrap gap-2">
           {submittedView.sourceLinks.map((link) => (
             <a
               key={link.href}
@@ -475,7 +466,7 @@ export default function DuoAanvullendeBeursCalculator() {
             </a>
           ))}
         </div>
-      </section>
+      </DisclosureSection>
     </div>
   ) : (
     <div className="surface-panel p-5">
@@ -494,9 +485,9 @@ export default function DuoAanvullendeBeursCalculator() {
           <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-[var(--muted)]">
             DUO · aanvullende beurs 2026
           </p>
-          <h2 className="mt-2 font-serif text-3xl text-[var(--ink)]">
+          <h1 className="mt-2 font-serif text-3xl text-[var(--ink)]">
             Schat je aanvullende beurs
-          </h2>
+          </h1>
           <p className="mt-3 text-[15px] leading-[1.7] text-[var(--muted)]">
             Bereken met concrete ouderinkomens uit 2024 wat de aanvullende beurs in 2026
             indicatief per maand en per jaar kan zijn.
@@ -518,9 +509,6 @@ export default function DuoAanvullendeBeursCalculator() {
         <div className="space-y-3">
           <ToolActionButton type="button" onClick={handleSubmit} disabled={hasErrors}>
             Bereken
-          </ToolActionButton>
-          <ToolActionButton type="button" variant="secondary" onClick={() => reset()}>
-            Wis invoer
           </ToolActionButton>
           {hasDirtyChanges ? (
             <p className="text-[12px] leading-[1.5] text-[var(--muted)]">

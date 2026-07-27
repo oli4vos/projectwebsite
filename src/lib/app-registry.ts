@@ -277,8 +277,8 @@ export const appRegistry = [
   },
   {
     "slug": "schulden-volgorde",
-    "title": "Welke schuld eerst?",
-    "description": "Zet dure schulden, DUO, hypotheek en achteraf betalen in een extra-aflosvolgorde.",
+    "title": "Vergelijk mijn schulden",
+    "description": "Vergelijk dure schulden, DUO, hypotheek en achteraf betalen voor extra aflossen.",
     "enabled": true,
     "type": "frontend",
     "category": "Schulden",

@@ -26,21 +26,10 @@ export default function OverPage() {
             <p>
               Deze site is een onafhankelijk project met heldere rekentools voor
               mensen met een DUO-studieschuld, en voor starters die hun maximale
-              hypotheek willen inschatten. Het doel is simpel: grip. Je ziet wat
-              een keuze met je eigen cijfers doet, zodat je zelf een
-              geïnformeerd besluit neemt.
+              hypotheek willen inschatten. Er zijn geen advertenties of
+              doorverwijzingen naar aanbieders. Je ziet informatieve scenario&apos;s
+              met je eigen cijfers; geen persoonlijk advies.
             </p>
-
-            <div>
-              <h2 className="font-serif text-[18px] tracking-[-0.02em] text-[var(--ink)] mb-2">
-                Onafhankelijk
-              </h2>
-              <p>
-                Geen advies, geen advertenties, geen doorverwijzing naar
-                aanbieders. De berekeningen zijn scenario&rsquo;s, geen persoonlijk
-                advies.
-              </p>
-            </div>
 
             <div>
               <h2 className="font-serif text-[18px] tracking-[-0.02em] text-[var(--ink)] mb-2">
@@ -57,12 +46,11 @@ export default function OverPage() {
                 Waarop we ons baseren
               </h2>
               <p>
-                Elke aanname is terug te voeren op de bron: wet- en
+                Elke aanname is terug te voeren op wet- en
                 regelgeving, het normadvies van het Nibud, toezichthouders
                 zoals de AFM, en officiële uitleg van de overheid, DUO en de
-                Belastingdienst. Bij elke aanname zie je het bronniveau en een
-                link naar die bron. Waar een getal een eigen indicatieve keuze
-                is in plaats van een norm, staat dat er eerlijk bij. Bekijk de{" "}
+                Belastingdienst. De waarden worden minstens jaarlijks en bij
+                relevante wijzigingen gecontroleerd. Bekijk de{" "}
                 <Link
                   href="/variabelen"
                   className="underline text-[var(--ink)] hover:text-[var(--ink-2)]"
@@ -82,18 +70,6 @@ export default function OverPage() {
 
             <div>
               <h2 className="font-serif text-[18px] tracking-[-0.02em] text-[var(--ink)] mb-2">
-                Bijwerken
-              </h2>
-              <p>
-                De aannames worden minstens één keer per jaar en bij relevante
-                wetswijzigingen gecontroleerd. Bij elke aanname zie je de
-                laatste controledatum en de status: definitief, voorlopig of
-                indicatief.
-              </p>
-            </div>
-
-            <div>
-              <h2 className="font-serif text-[18px] tracking-[-0.02em] text-[var(--ink)] mb-2">
                 Fouten melden
               </h2>
               <p>
@@ -104,20 +80,9 @@ export default function OverPage() {
                   rel="noopener noreferrer"
                   className="underline text-[var(--ink)] hover:text-[var(--ink-2)]"
                 >
-                  GitHub issues
+                  het foutformulier
                 </a>
                 .
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3">
-              <h2 className="font-serif text-[16px] tracking-[-0.02em] text-[var(--ink)] mb-2">
-                Belangrijk
-              </h2>
-              <p className="text-[13px] text-[var(--muted)]">
-                Dit zijn indicatieve scenario&rsquo;s, geen persoonlijk financieel
-                advies. Voor een besluit dat veel geld of lange tijd raakt,
-                raadpleeg een onafhankelijk adviseur.
               </p>
             </div>
           </div>

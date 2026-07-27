@@ -319,32 +319,41 @@ export default function DuoMaandbedragCalculator() {
       />
       <FieldError message={view.errors.debtParts} />
 
-      <MoneyField
-        id="assessmentIncome"
-        label="Toetsingsinkomen optioneel"
-        value={formValues.assessmentIncome}
-        error={view.errors.assessmentIncome}
-        prefix="€"
-        hint="Alleen voor draagkrachtindicatie"
-        onChange={(value) => updateField("assessmentIncome", value)}
-      />
-
-      <label className="grid gap-2" htmlFor="householdSituation">
-        <span className="text-[12px] font-medium uppercase tracking-[0.04em] text-[var(--muted)]">
-          Huishoudsituatie
-        </span>
-        <select
-          id="householdSituation"
-          value={formValues.householdSituation}
-          onChange={(event) =>
-            updateField("householdSituation", event.target.value as DuoHouseholdSituation)
-          }
-          className="field-shell ring-focus h-12 px-3 text-[15px] text-[var(--ink)] outline-none"
-        >
-          <option value="single">Alleenstaand</option>
-          <option value="partner">Met partner of alleenstaande ouder</option>
-        </select>
-      </label>
+      <details
+        open={formValues.assessmentIncome.trim().length > 0}
+        className="surface-subtle p-4"
+      >
+        <summary className="cursor-pointer text-[13px] font-medium text-[var(--ink)]">
+          Draagkracht op basis van inkomen toevoegen
+        </summary>
+        <div className="mt-4 grid gap-4">
+          <MoneyField
+            id="assessmentIncome"
+            label="Toetsingsinkomen"
+            value={formValues.assessmentIncome}
+            error={view.errors.assessmentIncome}
+            prefix="€"
+            hint="Alleen nodig voor de draagkrachtindicatie"
+            onChange={(value) => updateField("assessmentIncome", value)}
+          />
+          <label className="grid gap-2" htmlFor="householdSituation">
+            <span className="text-[12px] font-medium uppercase tracking-[0.04em] text-[var(--muted)]">
+              Huishoudsituatie
+            </span>
+            <select
+              id="householdSituation"
+              value={formValues.householdSituation}
+              onChange={(event) =>
+                updateField("householdSituation", event.target.value as DuoHouseholdSituation)
+              }
+              className="field-shell ring-focus h-12 px-3 text-[15px] text-[var(--ink)] outline-none"
+            >
+              <option value="single">Alleenstaand</option>
+              <option value="partner">Met partner of alleenstaande ouder</option>
+            </select>
+          </label>
+        </div>
+      </details>
 
       <div className="flex flex-wrap gap-2">
         <ToolActionButton
@@ -416,11 +425,11 @@ export default function DuoMaandbedragCalculator() {
       </div>
       <ToolNextSteps {...nextSteps} />
 
-      <section className="surface-panel p-5">
-        <h2 className="text-lg font-semibold tracking-tight text-[var(--ink)]">
-          Berekening
-        </h2>
-        <div className="mt-3">
+      <DisclosureSection
+        title="Volledige berekening"
+        subtitle="Bekijk schuld, rente, looptijd en draagkracht."
+      >
+        <div>
           <ResultRow label="Openstaande schuld" value={formatCurrency(view.remainingDebt)} />
           <ResultRow label="Regeling" value={getRepaymentRuleLabel(view.repaymentRule)} />
           <ResultRow label="DUO-rentejaar" value={String(view.duoRateYear)} />
@@ -454,27 +463,17 @@ export default function DuoMaandbedragCalculator() {
             </>
           ) : null}
         </div>
-      </section>
+      </DisclosureSection>
     </div>
-  ) : (
-    <section id="tool-result-summary" className="surface-panel p-5">
-      <h2 className="text-lg font-semibold tracking-tight text-[var(--ink)]">
-        Vul je studieschuld in
-      </h2>
-      <p className="mt-2 text-[13px] leading-[1.7] text-[var(--muted)]">
-        Na een geldig bedrag toont de tool direct de wettelijke DUO-termijn.
-        Draagkracht verschijnt alleen als je inkomen invult.
-      </p>
-    </section>
-  );
+  ) : null;
 
   return (
     <CalculatorShell
       intro={
         <>
-          <h2 className="text-2xl font-semibold tracking-tight text-[var(--ink)]">
+          <h1 className="text-2xl font-semibold tracking-tight text-[var(--ink)]">
             Wat wordt mijn DUO-maandbedrag?
-          </h2>
+          </h1>
           <p className="mt-3 text-[15px] leading-[1.7] text-[var(--muted)]">
             Bereken feitelijk welk maandbedrag bij je studieschuld hoort. Met
             inkomen erbij zie je ook een indicatieve draagkrachtgrens. Het
@@ -488,7 +487,7 @@ export default function DuoMaandbedragCalculator() {
       details={
         view.isValid ? (
           <div className="space-y-4">
-            <DisclosureSection title="Aannames" defaultOpen>
+            <DisclosureSection title="Aannames">
               <ul className="list-disc space-y-2 pl-5 text-[13px] leading-[1.7] text-[var(--muted)]">
                 <li>Gebruikte normversie: {view.normVersion}.</li>
                 <li>

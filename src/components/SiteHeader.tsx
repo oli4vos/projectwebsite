@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BtnLink, Logo } from "@/components/ui";
+import { Logo } from "@/components/ui";
 import { ENABLE_PROFILE } from "@/lib/feature-flags";
 
 const navItems = [
   { href: "/#route", label: "Stappenplan", mobileLabel: "Stappenplan" },
-  { href: "/#apps", label: "Alle tools", mobileLabel: "Alle tools" },
+  { href: "/apps", label: "Alle tools", mobileLabel: "Alle tools" },
   { href: "/kennisbank", label: "Kennisbank", mobileLabel: "Kennisbank" },
   { href: "/variabelen", label: "Aannames", mobileLabel: "Aannames" },
   { href: "/over", label: "Over", mobileLabel: "Over" },
@@ -69,14 +69,6 @@ export function SiteHeader() {
               </Link>
             ) : null}
           </nav>
-
-          {pathname === "/" ? (
-            <div className="hidden items-center gap-2 md:flex">
-              <BtnLink href="/#route" kind="primary" size="sm">
-                Begin bij stap 1
-              </BtnLink>
-            </div>
-          ) : null}
         </div>
 
         <nav

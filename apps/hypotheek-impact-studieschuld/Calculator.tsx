@@ -563,25 +563,20 @@ function CalculatorContent({
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
             Rekentool
           </div>
-          <h2 className="mt-2 font-serif text-[30px] tracking-[-0.02em] text-[var(--ink)]">
+          <h1 className="mt-2 font-serif text-[30px] tracking-[-0.02em] text-[var(--ink)]">
             Hypotheek-impact van je studieschuld
-          </h2>
+          </h1>
           <p className="mt-3 text-[14px] leading-[1.7] text-[var(--ink-2)]">
             Je studieschuld hoeft een koophuis niet onmogelijk te maken, maar je
             DUO-maandlast kan wel meetellen. Deze tool laat zien welk bedrag waarschijnlijk
-            relevant is, hoe brutering werkt en wat dat indicatief met je
-            hypotheekruimte kan doen.
+            relevant is, hoe geldverstrekkers die last omrekenen en wat dat
+            indicatief met je hypotheekruimte kan doen.
           </p>
           <p className="mt-3 text-[13px] leading-[1.65] text-[var(--muted)]">
-            Sinds 2024 kijken geldverstrekkers meestal vooral naar je DUO-maandlast,
-            maar tijdelijke verlagingen of betaalpauzes tellen niet altijd als
+            Je hebt je DUO-maandbedrag, resterende schuld, inkomen en woningdoel
+            nodig. Tijdelijke verlagingen of betaalpauzes tellen niet altijd als
             structureel lagere last.
           </p>
-        </div>
-
-        <div className="surface-subtle mt-6 px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
-          Deze tool geeft een indicatie. Een hypotheekverstrekker of adviseur rekent
-          met actuele normen, acceptatiebeleid en jouw volledige situatie.
         </div>
 
         {hasRelevantProfileValues ? (
@@ -622,17 +617,6 @@ function CalculatorContent({
             {duoTransferMessage}
           </p>
         ) : null}
-
-        <section className="surface-subtle mt-5 px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
-          <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--soft)]">
-            Wat heb je nodig?
-          </div>
-          <ul className="mt-2 list-disc space-y-1.5 pl-5">
-            <li>Je bruto jaarinkomen en eventueel partnerinkomen.</li>
-            <li>Je DUO-maandbedrag en studieschuld.</li>
-            <li>Koopprijs, woningwaarde en eigen geld.</li>
-          </ul>
-        </section>
 
         <div className={`mt-7 ${isStepVisible(step1Fields) ? "block" : "hidden"} md:block`}>
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
@@ -849,7 +833,7 @@ function CalculatorContent({
               <p className="text-[12px] leading-[1.5] text-[var(--soft)]">
                 {formValues.useDebtParts
                   ? "Wordt overschreven door de som van je leningdelen hieronder."
-                  : "Nodig voor schattingen, brutering én het scenario extra aflossen."}
+                  : "Nodig voor schattingen, de hypotheektoets en het scenario extra aflossen."}
               </p>
               <FieldError message={errors.remainingStudentDebt} />
             </label>
@@ -1126,12 +1110,12 @@ function CalculatorContent({
                   className="h-4 w-4 rounded border-[var(--hair)] text-[var(--deep)]"
                 />
                 <span className="text-[14px] leading-[1.6] text-[var(--ink)]">
-                  Toon gebruikte defaults en bruteringscontext
+                  Toon gebruikte uitgangspunten en omrekening
                 </span>
               </div>
               {result ? (
                 <p className="text-[12px] leading-[1.5] text-[var(--soft)]">
-                  Indicatieve bruteringsstaffel: factor {formatDecimal(result.mortgageImpact.bruteringFactor)} bij {result.mortgageImpact.bruteringLabel}.
+                  Indicatieve omrekenfactor: {formatDecimal(result.mortgageImpact.bruteringFactor)} bij {result.mortgageImpact.bruteringLabel}.
                 </p>
               ) : null}
             </label>
@@ -1180,25 +1164,22 @@ function CalculatorContent({
                 {formatCurrency(result.duoMandatoryPayment.requiredMonthlyPayment)} per maand.
               </div>
               <p className="mt-3 max-w-[58ch] text-[14px] leading-[1.7] text-white/78">
-                Voor brutering rekenen geldverstrekkers met de annuïtaire
-                DUO-maandlast die nodig is om de schuld op nul te zetten:
+                Voor de hypotheektoets rekenen geldverstrekkers met het
+                DUO-maandbedrag waarmee de schuld binnen de looptijd wordt afgelost:
                 {` `}
                 {formatCurrency(result.mortgageImpact.bruteringBaseMonthlyPayment)}.
-                Na brutering telt dat indicatief als ongeveer{" "}
+                Na omrekening telt dat indicatief als ongeveer{" "}
                 {formatCurrency(result.mortgageImpact.grossDuoMonthlyImpact)} bruto
                 maandlast.
               </p>
-              <ul className="mt-4 space-y-2 rounded-2xl border border-white/12 bg-white/6 px-4 py-3 text-[13px] leading-[1.65] text-white/76">
-                <li>
-                  Verplicht DUO-bedrag: {formatCurrency(result.duoMandatoryPayment.requiredMonthlyPayment)} per maand.
-                </li>
-                <li>
-                  Bruto DUO-maandlast voor hypotheek: {formatCurrency(result.mortgageImpact.grossDuoMonthlyImpact)} per maand.
-                </li>
-                <li>
-                  Impact op leencapaciteit: {formatCurrency(result.mortgageImpact.principalImpact)} minder leencapaciteit.
-                </li>
-              </ul>
+              <div className="mt-4 rounded-2xl border border-white/12 bg-white/6 px-4 py-3">
+                <div className="text-[11px] uppercase tracking-[0.12em] text-white/55">
+                  Impact op leencapaciteit
+                </div>
+                <div className="mt-1 font-mono text-[24px] tabular text-white">
+                  − {formatCurrency(result.mortgageImpact.principalImpact)}
+                </div>
+              </div>
               <div className="mt-5 flex flex-wrap items-center gap-3">
                 {canDownloadPdf ? (
                   <ToolActionButton
@@ -1314,7 +1295,7 @@ function CalculatorContent({
                 label="Geschat wettelijk maandbedrag"
                 value={formatCurrency(result.duoPayment.estimatedStatutoryPayment)}
                 sub={`Gebaseerd op schuld, rentejaar en looptijd onder ${ruleLabels[formValues.repaymentRule]}`}
-                breakdownLabel="Wettelijke annuïteit"
+                breakdownLabel="Berekening van het maandbedrag"
                 breakdown={
                   <AmountBreakdown
                     items={[
@@ -1328,7 +1309,7 @@ function CalculatorContent({
                         Resterende looptijd: {formatMonthsAndYears(result.duoTermYearsUsed * 12)}.
                       </span>,
                       <span key="4">
-                        Dit is de annuïteit die naar nul aflost over de resterende looptijd.
+                        Met dit vaste maandbedrag wordt de schuld binnen de resterende looptijd afgelost.
                       </span>,
                       ...(result.debtPortfolio.usesDebtParts
                         ? [
@@ -1479,8 +1460,8 @@ function CalculatorContent({
               <ResultRow
                 label="Wettelijk maandbedrag"
                 value={formatCurrency(result.duoMandatoryPayment.statutoryMonthlyPayment)}
-                sub="Indicatie uit annuïtaire DUO-berekening"
-                breakdownLabel="Annuïteit tot nul"
+                sub="Indicatie van het bedrag waarmee de schuld binnen de looptijd wordt afgelost"
+                breakdownLabel="Berekening tot het einde van de looptijd"
                 breakdown={
                   <AmountBreakdown
                     items={[
@@ -1541,22 +1522,23 @@ function CalculatorContent({
         <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h3 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
-              Wat is brutering?
+              Hoe wordt je DUO-last omgerekend?
             </h3>
             {result ? <Pill tone="accent">Factor {formatDecimal(result.mortgageImpact.bruteringFactor)}</Pill> : null}
           </div>
           <p className="mt-3 text-[13.5px] leading-[1.65] text-[var(--muted)]">
-            De DUO-maandlast is meestal een netto maandlast. Voor hypotheekberekeningen
-            wordt die vaak omgerekend naar een bruto vergelijkbare maandlast. Dat heet
-            brutering. Hoe hoger de hypotheekrente, hoe zwaarder die brutering meestal telt.
+            De DUO-maandlast is meestal een netto maandlast. Voor de hypotheektoets
+            rekenen geldverstrekkers die om naar een vergelijkbare bruto maandlast.
+            Deze omrekening wordt ook wel brutering genoemd. Hoe hoger de
+            hypotheekrente, hoe zwaarder de omrekening meestal telt.
           </p>
           <p className="mt-2 text-[12.5px] leading-[1.6] text-[var(--soft)]">
             {getGlossaryExplanation("brutering")}
           </p>
           <p className="mt-3 text-[12.5px] leading-[1.6] text-[var(--soft)]">
-            Belangrijk: een hogere brutering verhoogt altijd je maandlast-impact. Dat
+            Belangrijk: een hogere omrekenfactor verhoogt altijd je maandlast-impact. Dat
             de hoofdsom-impact soms niet even hard meegroeit komt door de
-            hypotheekrente in de annuïtaire vertaling naar leenruimte.
+            hypotheekrente waarmee de maandlast naar leenruimte wordt vertaald.
           </p>
           {result ? (
             <div className="mt-5">
@@ -1572,22 +1554,22 @@ function CalculatorContent({
                         Dit bedrag komt uit de draagkrachttoets en het wettelijke maandbedrag.
                       </span>,
                       <span key="2">
-                        Het blijft apart van het bedrag dat geldverstrekkers voor brutering gebruiken.
+                        Het blijft apart van het bedrag dat geldverstrekkers voor de hypotheektoets gebruiken.
                       </span>,
                     ]}
                   />
                 }
               />
               <ResultRow
-                label="Bruteringsbasis"
+                label="Maandbedrag voor de hypotheektoets"
                 value={formatCurrency(result.mortgageImpact.bruteringBaseMonthlyPayment)}
-                sub="Annuïtaire DUO-last die naar nul aflost"
+                sub="DUO-last waarmee de schuld binnen de looptijd wordt afgelost"
                 breakdownLabel="Waarom dit bedrag?"
                 breakdown={
                   <AmountBreakdown
                     items={[
                       <span key="1">
-                        Geldverstrekkers rekenen voor brutering met de DUO-annuïteit tot nul.
+                        Geldverstrekkers rekenen met het DUO-maandbedrag dat de schuld binnen de looptijd aflost.
                       </span>,
                       <span key="2">
                         Dat bedrag is hier {formatCurrency(result.mortgageImpact.bruteringBaseMonthlyPayment)}.
@@ -1597,7 +1579,7 @@ function CalculatorContent({
                 }
               />
               <ResultRow
-                label="Gebruikte bruteringsfactor"
+                label="Gebruikte omrekenfactor"
                 value={formatDecimal(result.mortgageImpact.bruteringFactor)}
                 sub={`Indicatieve staffel: ${result.mortgageImpact.bruteringLabel}`}
               />
@@ -1606,7 +1588,7 @@ function CalculatorContent({
                 value={formatCurrency(result.mortgageImpact.grossDuoMonthlyImpact)}
                 sub="De netto DUO-last omgerekend naar bruto vergelijkbare hypotheeklast"
                 accent
-                breakdownLabel="Brutering"
+                breakdownLabel="Omrekening"
                 breakdown={
                   <AmountBreakdown
                     items={[
@@ -1907,8 +1889,8 @@ function CalculatorContent({
                 value={formatCurrency(
                   result.extraRepaymentScenario.grossMonthlyImpactReduction,
                 )}
-                sub="De maandlastdaling na toepassing van dezelfde bruteringsfactor"
-                breakdownLabel="Brutering van het verschil"
+                sub="De maandlastdaling na toepassing van dezelfde omrekenfactor"
+                breakdownLabel="Omrekening van het verschil"
                 breakdown={
                   <AmountBreakdown
                     items={[
@@ -2103,7 +2085,7 @@ function CalculatorContent({
             </p>
             <p>Laatste controle van deze aannames: {formatIsoDateLabel(LAST_CHECKED)}.</p>
             <p>
-              Voor brutering gebruiken we een indicatieve staffel. Geldverstrekkers
+              Voor de omrekening gebruiken we een indicatieve tabel. Geldverstrekkers
               en actuele normen kunnen daarvan afwijken.
             </p>
             <p>
@@ -2111,7 +2093,7 @@ function CalculatorContent({
               {FINANCIAL_CONSTANTS.duo.meta.status}).
             </p>
             <p>
-              Centrale bron brutering/hypotheekdefaults:{" "}
+              Bron voor de omrekening en hypotheekuitgangspunten:{" "}
               {FINANCIAL_CONSTANTS.mortgage.meta.sourceLabel} (
               {FINANCIAL_CONSTANTS.mortgage.meta.status}).
             </p>

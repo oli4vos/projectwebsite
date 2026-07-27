@@ -42,11 +42,13 @@ const modeCopy: Record<SimpleDuoToolMode, ToolCopy> = {
       "calculationMonth",
       "monthsUntilDiploma",
       "monthlyLoan",
+      "duoRateYear",
+    ],
+    advancedFields: [
       "monthlyCollegegeldkrediet",
       "monthlyBasisbeurs",
       "monthlyAanvullendeBeurs",
       "monthlyReisproduct",
-      "duoRateYear",
     ],
     helper:
       "Gebruik deze tool als je nog geen studieschuld hebt of een nieuwe leenperiode wilt inschatten.",
@@ -311,7 +313,7 @@ function fieldHint(field: keyof SimpleDuoValues) {
 export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
   const copy = modeCopy[mode];
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
-  const { formValues, setFormValues, submittedValues, submit, reset } =
+  const { formValues, setFormValues, submittedValues, submit } =
     useSubmittedCalculation<SimpleDuoValues>(defaultSimpleDuoValues(mode));
   const currentView = useMemo(() => createSimpleDuoView(mode, formValues), [formValues, mode]);
   const submittedView = submittedValues ? createSimpleDuoView(mode, submittedValues) : null;
@@ -436,52 +438,22 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
           <ResultCard
             label={submittedView.focusScenario.primaryLabel}
             value={formatCurrency(submittedView.focusScenario.primaryAmount)}
-          />
-          <ResultCard
-            label="Totaal betalen incl. rente"
-            value={formatCurrency(submittedView.focusScenario.totalPaid)}
-            note={`Berekend vanaf start terugbetalen met SF35 over maximaal ${submittedView.focusScenario.repaymentTermYears} jaar.`}
+            className="sm:col-span-2"
           />
         </div>
-        <div className="surface-subtle px-4">
-          <ResultRow
-            label="Eindschuld bij start terugbetaling"
-            value={formatCurrency(submittedView.focusScenario.debtAtRepaymentStart)}
-          />
-          <ResultRow
-            label={submittedView.focusScenario.secondaryLabel}
-            value={formatCurrency(submittedView.focusScenario.secondaryAmount)}
-          />
-          <ResultRow
-            label="Rente in aflosfase"
-            value={formatCurrency(submittedView.focusScenario.totalInterest)}
-          />
-          <ResultRow
-            label="Schuldenvrij rond"
-            value={submittedView.focusScenario.payoffDate ?? "n.v.t."}
-          />
-          <ResultRow
-            label="Altijd terug te betalen"
-            value={formatCurrency(
-              mode === "stop-cost"
-                ? submittedView.result.scenarios[0].debtAtStop.alwaysRepayable
-                : submittedView.result.scenarios[2].debtAtStop.alwaysRepayable,
-            )}
-          />
-          {mode === "stop-cost" && selectedScenario ? (
-            <>
-              <ResultRow label="Basisbeurs blijft schuld" value={formatCurrency(selectedScenario.debtAtStop.basisbeurs)} />
-              <ResultRow
-                label="Aanvullende beurs blijft schuld"
-                value={formatCurrency(selectedScenario.debtAtStop.aanvullendeBeurs)}
-              />
-              <ResultRow
-                label="Studentenreisproduct blijft schuld"
-                value={formatCurrency(selectedScenario.debtAtStop.reisproduct)}
-              />
-            </>
-          ) : null}
-        </div>
+        {mode === "stop-cost" && selectedScenario ? (
+          <div className="surface-subtle px-4">
+            <ResultRow label="Basisbeurs blijft schuld" value={formatCurrency(selectedScenario.debtAtStop.basisbeurs)} />
+            <ResultRow
+              label="Aanvullende beurs blijft schuld"
+              value={formatCurrency(selectedScenario.debtAtStop.aanvullendeBeurs)}
+            />
+            <ResultRow
+              label="Studentenreisproduct blijft schuld"
+              value={formatCurrency(selectedScenario.debtAtStop.reisproduct)}
+            />
+          </div>
+        ) : null}
         <p className="text-[13px] leading-[1.7] text-[var(--soft)]">
           {submittedView.focusScenario.note}
         </p>
@@ -494,6 +466,42 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
         >
           {isDownloadingPdf ? "PDF wordt gemaakt..." : "Download overzicht"}
         </ToolActionButton>
+        <details className="surface-subtle p-4">
+          <summary className="cursor-pointer text-[13px] font-medium text-[var(--ink)]">
+            Bekijk de volledige berekening
+          </summary>
+          <div className="mt-4">
+            <ResultRow
+              label="Totaal betalen inclusief rente"
+              value={formatCurrency(submittedView.focusScenario.totalPaid)}
+              sub={`Berekend vanaf start terugbetalen met SF35 over maximaal ${submittedView.focusScenario.repaymentTermYears} jaar.`}
+            />
+            <ResultRow
+              label="Eindschuld bij start terugbetaling"
+              value={formatCurrency(submittedView.focusScenario.debtAtRepaymentStart)}
+            />
+            <ResultRow
+              label={submittedView.focusScenario.secondaryLabel}
+              value={formatCurrency(submittedView.focusScenario.secondaryAmount)}
+            />
+            <ResultRow
+              label="Rente in aflosfase"
+              value={formatCurrency(submittedView.focusScenario.totalInterest)}
+            />
+            <ResultRow
+              label="Schuldenvrij rond"
+              value={submittedView.focusScenario.payoffDate ?? "Niet te bepalen"}
+            />
+            <ResultRow
+              label="Altijd terug te betalen"
+              value={formatCurrency(
+                mode === "stop-cost"
+                  ? submittedView.result.scenarios[0].debtAtStop.alwaysRepayable
+                  : submittedView.result.scenarios[2].debtAtStop.alwaysRepayable,
+              )}
+            />
+          </div>
+        </details>
       </section>
     </div>
   ) : (
@@ -515,9 +523,9 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
             {copy.eyebrow}
           </div>
-          <h2 className="mt-2 text-[26px] font-semibold tracking-[-0.02em] text-[var(--ink)]">
+          <h1 className="mt-2 text-[26px] font-semibold tracking-[-0.02em] text-[var(--ink)]">
             {copy.title}
-          </h2>
+          </h1>
           <p className="mt-3 max-w-[58ch] text-[14px] leading-[1.7] text-[var(--ink-2)]">
             {copy.intro}
           </p>
@@ -531,17 +539,6 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
           <ToolActionButton type="button" variant="secondary" onClick={() => setFormValues(emptySimpleDuoValues(mode))}>
             Wis invoer
           </ToolActionButton>
-          <ToolActionButton type="button" variant="secondary" onClick={() => reset("Invoer gewist.")}>
-            Standaard terugzetten
-          </ToolActionButton>
-          <ToolActionButton
-            type="button"
-            variant="secondary"
-            onClick={() => void handleDownloadPdf()}
-            disabled={!submittedView?.isValid || isDownloadingPdf}
-          >
-            {isDownloadingPdf ? "PDF wordt gemaakt..." : "Download overzicht"}
-          </ToolActionButton>
         </div>
       }
       inputs={
@@ -550,7 +547,9 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
           {copy.advancedFields ? (
             <details className="surface-subtle p-4">
               <summary className="cursor-pointer text-[13px] font-medium text-[var(--ink)]">
-                Verder specificeren
+                {mode === "start-borrowing"
+                  ? "Andere studiebedragen toevoegen"
+                  : "Verder specificeren"}
               </summary>
               <div className="mt-4 grid gap-4">
                 {copy.advancedFields.map((field) => renderField(field, false))}

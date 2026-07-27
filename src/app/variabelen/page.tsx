@@ -86,11 +86,11 @@ function MetaBlock({
 
   return (
     <div className="mt-4 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[12.5px] leading-[1.6] text-[var(--muted)]">
-      <p>Jaar: {year}</p>
-      <p>Status: {formatStatusLabel(status)}</p>
-      <p>Gecontroleerd op: {formatIsoDate(lastChecked)}</p>
+      <p>Geldt voor: {year}</p>
+      <p>Zekerheid: {formatStatusLabel(status)}</p>
+      <p>Laatst gecontroleerd: {formatIsoDate(lastChecked)}</p>
       <p>
-        Bron/aannameset:{" "}
+        Gebruikte bron:{" "}
         {sourceUrl ? (
           <a
             href={sourceUrl}
@@ -105,7 +105,7 @@ function MetaBlock({
         )}
       </p>
       <p className="mt-2">
-        Niveau:{" "}
+        Soort bron:{" "}
         <span
           className={`inline-block rounded-md px-2 py-1 text-[11px] font-medium ${
             isApprox
@@ -168,7 +168,6 @@ export default function VariabelenPage() {
             Snelle samenvatting van de meest gebruikte standaardwaarden.
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <SummaryCard label="Jaar" value={`${year}`} />
             <SummaryCard
               label="DUO-rente SF35"
               value={`${formatPercent(constants.duo.rates.SF35)}%`}
@@ -182,20 +181,8 @@ export default function VariabelenPage() {
               value={`${formatPercent(constants.mortgage.defaultMortgageRate)}%`}
             />
             <SummaryCard
-              label="Forfait overige bezittingen"
-              value={`${formatPercent(constants.box3.deemedReturns.investmentsAndOtherAssets)}%`}
-            />
-            <SummaryCard
-              label="Box 3-tarief"
-              value={`${formatPercent(constants.box3.taxRate)}%`}
-            />
-            <SummaryCard
-              label="Vrijstelling box 3 (alleenstaand)"
-              value={formatCurrency(constants.box3.taxFreeAllowanceSingle)}
-            />
-            <SummaryCard
-              label="Vrijstelling box 3 (partners)"
-              value={formatCurrency(constants.box3.taxFreeAllowancePartners)}
+              label="Standaard hypotheeklooptijd"
+              value={`${constants.mortgage.defaultMortgageTermYears} jaar`}
             />
           </div>
         </section>

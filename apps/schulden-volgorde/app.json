@@ -1,8 +1,8 @@
 {
   "slug": "schulden-volgorde",
   "enabled": true,
-  "title": "Welke schuld eerst?",
-  "description": "Zet dure schulden, DUO, hypotheek en achteraf betalen in een extra-aflosvolgorde.",
+  "title": "Vergelijk mijn schulden",
+  "description": "Vergelijk dure schulden, DUO, hypotheek en achteraf betalen voor extra aflossen.",
   "type": "frontend",
   "category": "Schulden",
   "tags": [

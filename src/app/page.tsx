@@ -1,8 +1,7 @@
-import { AppDashboard } from "@/components/AppDashboard";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { BtnLink } from "@/components/ui";
-import { appRegistry, appRegistryBySlug } from "@/lib/app-registry";
+import { appRegistryBySlug } from "@/lib/app-registry";
 
 const routeSteps = [
   {
@@ -111,7 +110,20 @@ export default async function HomePage() {
         </section>
 
         <section className="pt-8">
-          <AppDashboard apps={appRegistry} />
+          <div className="surface-panel p-6">
+            <h2 className="font-serif text-fluid-h2 tracking-[-0.02em] text-[var(--ink)]">
+              Zelf een tool kiezen
+            </h2>
+            <p className="mt-3 max-w-[58ch] text-[14px] leading-7 text-[var(--muted)]">
+              Bekijk het volledige overzicht als je al weet welke vraag je wilt
+              beantwoorden.
+            </p>
+            <div className="mt-5">
+              <BtnLink href="/apps" kind="outline" size="md">
+                Bekijk alle tools
+              </BtnLink>
+            </div>
+          </div>
         </section>
       </main>
       <SiteFooter />

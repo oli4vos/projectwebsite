@@ -36,17 +36,26 @@ export function ToolNextSteps({
         <ToolActionLinkButton href={primary.href} variant="accent" size="md">
           {primary.label}
         </ToolActionLinkButton>
-        {secondary.map((action) => (
-          <ToolActionLinkButton
-            key={action.href}
-            href={action.href}
-            variant="secondary"
-            size="md"
-          >
-            {action.label}
-          </ToolActionLinkButton>
-        ))}
       </div>
+      {secondary.length > 0 ? (
+        <details className="mt-4 border-t border-[var(--hair)] pt-3">
+          <summary className="cursor-pointer text-[13px] font-medium text-[var(--ink)]">
+            Meer mogelijkheden
+          </summary>
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+            {secondary.map((action) => (
+              <ToolActionLinkButton
+                key={action.href}
+                href={action.href}
+                variant="secondary"
+                size="md"
+              >
+                {action.label}
+              </ToolActionLinkButton>
+            ))}
+          </div>
+        </details>
+      ) : null}
     </aside>
   );
 }

@@ -97,8 +97,8 @@ test("mobiele hypotheekflow kan naar veld 2", async ({ page }, testInfo) => {
   await expect(page.getByLabel("Terugbetalingsregel")).toBeVisible();
 });
 
-test("DUO-impact staat rechtsboven in de hypotheekuitkomst", async ({ page }, testInfo) => {
-  test.skip(!testInfo.project.name.startsWith("desktop"), "Desktoppositie controleren");
+test("maximale hypotheek toont één primaire uitkomst", async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "Desktopuitkomst controleren");
 
   await page.goto("/apps/artifact-hypotheek-wonen-maximale-hypotheek", {
     waitUntil: "networkidle",
@@ -107,18 +107,9 @@ test("DUO-impact staat rechtsboven in de hypotheekuitkomst", async ({ page }, te
   await page.getByRole("button", { name: "Bereken", exact: true }).click();
 
   const summary = page.locator("#tool-result-summary");
-  const incomeCard = summary.locator("article").filter({
-    hasText: "Maximale hypotheek op inkomen",
-  });
-  const duoCard = summary.locator("article").filter({ hasText: "Impact DUO-schuld" });
-
-  await expect(duoCard).toContainText("− € 42.334");
-
-  const incomeBox = await incomeCard.boundingBox();
-  const duoBox = await duoCard.boundingBox();
-  expect(incomeBox).not.toBeNull();
-  expect(duoBox).not.toBeNull();
-  expect(duoBox?.x ?? 0).toBeGreaterThan(incomeBox?.x ?? 0);
+  await expect(summary.getByText("Indicatieve maximale hypotheek")).toBeVisible();
+  await expect(summary.locator("article")).toHaveCount(1);
+  await expect(summary.getByText("Impact DUO-schuld")).toHaveCount(0);
 });
 
 test("maximale hypotheek toont rentelink en salarisverhogingsanalyse", async ({
@@ -170,7 +161,9 @@ test("maximale hypotheek toont rentelink en salarisverhogingsanalyse", async ({
 
   await page.getByRole("button", { name: "Voorbeeld invullen" }).click();
   await page.getByRole("button", { name: "Bereken", exact: true }).click();
-  await expect(page.locator("#tool-result-summary").getByText("Einduitkomst")).toBeVisible();
+  await expect(
+    page.locator("#tool-result-summary").getByText("Indicatieve maximale hypotheek"),
+  ).toBeVisible();
 
   await page
     .getByText("Wat doet een salarisverhoging met mijn leenruimte?")
@@ -218,6 +211,14 @@ test("DUO-tools tonen de uitgebreide PDF-download", async ({ page }, testInfo) =
     "/apps/duo-extra-aflossen",
   ]) {
     await page.goto(route, { waitUntil: "networkidle" });
+    if (
+      route === "/apps/duo-schuld-bij-starten-lenen" ||
+      route === "/apps/duo-stoppen-kosten-prestatiebeurs" ||
+      route === "/apps/duo-leenbedrag-impact"
+    ) {
+      await page.getByRole("button", { name: "Voorbeeld invullen" }).click();
+      await page.getByRole("button", { name: "Bereken", exact: true }).click();
+    }
     await expect(page.getByRole("button", { name: "Download overzicht" })).toBeVisible();
   }
 });
@@ -269,7 +270,7 @@ test("hypotheek-impact maakt een PDF vanuit de laatst berekende invoer", async (
   await page.getByRole("button", { name: "Voorbeeld invullen" }).click();
   await page.getByRole("button", { name: "Bereken", exact: true }).click();
   await expect(pdfButton).toBeVisible();
-  await expect(page.getByText("Verplicht DUO-bedrag:")).toBeVisible();
+  await expect(page.getByText(/Voor jouw situatie is het verplichte DUO-bedrag/)).toBeVisible();
 
   const downloadPromise = page.waitForEvent("download");
   await pdfButton.click();
@@ -356,11 +357,15 @@ test("v2 routes zijn gepauzeerd voor de publieke livegang", async ({
   }
 });
 
-test("dashboard toont publieke toolkaarten met centrale surface-stijl", async ({ page }, testInfo) => {
-  test.skip(!testInfo.project.name.startsWith("desktop"), "Desktop dashboardstijl controleren");
+test("homepage verwijst één keer naar het volledige tooloverzicht", async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "Desktop routecontrole");
 
   await page.goto("/", { waitUntil: "networkidle" });
+  await expect(page.getByRole("link", { name: "Bekijk alle tools" })).toBeVisible();
+  await expect(page.locator('a[href^="/apps/"]').filter({ hasText: "Open tool" })).toHaveCount(0);
 
+  await page.goto("/apps", { waitUntil: "networkidle" });
+  await page.getByRole("button", { name: "Alle tools" }).click();
   const cards = page.locator('a[href^="/apps/"]').filter({ hasText: "Open tool" });
   await expect(cards.first()).toBeVisible();
 
@@ -369,15 +374,15 @@ test("dashboard toont publieke toolkaarten met centrale surface-stijl", async ({
   const uniqueToolRoutes = await cards.evaluateAll((links) => [
     ...new Set(links.map((link) => link.getAttribute("href")).filter(Boolean)),
   ] as string[]);
-  expect(uniqueToolRoutes).toHaveLength(9);
+  await expect(cards).toHaveCount(10);
+  expect(uniqueToolRoutes).toHaveLength(10);
   expect(uniqueToolRoutes).not.toContain("/apps/familiehulp-eerste-woning");
-  expect(uniqueToolRoutes).not.toContain(allowanceScanRoute);
+  expect(uniqueToolRoutes).toContain(allowanceScanRoute);
   expect(uniqueToolRoutes.every((route) => !route.startsWith("/v2"))).toBe(true);
   await expect(page.locator('a[href^="/v2"]')).toHaveCount(0);
   await expect(page.getByText("Familiehulp")).toHaveCount(0);
   await expect(page.getByText("Waarom dit rustig blijft")).toHaveCount(0);
 
-  await page.getByRole("button", { name: "Alle tools" }).click();
   await expect(page.locator(`a[href="${allowanceScanRoute}"]`)).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "Welke toeslagen passen mogelijk bij mij?" }),
@@ -415,7 +420,7 @@ test("publieke toeslagenscan route, formulier en bedragindicatie werken", async 
   ).toBeVisible();
   await expect(page.getByText("Toeslagenindicatie 2026")).toBeVisible();
   await expect(
-    page.getByText("Geen persoonlijke aanbeveling en geen officiële beschikking"),
+    page.getByText(/geen officiële beschikking/i),
   ).toBeVisible();
   await expect(page.getByText("Je krijgt een bedrag waar je gegevens dat toelaten.")).toBeVisible();
   await expect(page.getByRole("progressbar")).toHaveCount(0);
@@ -434,7 +439,7 @@ test("publieke toeslagenscan route, formulier en bedragindicatie werken", async 
   await expect(page.getByLabel("Kale huur per maand")).toBeVisible();
   await expect(page.getByText("Afgeleid uit eerdere antwoorden")).toBeVisible();
   await page.getByRole("button", { name: "Bekijk mijn toeslagenindicatie" }).click();
-  await expect(page.locator("#tool-result-summary article")).toHaveCount(4);
+  await expect(page.locator("[data-allowance-result]")).toHaveCount(4);
   await expect(page.getByText("Totaal per maand")).toBeVisible();
   await expect(page.getByText("Totaal per jaar")).toBeVisible();
   await expect(page.getByText(/Meegeteld: .*Zorgtoeslag/)).toBeVisible();
@@ -442,14 +447,16 @@ test("publieke toeslagenscan route, formulier en bedragindicatie werken", async 
   await expect(page.getByRole("heading", { name: "Huurtoeslag" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Kindgebonden budget" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Kinderopvangtoeslag" })).toBeVisible();
+  await page.locator("[data-allowance-result]").first().locator("summary").click();
   await expect(page.getByText("Geschatte toeslag").first()).toBeVisible();
   await expect(page.getByText("eligible-estimate")).toHaveCount(0);
   await expect(page.getByText("Per maand").first()).toBeVisible();
-  await expect(page.getByText("Betrouwbaarheid:").first()).toBeVisible();
+  await expect(page.getByText("Betrouwbaarheid:")).toHaveCount(0);
 
+  await page.getByText("Gebruikte bronnen").click();
   const officialLinks = page.locator("#tool-result-summary a[href^='https://www.belastingdienst.nl/']");
   await expect(officialLinks.first()).toBeVisible();
-  expect(await officialLinks.count()).toBeGreaterThanOrEqual(4);
+  expect(await officialLinks.count()).toBeGreaterThanOrEqual(1);
 
   await page.getByRole("textbox", { name: "Leeftijd", exact: true }).fill("35");
   await expect(
@@ -479,14 +486,18 @@ test("toeslagenscan kernregressies voor partner, vermogen, special-case en infer
   await page.getByLabel("Gezamenlijk toetsingsinkomen").fill("42000");
   await page.getByLabel("Gezamenlijk vermogen op 1 januari").fill("20000");
   await page.getByRole("button", { name: "Bekijk mijn toeslagenindicatie" }).click();
+  await page.locator("[data-allowance-result]").first().locator("summary").click();
   await expect(page.getByText("Geschatte toeslag").first()).toBeVisible();
 
   await page.getByLabel("Gezamenlijk vermogen op 1 januari").fill("999999");
   await page.getByRole("button", { name: "Bekijk mijn toeslagenindicatie" }).click();
+  await page.locator("[data-allowance-result]").first().locator("summary").click();
   await expect(page.getByText("Waarschijnlijk geen recht").first()).toBeVisible();
 
+  await page.getByText("Bijzondere situatie toevoegen").click();
   await page.getByLabel("Complexe of uitzonderlijke situatie?", { exact: true }).selectOption("yes");
   await page.getByRole("button", { name: "Bekijk mijn toeslagenindicatie" }).click();
+  await page.locator("[data-allowance-result]").first().locator("summary").click();
   await expect(page.getByText(/officiële controle/i).first()).toBeVisible();
 
   await page.getByLabel("Gezamenlijk vermogen op 1 januari").fill("20000");
@@ -494,7 +505,12 @@ test("toeslagenscan kernregressies voor partner, vermogen, special-case en infer
   await page.getByLabel("Heb je kinderen?", { exact: true }).selectOption("unknown");
   await expect(page.getByText("Afgeleid uit eerdere antwoorden")).toBeVisible();
   await page.getByRole("button", { name: "Bekijk mijn toeslagenindicatie" }).click();
-  await expect(page.getByText("Nog te bevestigen")).toBeVisible();
+  for (const summary of await page.locator("[data-allowance-result] summary").all()) {
+    await summary.click();
+  }
+  await expect(
+    page.locator("[data-allowance-result][open]").getByText("Nog te bevestigen").first(),
+  ).toBeVisible();
 });
 
 test("verborgen, uitgeschakelde en v2-routes blijven buiten publieke routes", async ({
@@ -581,6 +597,79 @@ test("losse DUO-tools tonen simpele scenario-uitkomst en schuldenvrije datum", a
   await page.getByRole("button", { name: "Bereken", exact: true }).first().click();
 
   await expect(page.getByRole("heading", { name: "Ik studeer al: impact nieuw leenbedrag per maand" })).toBeVisible();
+  await page.getByText("Bekijk de volledige berekening").click();
   await expect(page.getByText("Schuldenvrij rond")).toBeVisible();
-  await expect(page.getByText("Totaal betalen incl. rente")).toBeVisible();
+  await expect(page.getByText("Totaal betalen inclusief rente")).toBeVisible();
+});
+
+test("alle tien tools doorlopen invoer, uitkomst, details en vervolgactie", async ({
+  page,
+}, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "Desktop productiesmoke");
+
+  const scenarios: ReadonlyArray<{
+    route: string;
+    calculate?: string;
+    pdf: boolean;
+  }> = [
+    {
+      route: "/apps/artifact-hypotheek-wonen-maximale-hypotheek",
+      calculate: "Bereken",
+      pdf: true,
+    },
+    { route: "/apps/duo-aanvullende-beurs", calculate: "Bereken", pdf: false },
+    { route: "/apps/duo-extra-aflossen", pdf: true },
+    { route: "/apps/duo-leenbedrag-impact", calculate: "Bereken", pdf: true },
+    { route: "/apps/duo-maandbedrag", pdf: true },
+    { route: "/apps/duo-schuld-bij-starten-lenen", calculate: "Bereken", pdf: true },
+    {
+      route: "/apps/duo-stoppen-kosten-prestatiebeurs",
+      calculate: "Bereken",
+      pdf: true,
+    },
+    { route: "/apps/hypotheek-impact-studieschuld", calculate: "Bereken", pdf: true },
+    { route: "/apps/schulden-volgorde", calculate: "Bereken volgorde", pdf: false },
+    {
+      route: "/apps/toeslagen-scan",
+      calculate: "Bekijk mijn toeslagenindicatie",
+      pdf: false,
+    },
+  ];
+
+  for (const scenario of scenarios) {
+    const response = await page.goto(scenario.route, { waitUntil: "networkidle" });
+    expect(response?.status(), scenario.route).toBe(200);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
+
+    const clearButton = page.getByRole("button", { name: "Wis invoer" }).first();
+    if (await clearButton.isVisible().catch(() => false)) {
+      await clearButton.click();
+      await expect(
+        page.getByRole("complementary", { name: "Volgende stappen" }),
+      ).toHaveCount(0);
+    }
+
+    await page.getByRole("button", { name: "Voorbeeld invullen" }).first().click();
+    if (scenario.calculate) {
+      await page
+        .getByRole("button", { name: scenario.calculate, exact: true })
+        .first()
+        .click();
+    }
+
+    await expect(page.locator("#tool-result-summary")).toBeVisible();
+    await expect(page.getByRole("complementary", { name: "Volgende stappen" })).toBeVisible();
+
+    const resultDetails = page.locator("section.order-2 details").first();
+    await expect(resultDetails, `${scenario.route} heeft verdiepende details`).toBeVisible();
+    await resultDetails.locator("summary").click();
+    await expect(resultDetails).toHaveAttribute("open", "");
+
+    const pdfButton = page.getByRole("button", { name: "Download overzicht" });
+    if (scenario.pdf) {
+      await expect(pdfButton).toBeVisible();
+    } else {
+      await expect(pdfButton).toHaveCount(0);
+    }
+  }
 });

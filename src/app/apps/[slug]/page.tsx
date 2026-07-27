@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AppRenderer } from "@/components/AppRenderer";
-import { GlossaryText } from "@/components/GlossaryText";
 import { KnowledgeLevelHint } from "@/components/KnowledgeLevelHint";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -52,24 +51,13 @@ export default async function AppDetailPage({ params }: AppDetailPageProps) {
       <SiteHeader />
       <main id="main-content" className="page-shell min-h-[100dvh] pb-10 pt-8 lg:pb-14">
         <Link
-          href="/"
+          href="/apps"
           className="inline-flex min-h-11 items-center gap-2 rounded-lg text-[13px] text-[var(--muted)] transition hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
         >
-          ← Terug naar dashboard
+          ← Alle tools
         </Link>
 
-        <section className="mt-5 pb-8">
-          <div className="max-w-4xl">
-            <h1 className="text-fluid-h1 font-serif tracking-[-0.03em] text-[var(--ink)]">
-              {app.title}
-            </h1>
-            <p className="text-fluid-lead mt-5 max-w-[62ch] leading-[1.7] text-[var(--ink-2)]">
-              <GlossaryText text={app.description} />
-            </p>
-          </div>
-        </section>
-
-        <section className="pt-6">
+        <section className="mt-5 pt-2">
           {ENABLE_KNOWLEDGE_LEVEL ? (
             <div className="mb-4 rounded-xl border hair bg-white px-4 py-3 shadow-paper">
               <KnowledgeLevelHint />

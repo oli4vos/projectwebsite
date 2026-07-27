@@ -161,17 +161,11 @@ export default function Calculator() {
     "grossAnnualHouseholdIncome",
     "grossAnnualPartnerIncome",
     "annualMortgageRate",
-    "afmStressAnnualRate",
-    "mortgageTermYears",
-    "fixedRatePeriodMonths",
     "purchasePrice",
     "marketValue",
     "ownFunds",
     "monthlyDebtPayments",
     "nhgRequested",
-    "energyLabel",
-    "energySavingMeasuresAmount",
-    "renovationAmount",
   ]);
   const nextSteps = getToolNextSteps("artifact-hypotheek-wonen-maximale-hypotheek");
 
@@ -265,9 +259,9 @@ export default function Calculator() {
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
             Hypotheek
           </div>
-          <h2 className="mt-2 font-serif text-[28px] tracking-[-0.02em] text-[var(--ink)]">
+          <h1 className="mt-2 font-serif text-[28px] tracking-[-0.02em] text-[var(--ink)]">
             Maximale hypotheek
-          </h2>
+          </h1>
           <p className="mt-3 text-[14px] leading-[1.7] text-[var(--ink-2)]">
             Een indicatieve tool voor starters zonder bestaande hypotheek. Schat je maximale
             leencapaciteit op basis van inkomen, woningwaarde, studieschuld, NHG en een eenvoudige
@@ -293,14 +287,6 @@ export default function Calculator() {
           >
             Wis invoer
           </ToolActionButton>
-          <ToolActionButton
-            type="button"
-            variant="secondary"
-            onClick={() => void handleDownloadPdf()}
-            disabled={!result || isDownloadingPdf}
-          >
-            {isDownloadingPdf ? "PDF wordt gemaakt..." : "Download overzicht"}
-          </ToolActionButton>
         </div>
       }
       inputs={
@@ -311,17 +297,6 @@ export default function Calculator() {
             handleSubmit();
           }}
         >
-          <section className="surface-subtle px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
-            <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--soft)]">
-              Wat heb je nodig?
-            </div>
-            <ul className="mt-2 list-disc space-y-1.5 pl-5">
-              <li>Je bruto jaarinkomen en eventueel partnerinkomen.</li>
-              <li>De koopprijs of woningwaarde van het huis.</li>
-              <li>Je studieschuld en het huidige DUO-maandbedrag.</li>
-            </ul>
-          </section>
-
           <section className="grid gap-4">
             <h3 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">
               Inkomsten
@@ -354,31 +329,35 @@ export default function Calculator() {
             <div className={mobileFlow.getFieldClassName("annualMortgageRate")}>
               <MortgageRateReferenceLink compact />
             </div>
-            <Field
-              label="Toetsrente bij rentevast korter dan 10 jaar"
-              value={formValues.afmStressAnnualRate}
-              onChange={(value) => updateField("afmStressAnnualRate", value)}
-              error={errors.afmStressAnnualRate}
-              suffix="%"
-              hint="Bijv. 5,00%"
-              className={mobileFlow.getFieldClassName("afmStressAnnualRate")}
-            />
-            <Field
-              label="Rentevaste periode"
-              value={formValues.fixedRatePeriodMonths}
-              onChange={(value) => updateField("fixedRatePeriodMonths", value)}
-              error={errors.fixedRatePeriodMonths}
-              suffix="maanden"
-              className={mobileFlow.getFieldClassName("fixedRatePeriodMonths")}
-            />
-            <Field
-              label="Looptijd hypotheek"
-              value={formValues.mortgageTermYears}
-              onChange={(value) => updateField("mortgageTermYears", value)}
-              error={errors.mortgageTermYears}
-              suffix="jaar"
-              className={mobileFlow.getFieldClassName("mortgageTermYears")}
-            />
+            <details className="surface-subtle p-4">
+              <summary className="cursor-pointer text-[13px] font-medium text-[var(--ink)]">
+                Rente en looptijd aanpassen
+              </summary>
+              <div className="mt-4 grid gap-4">
+                <Field
+                  label="Toetsrente bij rentevast korter dan 10 jaar"
+                  value={formValues.afmStressAnnualRate}
+                  onChange={(value) => updateField("afmStressAnnualRate", value)}
+                  error={errors.afmStressAnnualRate}
+                  suffix="%"
+                  hint="Bijv. 5,00%"
+                />
+                <Field
+                  label="Rentevaste periode"
+                  value={formValues.fixedRatePeriodMonths}
+                  onChange={(value) => updateField("fixedRatePeriodMonths", value)}
+                  error={errors.fixedRatePeriodMonths}
+                  suffix="maanden"
+                />
+                <Field
+                  label="Looptijd hypotheek"
+                  value={formValues.mortgageTermYears}
+                  onChange={(value) => updateField("mortgageTermYears", value)}
+                  error={errors.mortgageTermYears}
+                  suffix="jaar"
+                />
+              </div>
+            </details>
           </section>
 
           <section className="grid gap-4">
@@ -421,43 +400,47 @@ export default function Calculator() {
                 { label: "Nee", value: "no" },
               ]}
             />
-            <SelectField
-              label="Energielabel"
-              value={formValues.energyLabel}
-              onChange={(value) => updateField("energyLabel", value)}
-              error={errors.energyLabel}
-              className={mobileFlow.getFieldClassName("energyLabel")}
-              options={[
-                { label: "Onbekend", value: "unknown" },
-                { label: "A++++", value: "A++++" },
-                { label: "A+++", value: "A+++" },
-                { label: "A++", value: "A++" },
-                { label: "A+", value: "A+" },
-                { label: "A", value: "A" },
-                { label: "B", value: "B" },
-                { label: "C", value: "C" },
-                { label: "D", value: "D" },
-                { label: "E", value: "E" },
-                { label: "F", value: "F" },
-                { label: "G", value: "G" },
-              ]}
-            />
-            <Field
-              label="Verduurzamingskosten"
-              value={formValues.energySavingMeasuresAmount}
-              onChange={(value) => updateField("energySavingMeasuresAmount", value)}
-              error={errors.energySavingMeasuresAmount}
-              suffix="euro"
-              className={mobileFlow.getFieldClassName("energySavingMeasuresAmount")}
-            />
-            <Field
-              label="Verbouwing overige kosten"
-              value={formValues.renovationAmount}
-              onChange={(value) => updateField("renovationAmount", value)}
-              error={errors.renovationAmount}
-              suffix="euro"
-              className={mobileFlow.getFieldClassName("renovationAmount")}
-            />
+            <details className="surface-subtle p-4">
+              <summary className="cursor-pointer text-[13px] font-medium text-[var(--ink)]">
+                Energielabel en verbouwing toevoegen
+              </summary>
+              <div className="mt-4 grid gap-4">
+                <SelectField
+                  label="Energielabel"
+                  value={formValues.energyLabel}
+                  onChange={(value) => updateField("energyLabel", value)}
+                  error={errors.energyLabel}
+                  options={[
+                    { label: "Onbekend", value: "unknown" },
+                    { label: "A++++", value: "A++++" },
+                    { label: "A+++", value: "A+++" },
+                    { label: "A++", value: "A++" },
+                    { label: "A+", value: "A+" },
+                    { label: "A", value: "A" },
+                    { label: "B", value: "B" },
+                    { label: "C", value: "C" },
+                    { label: "D", value: "D" },
+                    { label: "E", value: "E" },
+                    { label: "F", value: "F" },
+                    { label: "G", value: "G" },
+                  ]}
+                />
+                <Field
+                  label="Verduurzamingskosten"
+                  value={formValues.energySavingMeasuresAmount}
+                  onChange={(value) => updateField("energySavingMeasuresAmount", value)}
+                  error={errors.energySavingMeasuresAmount}
+                  suffix="euro"
+                />
+                <Field
+                  label="Overige verbouwingskosten"
+                  value={formValues.renovationAmount}
+                  onChange={(value) => updateField("renovationAmount", value)}
+                  error={errors.renovationAmount}
+                  suffix="euro"
+                />
+              </div>
+            </details>
           </section>
 
           <section className="grid gap-4">
@@ -584,63 +567,11 @@ export default function Calculator() {
               </p>
             ) : (
               <>
-                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                <div className="mt-4 grid gap-3">
                   <ResultCard
-                    label="Maximale hypotheek op inkomen"
-                    value={formatCurrency(result.maxMortgageByIncome)}
-                    tone="pos"
-                  />
-                  <ResultCard
-                    label="Impact DUO-schuld"
-                    value={
-                      result.breakdown.studentLoanBorrowingCapacityImpact > 0
-                        ? `− ${formatCurrency(result.breakdown.studentLoanBorrowingCapacityImpact)}`
-                        : formatCurrency(0)
-                    }
-                    note="Indicatief minder leencapaciteit door de gebruteerde DUO-maandlast."
-                    tone={
-                      result.breakdown.studentLoanBorrowingCapacityImpact > 0
-                        ? "neg"
-                        : "default"
-                    }
-                  />
-                  <ResultCard
-                    label="Einduitkomst"
+                    label="Indicatieve maximale hypotheek"
                     value={formatCurrency(result.finalMaxMortgage)}
-                    className="sm:col-span-2 sm:order-first"
                     tone="pos"
-                  />
-                  <ResultCard
-                    label="Maximaal koopbudget"
-                    value={result.maxHomeBudget === null ? "n.v.t." : formatCurrency(result.maxHomeBudget)}
-                  />
-                  <ResultCard
-                    label="Hogere hypotheek bij andere toetsrente"
-                    value={
-                      result.breakdown.higherMortgageOpportunity
-                        ? `+ ${formatCurrency(result.breakdown.higherMortgageOpportunity.increaseInMaxMortgage)}`
-                        : "Geen hogere uitkomst"
-                    }
-                    note={
-                      result.breakdown.higherMortgageOpportunity
-                        ? `Bij ${formatPercent(result.breakdown.higherMortgageOpportunity.alternativeTestRate, 3)} toetsrente kom je indicatief uit op ${formatCurrency(result.breakdown.higherMortgageOpportunity.alternativeFinalMaxMortgage)}.`
-                        : "Geen hogere uitkomst binnen de officiële financieringslasttabelbanden."
-                    }
-                    tone={result.breakdown.higherMortgageOpportunity ? "pos" : "default"}
-                  />
-                  <ResultCard
-                    label="Benodigde eigen middelen"
-                    value={formatCurrency(result.breakdown.requiredOwnFunds)}
-                    tone={result.breakdown.requiredOwnFunds > 0 ? "warn" : "pos"}
-                  />
-                  <ResultCard
-                    label="Financieringstekort"
-                    value={formatCurrency(result.fundingGap)}
-                    tone={result.fundingGap > 0 ? "neg" : "pos"}
-                  />
-                  <ResultCard
-                    label="Bruto maandlast"
-                    value={formatCurrency(result.monthlyPaymentGross)}
                   />
                 </div>
                 <p className="mt-4 text-[13px] leading-6 text-white/75">
@@ -648,17 +579,23 @@ export default function Calculator() {
                   <span className="font-medium text-white">
                     {limitingFactorLabels[result.limitingFactor] ?? result.limitingFactor}
                   </span>
-                  {" / "}
-                  <span className="font-medium text-white">
-                    {limitingFactorLabels[result.limitingFactorDetailed] ?? result.limitingFactorDetailed}
-                  </span>
-                  .{" "}
-                  Betrouwbaarheid: <span className="font-medium text-white">{result.confidence}</span>.
+                  . De berekening is indicatief en gebruikt de ingevulde
+                  inkomens-, woning- en schuldgegevens.
                 </p>
               </>
             )}
           </div>
           {result ? <ToolNextSteps {...nextSteps} /> : null}
+          {result ? (
+            <ToolActionButton
+              type="button"
+              variant="secondary"
+              onClick={() => void handleDownloadPdf()}
+              disabled={isDownloadingPdf}
+            >
+              {isDownloadingPdf ? "PDF wordt gemaakt..." : "Download overzicht"}
+            </ToolActionButton>
+          ) : null}
         </div>
       }
       details={
@@ -697,7 +634,7 @@ export default function Calculator() {
                 value={result.maxMortgageByCollateral === null ? "n.v.t." : formatCurrency(result.maxMortgageByCollateral)}
                 breakdown={
                   result.maxMortgageByCollateral === null ? (
-                    <div>Geen woningwaarde opgegeven, dus geen aparte collateral-cap.</div>
+                    <div>Geen woningwaarde opgegeven, dus geen aparte grens op basis van de woningwaarde.</div>
                   ) : (
                     <>
                       <div>Woningwaarde: {formatCurrency(result.breakdown.propertyValue || result.breakdown.marketValue)}</div>
@@ -709,7 +646,7 @@ export default function Calculator() {
                     </>
                   )
                 }
-                breakdownLabel="Toon LTV-berekening"
+                breakdownLabel="Toon berekening op basis van woningwaarde"
               />
               {result.breakdown.maxMortgageByNhg !== undefined ? (
                 <ResultRow
@@ -725,9 +662,9 @@ export default function Calculator() {
                 sub={`Na DUO en andere lasten: ${formatCurrency(result.breakdown.monthlyHousingBudgetAfterLiabilities)}`}
               />
               <ResultRow
-                label="Studentenlening brutering"
+                label="Omgerekende DUO-maandlast"
                 value={formatCurrency(result.breakdown.studentLoanMonthlyImpact)}
-                breakdown={<div>De centrale hypotheeklaag brutert de DUO-maandlast voor toetsing.</div>}
+                breakdown={<div>Voor de hypotheektoets wordt de DUO-maandlast omgerekend naar een vergelijkbare bruto maandlast.</div>}
               />
               <ResultRow
                 label="Hogere hypotheek bij andere toetsrente"
