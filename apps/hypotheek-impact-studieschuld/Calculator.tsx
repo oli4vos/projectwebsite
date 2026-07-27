@@ -2080,10 +2080,9 @@ function CalculatorContent({
           </div>
           <div className="mt-4 space-y-3 text-[13.5px] leading-[1.7] text-[var(--muted)]">
             <p>
-              Bedragen en aannames gecontroleerd op {formatIsoDateLabel(LAST_CHECKED)}. Controleer altijd
-              Mijn DUO en laat een hypotheekadviseur de officiële leencapaciteit berekenen.
+              Controleer je persoonlijke bedrag in Mijn DUO en laat een
+              hypotheekadviseur de officiële leencapaciteit berekenen.
             </p>
-            <p>Laatste controle van deze aannames: {formatIsoDateLabel(LAST_CHECKED)}.</p>
             <p>
               Voor de omrekening gebruiken we een indicatieve tabel. Geldverstrekkers
               en actuele normen kunnen daarvan afwijken.
