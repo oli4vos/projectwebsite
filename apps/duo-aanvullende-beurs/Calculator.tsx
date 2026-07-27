@@ -6,6 +6,10 @@ import { FieldError } from "@/components/forms/FieldError";
 import { ResultCard } from "@/components/ResultCard";
 import { ResultRow } from "@/components/ResultRow";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
+import {
+  ExampleValuesNotice,
+  ResultContextNotice,
+} from "@/components/tool/CalculationContextNotice";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
 import { ToolNextSteps } from "@/components/tool/ToolNextSteps";
 import { useSubmittedCalculation } from "@/hooks/useSubmittedCalculation";
@@ -165,8 +169,8 @@ export default function DuoAanvullendeBeursCalculator() {
     submittedValues,
     submit,
     hasDirtyChanges,
-    setValues,
-  } = useSubmittedCalculation<AdditionalGrantFormValues>(defaultValues);
+    replaceValues,
+  } = useSubmittedCalculation<AdditionalGrantFormValues>(emptyValues);
   const errors = validateAdditionalGrantForm(formValues);
   const submittedView = useMemo(
     () => (submittedValues ? createAdditionalGrantView(submittedValues) : null),
@@ -179,6 +183,11 @@ export default function DuoAanvullendeBeursCalculator() {
   const specialCaseGuidance = getAdditionalGrantSpecialCaseGuidance(
     formValues.specialCase,
   );
+  const isExampleInput =
+    JSON.stringify(formValues) === JSON.stringify(defaultValues);
+  const isExampleResult =
+    submittedValues !== null &&
+    JSON.stringify(submittedValues) === JSON.stringify(defaultValues);
 
   useEffect(() => {
     if (submittedView?.isValid) {
@@ -337,12 +346,14 @@ export default function DuoAanvullendeBeursCalculator() {
                 label="Ouderinkomen 2024 ouder 1"
                 value={formValues.parent1Income}
                 error={errors.parent1Income}
+                hint="Verzamelinkomen op de definitieve aanslag 2024; anders belastbaar loon"
                 onChange={(value) => updateField("parent1Income", value)}
               />
               <SelectField
                 id="parent1IncomeReliability"
                 label="Status inkomen ouder 1"
                 value={formValues.parent1IncomeReliability}
+                hint="Definitief = vastgesteld op de aanslag; anders kies je Schatting"
                 options={[
                   { value: "final", label: "Definitief" },
                   { value: "estimated", label: "Schatting" },
@@ -358,12 +369,14 @@ export default function DuoAanvullendeBeursCalculator() {
                     label="Ouderinkomen 2024 ouder 2"
                     value={formValues.parent2Income}
                     error={errors.parent2Income}
+                    hint="Verzamelinkomen op de definitieve aanslag 2024; anders belastbaar loon"
                     onChange={(value) => updateField("parent2Income", value)}
                   />
                   <SelectField
                     id="parent2IncomeReliability"
                     label="Status inkomen ouder 2"
                     value={formValues.parent2IncomeReliability}
+                    hint="Definitief = vastgesteld op de aanslag; anders kies je Schatting"
                     options={[
                       { value: "final", label: "Definitief" },
                       { value: "estimated", label: "Schatting" },
@@ -454,6 +467,7 @@ export default function DuoAanvullendeBeursCalculator() {
       className="space-y-5 outline-none"
       aria-live="polite"
     >
+      <ResultContextNotice kind="duo" isExample={isExampleResult} />
       <section className="surface-panel p-5">
         <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--muted)]">
           {submittedView.statusLabel}
@@ -533,13 +547,29 @@ export default function DuoAanvullendeBeursCalculator() {
         </div>
       }
       startActions={
-        <div className="flex flex-wrap gap-2">
-          <ToolActionButton type="button" variant="secondary" onClick={() => setValues(defaultValues)}>
-            Voorbeeld invullen
-          </ToolActionButton>
-          <ToolActionButton type="button" variant="secondary" onClick={() => setValues(emptyValues)}>
-            Wis invoer
-          </ToolActionButton>
+        <div>
+          <div className="flex flex-wrap gap-2">
+            <ToolActionButton
+              type="button"
+              variant="secondary"
+              onClick={() =>
+                replaceValues(
+                  defaultValues,
+                  "Voorbeeld ingevuld. Klik op Bereken voor de voorbeeldberekening.",
+                )
+              }
+            >
+              Voorbeeld invullen
+            </ToolActionButton>
+            <ToolActionButton
+              type="button"
+              variant="secondary"
+              onClick={() => replaceValues(emptyValues, "Invoer gewist.")}
+            >
+              Wis invoer
+            </ToolActionButton>
+          </div>
+          {isExampleInput ? <ExampleValuesNotice /> : null}
         </div>
       }
       inputs={inputs}

@@ -8,6 +8,10 @@ import { MobileFieldFlowControls } from "@/components/MobileFieldFlowControls";
 import { MortgageRateReferenceLink } from "@/components/mortgage/MortgageRateReferenceLink";
 import { ResultRow } from "@/components/ResultRow";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
+import {
+  ExampleValuesNotice,
+  ResultContextNotice,
+} from "@/components/tool/CalculationContextNotice";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
 import { ToolNextSteps } from "@/components/tool/ToolNextSteps";
 import { Pill } from "@/components/ui";
@@ -221,6 +225,7 @@ function CalculatorContent({
     hasDirtyChanges,
     submitContextMessage,
     setValues,
+    replaceValues,
     reset,
   } = useSubmittedCalculation<FormState>(initialValues);
   const validation = validateForm(formValues);
@@ -304,6 +309,11 @@ function CalculatorContent({
   );
   const canDownloadPdf = Boolean(result && !hasDirtyChanges);
   const nextSteps = getToolNextSteps("hypotheek-impact-studieschuld");
+  const isExampleInput =
+    JSON.stringify(formValues) === JSON.stringify(exampleValues);
+  const isExampleResult =
+    submittedValues !== null &&
+    JSON.stringify(submittedValues) === JSON.stringify(exampleValues);
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -443,7 +453,10 @@ function CalculatorContent({
     setPdfError("");
     setPdfStatus("");
     setShowHousingTarget(true);
-    setValues(exampleValues, "Voorbeeld ingevuld. Klik op Bereken om de uitkomst te zien.");
+    replaceValues(
+      exampleValues,
+      "Voorbeeld ingevuld. Klik op Bereken voor de voorbeeldberekening.",
+    );
   }
 
   function clearAllInputs() {
@@ -637,6 +650,7 @@ function CalculatorContent({
         {submitContextMessage ? (
           <p className="mt-3 text-[12.5px] text-[var(--muted)]">{submitContextMessage}</p>
         ) : null}
+        {isExampleInput ? <ExampleValuesNotice /> : null}
         {hasDirtyChanges ? (
           <p className="mt-3 text-[12.5px] text-[var(--muted)]">
             Klik opnieuw op Bereken om de uitkomst te vernieuwen.
@@ -679,16 +693,22 @@ function CalculatorContent({
               </select>
             </label>
 
-            <label className={mobileFlow.getFieldClassName("repaymentRule")}>
-              <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
+            <div className={mobileFlow.getFieldClassName("repaymentRule")}>
+              <label
+                htmlFor="mortgage-impact-repayment-rule"
+                className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]"
+              >
                 Terugbetalingsregel
-              </span>
+              </label>
               <select
+                id="mortgage-impact-repayment-rule"
                 value={formValues.repaymentRule}
                 onChange={(event) =>
                   updateField("repaymentRule", event.target.value as RepaymentRule)
                 }
                 onKeyDown={mobileFlow.handleEnterAdvance("repaymentRule")}
+                aria-invalid={Boolean(errors.repaymentRule)}
+                aria-describedby="repaymentRule-hint repaymentRule-error"
                 className="ring-focus hair h-12 w-full min-w-0 rounded-md border bg-white px-4 text-[15px] text-[var(--ink)] outline-none"
               >
                 {Object.entries(ruleLabels).map(([value, label]) => (
@@ -697,11 +717,11 @@ function CalculatorContent({
                   </option>
                 ))}
               </select>
-              <p className="text-[12px] leading-[1.5] text-[var(--soft)]">
-                SF35 is vaak gunstiger voor je maandlast; SF15 en varianten drukken
-                vaak harder op je hypotheekruimte.
+              <p id="repaymentRule-hint" className="text-[12px] leading-[1.5] text-[var(--soft)]">
+                In Mijn DUO staat bij Mijn schulden of je onder SF35 of SF15 terugbetaalt.
               </p>
-            </label>
+              <FieldError id="repaymentRule-error" message={errors.repaymentRule} />
+            </div>
           </div>
         </div>
 
@@ -738,7 +758,8 @@ function CalculatorContent({
                   className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
                 />
                 <p className="text-[12px] leading-[1.5] text-[var(--soft)]">
-                  Vul in wat je nu feitelijk betaalt. Bij een betaalpauze kan dat tijdelijk €0 zijn.
+                  Het bedrag dat DUO nu afschrijft. Dit kan door draagkracht of een
+                  betaalpauze lager zijn dan je wettelijke bedrag.
                 </p>
                 <FieldError message={errors.actualMonthlyPayment} />
               </label>
@@ -764,7 +785,8 @@ function CalculatorContent({
                   className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
                 />
                 <p className="text-[12px] leading-[1.5] text-[var(--soft)]">
-                  Handig als je feitelijke betaling lager is dan wat DUO wettelijk van je verwacht.
+                  Het bedrag vóór een tijdelijke verlaging of betaalpauze. Je vindt
+                  dit in Mijn DUO of via de DUO-maandbedragtool.
                 </p>
                 <FieldError message={errors.statutoryMonthlyPayment} />
               </label>
@@ -890,7 +912,8 @@ function CalculatorContent({
                   ))}
                 </select>
                 <p className="text-[12px] leading-[1.5] text-[var(--soft)]">
-                  Kies op jaar of percentage, bijvoorbeeld 2026 — 2,33%.
+                  Bekijk je rentepercentage in Mijn DUO bij Mijn schulden en kies
+                  hier het bijbehorende jaar.
                 </p>
                 <FieldError message={errors.duoRateYear} />
               </label>
@@ -927,7 +950,9 @@ function CalculatorContent({
                 className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
               />
               <p className="text-[12px] leading-[1.5] text-[var(--soft)]">
-                Leeg laten mag ook: dan gebruiken we {getDefaultTerm(formValues.repaymentRule)} jaar als standaard voor {ruleLabels[formValues.repaymentRule]}.
+                {formValues.repaymentRule === "UNKNOWN"
+                  ? "Kies eerst je terugbetalingsregel; daarna kan de tool een passende standaardlooptijd gebruiken."
+                  : `Leeg laten mag: dan gebruiken we ${getDefaultTerm(formValues.repaymentRule)} jaar als standaard voor ${ruleLabels[formValues.repaymentRule]}.`}
               </p>
               <FieldError message={errors.remainingTermYears} />
             </label>
@@ -1210,6 +1235,9 @@ function CalculatorContent({
       </section>
 
       <section className="order-2 min-w-0 space-y-5">
+        {result ? (
+          <ResultContextNotice kind="mortgage" isExample={isExampleResult} />
+        ) : null}
         <div id="tool-result-summary" className="surface-panel-strong p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="text-[11px] uppercase tracking-[0.12em] text-white/55">

@@ -47,13 +47,13 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 | DUO-doorlenen-of-stoppen | hidden-draft | `visibility: "hidden"` | uit | Stopscenario-tool technisch aanwezig, maar niet in huidige publieke registry | zet manifest op `public` + volledige blueprint-check |
 | DUO-leenbedrag-impact | experimenteel | `visibility: "public"` | aan | Eenvoudige leenfase-tool voor impact van nieuw leenbedrag op eindschuld | n.v.t. |
 | DUO-stoppen-kosten-prestatiebeurs | experimenteel | `visibility: "public"` | aan | Eenvoudige tool voor prestatiebeursbedragen die schuld blijven bij stoppen zonder diploma | n.v.t. |
-| DUO-maandbedrag | experimenteel | `visibility: "public"` | aan | Nieuwe fase-2-tool voor wettelijke maandtermijn, optionele draagkrachtindicatie en uitgebreide PDF | n.v.t. |
-| DUO-extra-aflossen | experimenteel | `visibility: "public"` | aan | Nieuwe fase-2-tool voor extra DUO-aflossing, looptijd/maandbedrag, afloscurve en uitgebreide PDF | n.v.t. |
+| DUO-maandbedrag | experimenteel | `visibility: "public"` | aan | Lege persoonlijke beginstaat; wettelijke maandtermijn, optionele draagkrachtindicatie en uitgebreide PDF. Een onbekende terugbetalingsregel wordt eerst opgelost en niet als SF35 doorgerekend | n.v.t. |
+| DUO-extra-aflossen | experimenteel | `visibility: "public"` | aan | Lege persoonlijke beginstaat; scenario voor extra DUO-aflossing, looptijd/maandbedrag, afloscurve en uitgebreide PDF. Een onbekende terugbetalingsregel blokkeert de berekening | n.v.t. |
 | DUO-aanvullende-beurs | experimenteel | `visibility: "public"` | aan | Publieke 2026-tool bovenop `src/lib/duo/additional-grant`; berekent reguliere aanvullende-beursindicatie met concrete ouderinkomens en toont bij bijzondere oudersituaties conditionele officiële uitleg zonder regulier bedrag; nog geen PDF | n.v.t. |
 | Centrale tax/DUO/pension/constants lagen | actief | n.v.t. | aan | Hergebruikt door meerdere tools | n.v.t. |
 | Submit-driven calculatorflow | actief | n.v.t. | aan | Patroon beschikbaar via `CalculatorShell` + submitlogica | n.v.t. |
 | Volgende-stap navigatie tussen publieke tools | actief | `ToolNextSteps` + journey-map | aan | Compacte vervolgstap per publieke tool, afgestemd op de meest waarschijnlijke vervolgvraag | n.v.t. |
-| DUO-impact in maximale-hypotheektool | actief | n.v.t. | aan | Kernuitkomst toont rechtsboven de indicatieve daling van de leencapaciteit | n.v.t. |
+| DUO-impact in maximale-hypotheektool | actief | n.v.t. | aan | Kernuitkomst toont rechtsboven de indicatieve daling van de leencapaciteit; onbekende DUO-regelingen worden niet stil met een standaardregeling doorgerekend | n.v.t. |
 | Hypotheekrentelink en salarisverhogingsanalyse | actief | centrale linkconfig + salarisadapter | aan | Maximale-hypotheekflow toont externe inspiratielink bij renteveld en vervolganalyse voor extra leenruimte via centrale hypotheekengine; PDF-uitbreiding blijft vervolgwerk | n.v.t. |
 | Familiehulp eerste woning | uitgeschakeld | `apps/familiehulp-eerste-woning/app.json -> enabled: false` | uit | Bewust buiten eerste-livegangscope; code blijft bestaan, maar publieke registry, routes, dashboard, zoekresultaten, lazy loading en journey-links sluiten de tool uit | zet alleen na scopebesluit `enabled: true` en draai volledige blueprint-/releasechecks |
 | Hypotheek Regulations-integratieadapter | voorbereid | centrale adapter | uit in UI | Centrale adapterlaag voor hypotheektools richting Regulations-architectuur; nog niet gekoppeld aan calculators en wijzigt geen publieke uitkomsten | koppel per tool pas na UX/PDF- en regressiecontrole |
@@ -74,6 +74,7 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 
 | Datum | Commit | Wijziging | Impact |
 |---|---|---|---|
+| 2026-07-27 | `pending` | Publieke calculators starten zonder persoonlijke voorbeeldbedragen, markeren voorbeelden en indicaties consequent, geven korte veldhulp bij moeilijke begrippen en blokkeren onbekende DUO-regelingen vóór berekening | UX / toegankelijkheid / unknown resolution / DUO-veiligheid |
 | 2026-07-27 | `pending` | Resterende categorie A/B-vereenvoudigingen uitgevoerd: alle publieke tools direct zichtbaar, optionele woningdoelvelden conditioneel, bijzondere DUO-oudersituaties taakgericht uitgelegd en toeslagbedragen per regeling geblokkeerd bij onopgeloste noodzakelijke invoer | UX / DUO / hypotheek / toeslagenveiligheid |
 | 2026-07-26 | `pending` | Versie 2 publiek gepauzeerd; v1 is de enige actieve ontwerp- en livegangversie, v2-routecode blijft alleen als private broncode bestaan | Architectuur / routing / livegangscope |
 | 2026-07-24 | `pending` | Manifestgestuurde `enabled`-laag toegevoegd voor tools; alle manifests hebben expliciet `enabled`, en `familiehulp-eerste-woning` is centraal uitgeschakeld voor de eerste livegang | Architectuur / registry / routes |

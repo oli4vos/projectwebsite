@@ -4,6 +4,7 @@ import {
   calculateDuoMonthlyPaymentView,
   createDuoMortgageAssessmentTransferCandidate,
   createDuoMonthlyPaymentDefaultValues,
+  createEmptyDuoMonthlyPaymentValues,
   validateDuoMonthlyPaymentForm,
 } from "./logic";
 
@@ -70,6 +71,22 @@ describe("duo-maandbedrag logic", () => {
       assessmentIncome: "-2",
       householdSituation: "single",
     }).assessmentIncome).toBeDefined();
+  });
+
+  it("keeps the empty state unresolved and blocks an unknown repayment rule", () => {
+    const emptyValues = createEmptyDuoMonthlyPaymentValues();
+    const errors = validateDuoMonthlyPaymentForm({
+      ...emptyValues,
+      remainingDebt: "25000",
+    });
+    const view = calculateDuoMonthlyPaymentView({
+      ...emptyValues,
+      remainingDebt: "25000",
+    });
+
+    expect(emptyValues.repaymentRule).toBe("UNKNOWN");
+    expect(errors.repaymentRule).toContain("Mijn DUO");
+    expect(view.isValid).toBe(false);
   });
 
   it("supports debt parts with separate DUO rate years", () => {

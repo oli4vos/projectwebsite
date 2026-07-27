@@ -4,6 +4,10 @@ import { useEffect, useMemo, useRef, type ReactNode } from "react";
 import { DisclosureSection } from "@/components/DisclosureSection";
 import { FieldError } from "@/components/forms/FieldError";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
+import {
+  ExampleValuesNotice,
+  ResultContextNotice,
+} from "@/components/tool/CalculationContextNotice";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
 import { ToolNextSteps } from "@/components/tool/ToolNextSteps";
 import { useSubmittedCalculation } from "@/hooks/useSubmittedCalculation";
@@ -309,7 +313,7 @@ export default function ToeslagenScanCalculator() {
     submittedValues,
     submit,
     hasDirtyChanges,
-    setValues,
+    replaceValues,
     reset,
   } = useSubmittedCalculation<AllowanceScanFormState>(defaultValues);
   const errors = validateAllowanceScanForm(formValues);
@@ -337,6 +341,11 @@ export default function ToeslagenScanCalculator() {
   const hasCoResidents = renting && formValues.hasCoResidents === "yes";
   const hasChildren = formValues.hasChildren === "yes";
   const usesChildcare = hasChildren && formValues.usesChildcare === "yes";
+  const isExampleInput =
+    JSON.stringify(formValues) === JSON.stringify(exampleValues);
+  const isExampleResult =
+    submittedValues !== null &&
+    JSON.stringify(submittedValues) === JSON.stringify(exampleValues);
 
   useEffect(() => {
     if (!submittedView?.result) {
@@ -420,7 +429,7 @@ export default function ToeslagenScanCalculator() {
             label="Geschat toetsingsinkomen"
             value={formValues.assessmentIncome}
             error={errors.assessmentIncome}
-            hint="Schatting voor kalenderjaar 2026."
+            hint="Verwacht verzamelinkomen of belastbaar loon over heel 2026"
             onChange={(value) => updateField("assessmentIncome", value)}
           />
           <TextInput
@@ -428,6 +437,7 @@ export default function ToeslagenScanCalculator() {
             label="Vermogen op 1 januari"
             value={formValues.assets}
             error={errors.assets}
+            hint="Denk aan spaargeld en beleggingen min aftrekbare schulden op 1 januari"
             onChange={(value) => updateField("assets", value)}
           />
           {hasPartner ? (
@@ -446,6 +456,7 @@ export default function ToeslagenScanCalculator() {
                 label="Gezamenlijk toetsingsinkomen"
                 value={formValues.jointAssessmentIncome}
                 error={errors.jointAssessmentIncome}
+                hint="Jullie verwachte gezamenlijke jaarinkomen voor toeslagen in 2026"
                 onChange={(value) => updateField("jointAssessmentIncome", value)}
               />
               <TextInput
@@ -453,6 +464,7 @@ export default function ToeslagenScanCalculator() {
                 label="Gezamenlijk vermogen op 1 januari"
                 value={formValues.jointAssets}
                 error={errors.jointAssets}
+                hint="Jullie gezamenlijke vermogen op de peildatum 1 januari"
                 onChange={(value) => updateField("jointAssets", value)}
               />
             </>
@@ -541,6 +553,7 @@ export default function ToeslagenScanCalculator() {
               id="independentHome"
               label="Zelfstandige woonruimte?"
               value={formValues.independentHome}
+              hint="Eigen toegangsdeur, keuken en toilet voor jouw huishouden"
               onChange={(value) => updateField("independentHome", value)}
             />
             <TextInput
@@ -548,6 +561,7 @@ export default function ToeslagenScanCalculator() {
               label="Kale huur per maand"
               value={formValues.basicRent}
               error={errors.basicRent}
+              hint="Huur zonder servicekosten; meestal apart vermeld in je huurcontract"
               onChange={(value) => updateField("basicRent", value)}
             />
             <TextInput
@@ -696,6 +710,7 @@ export default function ToeslagenScanCalculator() {
                 id="registeredChildcare"
                 label="Staat de opvang geregistreerd in het LRK?"
                 value={formValues.registeredChildcare}
+                hint="LRK is het Landelijk Register Kinderopvang; het nummer staat op contract of factuur"
                 onChange={(value) => updateField("registeredChildcare", value)}
               />
               <YesNoUnknownField
@@ -780,6 +795,7 @@ export default function ToeslagenScanCalculator() {
       className="space-y-5 outline-none"
       aria-live="polite"
     >
+      <ResultContextNotice kind="allowances" isExample={isExampleResult} />
       <section className="surface-panel-strong p-6 text-white">
         <h2 className="text-xl font-semibold">Samenvatting</h2>
         <p className="mt-3 text-[14px] leading-[1.65] text-white/80">
@@ -875,13 +891,24 @@ export default function ToeslagenScanCalculator() {
         </>
       }
       startActions={
-        <div className="flex flex-wrap gap-2">
-          <ToolActionButton type="button" onClick={() => setValues(exampleValues)}>
-            Voorbeeld invullen
-          </ToolActionButton>
-          <ToolActionButton type="button" onClick={() => reset("Invoer gewist.")}>
-            Wis invoer
-          </ToolActionButton>
+        <div>
+          <div className="flex flex-wrap gap-2">
+            <ToolActionButton
+              type="button"
+              onClick={() =>
+                replaceValues(
+                  exampleValues,
+                  "Voorbeeld ingevuld. Start de scan voor de voorbeeldberekening.",
+                )
+              }
+            >
+              Voorbeeld invullen
+            </ToolActionButton>
+            <ToolActionButton type="button" onClick={() => reset("Invoer gewist.")}>
+              Wis invoer
+            </ToolActionButton>
+          </div>
+          {isExampleInput ? <ExampleValuesNotice /> : null}
         </div>
       }
       inputs={inputs}

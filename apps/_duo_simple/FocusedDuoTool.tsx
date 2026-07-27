@@ -6,6 +6,10 @@ import { MobileFieldFlowControls } from "@/components/MobileFieldFlowControls";
 import { ResultCard } from "@/components/ResultCard";
 import { ResultRow } from "@/components/ResultRow";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
+import {
+  ExampleValuesNotice,
+  ResultContextNotice,
+} from "@/components/tool/CalculationContextNotice";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
 import { ToolNextSteps } from "@/components/tool/ToolNextSteps";
 import { useMobileFieldFlow } from "@/hooks/useMobileFieldFlow";
@@ -313,10 +317,16 @@ function fieldHint(field: keyof SimpleDuoValues) {
 export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
   const copy = modeCopy[mode];
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
-  const { formValues, setFormValues, submittedValues, submit } =
-    useSubmittedCalculation<SimpleDuoValues>(defaultSimpleDuoValues(mode));
+  const exampleValues = useMemo(() => defaultSimpleDuoValues(mode), [mode]);
+  const initialValues = useMemo(() => emptySimpleDuoValues(mode), [mode]);
+  const { formValues, setFormValues, submittedValues, submit, replaceValues } =
+    useSubmittedCalculation<SimpleDuoValues>(initialValues);
   const currentView = useMemo(() => createSimpleDuoView(mode, formValues), [formValues, mode]);
   const submittedView = submittedValues ? createSimpleDuoView(mode, submittedValues) : null;
+  const isExampleInput = JSON.stringify(formValues) === JSON.stringify(exampleValues);
+  const isExampleResult =
+    submittedValues !== null &&
+    JSON.stringify(submittedValues) === JSON.stringify(exampleValues);
   const mobileFlow = useMobileFieldFlow(copy.fields);
 
   function updateField<K extends keyof SimpleDuoValues>(field: K, value: SimpleDuoValues[K]) {
@@ -423,6 +433,7 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
   const result = submittedView?.isValid ? (
     <div className="space-y-5">
       <section id="tool-result-summary" className="surface-panel space-y-4 p-5">
+        <ResultContextNotice kind="duo" isExample={isExampleResult} />
         <div className="space-y-1">
           <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
             Uitkomst
@@ -532,13 +543,29 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
         </>
       }
       startActions={
-        <div className="flex flex-wrap gap-2">
-          <ToolActionButton type="button" variant="secondary" onClick={() => setFormValues(defaultSimpleDuoValues(mode))}>
-            Voorbeeld invullen
-          </ToolActionButton>
-          <ToolActionButton type="button" variant="secondary" onClick={() => setFormValues(emptySimpleDuoValues(mode))}>
-            Wis invoer
-          </ToolActionButton>
+        <div>
+          <div className="flex flex-wrap gap-2">
+            <ToolActionButton
+              type="button"
+              variant="secondary"
+              onClick={() =>
+                replaceValues(
+                  exampleValues,
+                  "Voorbeeld ingevuld. Klik op Bereken voor de voorbeeldberekening.",
+                )
+              }
+            >
+              Voorbeeld invullen
+            </ToolActionButton>
+            <ToolActionButton
+              type="button"
+              variant="secondary"
+              onClick={() => replaceValues(initialValues, "Invoer gewist.")}
+            >
+              Wis invoer
+            </ToolActionButton>
+          </div>
+          {isExampleInput ? <ExampleValuesNotice /> : null}
         </div>
       }
       inputs={

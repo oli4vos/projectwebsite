@@ -48,6 +48,12 @@ export function useSubmittedCalculation<T>(initialValues: T) {
     }
   }, []);
 
+  const replaceValues = useCallback((nextValues: T, message?: string) => {
+    setFormValues(nextValues);
+    setSubmittedValues(null);
+    setSubmitContextMessage(message ?? null);
+  }, []);
+
   const reset = useCallback((message?: string) => {
     setFormValues(initialValues);
     setSubmittedValues(null);
@@ -64,6 +70,7 @@ export function useSubmittedCalculation<T>(initialValues: T) {
     submitContextMessage,
     setSubmitContextMessage,
     setValues,
+    replaceValues,
     reset,
   };
 }

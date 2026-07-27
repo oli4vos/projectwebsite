@@ -9,6 +9,10 @@ import { FieldError } from "@/components/forms/FieldError";
 import { ResultCard } from "@/components/ResultCard";
 import { ResultRow } from "@/components/ResultRow";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
+import {
+  ExampleValuesNotice,
+  ResultContextNotice,
+} from "@/components/tool/CalculationContextNotice";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
 import { ToolNextSteps } from "@/components/tool/ToolNextSteps";
 import { getRepaymentRuleLabel } from "@/lib/copy-glossary";
@@ -81,11 +85,16 @@ function MoneyField({ id, label, value, error, hint, onChange }: MoneyFieldProps
 }
 
 export default function DuoExtraAflossenCalculator() {
+  const exampleValues = useMemo(
+    () => createDuoExtraRepaymentDefaultValues(),
+    [],
+  );
   const [formValues, setFormValues] = useState<DuoExtraRepaymentFormValues>(
-    createDuoExtraRepaymentDefaultValues,
+    createEmptyDuoExtraRepaymentValues,
   );
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
   const view = useMemo(() => calculateDuoExtraRepaymentView(formValues), [formValues]);
+  const isExample = JSON.stringify(formValues) === JSON.stringify(exampleValues);
   const nextSteps = getToolNextSteps("duo-extra-aflossen");
 
   function updateField<K extends keyof DuoExtraRepaymentFormValues>(
@@ -192,6 +201,8 @@ export default function DuoExtraAflossenCalculator() {
             updateField("repaymentRule", event.target.value as DuoExtraRepaymentFormValues["repaymentRule"])
           }
           className="ring-focus hair h-12 rounded-md border bg-white px-3 text-[15px] text-[var(--ink)] outline-none"
+          aria-invalid={view.errors.repaymentRule ? "true" : "false"}
+          aria-describedby="repaymentRule-hint repaymentRule-error"
         >
           {repaymentRuleOptions.map((option) => (
             <option key={option} value={option}>
@@ -199,7 +210,10 @@ export default function DuoExtraAflossenCalculator() {
             </option>
           ))}
         </select>
-        <FieldError message={view.errors.repaymentRule} />
+        <p id="repaymentRule-hint" className="text-[12px] leading-[1.5] text-[var(--soft)]">
+          In Mijn DUO staat bij Mijn schulden of je onder SF35 of SF15 terugbetaalt.
+        </p>
+        <FieldError id="repaymentRule-error" message={view.errors.repaymentRule} />
       </label>
 
       {!formValues.useDebtParts ? (
@@ -220,7 +234,8 @@ export default function DuoExtraAflossenCalculator() {
             ))}
           </select>
           <p className="text-[12px] leading-[1.5] text-[var(--soft)]">
-            Selecteer het jaar of herken het aan het percentage, bijvoorbeeld 2026 — 2,33%.
+            Bekijk je rentepercentage in Mijn DUO bij Mijn schulden en kies hier het
+            bijbehorende jaar.
           </p>
           <FieldError message={view.errors.duoRateYear} />
         </label>
@@ -282,7 +297,7 @@ export default function DuoExtraAflossenCalculator() {
       <div className="flex flex-wrap gap-2">
         <ToolActionButton
           type="button"
-          onClick={() => setFormValues(createDuoExtraRepaymentDefaultValues())}
+          onClick={() => setFormValues(exampleValues)}
         >
           Voorbeeld invullen
         </ToolActionButton>
@@ -293,11 +308,13 @@ export default function DuoExtraAflossenCalculator() {
           Wis invoer
         </ToolActionButton>
       </div>
+      {isExample ? <ExampleValuesNotice /> : null}
     </div>
   );
 
   const result = view.isValid ? (
     <div id="tool-result-summary" className="space-y-5">
+      <ResultContextNotice kind="duo" isExample={isExample} />
       <div className="flex flex-wrap items-center gap-2">
         <ToolActionButton
           type="button"
@@ -411,7 +428,17 @@ export default function DuoExtraAflossenCalculator() {
         </DisclosureSection>
       ) : null}
     </div>
-  ) : null;
+  ) : (
+    <section id="tool-result-summary" className="surface-panel p-5">
+      <h2 className="text-lg font-semibold tracking-tight text-[var(--ink)]">
+        Nog geen berekening
+      </h2>
+      <p className="mt-2 text-[13px] leading-[1.65] text-[var(--muted)]">
+        Vul je schuld, concrete terugbetalingsregel en extra aflossing in. Daarna
+        zie je het effect op maandbedrag, rente en einddatum.
+      </p>
+    </section>
+  );
 
   return (
     <CalculatorShell

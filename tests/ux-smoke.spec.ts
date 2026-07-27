@@ -94,7 +94,9 @@ test("mobiele hypotheekflow kan naar veld 2", async ({ page }, testInfo) => {
   await expect(page.getByText("Veld 1 van 13")).toBeVisible();
   await page.getByRole("button", { name: "Volgende veld" }).click();
   await expect(page.getByText(/Veld 2 van \d+/)).toBeVisible();
-  await expect(page.getByLabel("Terugbetalingsregel")).toBeVisible();
+  await expect(
+    page.getByLabel("Terugbetalingsregel", { exact: true }),
+  ).toBeVisible();
 });
 
 test("maximale hypotheek toont één primaire uitkomst", async ({ page }, testInfo) => {
@@ -211,12 +213,12 @@ test("DUO-tools tonen de uitgebreide PDF-download", async ({ page }, testInfo) =
     "/apps/duo-extra-aflossen",
   ]) {
     await page.goto(route, { waitUntil: "networkidle" });
+    await page.getByRole("button", { name: "Voorbeeld invullen" }).click();
     if (
       route === "/apps/duo-schuld-bij-starten-lenen" ||
       route === "/apps/duo-stoppen-kosten-prestatiebeurs" ||
       route === "/apps/duo-leenbedrag-impact"
     ) {
-      await page.getByRole("button", { name: "Voorbeeld invullen" }).click();
       await page.getByRole("button", { name: "Bereken", exact: true }).click();
     }
     await expect(page.getByRole("button", { name: "Download overzicht" })).toBeVisible();
@@ -317,6 +319,7 @@ test("hypotheek-impact haalt DUO-maandbedrag op via expliciete returnflow", asyn
   expect(duoUrl.search).not.toContain("150");
   expect(duoUrl.search).not.toContain("48000");
   await expect(page.getByText("Je kwam vanuit de hypotheektool")).toBeVisible();
+  await page.getByRole("button", { name: "Voorbeeld invullen" }).click();
 
   await page
     .getByRole("button", { name: "Terug naar mijn hypotheekberekening" })
@@ -499,6 +502,7 @@ test("aanvullende beurs vraagt bij bijzondere oudersituaties geen regulier inkom
   await page.goto("/apps/duo-aanvullende-beurs", {
     waitUntil: "networkidle",
   });
+  await page.getByRole("button", { name: "Voorbeeld invullen" }).click();
   await page
     .getByLabel("Bijzondere oudersituatie?")
     .selectOption("parent-deceased");
@@ -715,6 +719,9 @@ test("alle tien tools doorlopen invoer, uitkomst, details en vervolgactie", asyn
     }
 
     await page.getByRole("button", { name: "Voorbeeld invullen" }).first().click();
+    await expect(
+      page.getByText("Voorbeeldgegevens ingevuld", { exact: true }),
+    ).toBeVisible();
     if (scenario.calculate) {
       await page
         .getByRole("button", { name: scenario.calculate, exact: true })
@@ -723,7 +730,15 @@ test("alle tien tools doorlopen invoer, uitkomst, details en vervolgactie", asyn
     }
 
     await expect(page.locator("#tool-result-summary")).toBeVisible();
-    await expect(page.getByRole("complementary", { name: "Volgende stappen" })).toBeVisible();
+    await expect(
+      page.getByText("Voorbeeldberekening", { exact: true }),
+    ).toBeVisible();
+    const nextSteps = page.getByRole("complementary", { name: "Volgende stappen" });
+    await expect(nextSteps).toBeVisible();
+    await expect(nextSteps.locator("a").first()).toHaveCSS(
+      "color",
+      "rgb(255, 250, 240)",
+    );
 
     const resultDetails = page.locator("section.order-2 details").first();
     await expect(resultDetails, `${scenario.route} heeft verdiepende details`).toBeVisible();

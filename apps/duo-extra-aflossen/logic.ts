@@ -103,7 +103,7 @@ export function createDuoExtraRepaymentDefaultValues(): DuoExtraRepaymentFormVal
 export function createEmptyDuoExtraRepaymentValues(): DuoExtraRepaymentFormValues {
   return {
     remainingDebt: "",
-    repaymentRule: "SF35",
+    repaymentRule: "UNKNOWN",
     duoRateYear: String(getDefaultRateYear()),
     useDebtParts: false,
     debtParts: createDefaultDuoDebtPartFormValues(),
@@ -147,6 +147,9 @@ export function validateDuoExtraRepaymentForm(
 
   if (!repaymentRuleOptions.includes(values.repaymentRule)) {
     errors.repaymentRule = "Kies een geldige terugbetalingsregel.";
+  } else if (values.repaymentRule === "UNKNOWN") {
+    errors.repaymentRule =
+      "Kies je concrete regeling. Je vindt SF35 of SF15 in Mijn DUO bij Mijn schulden.";
   }
 
   if (!values.useDebtParts) {

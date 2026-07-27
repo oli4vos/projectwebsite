@@ -16,11 +16,22 @@ function validValues(overrides: Partial<FormState> = {}): FormState {
 describe("hypotheek-impact-studieschuld form adapter", () => {
   it("keeps defaults empty except explicit structural defaults", () => {
     expect(defaultValues.situation).toBe("repaying");
-    expect(defaultValues.repaymentRule).toBe("SF35");
+    expect(defaultValues.repaymentRule).toBe("UNKNOWN");
     expect(defaultValues.actualMonthlyPayment).toBe("");
     expect(defaultValues.remainingStudentDebt).toBe("");
     expect(defaultValues.debtParts.length).toBeGreaterThan(0);
     expect(defaultValues.useDebtParts).toBe(false);
+  });
+
+  it("does not calculate with an unresolved repayment rule", () => {
+    const validation = validateForm(
+      validValues({
+        repaymentRule: "UNKNOWN",
+      }),
+    );
+
+    expect(validation.errors.repaymentRule).toContain("Mijn DUO");
+    expect(validation.parsedValues).toBeNull();
   });
 
   it("keeps example values usable for a full calculation", () => {

@@ -3,6 +3,7 @@ import { createDuoDebtPartFormValue } from "@/lib/duo/debt-parts-form";
 import {
   calculateDuoExtraRepaymentView,
   createDuoExtraRepaymentDefaultValues,
+  createEmptyDuoExtraRepaymentValues,
   validateDuoExtraRepaymentForm,
 } from "./logic";
 
@@ -79,6 +80,24 @@ describe("duo-extra-aflossen logic", () => {
       monthlyExtraRepayment: "-4",
       strategy: "shortenTerm",
     }).currentMonthlyPayment).toBeDefined();
+  });
+
+  it("keeps the empty state unresolved and blocks an unknown repayment rule", () => {
+    const emptyValues = createEmptyDuoExtraRepaymentValues();
+    const errors = validateDuoExtraRepaymentForm({
+      ...emptyValues,
+      remainingDebt: "25000",
+      oneTimeExtraRepayment: "1000",
+    });
+    const view = calculateDuoExtraRepaymentView({
+      ...emptyValues,
+      remainingDebt: "25000",
+      oneTimeExtraRepayment: "1000",
+    });
+
+    expect(emptyValues.repaymentRule).toBe("UNKNOWN");
+    expect(errors.repaymentRule).toContain("Mijn DUO");
+    expect(view.isValid).toBe(false);
   });
 
   it("builds chart data from central timeline points", () => {

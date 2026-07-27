@@ -8,6 +8,10 @@ import { MortgageRateReferenceLink } from "@/components/mortgage/MortgageRateRef
 import { ResultCard } from "@/components/ResultCard";
 import { ResultRow } from "@/components/ResultRow";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
+import {
+  ExampleValuesNotice,
+  ResultContextNotice,
+} from "@/components/tool/CalculationContextNotice";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
 import { ToolNextSteps } from "@/components/tool/ToolNextSteps";
 import { useMobileFieldFlow } from "@/hooks/useMobileFieldFlow";
@@ -148,6 +152,7 @@ export default function Calculator() {
     hasDirtyChanges,
     submitContextMessage,
     submitValues,
+    replaceValues,
     reset,
   } =
     useSubmittedCalculation<MortgageFormState>(defaultValues);
@@ -168,6 +173,11 @@ export default function Calculator() {
     "nhgRequested",
   ]);
   const nextSteps = getToolNextSteps("artifact-hypotheek-wonen-maximale-hypotheek");
+  const isExampleInput =
+    JSON.stringify(formValues) === JSON.stringify(exampleValues);
+  const isExampleResult =
+    submittedValues !== null &&
+    JSON.stringify(submittedValues) === JSON.stringify(exampleValues);
 
   const errors = formValidation.errors;
 
@@ -270,23 +280,29 @@ export default function Calculator() {
         </>
       }
       startActions={
-        <div className="flex flex-wrap gap-2">
-          <ToolActionButton
-            type="button"
-            variant="secondary"
-            onClick={() => {
-              setFormValues(exampleValues);
-            }}
-          >
-            Voorbeeld invullen
-          </ToolActionButton>
-          <ToolActionButton
-            type="button"
-            variant="secondary"
-            onClick={() => reset("Invoer gewist.")}
-          >
-            Wis invoer
-          </ToolActionButton>
+        <div>
+          <div className="flex flex-wrap gap-2">
+            <ToolActionButton
+              type="button"
+              variant="secondary"
+              onClick={() =>
+                replaceValues(
+                  exampleValues,
+                  "Voorbeeld ingevuld. Klik op Bereken voor de voorbeeldberekening.",
+                )
+              }
+            >
+              Voorbeeld invullen
+            </ToolActionButton>
+            <ToolActionButton
+              type="button"
+              variant="secondary"
+              onClick={() => reset("Invoer gewist.")}
+            >
+              Wis invoer
+            </ToolActionButton>
+          </div>
+          {isExampleInput ? <ExampleValuesNotice /> : null}
         </div>
       }
       inputs={
@@ -340,7 +356,7 @@ export default function Calculator() {
                   onChange={(value) => updateField("afmStressAnnualRate", value)}
                   error={errors.afmStressAnnualRate}
                   suffix="%"
-                  hint="Bijv. 5,00%"
+                  hint="Veiligheidsrente voor de hypotheektoets; de standaard staat al ingevuld"
                 />
                 <Field
                   label="Rentevaste periode"
@@ -348,6 +364,7 @@ export default function Calculator() {
                   onChange={(value) => updateField("fixedRatePeriodMonths", value)}
                   error={errors.fixedRatePeriodMonths}
                   suffix="maanden"
+                  hint="Hoe lang je afgesproken rente gelijk blijft; 10 jaar is 120 maanden"
                 />
                 <Field
                   label="Looptijd hypotheek"
@@ -453,6 +470,7 @@ export default function Calculator() {
               onChange={(value) => updateField("monthlyDebtPayments", value)}
               error={errors.monthlyDebtPayments}
               suffix="per maand"
+              hint="Verplichte maandbedragen buiten DUO, bijvoorbeeld krediet of private lease"
               className={mobileFlow.getFieldClassName("monthlyDebtPayments")}
             />
             <label className="flex items-start gap-3 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3">
@@ -465,7 +483,7 @@ export default function Calculator() {
               <span className="space-y-1">
                 <span className="block text-[14px] font-medium text-[var(--ink)]">Studieschuld aanwezig</span>
                 <span className="block text-[12px] leading-6 text-[var(--muted)]">
-                  DUO wordt gebruteerd volgens de centrale hypotheeklaag.
+                  Een geldverstrekker rekent je DUO-maandlast volgens hypotheekregels om.
                 </span>
               </span>
             </label>
@@ -559,6 +577,9 @@ export default function Calculator() {
       }
       result={
         <div className="space-y-5">
+          {result ? (
+            <ResultContextNotice kind="mortgage" isExample={isExampleResult} />
+          ) : null}
           <div id="tool-result-summary" className="rounded-[1.5rem] bg-[var(--deep)] p-6 text-white shadow-paper-lg">
             <div className="text-[11px] uppercase tracking-[0.12em] text-white/55">Uitkomst</div>
             {!result ? (

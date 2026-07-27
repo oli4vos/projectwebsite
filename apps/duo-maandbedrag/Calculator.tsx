@@ -7,6 +7,10 @@ import { FieldError } from "@/components/forms/FieldError";
 import { ResultCard } from "@/components/ResultCard";
 import { ResultRow } from "@/components/ResultRow";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
+import {
+  ExampleValuesNotice,
+  ResultContextNotice,
+} from "@/components/tool/CalculationContextNotice";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
 import { ToolNextSteps } from "@/components/tool/ToolNextSteps";
 import { getRepaymentRuleLabel } from "@/lib/copy-glossary";
@@ -95,14 +99,19 @@ function MoneyField({ id, label, value, error, prefix, hint, onChange }: FieldPr
 }
 
 export default function DuoMaandbedragCalculator() {
+  const exampleValues = useMemo(
+    () => createDuoMonthlyPaymentDefaultValues(),
+    [],
+  );
   const [formValues, setFormValues] = useState<DuoMonthlyPaymentFormValues>(
-    createDuoMonthlyPaymentDefaultValues,
+    createEmptyDuoMonthlyPaymentValues,
   );
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
   const [transferRecord, setTransferRecord] =
     useState<DuoMortgageTransferRecord | null>(null);
   const [transferMessage, setTransferMessage] = useState("");
   const view = useMemo(() => calculateDuoMonthlyPaymentView(formValues), [formValues]);
+  const isExample = JSON.stringify(formValues) === JSON.stringify(exampleValues);
   const nextSteps = getToolNextSteps("duo-maandbedrag");
 
   useEffect(() => {
@@ -266,7 +275,7 @@ export default function DuoMaandbedragCalculator() {
             )
           }
           aria-invalid={view.errors.repaymentRule ? "true" : "false"}
-          aria-describedby={view.errors.repaymentRule ? "repaymentRule-error" : undefined}
+          aria-describedby="repaymentRule-hint repaymentRule-error"
           className="field-shell ring-focus h-12 px-3 text-[15px] text-[var(--ink)] outline-none"
         >
           {repaymentRuleOptions.map((option) => (
@@ -275,6 +284,9 @@ export default function DuoMaandbedragCalculator() {
             </option>
           ))}
         </select>
+        <p id="repaymentRule-hint" className="text-[12px] leading-[1.5] text-[var(--soft)]">
+          In Mijn DUO staat bij Mijn schulden of je onder SF35 of SF15 terugbetaalt.
+        </p>
         <FieldError id="repaymentRule-error" message={view.errors.repaymentRule} />
       </label>
 
@@ -300,7 +312,8 @@ export default function DuoMaandbedragCalculator() {
             ))}
           </select>
           <p id="duoRateYear-hint" className="text-[12px] leading-[1.5] text-[var(--soft)]">
-            Selecteer het jaar of herken het aan het percentage, bijvoorbeeld 2026 — 2,33%.
+            Bekijk je rentepercentage in Mijn DUO bij Mijn schulden en kies hier het
+            bijbehorende jaar.
           </p>
           <FieldError id="duoRateYear-error" message={view.errors.duoRateYear} />
         </label>
@@ -333,7 +346,7 @@ export default function DuoMaandbedragCalculator() {
             value={formValues.assessmentIncome}
             error={view.errors.assessmentIncome}
             prefix="€"
-            hint="Alleen nodig voor de draagkrachtindicatie"
+            hint="Inkomen van twee jaar terug; zie je definitieve belastingaanslag"
             onChange={(value) => updateField("assessmentIncome", value)}
           />
           <label className="grid gap-2" htmlFor="householdSituation">
@@ -358,7 +371,7 @@ export default function DuoMaandbedragCalculator() {
       <div className="flex flex-wrap gap-2">
         <ToolActionButton
           type="button"
-          onClick={() => setFormValues(createDuoMonthlyPaymentDefaultValues())}
+          onClick={() => setFormValues(exampleValues)}
         >
           Voorbeeld invullen
         </ToolActionButton>
@@ -369,6 +382,7 @@ export default function DuoMaandbedragCalculator() {
           Wis invoer
         </ToolActionButton>
       </div>
+      {isExample ? <ExampleValuesNotice /> : null}
       {transferRecord ? (
         <div className="surface-subtle px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
           Je kwam vanuit de hypotheektool. Bereken hier je DUO-maandbedrag en
@@ -386,6 +400,7 @@ export default function DuoMaandbedragCalculator() {
 
   const result = view.isValid ? (
     <div id="tool-result-summary" className="space-y-5">
+      <ResultContextNotice kind="duo" isExample={isExample} />
       <div className="flex flex-wrap items-center gap-2">
         {transferRecord ? (
           <ToolActionButton type="button" variant="accent" onClick={handleReturnToMortgageTool}>
@@ -465,7 +480,17 @@ export default function DuoMaandbedragCalculator() {
         </div>
       </DisclosureSection>
     </div>
-  ) : null;
+  ) : (
+    <section id="tool-result-summary" className="surface-panel p-5">
+      <h2 className="text-lg font-semibold tracking-tight text-[var(--ink)]">
+        Nog geen berekening
+      </h2>
+      <p className="mt-2 text-[13px] leading-[1.65] text-[var(--muted)]">
+        Vul je openstaande schuld in en kies je concrete terugbetalingsregel.
+        Daarna verschijnt je indicatieve maandbedrag.
+      </p>
+    </section>
+  );
 
   return (
     <CalculatorShell

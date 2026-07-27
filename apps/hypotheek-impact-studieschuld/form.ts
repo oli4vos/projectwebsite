@@ -70,7 +70,7 @@ export const exampleValues: FormState = {
 
 export const defaultValues: FormState = {
   situation: "repaying",
-  repaymentRule: "SF35",
+  repaymentRule: "UNKNOWN",
   actualMonthlyPayment: "",
   statutoryMonthlyPayment: "",
   remainingStudentDebt: "",
@@ -143,6 +143,11 @@ export function validateForm(values: FormState) {
   const remainingStudentDebt = values.useDebtParts
     ? debtPartsValidation.totalDebt
     : remainingStudentDebtInput;
+
+  if (values.repaymentRule === "UNKNOWN") {
+    errors.repaymentRule =
+      "Kies je concrete regeling. Je vindt SF35 of SF15 in Mijn DUO bij Mijn schulden.";
+  }
 
   const showActualField =
     values.situation === "repaying" ||

@@ -5,6 +5,10 @@ import { DisclosureSection } from "@/components/DisclosureSection";
 import { FieldError } from "@/components/forms/FieldError";
 import { GlossaryText } from "@/components/GlossaryText";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
+import {
+  ExampleValuesNotice,
+  ResultContextNotice,
+} from "@/components/tool/CalculationContextNotice";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
 import { ToolNextSteps } from "@/components/tool/ToolNextSteps";
 import { parseOptionalDecimalInput } from "@/lib/number-input";
@@ -180,6 +184,11 @@ export default function Calculator() {
     if (!submittedValidation.parsedValues) return null;
     return calculateDebtPriority(submittedValidation.parsedValues);
   }, [submitted]);
+  const isExampleInput =
+    JSON.stringify(values) === JSON.stringify(exampleValues);
+  const isExampleResult =
+    submitted !== null &&
+    JSON.stringify(submitted) === JSON.stringify(exampleValues);
   const nextSteps = getToolNextSteps("schulden-volgorde");
 
   function updateDebt(index: number, patch: Partial<DebtFormRow>) {
@@ -204,14 +213,32 @@ export default function Calculator() {
         </>
       }
       startActions={
-        <div className="flex flex-wrap gap-2">
-          <ToolActionButton
-            type="button"
-            variant="secondary"
-            onClick={() => setValues(exampleValues)}
-          >
-            Voorbeeld invullen
-          </ToolActionButton>
+        <div>
+          <div className="flex flex-wrap gap-2">
+            <ToolActionButton
+              type="button"
+              variant="secondary"
+              onClick={() => {
+                setValues(exampleValues);
+                setSubmitted(null);
+                setDidSubmitAttempt(false);
+              }}
+            >
+              Voorbeeld invullen
+            </ToolActionButton>
+            <ToolActionButton
+              type="button"
+              variant="secondary"
+              onClick={() => {
+                setValues(defaultValues);
+                setSubmitted(null);
+                setDidSubmitAttempt(false);
+              }}
+            >
+              Wis invoer
+            </ToolActionButton>
+          </div>
+          {isExampleInput ? <ExampleValuesNotice /> : null}
         </div>
       }
       inputs={
@@ -359,6 +386,9 @@ export default function Calculator() {
       }
       result={
         <div className="space-y-5">
+          {result ? (
+            <ResultContextNotice kind="comparison" isExample={isExampleResult} />
+          ) : null}
           <div
             id="tool-result-summary"
             className="rounded-[1.5rem] bg-[var(--deep)] p-6 text-white shadow-paper-lg"
