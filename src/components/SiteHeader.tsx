@@ -63,6 +63,7 @@ export function SiteHeader() {
             {ENABLE_PROFILE ? (
               <Link
                 href="/profiel"
+                aria-current={pathname === "/profiel" ? "page" : undefined}
                 className={navClassName(pathname === "/profiel")}
               >
                 Profiel
@@ -86,7 +87,11 @@ export function SiteHeader() {
             </Link>
           ))}
           {ENABLE_PROFILE ? (
-            <Link href="/profiel" className={navClassName(pathname === "/profiel")}>
+            <Link
+              href="/profiel"
+              aria-current={pathname === "/profiel" ? "page" : undefined}
+              className={navClassName(pathname === "/profiel")}
+            >
               Profiel
             </Link>
           ) : null}

@@ -63,11 +63,12 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 | Toeslagenscan publieke beta | experimenteel | `visibility: "public"` | aan | `apps/toeslagen-scan` gebruikt centrale allowances-engines; ondersteunde 2026-standaardscenario's tonen alleen een euro-indicatie wanneer de beslissende invoer voor die toeslag concreet is. Geen opslag/backend/analytics | 2027-dataset vereist vóór gebruik in 2027 |
 | Doorstap vanaf DUO-doorlenen-of-stoppen | actief | n.v.t. | aan | Resultaat toont scenariovergelijking, schuldenvrije datum en uitgebreide PDF | n.v.t. |
 | Chart-standaardisatie (jaar/euro/tooltips) | actief | n.v.t. | aan | Centrale charthelpers/componenten | n.v.t. |
-| Profielfunctie (`/profiel`, prefillpad) | uitgeschakeld | `NEXT_PUBLIC_ENABLE_PROFILE` | `false` | UI/CTA's verborgen, code blijft intact | zet op `1` en valideer profiel + tools |
+| Profielfunctie (`/profiel`, prefillpad) | actief | `NEXT_PUBLIC_ENABLE_PROFILE` | `true` | Compact profiel voor inkomen, studieschuld en wonen; vult alleen exact overeenkomende velden vooraf in bij DUO-maandbedrag, DUO-extra-aflossen en beide publieke hypotheektools | zet op `0` voor nooduitschakeling |
 | Kennisniveaufunctionaliteit | uitgeschakeld | `NEXT_PUBLIC_ENABLE_KNOWLEDGE_LEVEL` | `false` | Bewust niet zichtbaar in productieflow | zet op `1` en valideer homepage/toolhints |
 | Handmatige profielsync-panel | uitgeschakeld | `NEXT_PUBLIC_ENABLE_PROFILE_SYNC_PANEL` | `false` | Alleen zinvol in hybrid/remote traject | zet op `1` en valideer `/profiel` |
 | Saved calculations MVP (opslaan/lijst/heropen) | uitgeschakeld | `NEXT_PUBLIC_ENABLE_SAVED_CALCULATIONS` | `false` | Feature-flagged local-first MVP | zet op `true` en valideer `volgende-euro` + `/profiel` |
 | Profile storage mode: `local` | actief | `NEXT_PUBLIC_PROFILE_STORAGE_MODE` | `local` | Huidige runtime-opslag | n.v.t. |
+| Bewaartermijn browserprofiel | actief | keuze op `/profiel` | `session` | Nieuwe profielen blijven standaard alleen tijdens de browsersessie; expliciete keuze voor opslag op hetzelfde apparaat migreert dezelfde gevalideerde data en verwijdert de oude kopie | n.v.t. |
 | Profile storage mode: `hybrid`/`remote` | voorbereid | `NEXT_PUBLIC_PROFILE_STORAGE_MODE` | `local` | Fallback/no-op zonder remote activering | latere database/auth activatiestap nodig |
 | Supabase/auth/session-contract | voorbereid | env/config | uit | Client-safe voorbereiding zonder verplichte login | alleen activeren met aparte rollout |
 
@@ -75,6 +76,7 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 
 | Datum | Commit | Wijziging | Impact |
 |---|---|---|---|
+| 2026-07-28 | `pending` | Browserprofiel geactiveerd met sessieopslag als standaard, expliciete apparaatopslag, toegankelijke compacte profielinvoer en allowlisted automatische prefill voor vier publieke DUO- en hypotheektools | Profiel / privacy / DUO / hypotheek / UX |
 | 2026-07-28 | `pending` | Verwachte eindschuld in de gerichte DUO-leenfasetool direct aangevuld met het totale terug te betalen bedrag inclusief rente bij regulier aflossen; dezelfde centrale `totalPaid`-uitkomst staat aansluitend in de PDF | DUO / studieschuld / resultaten / PDF |
 | 2026-07-27 | `pending` | Publieke calculators starten zonder persoonlijke voorbeeldbedragen, markeren voorbeelden en indicaties consequent, geven korte veldhulp bij moeilijke begrippen en blokkeren onbekende DUO-regelingen vóór berekening | UX / toegankelijkheid / unknown resolution / DUO-veiligheid |
 | 2026-07-27 | `pending` | Resterende categorie A/B-vereenvoudigingen uitgevoerd: alle publieke tools direct zichtbaar, optionele woningdoelvelden conditioneel, bijzondere DUO-oudersituaties taakgericht uitgelegd en toeslagbedragen per regeling geblokkeerd bij onopgeloste noodzakelijke invoer | UX / DUO / hypotheek / toeslagenveiligheid |

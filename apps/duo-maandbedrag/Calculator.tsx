@@ -13,6 +13,7 @@ import {
 } from "@/components/tool/CalculationContextNotice";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
 import { ToolNextSteps } from "@/components/tool/ToolNextSteps";
+import { useUserProfile } from "@/hooks/useUserProfile";
 import { getRepaymentRuleLabel } from "@/lib/copy-glossary";
 import {
   formatDuoRateYearLabel,
@@ -22,6 +23,10 @@ import {
   createDuoDebtPartFormValue,
   type DuoDebtPartFormValue,
 } from "@/lib/duo/debt-parts-form";
+import {
+  createProfilePrefillState,
+} from "@/lib/profile-prefill";
+import { getDuoMonthlyPaymentDefaultsFromProfile } from "@/lib/profile-tool-mapping";
 import {
   calculateDuoMonthlyPaymentView,
   createDuoMortgageAssessmentTransferCandidate,
@@ -98,13 +103,41 @@ function MoneyField({ id, label, value, error, prefix, hint, onChange }: FieldPr
   );
 }
 
+type DuoMaandbedragContentProps = {
+  initialValues: DuoMonthlyPaymentFormValues;
+  hasRelevantProfileValues: boolean;
+};
+
 export default function DuoMaandbedragCalculator() {
+  const { profile, hasProfile } = useUserProfile();
+  const profilePatch = getDuoMonthlyPaymentDefaultsFromProfile(profile);
+  const { initialValues, profileKey, hasRelevantProfileValues } =
+    createProfilePrefillState<DuoMonthlyPaymentFormValues>({
+      defaultValues: createEmptyDuoMonthlyPaymentValues(),
+      profilePatch,
+      hasProfile,
+      profileUpdatedAt: profile.updatedAt,
+    });
+
+  return (
+    <DuoMaandbedragContent
+      key={profileKey}
+      initialValues={initialValues}
+      hasRelevantProfileValues={hasRelevantProfileValues}
+    />
+  );
+}
+
+function DuoMaandbedragContent({
+  initialValues,
+  hasRelevantProfileValues,
+}: DuoMaandbedragContentProps) {
   const exampleValues = useMemo(
     () => createDuoMonthlyPaymentDefaultValues(),
     [],
   );
   const [formValues, setFormValues] = useState<DuoMonthlyPaymentFormValues>(
-    createEmptyDuoMonthlyPaymentValues,
+    initialValues,
   );
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
   const [transferRecord, setTransferRecord] =
@@ -368,6 +401,12 @@ export default function DuoMaandbedragCalculator() {
         </div>
       </details>
 
+      {hasRelevantProfileValues ? (
+        <p className="text-[13px] leading-[1.6] text-[var(--muted)]">
+          Je studieschuldgegevens zijn ingevuld vanuit je profiel. Controleer ze
+          voordat je berekent.
+        </p>
+      ) : null}
       <div className="flex flex-wrap gap-2">
         <ToolActionButton
           type="button"

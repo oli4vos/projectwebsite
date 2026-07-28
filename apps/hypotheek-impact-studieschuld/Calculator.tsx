@@ -226,7 +226,6 @@ function CalculatorContent({
     submitContextMessage,
     setValues,
     replaceValues,
-    reset,
   } = useSubmittedCalculation<FormState>(initialValues);
   const validation = validateForm(formValues);
   const errors = Object.fromEntries(
@@ -465,7 +464,10 @@ function CalculatorContent({
     setDuoTransferMessage("");
     setPendingDuoCandidate(null);
     setShowHousingTarget(false);
-    reset("Alle invoervelden zijn gewist. Vul opnieuw in of gebruik een voorbeeldscenario.");
+    replaceValues(
+      defaultValues,
+      "Alle invoervelden zijn gewist. Vul opnieuw in of gebruik een voorbeeldscenario.",
+    );
   }
 
   function toggleHousingTarget(enabled: boolean) {
@@ -624,12 +626,15 @@ function CalculatorContent({
 
         {hasRelevantProfileValues ? (
           <div className="surface-subtle mt-4 flex flex-wrap items-center gap-3 px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
-            <span>Profielwaarden gevonden in deze browser.</span>
+            <span>
+              Relevante velden zijn ingevuld vanuit je profiel. Controleer ze
+              voordat je berekent.
+            </span>
             <ToolActionButton type="button" onClick={applyExampleValues} variant="secondary" size="sm">
               Voorbeeld invullen
             </ToolActionButton>
             <ToolActionButton type="button" onClick={applyProfileValues} variant="secondary" size="sm">
-              Gebruik profiel
+              Profiel opnieuw invullen
             </ToolActionButton>
             <ToolActionButton type="button" onClick={clearAllInputs} variant="secondary" size="sm">
               Wis invoer

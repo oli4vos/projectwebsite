@@ -15,6 +15,7 @@ import {
 } from "@/components/tool/CalculationContextNotice";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
 import { ToolNextSteps } from "@/components/tool/ToolNextSteps";
+import { useUserProfile } from "@/hooks/useUserProfile";
 import { getRepaymentRuleLabel } from "@/lib/copy-glossary";
 import {
   formatDuoRateYearLabel,
@@ -24,6 +25,8 @@ import {
   createDuoDebtPartFormValue,
   type DuoDebtPartFormValue,
 } from "@/lib/duo/debt-parts-form";
+import { createProfilePrefillState } from "@/lib/profile-prefill";
+import { getDuoExtraRepaymentDefaultsFromProfile } from "@/lib/profile-tool-mapping";
 import { getToolNextSteps } from "@/lib/tool-journeys";
 import {
   calculateDuoExtraRepaymentView,
@@ -84,13 +87,41 @@ function MoneyField({ id, label, value, error, hint, onChange }: MoneyFieldProps
   );
 }
 
+type DuoExtraAflossenContentProps = {
+  initialValues: DuoExtraRepaymentFormValues;
+  hasRelevantProfileValues: boolean;
+};
+
 export default function DuoExtraAflossenCalculator() {
+  const { profile, hasProfile } = useUserProfile();
+  const profilePatch = getDuoExtraRepaymentDefaultsFromProfile(profile);
+  const { initialValues, profileKey, hasRelevantProfileValues } =
+    createProfilePrefillState<DuoExtraRepaymentFormValues>({
+      defaultValues: createEmptyDuoExtraRepaymentValues(),
+      profilePatch,
+      hasProfile,
+      profileUpdatedAt: profile.updatedAt,
+    });
+
+  return (
+    <DuoExtraAflossenContent
+      key={profileKey}
+      initialValues={initialValues}
+      hasRelevantProfileValues={hasRelevantProfileValues}
+    />
+  );
+}
+
+function DuoExtraAflossenContent({
+  initialValues,
+  hasRelevantProfileValues,
+}: DuoExtraAflossenContentProps) {
   const exampleValues = useMemo(
     () => createDuoExtraRepaymentDefaultValues(),
     [],
   );
   const [formValues, setFormValues] = useState<DuoExtraRepaymentFormValues>(
-    createEmptyDuoExtraRepaymentValues,
+    initialValues,
   );
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
   const view = useMemo(() => calculateDuoExtraRepaymentView(formValues), [formValues]);
@@ -294,6 +325,12 @@ export default function DuoExtraAflossenCalculator() {
         </select>
       </label>
 
+      {hasRelevantProfileValues ? (
+        <p className="text-[13px] leading-[1.6] text-[var(--muted)]">
+          Je studieschuldgegevens zijn ingevuld vanuit je profiel. Controleer ze
+          voordat je berekent.
+        </p>
+      ) : null}
       <div className="flex flex-wrap gap-2">
         <ToolActionButton
           type="button"

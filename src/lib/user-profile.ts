@@ -1,4 +1,6 @@
 export const USER_PROFILE_STORAGE_KEY = "project-site:user-profile:v1";
+export const USER_PROFILE_SESSION_STORAGE_KEY =
+  "project-site:user-profile:session:v1";
 export const USER_PROFILE_STORAGE_EVENT = "project-site:user-profile:changed";
 
 export type HouseholdType = "single" | "withPartner" | "family" | "unknown";

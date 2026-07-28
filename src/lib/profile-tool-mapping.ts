@@ -22,6 +22,33 @@ export const PROFILE_FIELDS_MORTGAGE_IMPACT = [
   "housing.maxMortgageWithoutStudentDebt",
 ] as const;
 
+export const PROFILE_FIELDS_DUO_MONTHLY_PAYMENT = [
+  "studentDebt.remainingDebt",
+  "studentDebt.repaymentRule",
+  "studentDebt.duoInterestRate",
+  "income.householdType",
+] as const;
+
+export const PROFILE_FIELDS_DUO_EXTRA_REPAYMENT = [
+  "studentDebt.remainingDebt",
+  "studentDebt.repaymentRule",
+  "studentDebt.duoInterestRate",
+  "studentDebt.currentMonthlyPayment",
+] as const;
+
+export const PROFILE_FIELDS_MAX_MORTGAGE = [
+  "income.grossAnnualIncome",
+  "income.partnerGrossAnnualIncome",
+  "studentDebt.remainingDebt",
+  "studentDebt.currentMonthlyPayment",
+  "studentDebt.statutoryMonthlyPayment",
+  "studentDebt.duoSituation",
+  "housing.targetHomePrice",
+  "housing.ownFunds",
+  "housing.mortgageRate",
+  "housing.mortgageTermYears",
+] as const;
+
 export const PROFILE_FIELDS_STUDENT_DEBT_VS_INVESTING = [
   "studentDebt.remainingDebt",
   "studentDebt.remainingTermYears",
@@ -121,6 +148,39 @@ type MortgageImpactDefaults = Partial<{
   mortgageRate: string;
   mortgageTermYears: string;
   maxMortgageWithoutStudentDebt: string;
+}>;
+
+type DuoMonthlyPaymentDefaults = Partial<{
+  remainingDebt: string;
+  repaymentRule: ProfileRepaymentRule;
+  duoRateYear: string;
+  householdSituation: "single" | "partner";
+}>;
+
+type DuoExtraRepaymentDefaults = Partial<{
+  remainingDebt: string;
+  repaymentRule: ProfileRepaymentRule;
+  duoRateYear: string;
+  currentMonthlyPayment: string;
+}>;
+
+type MaxMortgageDefaults = Partial<{
+  grossAnnualHouseholdIncome: string;
+  grossAnnualPartnerIncome: string;
+  annualMortgageRate: string;
+  mortgageTermYears: string;
+  purchasePrice: string;
+  marketValue: string;
+  ownFunds: string;
+  hasStudentLoan: boolean;
+  studentLoanStatus:
+    | "repaying"
+    | "start_phase"
+    | "reduced_capacity"
+    | "payment_pause"
+    | "unknown";
+  actualMonthlyPayment: string;
+  statutoryMonthlyPayment: string;
 }>;
 
 type StudentDebtVsInvestingDefaults = Partial<{
@@ -236,6 +296,163 @@ type ZzpUurtariefDefaults = Partial<{
 
 function toStringValue(value?: number) {
   return value === undefined ? undefined : String(value);
+}
+
+function getProfileDuoRateYear(profile: UserProfile) {
+  const repaymentRule = profile.studentDebt?.repaymentRule;
+  const duoInterestRate = profile.studentDebt?.duoInterestRate;
+
+  if (
+    !repaymentRule ||
+    repaymentRule === "UNKNOWN" ||
+    duoInterestRate === undefined
+  ) {
+    return undefined;
+  }
+
+  const rateYear = getDuoHistoricalRateYearForRule(
+    repaymentRule,
+    duoInterestRate,
+  );
+  return rateYear === undefined ? undefined : String(rateYear);
+}
+
+export function getDuoMonthlyPaymentDefaultsFromProfile(
+  profile: UserProfile,
+): DuoMonthlyPaymentDefaults {
+  const defaults: DuoMonthlyPaymentDefaults = {};
+  const remainingDebt = toStringValue(profile.studentDebt?.remainingDebt);
+  const duoRateYear = getProfileDuoRateYear(profile);
+
+  if (remainingDebt !== undefined) {
+    defaults.remainingDebt = remainingDebt;
+  }
+  if (profile.studentDebt?.repaymentRule) {
+    defaults.repaymentRule = profile.studentDebt.repaymentRule;
+  }
+  if (duoRateYear) {
+    defaults.duoRateYear = duoRateYear;
+  }
+  if (profile.income?.householdType === "single") {
+    defaults.householdSituation = "single";
+  } else if (profile.income?.householdType === "withPartner") {
+    defaults.householdSituation = "partner";
+  }
+
+  return defaults;
+}
+
+export function getDuoExtraRepaymentDefaultsFromProfile(
+  profile: UserProfile,
+): DuoExtraRepaymentDefaults {
+  const defaults: DuoExtraRepaymentDefaults = {};
+  const remainingDebt = toStringValue(profile.studentDebt?.remainingDebt);
+  const currentMonthlyPayment = toStringValue(
+    profile.studentDebt?.currentMonthlyPayment,
+  );
+  const duoRateYear = getProfileDuoRateYear(profile);
+
+  if (remainingDebt !== undefined) {
+    defaults.remainingDebt = remainingDebt;
+  }
+  if (profile.studentDebt?.repaymentRule) {
+    defaults.repaymentRule = profile.studentDebt.repaymentRule;
+  }
+  if (duoRateYear) {
+    defaults.duoRateYear = duoRateYear;
+  }
+  if (currentMonthlyPayment !== undefined) {
+    defaults.currentMonthlyPayment = currentMonthlyPayment;
+  }
+
+  return defaults;
+}
+
+function mapDuoSituationToMortgageStatus(
+  situation?: ProfileDuoSituation,
+): MaxMortgageDefaults["studentLoanStatus"] {
+  const statusBySituation: Partial<
+    Record<
+      ProfileDuoSituation,
+      NonNullable<MaxMortgageDefaults["studentLoanStatus"]>
+    >
+  > = {
+    repaying: "repaying",
+    gracePeriod: "start_phase",
+    incomeBasedReduction: "reduced_capacity",
+    paymentPause: "payment_pause",
+    unknown: "unknown",
+  };
+
+  return situation ? statusBySituation[situation] : undefined;
+}
+
+export function getMaxMortgageDefaultsFromProfile(
+  profile: UserProfile,
+): MaxMortgageDefaults {
+  const defaults: MaxMortgageDefaults = {};
+  const grossIncome = toStringValue(profile.income?.grossAnnualIncome);
+  const partnerIncome = toStringValue(
+    profile.income?.partnerGrossAnnualIncome,
+  );
+  const mortgageRate = toStringValue(profile.housing?.mortgageRate);
+  const mortgageTerm = toStringValue(profile.housing?.mortgageTermYears);
+  const targetHomePrice = toStringValue(profile.housing?.targetHomePrice);
+  const ownFunds = toStringValue(profile.housing?.ownFunds);
+  const actualMonthlyPayment = toStringValue(
+    profile.studentDebt?.currentMonthlyPayment,
+  );
+  const statutoryMonthlyPayment = toStringValue(
+    profile.studentDebt?.statutoryMonthlyPayment,
+  );
+  const studentLoanAmounts = [
+    profile.studentDebt?.remainingDebt,
+    profile.studentDebt?.currentMonthlyPayment,
+    profile.studentDebt?.statutoryMonthlyPayment,
+  ];
+  const hasStudentLoan = studentLoanAmounts.some(
+    (value) => value !== undefined && value > 0,
+  );
+  const hasStudentLoanAnswer = studentLoanAmounts.some(
+    (value) => value !== undefined,
+  );
+  const studentLoanStatus = mapDuoSituationToMortgageStatus(
+    profile.studentDebt?.duoSituation,
+  );
+
+  if (grossIncome !== undefined) {
+    defaults.grossAnnualHouseholdIncome = grossIncome;
+  }
+  if (partnerIncome !== undefined) {
+    defaults.grossAnnualPartnerIncome = partnerIncome;
+  }
+  if (mortgageRate !== undefined) {
+    defaults.annualMortgageRate = mortgageRate;
+  }
+  if (mortgageTerm !== undefined) {
+    defaults.mortgageTermYears = mortgageTerm;
+  }
+  if (targetHomePrice !== undefined) {
+    defaults.purchasePrice = targetHomePrice;
+    defaults.marketValue = targetHomePrice;
+  }
+  if (ownFunds !== undefined) {
+    defaults.ownFunds = ownFunds;
+  }
+  if (hasStudentLoanAnswer) {
+    defaults.hasStudentLoan = hasStudentLoan;
+  }
+  if (studentLoanStatus) {
+    defaults.studentLoanStatus = studentLoanStatus;
+  }
+  if (actualMonthlyPayment !== undefined) {
+    defaults.actualMonthlyPayment = actualMonthlyPayment;
+  }
+  if (statutoryMonthlyPayment !== undefined) {
+    defaults.statutoryMonthlyPayment = statutoryMonthlyPayment;
+  }
+
+  return defaults;
 }
 
 export function getMortgageImpactDefaultsFromProfile(

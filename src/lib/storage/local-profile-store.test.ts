@@ -17,6 +17,7 @@ type LocalStorageMock = {
 
 function createWindowMock() {
   const values = new Map<string, string>();
+  const sessionValues = new Map<string, string>();
   const localStorage: LocalStorageMock = {
     getItem: (key: string) => values.get(key) ?? null,
     setItem: (key: string, value: string) => {
@@ -26,11 +27,22 @@ function createWindowMock() {
       values.delete(key);
     },
   };
+  const sessionStorage: LocalStorageMock = {
+    getItem: (key: string) => sessionValues.get(key) ?? null,
+    setItem: (key: string, value: string) => {
+      sessionValues.set(key, value);
+    },
+    removeItem: (key: string) => {
+      sessionValues.delete(key);
+    },
+  };
 
   return {
     localStorage,
+    sessionStorage,
     dispatchEvent: () => true,
     __values: values,
+    __sessionValues: sessionValues,
   };
 }
 
@@ -76,6 +88,25 @@ describe("createLocalProfileStore", () => {
     expect(typeof saveResult.data?.updatedAt).toBe("string");
     expect(loadResult.data?.income?.grossAnnualIncome).toBe(75000);
     expect(windowMock.__values.get(USER_PROFILE_STORAGE_KEY)).toBeTruthy();
+  });
+
+  it("can keep profile data in session storage only", () => {
+    const windowMock = createWindowMock();
+    (globalThis as { window?: unknown }).window = windowMock;
+    const store = createLocalProfileStore({
+      storageKey: USER_PROFILE_STORAGE_KEY,
+      storageEvent: USER_PROFILE_STORAGE_EVENT,
+      storageArea: "sessionStorage",
+      defaultProfile: defaultUserProfile,
+      sanitizeProfile: sanitizeUserProfile,
+      profileHasValues,
+    });
+
+    store.saveProfile({ income: { grossAnnualIncome: 64000 } });
+
+    expect(windowMock.__sessionValues.get(USER_PROFILE_STORAGE_KEY)).toBeTruthy();
+    expect(windowMock.__values.get(USER_PROFILE_STORAGE_KEY)).toBeUndefined();
+    expect(store.loadProfile().data?.income?.grossAnnualIncome).toBe(64000);
   });
 
   it("clears profile data from storage", () => {

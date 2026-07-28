@@ -4,6 +4,7 @@ import type { ProfileStore, ProfileStoreResult } from "@/lib/storage/profile-sto
 type LocalProfileStoreOptions = {
   storageKey: string;
   storageEvent: string;
+  storageArea?: "localStorage" | "sessionStorage";
   defaultProfile: UserProfile;
   sanitizeProfile: (profile: UserProfile) => UserProfile;
   profileHasValues: (profile: UserProfile) => boolean;
@@ -20,6 +21,7 @@ function safeErrorMessage(error: unknown) {
 export function createLocalProfileStore({
   storageKey,
   storageEvent,
+  storageArea = "localStorage",
   defaultProfile,
   sanitizeProfile,
   profileHasValues,
@@ -32,7 +34,7 @@ export function createLocalProfileStore({
     }
 
     try {
-      const rawValue = activeWindow.localStorage.getItem(storageKey);
+      const rawValue = activeWindow[storageArea].getItem(storageKey);
 
       if (!rawValue) {
         return { data: defaultProfile };
@@ -61,12 +63,12 @@ export function createLocalProfileStore({
 
     try {
       if (!profileHasValues(sanitizedProfile)) {
-        activeWindow.localStorage.removeItem(storageKey);
+        activeWindow[storageArea].removeItem(storageKey);
         activeWindow.dispatchEvent(new Event(storageEvent));
         return { data: defaultProfile };
       }
 
-      activeWindow.localStorage.setItem(storageKey, JSON.stringify(sanitizedProfile));
+      activeWindow[storageArea].setItem(storageKey, JSON.stringify(sanitizedProfile));
       activeWindow.dispatchEvent(new Event(storageEvent));
 
       return { data: sanitizedProfile };
@@ -86,7 +88,7 @@ export function createLocalProfileStore({
     }
 
     try {
-      activeWindow.localStorage.removeItem(storageKey);
+      activeWindow[storageArea].removeItem(storageKey);
       activeWindow.dispatchEvent(new Event(storageEvent));
       return { data: null };
     } catch (error) {

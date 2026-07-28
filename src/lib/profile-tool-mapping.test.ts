@@ -2,9 +2,12 @@ import { describe, expect, it } from "vitest";
 import {
   getBox3ImpactDefaultsFromProfile,
   getBox3IndicatieDefaultsFromProfile,
+  getDuoExtraRepaymentDefaultsFromProfile,
+  getDuoMonthlyPaymentDefaultsFromProfile,
   getHypotheekAflossenVsBeleggenDefaultsFromProfile,
   getJaarruimteVsVrijBeleggenDefaultsFromProfile,
   getMortgageImpactDefaultsFromProfile,
+  getMaxMortgageDefaultsFromProfile,
   getStudentDebtVsInvestingDefaultsFromProfile,
   getFireNaBelastingDefaultsFromProfile,
   getVolgendeEuroDefaultsFromProfile,
@@ -13,6 +16,89 @@ import {
 import type { UserProfile } from "@/lib/user-profile";
 
 describe("profile tool mapping", () => {
+  it("maps only matching profile fields to DUO repayment tools", () => {
+    const profile: UserProfile = {
+      income: {
+        grossAnnualIncome: 54000,
+        householdType: "withPartner",
+      },
+      studentDebt: {
+        remainingDebt: 21000,
+        currentMonthlyPayment: 155,
+        repaymentRule: "SF35",
+        duoInterestRate: 2.33,
+      },
+    };
+
+    expect(getDuoMonthlyPaymentDefaultsFromProfile(profile)).toEqual({
+      remainingDebt: "21000",
+      repaymentRule: "SF35",
+      duoRateYear: "2026",
+      householdSituation: "partner",
+    });
+    expect(getDuoExtraRepaymentDefaultsFromProfile(profile)).toEqual({
+      remainingDebt: "21000",
+      repaymentRule: "SF35",
+      duoRateYear: "2026",
+      currentMonthlyPayment: "155",
+    });
+  });
+
+  it("does not treat gross income as DUO assessment income", () => {
+    const profile: UserProfile = {
+      income: { grossAnnualIncome: 54000 },
+    };
+
+    expect(getDuoMonthlyPaymentDefaultsFromProfile(profile)).toEqual({});
+  });
+
+  it("maps profile fields to the maximum-mortgage form", () => {
+    const profile: UserProfile = {
+      income: {
+        grossAnnualIncome: 62000,
+        partnerGrossAnnualIncome: 28000,
+      },
+      studentDebt: {
+        remainingDebt: 18000,
+        currentMonthlyPayment: 135,
+        statutoryMonthlyPayment: 170,
+        duoSituation: "paymentPause",
+      },
+      housing: {
+        targetHomePrice: 410000,
+        ownFunds: 22000,
+        mortgageRate: 4.1,
+        mortgageTermYears: 30,
+      },
+    };
+
+    expect(getMaxMortgageDefaultsFromProfile(profile)).toEqual({
+      grossAnnualHouseholdIncome: "62000",
+      grossAnnualPartnerIncome: "28000",
+      annualMortgageRate: "4.1",
+      mortgageTermYears: "30",
+      purchasePrice: "410000",
+      marketValue: "410000",
+      ownFunds: "22000",
+      hasStudentLoan: true,
+      studentLoanStatus: "payment_pause",
+      actualMonthlyPayment: "135",
+      statutoryMonthlyPayment: "170",
+    });
+  });
+
+  it("maps an explicit zero studieschuld to no student loan", () => {
+    const profile: UserProfile = {
+      studentDebt: {
+        remainingDebt: 0,
+      },
+    };
+
+    expect(getMaxMortgageDefaultsFromProfile(profile)).toEqual({
+      hasStudentLoan: false,
+    });
+  });
+
   it("maps mortgage-impact defaults from profile fields", () => {
     const profile: UserProfile = {
       income: {
@@ -91,6 +177,9 @@ describe("profile tool mapping", () => {
 
   it("returns empty mappings for an empty profile", () => {
     expect(getMortgageImpactDefaultsFromProfile({})).toEqual({});
+    expect(getDuoMonthlyPaymentDefaultsFromProfile({})).toEqual({});
+    expect(getDuoExtraRepaymentDefaultsFromProfile({})).toEqual({});
+    expect(getMaxMortgageDefaultsFromProfile({})).toEqual({});
     expect(getStudentDebtVsInvestingDefaultsFromProfile({})).toEqual({});
     expect(getBox3IndicatieDefaultsFromProfile({})).toEqual({});
     expect(getBox3ImpactDefaultsFromProfile({})).toEqual({});

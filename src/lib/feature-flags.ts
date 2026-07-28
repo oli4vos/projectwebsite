@@ -1,6 +1,9 @@
-export function parseFeatureFlag(value: string | undefined): boolean {
+export function parseFeatureFlag(
+  value: string | undefined,
+  defaultValue = false,
+): boolean {
   if (!value) {
-    return false;
+    return defaultValue;
   }
 
   const normalized = value.trim().toLowerCase();
@@ -13,6 +16,7 @@ export const ENABLE_KNOWLEDGE_LEVEL = parseFeatureFlag(
 
 export const ENABLE_PROFILE = parseFeatureFlag(
   process.env.NEXT_PUBLIC_ENABLE_PROFILE,
+  true,
 );
 
 export const ENABLE_PROFILE_SYNC_PANEL = parseFeatureFlag(

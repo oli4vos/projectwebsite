@@ -19,7 +19,9 @@ export function createProfilePrefillState<T extends Record<string, unknown>>(inp
   return {
     hasRelevantProfileValues,
     profileKey,
-    initialValues: defaultValues,
+    initialValues: hasRelevantProfileValues
+      ? mergeProfilePatchIntoValues(defaultValues, profilePatch)
+      : defaultValues,
   };
 }
 

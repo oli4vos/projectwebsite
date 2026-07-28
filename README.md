@@ -259,7 +259,7 @@ De huidige publieke site is bewust Type A/local-first: er zijn geen serversecret
 | Variabele | Doel | Secret? |
 |---|---|---|
 | `NEXT_PUBLIC_PROFILE_STORAGE_MODE` | Kies `local`, `hybrid` of `remote`; productie-default blijft `local`. | Nee |
-| `NEXT_PUBLIC_ENABLE_PROFILE` | Feature flag voor profiel-UI. | Nee |
+| `NEXT_PUBLIC_ENABLE_PROFILE` | Feature flag voor profiel-UI; standaard aan, zet op `0` voor een nooduitschakeling. | Nee |
 | `NEXT_PUBLIC_ENABLE_KNOWLEDGE_LEVEL` | Feature flag voor kennisniveauhints. | Nee |
 | `NEXT_PUBLIC_ENABLE_PROFILE_SYNC_PANEL` | Feature flag voor handmatige sync-UI. | Nee |
 | `NEXT_PUBLIC_ENABLE_SAVED_CALCULATIONS` | Feature flag voor lokaal opgeslagen berekeningen. | Nee |

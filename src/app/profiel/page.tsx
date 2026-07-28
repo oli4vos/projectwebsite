@@ -1,29 +1,34 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { SiteFooter } from "@/components/SiteFooter";
-import { SiteHeader } from "@/components/SiteHeader";
+import {
+  useMemo,
+  useRef,
+  useState,
+  type FormEvent,
+  type ReactNode,
+} from "react";
+import { FieldError } from "@/components/forms/FieldError";
 import { ProfileSyncPanel } from "@/components/ProfileSyncPanel";
 import { SavedCalculationsList } from "@/components/SavedCalculationsList";
 import { SavedScenarioComparison } from "@/components/SavedScenarioComparison";
+import { SiteFooter } from "@/components/SiteFooter";
+import { SiteHeader } from "@/components/SiteHeader";
 import { Btn } from "@/components/ui";
 import { useUserProfile } from "@/hooks/useUserProfile";
-import { ENABLE_PROFILE } from "@/lib/feature-flags";
 import {
   getDuoSituationLabel,
   getEmploymentTypeLabel,
   getGlossaryExplanation,
   getRepaymentRuleLabel,
 } from "@/lib/copy-glossary";
+import { ENABLE_PROFILE } from "@/lib/feature-flags";
 import { parseOptionalDecimalInput } from "@/lib/number-input";
+import type { ProfileRetention } from "@/lib/storage/profile-retention";
 import type {
-  Box3MethodPreference,
   EmploymentType,
   HouseholdType,
-  PensionBuildUp,
   ProfileDuoSituation,
   ProfileRepaymentRule,
-  RiskProfile,
   UserProfile,
 } from "@/lib/user-profile";
 
@@ -44,17 +49,6 @@ type ProfileFormState = {
   mortgageRate: string;
   mortgageTermYears: string;
   maxMortgageWithoutStudentDebt: string;
-  currentSavings: string;
-  targetEmergencyFund: string;
-  monthlyFreeCashflow: string;
-  expectedAnnualReturn: string;
-  investmentHorizonYears: string;
-  riskProfile: RiskProfile;
-  hasAov: boolean;
-  pensionBuildUp: PensionBuildUp;
-  preferredBox3Method: Box3MethodPreference;
-  hasFiscalPartnerTax: boolean;
-  preferredTaxYear: string;
 };
 
 type ValidationErrors = Partial<Record<keyof ProfileFormState, string>>;
@@ -76,17 +70,27 @@ const defaultFormState: ProfileFormState = {
   mortgageRate: "",
   mortgageTermYears: "",
   maxMortgageWithoutStudentDebt: "",
-  currentSavings: "",
-  targetEmergencyFund: "",
-  monthlyFreeCashflow: "",
-  expectedAnnualReturn: "",
-  investmentHorizonYears: "",
-  riskProfile: "neutral",
-  hasAov: false,
-  pensionBuildUp: "unknown",
-  preferredBox3Method: "actual",
-  hasFiscalPartnerTax: false,
-  preferredTaxYear: "",
+};
+
+const profileSteps = ["Inkomen", "Studieschuld", "Wonen"] as const;
+
+const profileStepByField: Record<keyof ProfileFormState, number> = {
+  grossAnnualIncome: 0,
+  partnerGrossAnnualIncome: 0,
+  householdType: 0,
+  employmentType: 0,
+  remainingDebt: 1,
+  currentMonthlyPayment: 1,
+  statutoryMonthlyPayment: 1,
+  repaymentRule: 1,
+  duoSituation: 1,
+  duoInterestRate: 1,
+  remainingTermYears: 1,
+  targetHomePrice: 2,
+  ownFunds: 2,
+  mortgageRate: 2,
+  mortgageTermYears: 2,
+  maxMortgageWithoutStudentDebt: 2,
 };
 
 const employmentTypeOptions: EmploymentType[] = [
@@ -118,7 +122,6 @@ function formatUpdatedAt(value?: string) {
   }
 
   const date = new Date(value);
-
   if (Number.isNaN(date.getTime())) {
     return "Onbekende datum";
   }
@@ -136,11 +139,15 @@ function toFormValue(value?: number) {
 function profileToFormState(profile: UserProfile): ProfileFormState {
   return {
     grossAnnualIncome: toFormValue(profile.income?.grossAnnualIncome),
-    partnerGrossAnnualIncome: toFormValue(profile.income?.partnerGrossAnnualIncome),
+    partnerGrossAnnualIncome: toFormValue(
+      profile.income?.partnerGrossAnnualIncome,
+    ),
     householdType: profile.income?.householdType ?? "unknown",
     employmentType: profile.income?.employmentType ?? "unknown",
     remainingDebt: toFormValue(profile.studentDebt?.remainingDebt),
-    currentMonthlyPayment: toFormValue(profile.studentDebt?.currentMonthlyPayment),
+    currentMonthlyPayment: toFormValue(
+      profile.studentDebt?.currentMonthlyPayment,
+    ),
     statutoryMonthlyPayment: toFormValue(
       profile.studentDebt?.statutoryMonthlyPayment,
     ),
@@ -155,24 +162,7 @@ function profileToFormState(profile: UserProfile): ProfileFormState {
     maxMortgageWithoutStudentDebt: toFormValue(
       profile.housing?.maxMortgageWithoutStudentDebt,
     ),
-    currentSavings: toFormValue(profile.savingInvesting?.currentSavings),
-    targetEmergencyFund: toFormValue(profile.savingInvesting?.targetEmergencyFund),
-    monthlyFreeCashflow: toFormValue(profile.savingInvesting?.monthlyFreeCashflow),
-    expectedAnnualReturn: toFormValue(profile.savingInvesting?.expectedAnnualReturn),
-    investmentHorizonYears: toFormValue(
-      profile.savingInvesting?.investmentHorizonYears,
-    ),
-    riskProfile: profile.savingInvesting?.riskProfile ?? "neutral",
-    hasAov: profile.savingInvesting?.hasAov ?? false,
-    pensionBuildUp: profile.savingInvesting?.pensionBuildUp ?? "unknown",
-    preferredBox3Method: profile.tax?.preferredBox3Method ?? "actual",
-    hasFiscalPartnerTax: profile.tax?.hasFiscalPartner ?? false,
-    preferredTaxYear: toFormValue(profile.tax?.preferredTaxYear),
   };
-}
-
-function parseOptionalNumber(value: string) {
-  return parseOptionalDecimalInput(value);
 }
 
 function validateNonNegative(
@@ -199,43 +189,36 @@ function validatePositive(
 
 function formStateToProfile(formValues: ProfileFormState) {
   const errors: ValidationErrors = {};
-
-  const grossAnnualIncome = parseOptionalNumber(formValues.grossAnnualIncome);
-  const partnerGrossAnnualIncome = parseOptionalNumber(
+  const grossAnnualIncome = parseOptionalDecimalInput(
+    formValues.grossAnnualIncome,
+  );
+  const partnerGrossAnnualIncome = parseOptionalDecimalInput(
     formValues.partnerGrossAnnualIncome,
   );
-  const remainingDebt = parseOptionalNumber(formValues.remainingDebt);
-  const currentMonthlyPayment = parseOptionalNumber(formValues.currentMonthlyPayment);
-  const statutoryMonthlyPayment = parseOptionalNumber(
+  const remainingDebt = parseOptionalDecimalInput(formValues.remainingDebt);
+  const currentMonthlyPayment = parseOptionalDecimalInput(
+    formValues.currentMonthlyPayment,
+  );
+  const statutoryMonthlyPayment = parseOptionalDecimalInput(
     formValues.statutoryMonthlyPayment,
   );
-  const duoInterestRate = parseOptionalNumber(formValues.duoInterestRate);
-  const remainingTermYears = parseOptionalNumber(formValues.remainingTermYears);
-  const targetHomePrice = parseOptionalNumber(formValues.targetHomePrice);
-  const ownFunds = parseOptionalNumber(formValues.ownFunds);
-  const mortgageRate = parseOptionalNumber(formValues.mortgageRate);
-  const mortgageTermYears = parseOptionalNumber(formValues.mortgageTermYears);
-  const maxMortgageWithoutStudentDebt = parseOptionalNumber(
+  const duoInterestRate = parseOptionalDecimalInput(
+    formValues.duoInterestRate,
+  );
+  const remainingTermYears = parseOptionalDecimalInput(
+    formValues.remainingTermYears,
+  );
+  const targetHomePrice = parseOptionalDecimalInput(
+    formValues.targetHomePrice,
+  );
+  const ownFunds = parseOptionalDecimalInput(formValues.ownFunds);
+  const mortgageRate = parseOptionalDecimalInput(formValues.mortgageRate);
+  const mortgageTermYears = parseOptionalDecimalInput(
+    formValues.mortgageTermYears,
+  );
+  const maxMortgageWithoutStudentDebt = parseOptionalDecimalInput(
     formValues.maxMortgageWithoutStudentDebt,
   );
-  const currentSavings = parseOptionalNumber(formValues.currentSavings);
-  const targetEmergencyFund = parseOptionalNumber(formValues.targetEmergencyFund);
-  const monthlyFreeCashflow = parseOptionalNumber(formValues.monthlyFreeCashflow);
-  const expectedAnnualReturn = parseOptionalNumber(formValues.expectedAnnualReturn);
-  const investmentHorizonYears = parseOptionalNumber(
-    formValues.investmentHorizonYears,
-  );
-  const preferredTaxYear = parseOptionalNumber(formValues.preferredTaxYear);
-  const hasSavingNumbers =
-    currentSavings !== undefined ||
-    targetEmergencyFund !== undefined ||
-    monthlyFreeCashflow !== undefined ||
-    expectedAnnualReturn !== undefined ||
-    investmentHorizonYears !== undefined;
-  const hasTaxPreferences =
-    formValues.preferredBox3Method !== "actual" ||
-    formValues.hasFiscalPartnerTax ||
-    preferredTaxYear !== undefined;
 
   validateNonNegative(
     "grossAnnualIncome",
@@ -285,47 +268,23 @@ function formStateToProfile(formValues: ProfileFormState) {
     errors,
     "Gebruik 0 of een hogere maximale hypotheek.",
   );
-  validateNonNegative(
-    "currentSavings",
-    currentSavings,
-    errors,
-    "Gebruik 0 of een hoger bedrag aan spaargeld.",
-  );
-  validateNonNegative(
-    "targetEmergencyFund",
-    targetEmergencyFund,
-    errors,
-    "Gebruik 0 of een hogere minimale buffer.",
-  );
-  validateNonNegative(
-    "monthlyFreeCashflow",
-    monthlyFreeCashflow,
-    errors,
-    "Gebruik 0 of een hogere maandelijkse vrije ruimte.",
-  );
 
   if (
     duoInterestRate !== undefined &&
-    (!Number.isFinite(duoInterestRate) || duoInterestRate < 0 || duoInterestRate > 100)
+    (!Number.isFinite(duoInterestRate) ||
+      duoInterestRate < 0 ||
+      duoInterestRate > 100)
   ) {
     errors.duoInterestRate = "Gebruik een rentepercentage tussen 0 en 100.";
   }
 
   if (
     mortgageRate !== undefined &&
-    (!Number.isFinite(mortgageRate) || mortgageRate < 0 || mortgageRate > 100)
+    (!Number.isFinite(mortgageRate) ||
+      mortgageRate < 0 ||
+      mortgageRate > 100)
   ) {
     errors.mortgageRate = "Gebruik een rentepercentage tussen 0 en 100.";
-  }
-
-  if (
-    expectedAnnualReturn !== undefined &&
-    (!Number.isFinite(expectedAnnualReturn) ||
-      expectedAnnualReturn < 0 ||
-      expectedAnnualReturn > 100)
-  ) {
-    errors.expectedAnnualReturn =
-      "Gebruik een verwacht rendement tussen 0 en 100.";
   }
 
   validatePositive(
@@ -340,22 +299,8 @@ function formStateToProfile(formValues: ProfileFormState) {
     errors,
     "Gebruik een hypotheeklooptijd groter dan 0.",
   );
-  validatePositive(
-    "investmentHorizonYears",
-    investmentHorizonYears,
-    errors,
-    "Gebruik een beleggingshorizon groter dan 0.",
-  );
-  if (
-    preferredTaxYear !== undefined &&
-    (!Number.isFinite(preferredTaxYear) ||
-      preferredTaxYear < 2000 ||
-      preferredTaxYear > 2200)
-  ) {
-    errors.preferredTaxYear = "Gebruik een jaartal tussen 2000 en 2200.";
-  }
 
-  const profile: UserProfile | null =
+  const profile: Pick<UserProfile, "income" | "studentDebt" | "housing"> | null =
     Object.keys(errors).length === 0
       ? {
           income: {
@@ -392,49 +337,188 @@ function formStateToProfile(formValues: ProfileFormState) {
             mortgageTermYears,
             maxMortgageWithoutStudentDebt,
           },
-          savingInvesting: {
-            currentSavings,
-            targetEmergencyFund,
-            monthlyFreeCashflow,
-            expectedAnnualReturn,
-            investmentHorizonYears,
-            riskProfile:
-              hasSavingNumbers || formValues.riskProfile !== "neutral"
-                ? formValues.riskProfile
-                : undefined,
-            hasAov: formValues.hasAov ? true : undefined,
-            pensionBuildUp:
-              formValues.pensionBuildUp === "unknown"
-                ? undefined
-                : formValues.pensionBuildUp,
-          },
-          tax: {
-            preferredBox3Method:
-              hasTaxPreferences || formValues.preferredBox3Method !== "actual"
-                ? formValues.preferredBox3Method
-                : undefined,
-            hasFiscalPartner: formValues.hasFiscalPartnerTax ? true : undefined,
-            preferredTaxYear,
-          },
         }
       : null;
 
-  return {
-    errors,
-    profile,
-  };
+  return { errors, profile };
 }
 
-function FieldError({ message }: { message?: string }) {
-  if (!message) {
-    return null;
-  }
+function TextField({
+  field,
+  label,
+  value,
+  error,
+  hint,
+  placeholder,
+  onChange,
+}: {
+  field: keyof ProfileFormState;
+  label: string;
+  value: string;
+  error?: string;
+  hint?: string;
+  placeholder?: string;
+  onChange: (value: string) => void;
+}) {
+  const id = `profile-${field}`;
+  const hintId = `${id}-hint`;
+  const errorId = `${id}-error`;
+  const describedBy =
+    [hint ? hintId : null, error ? errorId : null].filter(Boolean).join(" ") ||
+    undefined;
 
-  return <p className="text-sm text-red-700">{message}</p>;
+  return (
+    <div className="grid gap-2">
+      <label
+        htmlFor={id}
+        className="text-[12px] font-medium uppercase tracking-[0.04em] text-[var(--muted)]"
+      >
+        {label}
+      </label>
+      <input
+        id={id}
+        inputMode="decimal"
+        value={value}
+        placeholder={placeholder}
+        onChange={(event) => onChange(event.target.value)}
+        aria-invalid={error ? "true" : "false"}
+        aria-describedby={describedBy}
+        className="ring-focus hair h-12 min-w-0 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
+      />
+      {hint ? (
+        <p id={hintId} className="text-[12px] leading-[1.5] text-[var(--muted)]">
+          {hint}
+        </p>
+      ) : null}
+      <FieldError id={errorId} message={error} />
+    </div>
+  );
+}
+
+function SelectField<T extends string>({
+  field,
+  label,
+  value,
+  options,
+  hint,
+  onChange,
+}: {
+  field: keyof ProfileFormState;
+  label: string;
+  value: T;
+  options: readonly { value: T; label: string }[];
+  hint?: string;
+  onChange: (value: T) => void;
+}) {
+  const id = `profile-${field}`;
+  const hintId = `${id}-hint`;
+
+  return (
+    <div className="grid gap-2">
+      <label
+        htmlFor={id}
+        className="text-[12px] font-medium uppercase tracking-[0.04em] text-[var(--muted)]"
+      >
+        {label}
+      </label>
+      <select
+        id={id}
+        value={value}
+        onChange={(event) => onChange(event.target.value as T)}
+        aria-describedby={hint ? hintId : undefined}
+        className="ring-focus hair h-12 min-w-0 rounded-md border bg-white px-4 text-[15px] text-[var(--ink)] outline-none"
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+      {hint ? (
+        <p id={hintId} className="text-[12px] leading-[1.5] text-[var(--muted)]">
+          {hint}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+function StorageChoice({
+  retention,
+  onChange,
+}: {
+  retention: ProfileRetention;
+  onChange: (retention: ProfileRetention) => void;
+}) {
+  return (
+    <fieldset className="border-t border-[var(--hair)] pt-4">
+      <legend className="text-[13px] font-semibold text-[var(--ink)]">
+        Hoe lang mogen je gegevens blijven staan?
+      </legend>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <StorageOption
+          value="session"
+          checked={retention === "session"}
+          title="Alleen dit bezoek"
+          description="Verdwijnt wanneer je deze browsersessie sluit."
+          onChange={onChange}
+        />
+        <StorageOption
+          value="device"
+          checked={retention === "device"}
+          title="Op dit apparaat"
+          description="Blijft staan totdat je het profiel zelf wist."
+          onChange={onChange}
+        />
+      </div>
+    </fieldset>
+  );
+}
+
+function StorageOption({
+  value,
+  checked,
+  title,
+  description,
+  onChange,
+}: {
+  value: ProfileRetention;
+  checked: boolean;
+  title: string;
+  description: string;
+  onChange: (retention: ProfileRetention) => void;
+}) {
+  return (
+    <label className="flex min-h-14 cursor-pointer items-start gap-3 rounded-lg border border-[var(--hair)] bg-white px-4 py-3">
+      <input
+        type="radio"
+        name="profile-retention"
+        value={value}
+        checked={checked}
+        onChange={() => onChange(value)}
+        className="mt-1 size-4 shrink-0 accent-[var(--accent)]"
+      />
+      <span>
+        <span className="block text-[13px] font-semibold text-[var(--ink)]">
+          {title}
+        </span>
+        <span className="mt-1 block text-[12px] leading-[1.5] text-[var(--muted)]">
+          {description}
+        </span>
+      </span>
+    </label>
+  );
 }
 
 export default function ProfilePage() {
-  const { profile, hasProfile, saveProfile, clearProfile } = useUserProfile();
+  const {
+    profile,
+    hasProfile,
+    retention,
+    saveProfile,
+    clearProfile,
+    setRetention,
+  } = useUserProfile();
   const [saveMessage, setSaveMessage] = useState("");
 
   if (!ENABLE_PROFILE) {
@@ -445,16 +529,12 @@ export default function ProfilePage() {
           id="main-content"
           className="page-shell min-h-[100dvh] max-w-3xl pb-10 pt-8 lg:pb-14"
         >
-          <section className="grid gap-4 rounded-[1.5rem] border hair bg-white/80 p-6 shadow-paper">
-            <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
-              Mijn profiel
-            </div>
-            <h1 className="mt-2 font-serif text-[34px] tracking-[-0.02em] text-[var(--ink)]">
+          <section className="surface-panel p-6">
+            <h1 className="font-serif text-[34px] text-[var(--ink)]">
               Profielfunctie staat tijdelijk uit
             </h1>
-            <p className="text-[14.5px] leading-[1.7] text-[var(--ink-2)]">
-              Deze functie is bewust tijdelijk uitgeschakeld. Je kunt alle tools
-              blijven gebruiken met handmatige invoer of voorbeeldwaarden.
+            <p className="mt-3 text-[14.5px] leading-[1.7] text-[var(--ink-2)]">
+              Je kunt alle tools blijven gebruiken met handmatige invoer.
             </p>
           </section>
         </main>
@@ -462,7 +542,17 @@ export default function ProfilePage() {
       </>
     );
   }
-  const formKey = profile.updatedAt ?? (hasProfile ? "profile-present" : "profile-empty");
+
+  const formKey = `${retention}-${profile.updatedAt ?? (hasProfile ? "present" : "empty")}`;
+
+  function handleRetentionChange(nextRetention: ProfileRetention) {
+    setRetention(nextRetention);
+    setSaveMessage(
+      nextRetention === "session"
+        ? "Je profiel wordt nu alleen tijdens deze browsersessie bewaard."
+        : "Je profiel blijft nu op dit apparaat staan totdat je het wist.",
+    );
+  }
 
   return (
     <>
@@ -471,36 +561,47 @@ export default function ProfilePage() {
         id="main-content"
         className="page-shell min-h-[100dvh] max-w-4xl pb-10 pt-8 lg:pb-14"
       >
-        <section className="grid gap-4 rounded-[1.5rem] border hair bg-white/80 p-6 shadow-paper">
+        <section className="surface-panel grid gap-5 p-6">
           <div>
             <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--muted)]">
-              Mijn profiel
+              Mijn gegevens
             </div>
-            <h1 className="mt-2 font-serif text-[34px] tracking-[-0.02em] text-[var(--ink)]">
+            <h1 className="mt-2 font-serif text-[34px] text-[var(--ink)]">
               Vul je basisgegevens één keer in
             </h1>
             <p className="mt-3 max-w-[62ch] text-[14.5px] leading-[1.7] text-[var(--ink-2)]">
-              Gebruik je vaak meerdere rekentools? Dan hoef je niet steeds opnieuw
-              je inkomen, DUO-gegevens of woningdoel in te vullen. Dit profiel vult
-              relevante tools automatisch voor waar dat logisch is.
+              Relevante tools nemen deze gegevens automatisch over. Je controleert
+              de ingevulde velden altijd zelf voordat je een berekening start.
             </p>
           </div>
 
-          <div className="rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
-            Je profiel wordt alleen lokaal in deze browser opgeslagen. Er wordt niets
-            naar een server gestuurd. Gebruik je een andere browser of wis je
-            browsergegevens, dan ben je dit profiel kwijt.
+          <div className="rounded-lg border border-[var(--hair)] bg-[var(--paper-soft)] px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
+            Alles blijft in deze browser. We sturen je profiel niet naar een
+            server. Sla hier geen BSN, documenten of inloggegevens op.
           </div>
+
+          <StorageChoice
+            retention={retention}
+            onChange={handleRetentionChange}
+          />
 
           <div className="flex flex-wrap items-center justify-between gap-3 text-[12.5px] text-[var(--muted)]">
             <span>Laatst bijgewerkt: {formatUpdatedAt(profile.updatedAt)}</span>
-            <span>{hasProfile ? "Profiel aanwezig" : "Nog geen opgeslagen profiel"}</span>
+            <span>
+              {hasProfile
+                ? retention === "session"
+                  ? "Tijdelijk profiel actief"
+                  : "Profiel op dit apparaat actief"
+                : "Nog geen opgeslagen profiel"}
+            </span>
           </div>
         </section>
 
         <ProfileEditor
           key={formKey}
+          existingProfile={profile}
           initialValues={profileToFormState(profile)}
+          retention={retention}
           saveMessage={saveMessage}
           onSaveMessageChange={setSaveMessage}
           onSave={saveProfile}
@@ -516,7 +617,9 @@ export default function ProfilePage() {
 }
 
 type ProfileEditorProps = {
+  existingProfile: UserProfile;
   initialValues: ProfileFormState;
+  retention: ProfileRetention;
   saveMessage: string;
   onSaveMessageChange: (message: string) => void;
   onSave: (profile: UserProfile) => UserProfile;
@@ -524,21 +627,18 @@ type ProfileEditorProps = {
 };
 
 function ProfileEditor({
+  existingProfile,
   initialValues,
+  retention,
   saveMessage,
   onSaveMessageChange,
   onSave,
   onClear,
 }: ProfileEditorProps) {
-  const [formValues, setFormValues] = useState<ProfileFormState>(initialValues);
-  const profileSteps = [
-    "Inkomen",
-    "Studieschuld",
-    "Wonen",
-    "Sparen & beleggen",
-    "Belasting",
-  ] as const;
+  const [formValues, setFormValues] = useState(initialValues);
   const [activeStep, setActiveStep] = useState(0);
+  const [didSubmitAttempt, setDidSubmitAttempt] = useState(false);
+  const errorSummaryRef = useRef<HTMLDivElement | null>(null);
   const { errors, profile: parsedProfile } = useMemo(
     () => formStateToProfile(formValues),
     [formValues],
@@ -548,589 +648,315 @@ function ProfileEditor({
     field: K,
     value: ProfileFormState[K],
   ) {
-    setFormValues((current) => ({
-      ...current,
-      [field]: value,
-    }));
+    setFormValues((current) => ({ ...current, [field]: value }));
     onSaveMessageChange("");
   }
 
-  function handleSave() {
+  function handleSave(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
     if (!parsedProfile) {
+      setDidSubmitAttempt(true);
       onSaveMessageChange("Controleer eerst de velden met een foutmelding.");
+      const firstError = Object.keys(errors)[0] as
+        | keyof ProfileFormState
+        | undefined;
+      if (firstError) {
+        setActiveStep(profileStepByField[firstError]);
+      }
+      window.requestAnimationFrame(() => errorSummaryRef.current?.focus());
       return;
     }
 
-    try {
-      const savedProfile = onSave(parsedProfile);
-      setFormValues(profileToFormState(savedProfile));
-      onSaveMessageChange("Profiel lokaal opgeslagen in deze browser.");
-    } catch {
-      onSaveMessageChange(
-        "Opslaan is niet gelukt. Controleer of lokale opslag in je browser is toegestaan.",
-      );
-    }
+    setDidSubmitAttempt(false);
+    const savedProfile = onSave({
+      ...existingProfile,
+      ...parsedProfile,
+    });
+    setFormValues(profileToFormState(savedProfile));
+    onSaveMessageChange(
+      retention === "session"
+        ? "Tijdelijk profiel opgeslagen voor deze browsersessie."
+        : "Profiel opgeslagen op dit apparaat.",
+    );
   }
 
   function handleClear() {
     onClear();
     setFormValues(defaultFormState);
-    onSaveMessageChange("Profiel uit deze browser verwijderd.");
-  }
-
-  function goToPreviousStep() {
-    setActiveStep((current) => Math.max(0, current - 1));
-  }
-
-  function goToNextStep() {
-    setActiveStep((current) => Math.min(profileSteps.length - 1, current + 1));
+    setActiveStep(0);
+    setDidSubmitAttempt(false);
+    onSaveMessageChange("Profielgegevens uit deze browser verwijderd.");
   }
 
   return (
-    <>
-      <section className="mt-6 space-y-6">
-          <div className="rounded-[1.5rem] border hair bg-white p-4 shadow-paper">
-            <div className="flex items-center justify-between gap-3 text-[12px] text-[var(--muted)]">
-              <span>
-                Stap {activeStep + 1} van {profileSteps.length}
-              </span>
-              <span>{profileSteps[activeStep]}</span>
-            </div>
-            <div className="mt-3 h-2 rounded-full bg-[var(--paper-soft)]">
-              <div
-                className="h-2 rounded-full bg-[var(--accent)] transition-all"
-                style={{
-                  width: `${((activeStep + 1) / profileSteps.length) * 100}%`,
-                }}
+    <form className="mt-6" onSubmit={handleSave} noValidate>
+      <section className="space-y-6" aria-labelledby="profile-editor-title">
+        <h2 id="profile-editor-title" className="sr-only">
+          Profielgegevens
+        </h2>
+
+        <div className="surface-panel p-4">
+          <div className="flex items-center justify-between gap-3 text-[12px] text-[var(--muted)]">
+            <span>
+              Stap {activeStep + 1} van {profileSteps.length}
+            </span>
+            <span>{profileSteps[activeStep]}</span>
+          </div>
+          <div
+            className="mt-3 h-2 rounded-full bg-[var(--paper-soft)]"
+            role="progressbar"
+            aria-label="Voortgang profiel"
+            aria-valuemin={1}
+            aria-valuemax={profileSteps.length}
+            aria-valuenow={activeStep + 1}
+          >
+            <div
+              className="h-2 rounded-full bg-[var(--accent)] transition-[width] motion-reduce:transition-none"
+              style={{
+                width: `${((activeStep + 1) / profileSteps.length) * 100}%`,
+              }}
+            />
+          </div>
+          <nav className="mt-4 flex flex-wrap gap-2" aria-label="Profielstappen">
+            {profileSteps.map((step, index) => (
+              <button
+                key={step}
+                type="button"
+                onClick={() => setActiveStep(index)}
+                aria-current={index === activeStep ? "step" : undefined}
+                className={`min-h-11 rounded-full border px-3 py-2 text-[12px] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 ${
+                  index === activeStep
+                    ? "border-[var(--ink)] bg-[var(--ink)] text-white"
+                    : "border-[var(--hair)] bg-white text-[var(--ink)] hover:bg-[var(--paper-soft)]"
+                }`}
+              >
+                {step}
+              </button>
+            ))}
+          </nav>
+        </div>
+
+        {didSubmitAttempt && Object.keys(errors).length > 0 ? (
+          <div
+            ref={errorSummaryRef}
+            tabIndex={-1}
+            role="alert"
+            className="rounded-lg border border-[var(--neg-soft)] bg-[var(--neg-soft)]/55 px-4 py-3 text-sm text-[oklch(35%_0.13_28)]"
+          >
+            Controleer de gemarkeerde velden voordat je het profiel opslaat.
+          </div>
+        ) : null}
+
+        {activeStep === 0 ? (
+          <ProfileStep title="Persoonlijk en inkomen">
+            <TextField
+              field="grossAnnualIncome"
+              label="Bruto jaarinkomen"
+              value={formValues.grossAnnualIncome}
+              error={errors.grossAnnualIncome}
+              onChange={(value) => updateField("grossAnnualIncome", value)}
+            />
+            <TextField
+              field="partnerGrossAnnualIncome"
+              label="Bruto jaarinkomen partner"
+              value={formValues.partnerGrossAnnualIncome}
+              error={errors.partnerGrossAnnualIncome}
+              placeholder="Optioneel"
+              onChange={(value) =>
+                updateField("partnerGrossAnnualIncome", value)
+              }
+            />
+            <SelectField
+              field="householdType"
+              label="Huishouden"
+              value={formValues.householdType}
+              options={[
+                { value: "unknown", label: "Nog niet ingevuld" },
+                { value: "single", label: "Alleenstaand" },
+                { value: "withPartner", label: "Met partner" },
+                { value: "family", label: "Gezin" },
+              ]}
+              onChange={(value) => updateField("householdType", value)}
+            />
+            <SelectField
+              field="employmentType"
+              label="Werksituatie"
+              value={formValues.employmentType}
+              options={employmentTypeOptions.map((value) => ({
+                value,
+                label: getEmploymentTypeLabel(value),
+              }))}
+              onChange={(value) => updateField("employmentType", value)}
+            />
+          </ProfileStep>
+        ) : null}
+
+        {activeStep === 1 ? (
+          <ProfileStep title="Studieschuld en DUO">
+            <TextField
+              field="remainingDebt"
+              label="Resterende studieschuld"
+              value={formValues.remainingDebt}
+              error={errors.remainingDebt}
+              onChange={(value) => updateField("remainingDebt", value)}
+            />
+            <TextField
+              field="currentMonthlyPayment"
+              label="Huidig DUO-maandbedrag"
+              value={formValues.currentMonthlyPayment}
+              error={errors.currentMonthlyPayment}
+              onChange={(value) => updateField("currentMonthlyPayment", value)}
+            />
+            <TextField
+              field="statutoryMonthlyPayment"
+              label="Wettelijk DUO-maandbedrag"
+              value={formValues.statutoryMonthlyPayment}
+              error={errors.statutoryMonthlyPayment}
+              hint="Alleen nodig voor sommige hypotheekberekeningen."
+              onChange={(value) =>
+                updateField("statutoryMonthlyPayment", value)
+              }
+            />
+            <SelectField
+              field="repaymentRule"
+              label="Terugbetalingsregel"
+              value={formValues.repaymentRule}
+              options={repaymentRuleOptions.map((value) => ({
+                value,
+                label: getRepaymentRuleLabel(value),
+              }))}
+              onChange={(value) => updateField("repaymentRule", value)}
+            />
+            <TextField
+              field="duoInterestRate"
+              label="DUO-rentepercentage"
+              value={formValues.duoInterestRate}
+              error={errors.duoInterestRate}
+              onChange={(value) => updateField("duoInterestRate", value)}
+            />
+            <TextField
+              field="remainingTermYears"
+              label="Resterende looptijd in jaren"
+              value={formValues.remainingTermYears}
+              error={errors.remainingTermYears}
+              onChange={(value) => updateField("remainingTermYears", value)}
+            />
+            <div className="md:col-span-2">
+              <SelectField
+                field="duoSituation"
+                label="DUO-situatie"
+                value={formValues.duoSituation}
+                options={duoSituationOptions.map((value) => ({
+                  value,
+                  label: getDuoSituationLabel(value),
+                }))}
+                hint={`${getGlossaryExplanation("draagkracht")} ${getGlossaryExplanation("aflossingsvrijePeriode")}`}
+                onChange={(value) => updateField("duoSituation", value)}
               />
             </div>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {profileSteps.map((step, index) => (
-                <button
-                  key={step}
-                  type="button"
-                  onClick={() => setActiveStep(index)}
-                  className={`rounded-full border px-3 py-2 text-[12px] transition ${
-                    index === activeStep
-                      ? "border-[var(--ink)] bg-[var(--ink)] text-white"
-                      : "border-[var(--hair)] bg-white text-[var(--ink)] hover:bg-[var(--paper-soft)]"
-                  }`}
-                >
-                  {step}
-                </button>
-              ))}
+          </ProfileStep>
+        ) : null}
+
+        {activeStep === 2 ? (
+          <ProfileStep title="Wonen">
+            <TextField
+              field="targetHomePrice"
+              label="Gewenste woningprijs"
+              value={formValues.targetHomePrice}
+              error={errors.targetHomePrice}
+              onChange={(value) => updateField("targetHomePrice", value)}
+            />
+            <TextField
+              field="ownFunds"
+              label="Eigen geld"
+              value={formValues.ownFunds}
+              error={errors.ownFunds}
+              onChange={(value) => updateField("ownFunds", value)}
+            />
+            <TextField
+              field="mortgageRate"
+              label="Hypotheekrentepercentage"
+              value={formValues.mortgageRate}
+              error={errors.mortgageRate}
+              onChange={(value) => updateField("mortgageRate", value)}
+            />
+            <TextField
+              field="mortgageTermYears"
+              label="Hypotheeklooptijd in jaren"
+              value={formValues.mortgageTermYears}
+              error={errors.mortgageTermYears}
+              onChange={(value) => updateField("mortgageTermYears", value)}
+            />
+            <div className="md:col-span-2">
+              <TextField
+                field="maxMortgageWithoutStudentDebt"
+                label="Maximale hypotheek zonder studieschuld"
+                value={formValues.maxMortgageWithoutStudentDebt}
+                error={errors.maxMortgageWithoutStudentDebt}
+                placeholder="Volgens adviseur of rekenhulp"
+                onChange={(value) =>
+                  updateField("maxMortgageWithoutStudentDebt", value)
+                }
+              />
             </div>
-          </div>
+          </ProfileStep>
+        ) : null}
+      </section>
 
-          {activeStep === 0 ? (
-          <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
-            <h2 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
-              Persoonlijk en inkomen
-            </h2>
-            <div className="mt-5 grid gap-5 md:grid-cols-2">
-              <label className="grid gap-2">
-                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-                  Bruto jaarinkomen gebruiker
-                </span>
-                <input
-                  inputMode="decimal"
-                  value={formValues.grossAnnualIncome}
-                  onChange={(event) =>
-                    updateField("grossAnnualIncome", event.target.value)
-                  }
-                  className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-                />
-                <FieldError message={errors.grossAnnualIncome} />
-              </label>
+      <section className="surface-panel mt-6 p-6" aria-label="Profielacties">
+        <div className="mb-4 flex flex-wrap items-center gap-3">
+          <Btn
+            type="button"
+            kind="outline"
+            disabled={activeStep === 0}
+            onClick={() => setActiveStep((current) => Math.max(0, current - 1))}
+          >
+            Vorige stap
+          </Btn>
+          <Btn
+            type="button"
+            kind="outline"
+            disabled={activeStep === profileSteps.length - 1}
+            onClick={() =>
+              setActiveStep((current) =>
+                Math.min(profileSteps.length - 1, current + 1),
+              )
+            }
+          >
+            Volgende stap
+          </Btn>
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <Btn type="submit">Profiel opslaan</Btn>
+          <Btn type="button" kind="outline" onClick={handleClear}>
+            Profiel wissen
+          </Btn>
+        </div>
+        {saveMessage ? (
+          <p
+            className="mt-4 text-[13.5px] leading-[1.65] text-[var(--muted)]"
+            role="status"
+            aria-live="polite"
+          >
+            {saveMessage}
+          </p>
+        ) : null}
+      </section>
+    </form>
+  );
+}
 
-              <label className="grid gap-2">
-                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-                  Bruto jaarinkomen partner
-                </span>
-                <input
-                  inputMode="decimal"
-                  value={formValues.partnerGrossAnnualIncome}
-                  onChange={(event) =>
-                    updateField("partnerGrossAnnualIncome", event.target.value)
-                  }
-                  placeholder="Optioneel"
-                  className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-                />
-                <FieldError message={errors.partnerGrossAnnualIncome} />
-              </label>
-
-              <label className="grid gap-2 md:col-span-2">
-                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-                  Huishoudenstype
-                </span>
-                <select
-                  value={formValues.householdType}
-                  onChange={(event) =>
-                    updateField("householdType", event.target.value as HouseholdType)
-                  }
-                  className="ring-focus hair h-12 rounded-md border bg-white px-4 text-[15px] text-[var(--ink)] outline-none"
-                >
-                  <option value="unknown">Onbekend / nog niet ingevuld</option>
-                  <option value="single">Alleenstaand</option>
-                  <option value="withPartner">Met partner</option>
-                  <option value="family">Gezin</option>
-                </select>
-              </label>
-
-              <label className="grid gap-2 md:col-span-2">
-                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-                  Werksituatie
-                </span>
-                <select
-                  value={formValues.employmentType}
-                  onChange={(event) =>
-                    updateField("employmentType", event.target.value as EmploymentType)
-                  }
-                  className="ring-focus hair h-12 rounded-md border bg-white px-4 text-[15px] text-[var(--ink)] outline-none"
-                >
-                  {employmentTypeOptions.map((value) => (
-                    <option key={value} value={value}>
-                      {getEmploymentTypeLabel(value)}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
-          </div>
-          ) : null}
-
-          {activeStep === 1 ? (
-          <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
-            <h2 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
-              Studieschuld en DUO
-            </h2>
-            <div className="mt-5 grid gap-5 md:grid-cols-2">
-              <label className="grid gap-2">
-                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-                  Resterende studieschuld
-                </span>
-                <input
-                  inputMode="decimal"
-                  value={formValues.remainingDebt}
-                  onChange={(event) => updateField("remainingDebt", event.target.value)}
-                  className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-                />
-                <FieldError message={errors.remainingDebt} />
-              </label>
-
-              <label className="grid gap-2">
-                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-                  Huidig DUO-maandbedrag
-                </span>
-                <input
-                  inputMode="decimal"
-                  value={formValues.currentMonthlyPayment}
-                  onChange={(event) =>
-                    updateField("currentMonthlyPayment", event.target.value)
-                  }
-                  className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-                />
-                <FieldError message={errors.currentMonthlyPayment} />
-              </label>
-
-              <label className="grid gap-2">
-                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-                  Wettelijk DUO-maandbedrag
-                </span>
-                <input
-                  inputMode="decimal"
-                  value={formValues.statutoryMonthlyPayment}
-                  onChange={(event) =>
-                    updateField("statutoryMonthlyPayment", event.target.value)
-                  }
-                  placeholder="Optioneel"
-                  className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-                />
-                <FieldError message={errors.statutoryMonthlyPayment} />
-              </label>
-
-              <label className="grid gap-2">
-                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-                  Terugbetalingsregel
-                </span>
-                <select
-                  value={formValues.repaymentRule}
-                  onChange={(event) =>
-                    updateField(
-                      "repaymentRule",
-                      event.target.value as ProfileRepaymentRule,
-                    )
-                  }
-                  className="ring-focus hair h-12 rounded-md border bg-white px-4 text-[15px] text-[var(--ink)] outline-none"
-                >
-                  {repaymentRuleOptions.map((value) => (
-                    <option key={value} value={value}>
-                      {getRepaymentRuleLabel(value)}
-                    </option>
-                  ))}
-                </select>
-              </label>
-
-              <label className="grid gap-2">
-                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-                  DUO-rentepercentage
-                </span>
-                <input
-                  inputMode="decimal"
-                  value={formValues.duoInterestRate}
-                  onChange={(event) =>
-                    updateField("duoInterestRate", event.target.value)
-                  }
-                  className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-                />
-                <FieldError message={errors.duoInterestRate} />
-              </label>
-
-              <label className="grid gap-2">
-                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-                  Resterende looptijd
-                </span>
-                <input
-                  inputMode="decimal"
-                  value={formValues.remainingTermYears}
-                  onChange={(event) =>
-                    updateField("remainingTermYears", event.target.value)
-                  }
-                  className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-                />
-                <FieldError message={errors.remainingTermYears} />
-              </label>
-
-              <label className="grid gap-2 md:col-span-2">
-                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-                  DUO-situatie
-                </span>
-                <select
-                  value={formValues.duoSituation}
-                  onChange={(event) =>
-                    updateField(
-                      "duoSituation",
-                      event.target.value as ProfileDuoSituation,
-                    )
-                  }
-                  className="ring-focus hair h-12 rounded-md border bg-white px-4 text-[15px] text-[var(--ink)] outline-none"
-                >
-                  {duoSituationOptions.map((value) => (
-                    <option key={value} value={value}>
-                      {getDuoSituationLabel(value)}
-                    </option>
-                  ))}
-                </select>
-                <p className="text-[12px] leading-[1.5] text-[var(--muted)]">
-                  {getGlossaryExplanation("draagkracht")}{" "}
-                  {getGlossaryExplanation("aflossingsvrijePeriode")}
-                </p>
-              </label>
-            </div>
-          </div>
-          ) : null}
-
-          {activeStep === 2 ? (
-          <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
-            <h2 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
-              Wonen
-            </h2>
-            <div className="mt-5 grid gap-5 md:grid-cols-2">
-              <label className="grid gap-2">
-                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-                  Gewenste woningprijs
-                </span>
-                <input
-                  inputMode="decimal"
-                  value={formValues.targetHomePrice}
-                  onChange={(event) =>
-                    updateField("targetHomePrice", event.target.value)
-                  }
-                  className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-                />
-                <FieldError message={errors.targetHomePrice} />
-              </label>
-
-              <label className="grid gap-2">
-                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-                  Eigen geld
-                </span>
-                <input
-                  inputMode="decimal"
-                  value={formValues.ownFunds}
-                  onChange={(event) => updateField("ownFunds", event.target.value)}
-                  className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-                />
-                <FieldError message={errors.ownFunds} />
-              </label>
-
-              <label className="grid gap-2">
-                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-                  Hypotheekrentepercentage
-                </span>
-                <input
-                  inputMode="decimal"
-                  value={formValues.mortgageRate}
-                  onChange={(event) => updateField("mortgageRate", event.target.value)}
-                  className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-                />
-                <FieldError message={errors.mortgageRate} />
-              </label>
-
-              <label className="grid gap-2">
-                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-                  Hypotheeklooptijd
-                </span>
-                <input
-                  inputMode="decimal"
-                  value={formValues.mortgageTermYears}
-                  onChange={(event) =>
-                    updateField("mortgageTermYears", event.target.value)
-                  }
-                  className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-                />
-                <FieldError message={errors.mortgageTermYears} />
-              </label>
-
-              <label className="grid gap-2 md:col-span-2">
-                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-                  Maximale hypotheek zonder studieschuld
-                </span>
-                <input
-                  inputMode="decimal"
-                  value={formValues.maxMortgageWithoutStudentDebt}
-                  onChange={(event) =>
-                    updateField(
-                      "maxMortgageWithoutStudentDebt",
-                      event.target.value,
-                    )
-                  }
-                  placeholder="Volgens adviseur of rekenhulp"
-                  className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-                />
-                <FieldError message={errors.maxMortgageWithoutStudentDebt} />
-              </label>
-            </div>
-          </div>
-          ) : null}
-
-          {activeStep === 3 ? (
-          <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
-            <h2 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
-              Sparen en beleggen
-            </h2>
-            <div className="mt-5 grid gap-5 md:grid-cols-2">
-              <label className="grid gap-2">
-                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-                  Huidige buffer / spaargeld
-                </span>
-                <input
-                  inputMode="decimal"
-                  value={formValues.currentSavings}
-                  onChange={(event) =>
-                    updateField("currentSavings", event.target.value)
-                  }
-                  className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-                />
-                <FieldError message={errors.currentSavings} />
-              </label>
-
-              <label className="grid gap-2">
-                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-                  Gewenste minimale buffer
-                </span>
-                <input
-                  inputMode="decimal"
-                  value={formValues.targetEmergencyFund}
-                  onChange={(event) =>
-                    updateField("targetEmergencyFund", event.target.value)
-                  }
-                  className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-                />
-                <FieldError message={errors.targetEmergencyFund} />
-              </label>
-
-              <label className="grid gap-2">
-                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-                  Maandelijkse vrije ruimte
-                </span>
-                <input
-                  inputMode="decimal"
-                  value={formValues.monthlyFreeCashflow}
-                  onChange={(event) =>
-                    updateField("monthlyFreeCashflow", event.target.value)
-                  }
-                  className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-                />
-                <FieldError message={errors.monthlyFreeCashflow} />
-              </label>
-
-              <label className="grid gap-2">
-                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-                  Verwacht jaarlijks rendement
-                </span>
-                <input
-                  inputMode="decimal"
-                  value={formValues.expectedAnnualReturn}
-                  onChange={(event) =>
-                    updateField("expectedAnnualReturn", event.target.value)
-                  }
-                  className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-                />
-                <FieldError message={errors.expectedAnnualReturn} />
-              </label>
-
-              <label className="grid gap-2">
-                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-                  Beleggingshorizon in jaren
-                </span>
-                <input
-                  inputMode="decimal"
-                  value={formValues.investmentHorizonYears}
-                  onChange={(event) =>
-                    updateField("investmentHorizonYears", event.target.value)
-                  }
-                  className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-                />
-                <FieldError message={errors.investmentHorizonYears} />
-              </label>
-
-              <label className="grid gap-2">
-                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-                  Risicoprofiel
-                </span>
-                <select
-                  value={formValues.riskProfile}
-                  onChange={(event) =>
-                    updateField("riskProfile", event.target.value as RiskProfile)
-                  }
-                  className="ring-focus hair h-12 rounded-md border bg-white px-4 text-[15px] text-[var(--ink)] outline-none"
-                >
-                  <option value="conservative">Voorzichtig</option>
-                  <option value="neutral">Neutraal</option>
-                  <option value="offensive">Offensief</option>
-                </select>
-              </label>
-
-              <label className="grid gap-2">
-                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-                  Arbeidsongeschiktheidsverzekering (AOV)
-                </span>
-                <span className="flex items-center gap-3 text-[14px] text-[var(--ink)]">
-                  <input
-                    type="checkbox"
-                    checked={formValues.hasAov}
-                    onChange={(event) => updateField("hasAov", event.target.checked)}
-                    className="size-4 accent-[var(--accent)]"
-                  />
-                  Ja, ik houd rekening met AOV in mijn planning
-                </span>
-              </label>
-
-              <label className="grid gap-2">
-                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-                  Pensioenopbouw
-                </span>
-                <select
-                  value={formValues.pensionBuildUp}
-                  onChange={(event) =>
-                    updateField("pensionBuildUp", event.target.value as PensionBuildUp)
-                  }
-                  className="ring-focus hair h-12 rounded-md border bg-white px-4 text-[15px] text-[var(--ink)] outline-none"
-                >
-                  <option value="unknown">Onbekend / nog niet ingevuld</option>
-                  <option value="active">Actief via werkgever of regeling</option>
-                  <option value="limited">Beperkt of onregelmatig</option>
-                  <option value="none">Nog geen opbouw</option>
-                </select>
-              </label>
-            </div>
-          </div>
-          ) : null}
-
-          {activeStep === 4 ? (
-          <div className="rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
-            <h2 className="font-serif text-[24px] tracking-[-0.02em] text-[var(--ink)]">
-              Belastingvoorkeuren
-            </h2>
-            <div className="mt-5 grid gap-5 md:grid-cols-2">
-              <label className="grid gap-2">
-                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-                  Box 3-methode (default in tools)
-                </span>
-                <select
-                  value={formValues.preferredBox3Method}
-                  onChange={(event) =>
-                    updateField(
-                      "preferredBox3Method",
-                      event.target.value as Box3MethodPreference,
-                    )
-                  }
-                  className="ring-focus hair h-12 rounded-md border bg-white px-4 text-[15px] text-[var(--ink)] outline-none"
-                >
-                  <option value="actual">Werkelijk rendement (default)</option>
-                  <option value="forfaitary">Forfaitair rendement</option>
-                </select>
-              </label>
-
-              <label className="grid gap-2">
-                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-                  Fiscale partner voor box 3
-                </span>
-                <span className="flex items-center gap-3 text-[14px] text-[var(--ink)]">
-                  <input
-                    type="checkbox"
-                    checked={formValues.hasFiscalPartnerTax}
-                    onChange={(event) =>
-                      updateField("hasFiscalPartnerTax", event.target.checked)
-                    }
-                    className="size-4 accent-[var(--accent)]"
-                  />
-                  Ja, reken standaard met partnervrijstelling
-                </span>
-              </label>
-
-              <label className="grid gap-2 md:col-span-2">
-                <span className="text-[12px] uppercase tracking-[0.04em] text-[var(--muted)]">
-                  Voorkeursjaar belastingaannames
-                </span>
-                <input
-                  inputMode="numeric"
-                  value={formValues.preferredTaxYear}
-                  onChange={(event) => updateField("preferredTaxYear", event.target.value)}
-                  placeholder="Bijvoorbeeld 2026"
-                  className="ring-focus hair h-12 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
-                />
-                <FieldError message={errors.preferredTaxYear} />
-              </label>
-            </div>
-          </div>
-          ) : null}
-        </section>
-
-        <section className="mt-6 rounded-[1.5rem] border hair bg-white p-6 shadow-paper">
-          <div className="mb-4 flex flex-wrap items-center gap-3">
-            <Btn type="button" kind="outline" onClick={goToPreviousStep}>
-              Vorige stap
-            </Btn>
-            <Btn type="button" kind="outline" onClick={goToNextStep}>
-              Volgende stap
-            </Btn>
-          </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <Btn type="button" onClick={handleSave}>
-              Profiel opslaan
-            </Btn>
-            <Btn type="button" kind="outline" onClick={handleClear}>
-              Profiel wissen
-            </Btn>
-          </div>
-          {saveMessage ? (
-            <p className="mt-4 text-[13.5px] leading-[1.65] text-[var(--muted)]">
-              {saveMessage}
-            </p>
-          ) : null}
-        </section>
-    </>
+function ProfileStep({
+  title,
+  children,
+}: {
+  title: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className="surface-panel p-6">
+      <h3 className="font-serif text-[24px] text-[var(--ink)]">{title}</h3>
+      <div className="mt-5 grid gap-5 md:grid-cols-2">{children}</div>
+    </section>
   );
 }

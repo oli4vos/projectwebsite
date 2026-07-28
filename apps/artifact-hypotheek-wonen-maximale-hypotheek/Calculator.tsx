@@ -16,6 +16,9 @@ import { ToolActionButton } from "@/components/tool/ToolActionButton";
 import { ToolNextSteps } from "@/components/tool/ToolNextSteps";
 import { useMobileFieldFlow } from "@/hooks/useMobileFieldFlow";
 import { useSubmittedCalculation } from "@/hooks/useSubmittedCalculation";
+import { useUserProfile } from "@/hooks/useUserProfile";
+import { createProfilePrefillState } from "@/lib/profile-prefill";
+import { getMaxMortgageDefaultsFromProfile } from "@/lib/profile-tool-mapping";
 import { getToolNextSteps } from "@/lib/tool-journeys";
 import {
   consumeDuoMortgageTransfer,
@@ -141,7 +144,35 @@ function SelectField({
   );
 }
 
+type CalculatorContentProps = {
+  initialValues: MortgageFormState;
+  hasRelevantProfileValues: boolean;
+};
+
 export default function Calculator() {
+  const { profile, hasProfile } = useUserProfile();
+  const profilePatch = getMaxMortgageDefaultsFromProfile(profile);
+  const { initialValues, profileKey, hasRelevantProfileValues } =
+    createProfilePrefillState<MortgageFormState>({
+      defaultValues,
+      profilePatch,
+      hasProfile,
+      profileUpdatedAt: profile.updatedAt,
+    });
+
+  return (
+    <CalculatorContent
+      key={profileKey}
+      initialValues={initialValues}
+      hasRelevantProfileValues={hasRelevantProfileValues}
+    />
+  );
+}
+
+function CalculatorContent({
+  initialValues,
+  hasRelevantProfileValues,
+}: CalculatorContentProps) {
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
   const [duoTransferMessage, setDuoTransferMessage] = useState("");
   const {
@@ -153,9 +184,8 @@ export default function Calculator() {
     submitContextMessage,
     submitValues,
     replaceValues,
-    reset,
   } =
-    useSubmittedCalculation<MortgageFormState>(defaultValues);
+    useSubmittedCalculation<MortgageFormState>(initialValues);
   const formValidation = validateMortgageForm(formValues);
   const submittedValidation = submittedValues ? validateMortgageForm(submittedValues) : null;
   const result = submittedValidation?.parsed
@@ -297,11 +327,17 @@ export default function Calculator() {
             <ToolActionButton
               type="button"
               variant="secondary"
-              onClick={() => reset("Invoer gewist.")}
+              onClick={() => replaceValues(defaultValues, "Invoer gewist.")}
             >
               Wis invoer
             </ToolActionButton>
           </div>
+          {hasRelevantProfileValues ? (
+            <p className="mt-3 text-[13px] leading-[1.6] text-[var(--muted)]">
+              Inkomen, woninggegevens en relevante DUO-bedragen zijn ingevuld
+              vanuit je profiel. Controleer ze voordat je berekent.
+            </p>
+          ) : null}
           {isExampleInput ? <ExampleValuesNotice /> : null}
         </div>
       }

@@ -8,6 +8,11 @@ describe("parseFeatureFlag", () => {
     expect(parseFeatureFlag("   ")).toBe(false);
   });
 
+  it("supports a default for enabled-by-default features", () => {
+    expect(parseFeatureFlag(undefined, true)).toBe(true);
+    expect(parseFeatureFlag("0", true)).toBe(false);
+  });
+
   it("supports 1/true for enabled values", () => {
     expect(parseFeatureFlag("1")).toBe(true);
     expect(parseFeatureFlag("true")).toBe(true);
@@ -20,4 +25,3 @@ describe("parseFeatureFlag", () => {
     expect(parseFeatureFlag("yes")).toBe(false);
   });
 });
-
