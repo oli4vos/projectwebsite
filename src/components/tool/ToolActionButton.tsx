@@ -1,5 +1,9 @@
 import Link from "next/link";
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import type {
+  ButtonHTMLAttributes,
+  MouseEventHandler,
+  ReactNode,
+} from "react";
 
 type ToolActionButtonVariant = "secondary" | "accent" | "submit";
 type ToolActionButtonSize = "sm" | "md";
@@ -59,6 +63,7 @@ type ToolActionLinkButtonProps = {
   size?: ToolActionButtonSize;
   full?: boolean;
   className?: string;
+  onClick?: MouseEventHandler<HTMLAnchorElement>;
 };
 
 export function ToolActionLinkButton({
@@ -68,10 +73,12 @@ export function ToolActionLinkButton({
   size = "sm",
   full = false,
   className,
+  onClick,
 }: ToolActionLinkButtonProps) {
   return (
     <Link
       href={href}
+      onClick={onClick}
       className={`${classesFor(variant, size, full)} ${className ?? ""}`.trim()}
       style={styleFor(variant)}
     >

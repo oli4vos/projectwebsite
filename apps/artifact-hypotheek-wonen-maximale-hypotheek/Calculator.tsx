@@ -13,13 +13,16 @@ import {
   ResultContextNotice,
 } from "@/components/tool/CalculationContextNotice";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
+import { ToolHandoffNotice } from "@/components/tool/ToolHandoffNotice";
 import { ToolNextSteps } from "@/components/tool/ToolNextSteps";
 import { useMobileFieldFlow } from "@/hooks/useMobileFieldFlow";
 import { useSubmittedCalculation } from "@/hooks/useSubmittedCalculation";
+import { useToolHandoff } from "@/hooks/useToolHandoff";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { createProfilePrefillState } from "@/lib/profile-prefill";
 import { getMaxMortgageDefaultsFromProfile } from "@/lib/profile-tool-mapping";
 import { getToolNextSteps } from "@/lib/tool-journeys";
+import { mergeProfilePatch } from "@/lib/user-profile";
 import {
   consumeDuoMortgageTransfer,
   createDuoMortgageTransfer,
@@ -147,24 +150,37 @@ function SelectField({
 type CalculatorContentProps = {
   initialValues: MortgageFormState;
   hasRelevantProfileValues: boolean;
+  handoff:
+    | {
+        sourceTitle: string;
+        fieldLabels: string[];
+      }
+    | null;
 };
 
 export default function Calculator() {
   const { profile, hasProfile } = useUserProfile();
-  const profilePatch = getMaxMortgageDefaultsFromProfile(profile);
+  const handoff = useToolHandoff(
+    "artifact-hypotheek-wonen-maximale-hypotheek",
+  );
+  const effectiveProfile = handoff
+    ? mergeProfilePatch(profile, handoff.profilePatch)
+    : profile;
+  const profilePatch = getMaxMortgageDefaultsFromProfile(effectiveProfile);
   const { initialValues, profileKey, hasRelevantProfileValues } =
     createProfilePrefillState<MortgageFormState>({
       defaultValues,
       profilePatch,
-      hasProfile,
+      hasProfile: hasProfile || Boolean(handoff),
       profileUpdatedAt: profile.updatedAt,
     });
 
   return (
     <CalculatorContent
-      key={profileKey}
+      key={handoff ? `handoff-${handoff.transferId}` : profileKey}
       initialValues={initialValues}
       hasRelevantProfileValues={hasRelevantProfileValues}
+      handoff={handoff}
     />
   );
 }
@@ -172,6 +188,7 @@ export default function Calculator() {
 function CalculatorContent({
   initialValues,
   hasRelevantProfileValues,
+  handoff,
 }: CalculatorContentProps) {
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
   const [duoTransferMessage, setDuoTransferMessage] = useState("");
@@ -332,7 +349,15 @@ function CalculatorContent({
               Wis invoer
             </ToolActionButton>
           </div>
-          {hasRelevantProfileValues ? (
+          {handoff ? (
+            <div className="mt-3">
+              <ToolHandoffNotice
+                sourceTitle={handoff.sourceTitle}
+                fieldLabels={handoff.fieldLabels}
+              />
+            </div>
+          ) : null}
+          {hasRelevantProfileValues && !handoff ? (
             <p className="mt-3 text-[13px] leading-[1.6] text-[var(--muted)]">
               Inkomen, woninggegevens en relevante DUO-bedragen zijn ingevuld
               vanuit je profiel. Controleer ze voordat je berekent.

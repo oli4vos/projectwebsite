@@ -14,7 +14,9 @@ import {
   ResultContextNotice,
 } from "@/components/tool/CalculationContextNotice";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
+import { ToolHandoffNotice } from "@/components/tool/ToolHandoffNotice";
 import { ToolNextSteps } from "@/components/tool/ToolNextSteps";
+import { useToolHandoff } from "@/hooks/useToolHandoff";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { getRepaymentRuleLabel } from "@/lib/copy-glossary";
 import {
@@ -27,7 +29,9 @@ import {
 } from "@/lib/duo/debt-parts-form";
 import { createProfilePrefillState } from "@/lib/profile-prefill";
 import { getDuoExtraRepaymentDefaultsFromProfile } from "@/lib/profile-tool-mapping";
+import { createStudentDebtProfilePatch } from "@/lib/profile-result-mapping";
 import { getToolNextSteps } from "@/lib/tool-journeys";
+import { mergeProfilePatch } from "@/lib/user-profile";
 import {
   calculateDuoExtraRepaymentView,
   createDuoExtraRepaymentDefaultValues,
@@ -90,24 +94,36 @@ function MoneyField({ id, label, value, error, hint, onChange }: MoneyFieldProps
 type DuoExtraAflossenContentProps = {
   initialValues: DuoExtraRepaymentFormValues;
   hasRelevantProfileValues: boolean;
+  handoff:
+    | {
+        sourceTitle: string;
+        fieldLabels: string[];
+      }
+    | null;
 };
 
 export default function DuoExtraAflossenCalculator() {
   const { profile, hasProfile } = useUserProfile();
-  const profilePatch = getDuoExtraRepaymentDefaultsFromProfile(profile);
+  const handoff = useToolHandoff("duo-extra-aflossen");
+  const effectiveProfile = handoff
+    ? mergeProfilePatch(profile, handoff.profilePatch)
+    : profile;
+  const profilePatch =
+    getDuoExtraRepaymentDefaultsFromProfile(effectiveProfile);
   const { initialValues, profileKey, hasRelevantProfileValues } =
     createProfilePrefillState<DuoExtraRepaymentFormValues>({
       defaultValues: createEmptyDuoExtraRepaymentValues(),
       profilePatch,
-      hasProfile,
+      hasProfile: hasProfile || Boolean(handoff),
       profileUpdatedAt: profile.updatedAt,
     });
 
   return (
     <DuoExtraAflossenContent
-      key={profileKey}
+      key={handoff ? `handoff-${handoff.transferId}` : profileKey}
       initialValues={initialValues}
       hasRelevantProfileValues={hasRelevantProfileValues}
+      handoff={handoff}
     />
   );
 }
@@ -115,6 +131,7 @@ export default function DuoExtraAflossenCalculator() {
 function DuoExtraAflossenContent({
   initialValues,
   hasRelevantProfileValues,
+  handoff,
 }: DuoExtraAflossenContentProps) {
   const exampleValues = useMemo(
     () => createDuoExtraRepaymentDefaultValues(),
@@ -325,7 +342,13 @@ function DuoExtraAflossenContent({
         </select>
       </label>
 
-      {hasRelevantProfileValues ? (
+      {handoff ? (
+        <ToolHandoffNotice
+          sourceTitle={handoff.sourceTitle}
+          fieldLabels={handoff.fieldLabels}
+        />
+      ) : null}
+      {hasRelevantProfileValues && !handoff ? (
         <p className="text-[13px] leading-[1.6] text-[var(--muted)]">
           Je studieschuldgegevens zijn ingevuld vanuit je profiel. Controleer ze
           voordat je berekent.
@@ -380,7 +403,31 @@ function DuoExtraAflossenContent({
           tone="pos"
         />
       </div>
-      <ToolNextSteps {...nextSteps} />
+      <ToolNextSteps
+        {...nextSteps}
+        handoff={{
+          sourceTool: "duo-extra-aflossen",
+          profilePatch: createStudentDebtProfilePatch({
+            remainingDebt: view.result.newRemainingDebt,
+            statutoryMonthlyPayment:
+              view.result.newRequiredMonthlyPayment,
+            mortgageAssessmentMonthlyPayment:
+              view.result.newRequiredMonthlyPayment,
+            repaymentRule: view.result.repaymentRule,
+            duoInterestRate: view.annualInterestRate,
+            duoRateYear: view.duoRateYear,
+            remainingTermYears: view.result.remainingTermYearsUsed,
+            currentMonthlyPayment:
+              view.result.effectiveNewMonthlyPayment,
+          }),
+          fieldLabels: [
+            "schuld na eenmalige aflossing",
+            "nieuw maandbedrag",
+            "terugbetalingsregel",
+            "DUO-rente",
+          ],
+        }}
+      />
 
       <DisclosureSection
         title="Volledige berekening"

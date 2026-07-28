@@ -1,4 +1,12 @@
+"use client";
+
+import type { MouseEvent } from "react";
 import { ToolActionLinkButton } from "@/components/tool/ToolActionButton";
+import {
+  createToolHandoff,
+  getToolHandoffUrl,
+} from "@/lib/tool-handoff";
+import type { UserProfile } from "@/lib/user-profile";
 
 type ToolNextStep = {
   href: string;
@@ -10,6 +18,11 @@ type ToolNextStepsProps = {
   description: string;
   primary: ToolNextStep;
   secondary?: ToolNextStep[];
+  handoff?: {
+    sourceTool: string;
+    profilePatch: Partial<UserProfile>;
+    fieldLabels: string[];
+  };
 };
 
 export function ToolNextSteps({
@@ -17,7 +30,41 @@ export function ToolNextSteps({
   description,
   primary,
   secondary = [],
+  handoff,
 }: ToolNextStepsProps) {
+  function handleNavigation(
+    event: MouseEvent<HTMLAnchorElement>,
+    action: ToolNextStep,
+  ) {
+    if (
+      !handoff ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    ) {
+      return;
+    }
+
+    const targetTool = /^\/apps\/([^/?#]+)/.exec(action.href)?.[1];
+    if (!targetTool) {
+      return;
+    }
+
+    const transfer = createToolHandoff({
+      ...handoff,
+      targetTool,
+    });
+    if (!transfer.ok) {
+      return;
+    }
+
+    event.preventDefault();
+    window.location.assign(
+      getToolHandoffUrl(action.href, transfer.data.transferId),
+    );
+  }
+
   return (
     <aside
       aria-label="Volgende stappen"
@@ -33,7 +80,12 @@ export function ToolNextSteps({
         {description}
       </p>
       <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-        <ToolActionLinkButton href={primary.href} variant="accent" size="md">
+        <ToolActionLinkButton
+          href={primary.href}
+          variant="accent"
+          size="md"
+          onClick={(event) => handleNavigation(event, primary)}
+        >
           {primary.label}
         </ToolActionLinkButton>
       </div>
@@ -49,6 +101,7 @@ export function ToolNextSteps({
                 href={action.href}
                 variant="secondary"
                 size="md"
+                onClick={(event) => handleNavigation(event, action)}
               >
                 {action.label}
               </ToolActionLinkButton>

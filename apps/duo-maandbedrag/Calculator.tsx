@@ -12,7 +12,9 @@ import {
   ResultContextNotice,
 } from "@/components/tool/CalculationContextNotice";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
+import { ToolHandoffNotice } from "@/components/tool/ToolHandoffNotice";
 import { ToolNextSteps } from "@/components/tool/ToolNextSteps";
+import { useToolHandoff } from "@/hooks/useToolHandoff";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { getRepaymentRuleLabel } from "@/lib/copy-glossary";
 import { ENABLE_PROFILE } from "@/lib/feature-flags";
@@ -29,7 +31,10 @@ import {
 } from "@/lib/profile-prefill";
 import { getDuoMonthlyPaymentDefaultsFromProfile } from "@/lib/profile-tool-mapping";
 import { createStudentDebtProfilePatch } from "@/lib/profile-result-mapping";
-import type { UserProfile } from "@/lib/user-profile";
+import {
+  mergeProfilePatch,
+  type UserProfile,
+} from "@/lib/user-profile";
 import {
   calculateDuoMonthlyPaymentView,
   createDuoMortgageAssessmentTransferCandidate,
@@ -110,24 +115,37 @@ type DuoMaandbedragContentProps = {
   initialValues: DuoMonthlyPaymentFormValues;
   hasRelevantProfileValues: boolean;
   onSaveToProfile: (patch: Partial<UserProfile>) => UserProfile;
+  handoff:
+    | {
+        sourceTitle: string;
+        fieldLabels: string[];
+      }
+    | null;
 };
 
 export default function DuoMaandbedragCalculator() {
   const { profile, hasProfile, mergeProfile } = useUserProfile();
-  const profilePatch = getDuoMonthlyPaymentDefaultsFromProfile(profile);
+  const handoff = useToolHandoff("duo-maandbedrag");
+  const effectiveProfile = handoff
+    ? mergeProfilePatch(profile, handoff.profilePatch)
+    : profile;
+  const profilePatch =
+    getDuoMonthlyPaymentDefaultsFromProfile(effectiveProfile);
   const { initialValues, hasRelevantProfileValues } =
     createProfilePrefillState<DuoMonthlyPaymentFormValues>({
       defaultValues: createEmptyDuoMonthlyPaymentValues(),
       profilePatch,
-      hasProfile,
+      hasProfile: hasProfile || Boolean(handoff),
       profileUpdatedAt: profile.updatedAt,
     });
 
   return (
     <DuoMaandbedragContent
+      key={handoff ? `handoff-${handoff.transferId}` : "standard"}
       initialValues={initialValues}
       hasRelevantProfileValues={hasRelevantProfileValues}
       onSaveToProfile={mergeProfile}
+      handoff={handoff}
     />
   );
 }
@@ -136,6 +154,7 @@ function DuoMaandbedragContent({
   initialValues,
   hasRelevantProfileValues,
   onSaveToProfile,
+  handoff,
 }: DuoMaandbedragContentProps) {
   const exampleValues = useMemo(
     () => createDuoMonthlyPaymentDefaultValues(),
@@ -461,11 +480,17 @@ function DuoMaandbedragContent({
         </div>
       </details>
 
-      {hasRelevantProfileValues ? (
+      {hasRelevantProfileValues && !handoff ? (
         <p className="text-[13px] leading-[1.6] text-[var(--muted)]">
           Je studieschuldgegevens zijn ingevuld vanuit je profiel. Controleer ze
           voordat je berekent.
         </p>
+      ) : null}
+      {handoff ? (
+        <ToolHandoffNotice
+          sourceTitle={handoff.sourceTitle}
+          fieldLabels={handoff.fieldLabels}
+        />
       ) : null}
       <div className="flex flex-wrap gap-2">
         <ToolActionButton
@@ -554,7 +579,36 @@ function DuoMaandbedragContent({
           tone={view.incomeBased ? "warn" : "default"}
         />
       </div>
-      <ToolNextSteps {...nextSteps} />
+      <ToolNextSteps
+        {...nextSteps}
+        handoff={{
+          sourceTool: "duo-maandbedrag",
+          profilePatch: createStudentDebtProfilePatch({
+            remainingDebt: view.remainingDebt,
+            statutoryMonthlyPayment: view.statutoryMonthlyPayment,
+            mortgageAssessmentMonthlyPayment:
+              createDuoMortgageAssessmentTransferCandidate(view)
+                ?.recommendedMonthlyAssessmentPayment ??
+              view.statutoryMonthlyPayment,
+            repaymentRule: view.repaymentRule,
+            duoInterestRate: view.annualInterestRate,
+            duoRateYear: view.duoRateYear,
+            remainingTermYears: view.termYears,
+            debtParts: view.debtPortfolio.usesDebtParts
+              ? view.debtPortfolio.parts.map((part) => ({
+                  remainingDebt: part.remainingDebt,
+                  rateYear: part.rateYear,
+                }))
+              : undefined,
+          }),
+          fieldLabels: [
+            "resterende studieschuld",
+            "terugbetalingsregel",
+            "DUO-rente",
+            "wettelijk maandbedrag",
+          ],
+        }}
+      />
 
       <DisclosureSection
         title="Volledige berekening"

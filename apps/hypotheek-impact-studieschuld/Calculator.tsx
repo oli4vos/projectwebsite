@@ -13,10 +13,12 @@ import {
   ResultContextNotice,
 } from "@/components/tool/CalculationContextNotice";
 import { ToolActionButton } from "@/components/tool/ToolActionButton";
+import { ToolHandoffNotice } from "@/components/tool/ToolHandoffNotice";
 import { ToolNextSteps } from "@/components/tool/ToolNextSteps";
 import { Pill } from "@/components/ui";
 import { useMobileFieldFlow } from "@/hooks/useMobileFieldFlow";
 import { useSubmittedCalculation } from "@/hooks/useSubmittedCalculation";
+import { useToolHandoff } from "@/hooks/useToolHandoff";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { getGlossaryExplanation } from "@/lib/copy-glossary";
 import { ENABLE_PROFILE } from "@/lib/feature-flags";
@@ -45,7 +47,10 @@ import {
 import { getToolNextSteps } from "@/lib/tool-journeys";
 import { getMortgageImpactDefaultsFromProfile } from "@/lib/profile-tool-mapping";
 import { createStudentDebtProfilePatch } from "@/lib/profile-result-mapping";
-import type { UserProfile } from "@/lib/user-profile";
+import {
+  mergeProfilePatch,
+  type UserProfile,
+} from "@/lib/user-profile";
 import {
   defaultValues,
   exampleValues,
@@ -79,6 +84,12 @@ type CalculatorContentProps = {
   hasRelevantProfileValues: boolean;
   profilePatch: Partial<FormState>;
   onSaveToProfile: (patch: Partial<UserProfile>) => UserProfile;
+  handoff:
+    | {
+        sourceTitle: string;
+        fieldLabels: string[];
+      }
+    | null;
 };
 
 type PendingDuoMortgageCandidate = {
@@ -188,21 +199,28 @@ function InfoList({
 
 export default function Calculator() {
   const { profile, hasProfile, mergeProfile } = useUserProfile();
-  const profilePatch = getMortgageImpactDefaultsFromProfile(profile);
+  const handoff = useToolHandoff("hypotheek-impact-studieschuld");
+  const effectiveProfile = handoff
+    ? mergeProfilePatch(profile, handoff.profilePatch)
+    : profile;
+  const profilePatch =
+    getMortgageImpactDefaultsFromProfile(effectiveProfile);
   const { hasRelevantProfileValues, initialValues } =
     createProfilePrefillState<FormState>({
       defaultValues,
       profilePatch,
-      hasProfile,
+      hasProfile: hasProfile || Boolean(handoff),
       profileUpdatedAt: profile.updatedAt,
     });
 
   return (
     <CalculatorContent
+      key={handoff ? `handoff-${handoff.transferId}` : "standard"}
       initialValues={initialValues}
       hasRelevantProfileValues={hasRelevantProfileValues}
       profilePatch={profilePatch}
       onSaveToProfile={mergeProfile}
+      handoff={handoff}
     />
   );
 }
@@ -212,6 +230,7 @@ function CalculatorContent({
   hasRelevantProfileValues,
   profilePatch,
   onSaveToProfile,
+  handoff,
 }: CalculatorContentProps) {
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
   const [pdfError, setPdfError] = useState("");
@@ -321,6 +340,48 @@ function CalculatorContent({
   const isExampleResult =
     submittedValues !== null &&
     JSON.stringify(submittedValues) === JSON.stringify(exampleValues);
+  const handoffProfilePatch =
+    result && submittedValues && submittedValidation?.parsedValues
+      ? {
+          ...createStudentDebtProfilePatch({
+            remainingDebt: result.remainingStudentDebt,
+            statutoryMonthlyPayment:
+              result.duoMandatoryPayment.statutoryMonthlyPayment,
+            mortgageAssessmentMonthlyPayment:
+              result.mortgageImpact.bruteringBaseMonthlyPayment,
+            repaymentRule: submittedValues.repaymentRule,
+            duoSituation: submittedValues.situation,
+            duoInterestRate: result.duoRateUsed,
+            duoRateYear: result.debtPortfolio.rateYearUsed,
+            remainingTermYears: result.duoTermYearsUsed,
+            currentMonthlyPayment:
+              submittedValidation.parsedValues.actualMonthlyPayment,
+            debtParts: result.debtPortfolio.usesDebtParts
+              ? result.debtPortfolio.parts.map((part) => ({
+                  remainingDebt: part.remainingDebt,
+                  rateYear: part.rateYear,
+                }))
+              : undefined,
+          }),
+          income: {
+            grossAnnualIncome:
+              submittedValidation.parsedValues.grossIncomeUser,
+            partnerGrossAnnualIncome:
+              submittedValidation.parsedValues.grossIncomePartner,
+          },
+          housing: {
+            targetHomePrice:
+              submittedValidation.parsedValues.desiredHomePrice,
+            ownFunds: submittedValidation.parsedValues.ownMoney,
+            mortgageRate: submittedValidation.parsedValues.mortgageRate,
+            mortgageTermYears:
+              submittedValidation.parsedValues.mortgageTermYears,
+            maxMortgageWithoutStudentDebt:
+              submittedValidation.parsedValues
+                .maxMortgageWithoutStudentDebt,
+          },
+        }
+      : null;
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -685,7 +746,33 @@ function CalculatorContent({
           </p>
         </div>
 
-        {hasRelevantProfileValues ? (
+        {handoff ? (
+          <div className="mt-4 space-y-3">
+            <ToolHandoffNotice
+              sourceTitle={handoff.sourceTitle}
+              fieldLabels={handoff.fieldLabels}
+            />
+            <div className="flex flex-wrap gap-2">
+              <ToolActionButton
+                type="button"
+                onClick={applyExampleValues}
+                variant="secondary"
+                size="sm"
+              >
+                Voorbeeld invullen
+              </ToolActionButton>
+              <ToolActionButton
+                type="button"
+                onClick={clearAllInputs}
+                variant="secondary"
+                size="sm"
+              >
+                Wis invoer
+              </ToolActionButton>
+            </div>
+          </div>
+        ) : null}
+        {hasRelevantProfileValues && !handoff ? (
           <div className="surface-subtle mt-4 flex flex-wrap items-center gap-3 px-4 py-3 text-[13px] leading-[1.65] text-[var(--muted)]">
             <span>
               Relevante velden zijn ingevuld vanuit je profiel. Controleer ze
@@ -1420,7 +1507,24 @@ function CalculatorContent({
         </div>
 
         {result ? (
-          <ToolNextSteps {...nextSteps} />
+          <ToolNextSteps
+            {...nextSteps}
+            handoff={
+              handoffProfilePatch
+                ? {
+                    sourceTool: "hypotheek-impact-studieschuld",
+                    profilePatch: handoffProfilePatch,
+                    fieldLabels: [
+                      "inkomen",
+                      "studieschuld",
+                      "DUO-maandbedragen",
+                      "woningdoel",
+                      "hypotheekrente",
+                    ],
+                  }
+                : undefined
+            }
+          />
         ) : null}
 
         <DisclosureSection

@@ -64,6 +64,7 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 | Doorstap vanaf DUO-doorlenen-of-stoppen | actief | n.v.t. | aan | Resultaat toont scenariovergelijking, schuldenvrije datum en uitgebreide PDF | n.v.t. |
 | Chart-standaardisatie (jaar/euro/tooltips) | actief | n.v.t. | aan | Centrale charthelpers/componenten | n.v.t. |
 | Profielfunctie (`/profiel`, prefillpad) | actief | `NEXT_PUBLIC_ENABLE_PROFILE` | `true` | Compact profiel voor inkomen, studieschuld en wonen, met stelselafhankelijke DUO-rentejaarkeuze en optionele ingeklapte leningdelen; vult alleen passende velden vooraf in en laat DUO-maandbedrag en hypotheekimpact hun actuele uitkomsten na een expliciete gebruikersactie terugschrijven | zet op `0` voor nooduitschakeling |
+| Tijdelijke overdracht tussen vervolgtools | actief | sessionStorage-handoff | aan | Ondersteunde vervolgstappen dragen alleen semantisch passende profielvelden eenmalig over; bronwaarden hebben voorrang op profieldefaults en de doeltool toont welke waarden zijn overgenomen zonder het profiel te wijzigen | n.v.t. |
 | Kennisniveaufunctionaliteit | uitgeschakeld | `NEXT_PUBLIC_ENABLE_KNOWLEDGE_LEVEL` | `false` | Bewust niet zichtbaar in productieflow | zet op `1` en valideer homepage/toolhints |
 | Handmatige profielsync-panel | uitgeschakeld | `NEXT_PUBLIC_ENABLE_PROFILE_SYNC_PANEL` | `false` | Alleen zinvol in hybrid/remote traject | zet op `1` en valideer `/profiel` |
 | Saved calculations MVP (opslaan/lijst/heropen) | uitgeschakeld | `NEXT_PUBLIC_ENABLE_SAVED_CALCULATIONS` | `false` | Feature-flagged local-first MVP | zet op `true` en valideer `volgende-euro` + `/profiel` |
@@ -76,6 +77,7 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 
 | Datum | Commit | Wijziging | Impact |
 |---|---|---|---|
+| 2026-07-28 | `pending` | Centrale tijdelijke vervolgtool-overdracht toegevoegd voor DUO-maandbedrag, extra aflossen, hypotheekimpact en maximale hypotheek, inclusief expliciete voorrang boven profielwaarden en tekstuele toelichting op de doeltool | Tooljourneys / profiel / DUO / hypotheek / UX |
 | 2026-07-28 | `pending` | Vrij DUO-renteveld in het browserprofiel vervangen door een stelselafhankelijke keuze uit centraal beheerde rentejaren en percentages; het gekozen rentejaar wordt expliciet bewaard en hergebruikt | Profiel / DUO / brondata / UX |
 | 2026-07-28 | `pending` | Browserprofiel uitgebreid met optionele DUO-leningdelen, afzonderlijk hypotheektoetsbedrag en expliciete opslag van actuele DUO- en hypotheekimpactuitkomsten | Profiel / DUO / hypotheek / UX |
 | 2026-07-28 | `pending` | Browserprofiel geactiveerd met sessieopslag als standaard, expliciete apparaatopslag, toegankelijke compacte profielinvoer en allowlisted automatische prefill voor vier publieke DUO- en hypotheektools | Profiel / privacy / DUO / hypotheek / UX |
