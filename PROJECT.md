@@ -78,7 +78,7 @@ Voor hypotheektools start deze adapterlaag als voorbereidende centrale integrati
 
 Slimme toolkoppelingen blijven client-side en allowlist-gebaseerd. De DUO-maandbedragreturnflow bewaart hypotheekdrafts tijdelijk in `sessionStorage`, opent de DUO-maandbedragtool en zet alleen een bevestigd wettelijk DUO-maandbedrag terug in de bron-hypotheektool; financiële gegevens komen niet in de URL.
 
-Het browserprofiel volgt hetzelfde local-first principe. Nieuwe profielen worden standaard alleen voor de huidige browsersessie in `sessionStorage` bewaard; de gebruiker kan expliciet kiezen voor blijvende opslag op hetzelfde apparaat via `localStorage`. Alleen allowlisted velden met dezelfde inhoudelijke betekenis worden vooraf ingevuld in tools. Profieldata start nooit automatisch een berekening, komt niet in URL's en wordt zonder remote activatie niet naar een server gestuurd.
+Het browserprofiel volgt hetzelfde local-first principe. Nieuwe profielen worden standaard alleen voor de huidige browsersessie in `sessionStorage` bewaard; de gebruiker kan expliciet kiezen voor blijvende opslag op hetzelfde apparaat via `localStorage`. Alleen allowlisted velden met dezelfde inhoudelijke betekenis worden vooraf ingevuld in tools. Gebruikers kunnen DUO-leningdelen optioneel in een ingeklapte verdieping beheren en concrete DUO- en hypotheekuitkomsten via een expliciete actie terugschrijven naar het profiel. Profieldata start nooit automatisch een berekening, komt niet in URL's en wordt zonder remote activatie niet naar een server gestuurd.
 
 ## 4. Domeinen
 

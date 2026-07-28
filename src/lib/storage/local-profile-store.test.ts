@@ -155,4 +155,29 @@ describe("createLocalProfileStore", () => {
     expect(result.data?.income?.grossAnnualIncome).toBe(0);
     expect(result.data?.studentDebt?.duoInterestRate).toBe(100);
   });
+
+  it("sanitizes stored mortgage and DUO debt-part profile values", () => {
+    const windowMock = createWindowMock();
+    (globalThis as { window?: unknown }).window = windowMock;
+    const store = createStore();
+    store.saveProfile({
+      studentDebt: {
+        mortgageAssessmentMonthlyPayment: 164.25,
+        debtParts: [
+          { remainingDebt: 11000, rateYear: 2025 },
+          { remainingDebt: -1, rateYear: 2026 },
+          { remainingDebt: 15000, rateYear: 1999 },
+        ],
+      },
+    });
+
+    const result = store.loadProfile();
+
+    expect(result.data?.studentDebt?.mortgageAssessmentMonthlyPayment).toBe(
+      164.25,
+    );
+    expect(result.data?.studentDebt?.debtParts).toEqual([
+      { remainingDebt: 11000, rateYear: 2025 },
+    ]);
+  });
 });

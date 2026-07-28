@@ -15,6 +15,7 @@ import { ToolActionButton } from "@/components/tool/ToolActionButton";
 import { ToolNextSteps } from "@/components/tool/ToolNextSteps";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { getRepaymentRuleLabel } from "@/lib/copy-glossary";
+import { ENABLE_PROFILE } from "@/lib/feature-flags";
 import {
   formatDuoRateYearLabel,
   getAvailableDuoRateYears,
@@ -27,6 +28,8 @@ import {
   createProfilePrefillState,
 } from "@/lib/profile-prefill";
 import { getDuoMonthlyPaymentDefaultsFromProfile } from "@/lib/profile-tool-mapping";
+import { createStudentDebtProfilePatch } from "@/lib/profile-result-mapping";
+import type { UserProfile } from "@/lib/user-profile";
 import {
   calculateDuoMonthlyPaymentView,
   createDuoMortgageAssessmentTransferCandidate,
@@ -106,12 +109,13 @@ function MoneyField({ id, label, value, error, prefix, hint, onChange }: FieldPr
 type DuoMaandbedragContentProps = {
   initialValues: DuoMonthlyPaymentFormValues;
   hasRelevantProfileValues: boolean;
+  onSaveToProfile: (patch: Partial<UserProfile>) => UserProfile;
 };
 
 export default function DuoMaandbedragCalculator() {
-  const { profile, hasProfile } = useUserProfile();
+  const { profile, hasProfile, mergeProfile } = useUserProfile();
   const profilePatch = getDuoMonthlyPaymentDefaultsFromProfile(profile);
-  const { initialValues, profileKey, hasRelevantProfileValues } =
+  const { initialValues, hasRelevantProfileValues } =
     createProfilePrefillState<DuoMonthlyPaymentFormValues>({
       defaultValues: createEmptyDuoMonthlyPaymentValues(),
       profilePatch,
@@ -121,9 +125,9 @@ export default function DuoMaandbedragCalculator() {
 
   return (
     <DuoMaandbedragContent
-      key={profileKey}
       initialValues={initialValues}
       hasRelevantProfileValues={hasRelevantProfileValues}
+      onSaveToProfile={mergeProfile}
     />
   );
 }
@@ -131,6 +135,7 @@ export default function DuoMaandbedragCalculator() {
 function DuoMaandbedragContent({
   initialValues,
   hasRelevantProfileValues,
+  onSaveToProfile,
 }: DuoMaandbedragContentProps) {
   const exampleValues = useMemo(
     () => createDuoMonthlyPaymentDefaultValues(),
@@ -143,6 +148,7 @@ function DuoMaandbedragContent({
   const [transferRecord, setTransferRecord] =
     useState<DuoMortgageTransferRecord | null>(null);
   const [transferMessage, setTransferMessage] = useState("");
+  const [profileSaveMessage, setProfileSaveMessage] = useState("");
   const view = useMemo(() => calculateDuoMonthlyPaymentView(formValues), [formValues]);
   const isExample = JSON.stringify(formValues) === JSON.stringify(exampleValues);
   const nextSteps = getToolNextSteps("duo-maandbedrag");
@@ -217,6 +223,42 @@ function DuoMaandbedragContent({
     } finally {
       setIsDownloadingPdf(false);
     }
+  }
+
+  function handleSaveToProfile() {
+    if (!view.isValid) {
+      return;
+    }
+
+    const mortgageCandidate =
+      createDuoMortgageAssessmentTransferCandidate(view);
+    if (!mortgageCandidate) {
+      setProfileSaveMessage(
+        "De DUO-uitkomst kon niet veilig in je profiel worden bewaard.",
+      );
+      return;
+    }
+
+    onSaveToProfile(
+      createStudentDebtProfilePatch({
+        remainingDebt: view.remainingDebt,
+        statutoryMonthlyPayment: view.statutoryMonthlyPayment,
+        mortgageAssessmentMonthlyPayment:
+          mortgageCandidate.recommendedMonthlyAssessmentPayment,
+        repaymentRule: view.repaymentRule,
+        duoInterestRate: view.annualInterestRate,
+        remainingTermYears: view.termYears,
+        debtParts: view.debtPortfolio.usesDebtParts
+          ? view.debtPortfolio.parts.map((part) => ({
+              remainingDebt: part.remainingDebt,
+              rateYear: part.rateYear,
+            }))
+          : undefined,
+      }),
+    );
+    setProfileSaveMessage(
+      "Wettelijk maandbedrag, hypotheektoetsbedrag en DUO-gegevens zijn in je profiel bewaard.",
+    );
   }
 
   function handleReturnToMortgageTool() {
@@ -454,7 +496,24 @@ function DuoMaandbedragContent({
         >
           {isDownloadingPdf ? "PDF wordt gemaakt..." : "Download overzicht"}
         </ToolActionButton>
+        {ENABLE_PROFILE ? (
+          <ToolActionButton
+            type="button"
+            variant="secondary"
+            onClick={handleSaveToProfile}
+          >
+            Bewaar DUO-uitkomsten in profiel
+          </ToolActionButton>
+        ) : null}
       </div>
+      {profileSaveMessage ? (
+        <p
+          role="status"
+          className="text-[13px] leading-[1.6] text-[var(--muted)]"
+        >
+          {profileSaveMessage}
+        </p>
+      ) : null}
       <div className="grid gap-3 sm:grid-cols-2">
         <ResultCard
           label="Wettelijke maandtermijn"

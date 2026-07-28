@@ -1,4 +1,7 @@
-import { getDuoHistoricalRateYearForRule } from "@/lib/financial-constants";
+import {
+  getAvailableDuoRateYears,
+  getDuoHistoricalRateYearForRule,
+} from "@/lib/financial-constants";
 import type {
   ProfileDuoSituation,
   ProfileRepaymentRule,
@@ -11,10 +14,12 @@ export const PROFILE_FIELDS_MORTGAGE_IMPACT = [
   "studentDebt.remainingDebt",
   "studentDebt.currentMonthlyPayment",
   "studentDebt.statutoryMonthlyPayment",
+  "studentDebt.mortgageAssessmentMonthlyPayment",
   "studentDebt.repaymentRule",
   "studentDebt.duoSituation",
   "studentDebt.duoInterestRate",
   "studentDebt.remainingTermYears",
+  "studentDebt.debtParts",
   "housing.targetHomePrice",
   "housing.ownFunds",
   "housing.mortgageRate",
@@ -26,6 +31,7 @@ export const PROFILE_FIELDS_DUO_MONTHLY_PAYMENT = [
   "studentDebt.remainingDebt",
   "studentDebt.repaymentRule",
   "studentDebt.duoInterestRate",
+  "studentDebt.debtParts",
   "income.householdType",
 ] as const;
 
@@ -34,6 +40,7 @@ export const PROFILE_FIELDS_DUO_EXTRA_REPAYMENT = [
   "studentDebt.repaymentRule",
   "studentDebt.duoInterestRate",
   "studentDebt.currentMonthlyPayment",
+  "studentDebt.debtParts",
 ] as const;
 
 export const PROFILE_FIELDS_MAX_MORTGAGE = [
@@ -42,6 +49,7 @@ export const PROFILE_FIELDS_MAX_MORTGAGE = [
   "studentDebt.remainingDebt",
   "studentDebt.currentMonthlyPayment",
   "studentDebt.statutoryMonthlyPayment",
+  "studentDebt.mortgageAssessmentMonthlyPayment",
   "studentDebt.duoSituation",
   "housing.targetHomePrice",
   "housing.ownFunds",
@@ -148,6 +156,8 @@ type MortgageImpactDefaults = Partial<{
   mortgageRate: string;
   mortgageTermYears: string;
   maxMortgageWithoutStudentDebt: string;
+  useDebtParts: boolean;
+  debtParts: ProfileDebtPartFormDefault[];
 }>;
 
 type DuoMonthlyPaymentDefaults = Partial<{
@@ -155,6 +165,8 @@ type DuoMonthlyPaymentDefaults = Partial<{
   repaymentRule: ProfileRepaymentRule;
   duoRateYear: string;
   householdSituation: "single" | "partner";
+  useDebtParts: boolean;
+  debtParts: ProfileDebtPartFormDefault[];
 }>;
 
 type DuoExtraRepaymentDefaults = Partial<{
@@ -162,7 +174,15 @@ type DuoExtraRepaymentDefaults = Partial<{
   repaymentRule: ProfileRepaymentRule;
   duoRateYear: string;
   currentMonthlyPayment: string;
+  useDebtParts: boolean;
+  debtParts: ProfileDebtPartFormDefault[];
 }>;
+
+type ProfileDebtPartFormDefault = {
+  id: string;
+  amount: string;
+  rateYear: string;
+};
 
 type MaxMortgageDefaults = Partial<{
   grossAnnualHouseholdIncome: string;
@@ -317,12 +337,30 @@ function getProfileDuoRateYear(profile: UserProfile) {
   return rateYear === undefined ? undefined : String(rateYear);
 }
 
+function getProfileDebtPartDefaults(
+  profile: UserProfile,
+): ProfileDebtPartFormDefault[] {
+  const availableRateYears = new Set(getAvailableDuoRateYears());
+
+  return (profile.studentDebt?.debtParts ?? [])
+    .filter(
+      (part) =>
+        part.remainingDebt > 0 && availableRateYears.has(part.rateYear),
+    )
+    .map((part, index) => ({
+      id: `profile-duo-debt-part-${index + 1}`,
+      amount: String(part.remainingDebt),
+      rateYear: String(part.rateYear),
+    }));
+}
+
 export function getDuoMonthlyPaymentDefaultsFromProfile(
   profile: UserProfile,
 ): DuoMonthlyPaymentDefaults {
   const defaults: DuoMonthlyPaymentDefaults = {};
   const remainingDebt = toStringValue(profile.studentDebt?.remainingDebt);
   const duoRateYear = getProfileDuoRateYear(profile);
+  const debtParts = getProfileDebtPartDefaults(profile);
 
   if (remainingDebt !== undefined) {
     defaults.remainingDebt = remainingDebt;
@@ -332,6 +370,10 @@ export function getDuoMonthlyPaymentDefaultsFromProfile(
   }
   if (duoRateYear) {
     defaults.duoRateYear = duoRateYear;
+  }
+  if (debtParts.length > 0) {
+    defaults.useDebtParts = true;
+    defaults.debtParts = debtParts;
   }
   if (profile.income?.householdType === "single") {
     defaults.householdSituation = "single";
@@ -351,6 +393,7 @@ export function getDuoExtraRepaymentDefaultsFromProfile(
     profile.studentDebt?.currentMonthlyPayment,
   );
   const duoRateYear = getProfileDuoRateYear(profile);
+  const debtParts = getProfileDebtPartDefaults(profile);
 
   if (remainingDebt !== undefined) {
     defaults.remainingDebt = remainingDebt;
@@ -363,6 +406,10 @@ export function getDuoExtraRepaymentDefaultsFromProfile(
   }
   if (currentMonthlyPayment !== undefined) {
     defaults.currentMonthlyPayment = currentMonthlyPayment;
+  }
+  if (debtParts.length > 0) {
+    defaults.useDebtParts = true;
+    defaults.debtParts = debtParts;
   }
 
   return defaults;
@@ -403,12 +450,14 @@ export function getMaxMortgageDefaultsFromProfile(
     profile.studentDebt?.currentMonthlyPayment,
   );
   const statutoryMonthlyPayment = toStringValue(
-    profile.studentDebt?.statutoryMonthlyPayment,
+    profile.studentDebt?.statutoryMonthlyPayment ??
+      profile.studentDebt?.mortgageAssessmentMonthlyPayment,
   );
   const studentLoanAmounts = [
     profile.studentDebt?.remainingDebt,
     profile.studentDebt?.currentMonthlyPayment,
     profile.studentDebt?.statutoryMonthlyPayment,
+    profile.studentDebt?.mortgageAssessmentMonthlyPayment,
   ];
   const hasStudentLoan = studentLoanAmounts.some(
     (value) => value !== undefined && value > 0,
@@ -485,7 +534,8 @@ export function getMortgageImpactDefaultsFromProfile(
   }
 
   const statutoryMonthlyPayment = toStringValue(
-    profile.studentDebt?.statutoryMonthlyPayment,
+    profile.studentDebt?.statutoryMonthlyPayment ??
+      profile.studentDebt?.mortgageAssessmentMonthlyPayment,
   );
   if (statutoryMonthlyPayment !== undefined) {
     defaults.statutoryMonthlyPayment = statutoryMonthlyPayment;
@@ -509,6 +559,12 @@ export function getMortgageImpactDefaultsFromProfile(
     if (duoRateYear !== undefined) {
       defaults.duoRateYear = String(duoRateYear);
     }
+  }
+
+  const debtParts = getProfileDebtPartDefaults(profile);
+  if (debtParts.length > 0) {
+    defaults.useDebtParts = true;
+    defaults.debtParts = debtParts;
   }
 
   const remainingTermYears = toStringValue(profile.studentDebt?.remainingTermYears);

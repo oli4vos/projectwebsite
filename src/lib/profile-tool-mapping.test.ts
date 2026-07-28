@@ -52,6 +52,44 @@ describe("profile tool mapping", () => {
     expect(getDuoMonthlyPaymentDefaultsFromProfile(profile)).toEqual({});
   });
 
+  it("maps stored DUO debt parts to tools that support them", () => {
+    const profile: UserProfile = {
+      studentDebt: {
+        remainingDebt: 26000,
+        repaymentRule: "SF35",
+        debtParts: [
+          { remainingDebt: 11000, rateYear: 2025 },
+          { remainingDebt: 15000, rateYear: 2026 },
+        ],
+      },
+    };
+    const expectedParts = [
+      {
+        id: "profile-duo-debt-part-1",
+        amount: "11000",
+        rateYear: "2025",
+      },
+      {
+        id: "profile-duo-debt-part-2",
+        amount: "15000",
+        rateYear: "2026",
+      },
+    ];
+
+    expect(getDuoMonthlyPaymentDefaultsFromProfile(profile)).toMatchObject({
+      useDebtParts: true,
+      debtParts: expectedParts,
+    });
+    expect(getDuoExtraRepaymentDefaultsFromProfile(profile)).toMatchObject({
+      useDebtParts: true,
+      debtParts: expectedParts,
+    });
+    expect(getMortgageImpactDefaultsFromProfile(profile)).toMatchObject({
+      useDebtParts: true,
+      debtParts: expectedParts,
+    });
+  });
+
   it("maps profile fields to the maximum-mortgage form", () => {
     const profile: UserProfile = {
       income: {
@@ -96,6 +134,39 @@ describe("profile tool mapping", () => {
 
     expect(getMaxMortgageDefaultsFromProfile(profile)).toEqual({
       hasStudentLoan: false,
+    });
+  });
+
+  it("uses a stored mortgage assessment amount when no statutory amount exists", () => {
+    const profile: UserProfile = {
+      studentDebt: {
+        remainingDebt: 18000,
+        mortgageAssessmentMonthlyPayment: 164.25,
+      },
+    };
+
+    expect(getMaxMortgageDefaultsFromProfile(profile)).toMatchObject({
+      hasStudentLoan: true,
+      statutoryMonthlyPayment: "164.25",
+    });
+    expect(getMortgageImpactDefaultsFromProfile(profile)).toMatchObject({
+      statutoryMonthlyPayment: "164.25",
+    });
+  });
+
+  it("prefers an explicit statutory amount over the mortgage assessment amount", () => {
+    const profile: UserProfile = {
+      studentDebt: {
+        statutoryMonthlyPayment: 170,
+        mortgageAssessmentMonthlyPayment: 164.25,
+      },
+    };
+
+    expect(getMaxMortgageDefaultsFromProfile(profile)).toMatchObject({
+      statutoryMonthlyPayment: "170",
+    });
+    expect(getMortgageImpactDefaultsFromProfile(profile)).toMatchObject({
+      statutoryMonthlyPayment: "170",
     });
   });
 

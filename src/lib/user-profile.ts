@@ -20,6 +20,10 @@ export type RiskProfile = "conservative" | "neutral" | "offensive";
 export type EmploymentType = "employee" | "selfEmployed" | "mixed" | "unknown";
 export type PensionBuildUp = "active" | "limited" | "none" | "unknown";
 export type Box3MethodPreference = "actual" | "forfaitary";
+export type ProfileDuoDebtPart = {
+  remainingDebt: number;
+  rateYear: number;
+};
 
 export type UserProfile = {
   updatedAt?: string;
@@ -33,10 +37,12 @@ export type UserProfile = {
     remainingDebt?: number;
     currentMonthlyPayment?: number;
     statutoryMonthlyPayment?: number;
+    mortgageAssessmentMonthlyPayment?: number;
     repaymentRule?: ProfileRepaymentRule;
     duoSituation?: ProfileDuoSituation;
     duoInterestRate?: number;
     remainingTermYears?: number;
+    debtParts?: ProfileDuoDebtPart[];
   };
   housing?: {
     targetHomePrice?: number;
@@ -143,6 +149,35 @@ function sanitizePositiveYears(value?: number) {
   return sanitizedValue;
 }
 
+function sanitizeDuoDebtParts(
+  parts: ProfileDuoDebtPart[] | undefined,
+): ProfileDuoDebtPart[] | undefined {
+  if (!Array.isArray(parts)) {
+    return undefined;
+  }
+
+  const sanitizedParts = parts.flatMap((part) => {
+    if (!part || typeof part !== "object") {
+      return [];
+    }
+
+    const remainingDebt = sanitizeFiniteNumber(part.remainingDebt, 0);
+    const rateYear = sanitizeFiniteNumber(part.rateYear, 0);
+    if (
+      remainingDebt <= 0 ||
+      !Number.isInteger(rateYear) ||
+      rateYear < 2000 ||
+      rateYear > 2200
+    ) {
+      return [];
+    }
+
+    return [{ remainingDebt, rateYear }];
+  });
+
+  return sanitizedParts.length > 0 ? sanitizedParts : undefined;
+}
+
 function sanitizeEnum<T extends string>(value: unknown, allowed: Set<T>) {
   if (typeof value !== "string") {
     return undefined;
@@ -177,10 +212,14 @@ export function sanitizeUserProfile(profile: UserProfile): UserProfile {
     statutoryMonthlyPayment: sanitizeNonNegativeNumber(
       profile.studentDebt?.statutoryMonthlyPayment,
     ),
+    mortgageAssessmentMonthlyPayment: sanitizeNonNegativeNumber(
+      profile.studentDebt?.mortgageAssessmentMonthlyPayment,
+    ),
     repaymentRule: sanitizeEnum(profile.studentDebt?.repaymentRule, repaymentRules),
     duoSituation: sanitizeEnum(profile.studentDebt?.duoSituation, duoSituations),
     duoInterestRate: sanitizePercentNumber(profile.studentDebt?.duoInterestRate),
     remainingTermYears: sanitizePositiveYears(profile.studentDebt?.remainingTermYears),
+    debtParts: sanitizeDuoDebtParts(profile.studentDebt?.debtParts),
   };
 
   const housing = {

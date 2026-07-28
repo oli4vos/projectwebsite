@@ -19,6 +19,7 @@ import { useMobileFieldFlow } from "@/hooks/useMobileFieldFlow";
 import { useSubmittedCalculation } from "@/hooks/useSubmittedCalculation";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { getGlossaryExplanation } from "@/lib/copy-glossary";
+import { ENABLE_PROFILE } from "@/lib/feature-flags";
 import {
   formatDuoRateYearLabel,
   getAvailableDuoRateYears,
@@ -43,6 +44,8 @@ import {
 } from "@/lib/profile-prefill";
 import { getToolNextSteps } from "@/lib/tool-journeys";
 import { getMortgageImpactDefaultsFromProfile } from "@/lib/profile-tool-mapping";
+import { createStudentDebtProfilePatch } from "@/lib/profile-result-mapping";
+import type { UserProfile } from "@/lib/user-profile";
 import {
   defaultValues,
   exampleValues,
@@ -75,6 +78,7 @@ type CalculatorContentProps = {
   initialValues: FormState;
   hasRelevantProfileValues: boolean;
   profilePatch: Partial<FormState>;
+  onSaveToProfile: (patch: Partial<UserProfile>) => UserProfile;
 };
 
 type PendingDuoMortgageCandidate = {
@@ -183,9 +187,9 @@ function InfoList({
 }
 
 export default function Calculator() {
-  const { profile, hasProfile } = useUserProfile();
+  const { profile, hasProfile, mergeProfile } = useUserProfile();
   const profilePatch = getMortgageImpactDefaultsFromProfile(profile);
-  const { hasRelevantProfileValues, profileKey, initialValues } =
+  const { hasRelevantProfileValues, initialValues } =
     createProfilePrefillState<FormState>({
       defaultValues,
       profilePatch,
@@ -195,10 +199,10 @@ export default function Calculator() {
 
   return (
     <CalculatorContent
-      key={profileKey}
       initialValues={initialValues}
       hasRelevantProfileValues={hasRelevantProfileValues}
       profilePatch={profilePatch}
+      onSaveToProfile={mergeProfile}
     />
   );
 }
@@ -207,10 +211,12 @@ function CalculatorContent({
   initialValues,
   hasRelevantProfileValues,
   profilePatch,
+  onSaveToProfile,
 }: CalculatorContentProps) {
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
   const [pdfError, setPdfError] = useState("");
   const [pdfStatus, setPdfStatus] = useState("");
+  const [profileSaveMessage, setProfileSaveMessage] = useState("");
   const [duoTransferMessage, setDuoTransferMessage] = useState("");
   const [pendingDuoCandidate, setPendingDuoCandidate] =
     useState<PendingDuoMortgageCandidate | null>(null);
@@ -522,6 +528,42 @@ function CalculatorContent({
     } finally {
       setIsDownloadingPdf(false);
     }
+  }
+
+  function handleSaveToProfile() {
+    if (
+      !result ||
+      !submittedValues ||
+      !submittedValidation?.parsedValues ||
+      hasDirtyChanges
+    ) {
+      return;
+    }
+
+    const parsedInput = submittedValidation.parsedValues;
+    onSaveToProfile(
+      createStudentDebtProfilePatch({
+        remainingDebt: result.remainingStudentDebt,
+        statutoryMonthlyPayment:
+          result.duoMandatoryPayment.statutoryMonthlyPayment,
+        mortgageAssessmentMonthlyPayment:
+          result.mortgageImpact.bruteringBaseMonthlyPayment,
+        repaymentRule: submittedValues.repaymentRule,
+        duoSituation: submittedValues.situation,
+        duoInterestRate: result.duoRateUsed,
+        remainingTermYears: result.duoTermYearsUsed,
+        currentMonthlyPayment: parsedInput.actualMonthlyPayment,
+        debtParts: result.debtPortfolio.usesDebtParts
+          ? result.debtPortfolio.parts.map((part) => ({
+              remainingDebt: part.remainingDebt,
+              rateYear: part.rateYear,
+            }))
+          : undefined,
+      }),
+    );
+    setProfileSaveMessage(
+      "De gebruikte DUO-bedragen en het hypotheektoetsbedrag zijn in je profiel bewaard.",
+    );
   }
 
   function startDuoMonthlyPaymentTransfer() {
@@ -1292,6 +1334,15 @@ function CalculatorContent({
                     Bereken opnieuw om een actueel PDF-overzicht te downloaden.
                   </span>
                 )}
+                {ENABLE_PROFILE && canDownloadPdf ? (
+                  <ToolActionButton
+                    type="button"
+                    variant="secondary"
+                    onClick={handleSaveToProfile}
+                  >
+                    Bewaar uitkomst in profiel
+                  </ToolActionButton>
+                ) : null}
                 {pdfStatus ? (
                   <span
                     role="status"
@@ -1302,6 +1353,14 @@ function CalculatorContent({
                   </span>
                 ) : null}
               </div>
+              {profileSaveMessage ? (
+                <p
+                  role="status"
+                  className="mt-3 text-[12.5px] leading-[1.5] text-white/70"
+                >
+                  {profileSaveMessage}
+                </p>
+              ) : null}
               {pdfError ? (
                 <p
                   role="alert"

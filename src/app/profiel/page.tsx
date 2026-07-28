@@ -7,6 +7,7 @@ import {
   type FormEvent,
   type ReactNode,
 } from "react";
+import { DuoDebtPartsEditor } from "@/components/duo/DuoDebtPartsEditor";
 import { FieldError } from "@/components/forms/FieldError";
 import { ProfileSyncPanel } from "@/components/ProfileSyncPanel";
 import { SavedCalculationsList } from "@/components/SavedCalculationsList";
@@ -22,6 +23,12 @@ import {
   getRepaymentRuleLabel,
 } from "@/lib/copy-glossary";
 import { ENABLE_PROFILE } from "@/lib/feature-flags";
+import {
+  createDefaultDuoDebtPartFormValues,
+  createDuoDebtPartFormValue,
+  validateDuoDebtPartFormValues,
+  type DuoDebtPartFormValue,
+} from "@/lib/duo/debt-parts-form";
 import { parseOptionalDecimalInput } from "@/lib/number-input";
 import type { ProfileRetention } from "@/lib/storage/profile-retention";
 import type {
@@ -40,10 +47,13 @@ type ProfileFormState = {
   remainingDebt: string;
   currentMonthlyPayment: string;
   statutoryMonthlyPayment: string;
+  mortgageAssessmentMonthlyPayment: string;
   repaymentRule: ProfileRepaymentRule;
   duoSituation: ProfileDuoSituation;
   duoInterestRate: string;
   remainingTermYears: string;
+  useDebtParts: boolean;
+  debtParts: DuoDebtPartFormValue[];
   targetHomePrice: string;
   ownFunds: string;
   mortgageRate: string;
@@ -61,10 +71,13 @@ const defaultFormState: ProfileFormState = {
   remainingDebt: "",
   currentMonthlyPayment: "",
   statutoryMonthlyPayment: "",
+  mortgageAssessmentMonthlyPayment: "",
   repaymentRule: "UNKNOWN",
   duoSituation: "unknown",
   duoInterestRate: "",
   remainingTermYears: "",
+  useDebtParts: false,
+  debtParts: createDefaultDuoDebtPartFormValues(),
   targetHomePrice: "",
   ownFunds: "",
   mortgageRate: "",
@@ -82,10 +95,13 @@ const profileStepByField: Record<keyof ProfileFormState, number> = {
   remainingDebt: 1,
   currentMonthlyPayment: 1,
   statutoryMonthlyPayment: 1,
+  mortgageAssessmentMonthlyPayment: 1,
   repaymentRule: 1,
   duoSituation: 1,
   duoInterestRate: 1,
   remainingTermYears: 1,
+  useDebtParts: 1,
+  debtParts: 1,
   targetHomePrice: 2,
   ownFunds: 2,
   mortgageRate: 2,
@@ -137,6 +153,13 @@ function toFormValue(value?: number) {
 }
 
 function profileToFormState(profile: UserProfile): ProfileFormState {
+  const debtParts =
+    profile.studentDebt?.debtParts?.map((part, index) => ({
+      id: `profile-duo-debt-part-${index + 1}`,
+      amount: String(part.remainingDebt),
+      rateYear: String(part.rateYear),
+    })) ?? [];
+
   return {
     grossAnnualIncome: toFormValue(profile.income?.grossAnnualIncome),
     partnerGrossAnnualIncome: toFormValue(
@@ -151,10 +174,16 @@ function profileToFormState(profile: UserProfile): ProfileFormState {
     statutoryMonthlyPayment: toFormValue(
       profile.studentDebt?.statutoryMonthlyPayment,
     ),
+    mortgageAssessmentMonthlyPayment: toFormValue(
+      profile.studentDebt?.mortgageAssessmentMonthlyPayment,
+    ),
     repaymentRule: profile.studentDebt?.repaymentRule ?? "UNKNOWN",
     duoSituation: profile.studentDebt?.duoSituation ?? "unknown",
     duoInterestRate: toFormValue(profile.studentDebt?.duoInterestRate),
     remainingTermYears: toFormValue(profile.studentDebt?.remainingTermYears),
+    useDebtParts: debtParts.length > 0,
+    debtParts:
+      debtParts.length > 0 ? debtParts : createDefaultDuoDebtPartFormValues(),
     targetHomePrice: toFormValue(profile.housing?.targetHomePrice),
     ownFunds: toFormValue(profile.housing?.ownFunds),
     mortgageRate: toFormValue(profile.housing?.mortgageRate),
@@ -202,6 +231,9 @@ function formStateToProfile(formValues: ProfileFormState) {
   const statutoryMonthlyPayment = parseOptionalDecimalInput(
     formValues.statutoryMonthlyPayment,
   );
+  const mortgageAssessmentMonthlyPayment = parseOptionalDecimalInput(
+    formValues.mortgageAssessmentMonthlyPayment,
+  );
   const duoInterestRate = parseOptionalDecimalInput(
     formValues.duoInterestRate,
   );
@@ -219,6 +251,7 @@ function formStateToProfile(formValues: ProfileFormState) {
   const maxMortgageWithoutStudentDebt = parseOptionalDecimalInput(
     formValues.maxMortgageWithoutStudentDebt,
   );
+  const debtPartsValidation = validateDuoDebtPartFormValues(formValues.debtParts);
 
   validateNonNegative(
     "grossAnnualIncome",
@@ -250,6 +283,22 @@ function formStateToProfile(formValues: ProfileFormState) {
     errors,
     "Gebruik 0 of een hoger wettelijk DUO-maandbedrag.",
   );
+  validateNonNegative(
+    "mortgageAssessmentMonthlyPayment",
+    mortgageAssessmentMonthlyPayment,
+    errors,
+    "Gebruik 0 of een hoger maandbedrag voor de hypotheektoets.",
+  );
+  if (
+    formValues.useDebtParts &&
+    (Object.keys(debtPartsValidation.errorsById).length > 0 ||
+      debtPartsValidation.sanitizedParts.length === 0)
+  ) {
+    errors.debtParts =
+      debtPartsValidation.sanitizedParts.length === 0
+        ? "Voeg minimaal één geldig leningdeel toe."
+        : "Controleer de leningdelen met een foutmelding.";
+  }
   validateNonNegative(
     "targetHomePrice",
     targetHomePrice,
@@ -316,9 +365,12 @@ function formStateToProfile(formValues: ProfileFormState) {
                 : formValues.employmentType,
           },
           studentDebt: {
-            remainingDebt,
+            remainingDebt: formValues.useDebtParts
+              ? debtPartsValidation.totalDebt
+              : remainingDebt,
             currentMonthlyPayment,
             statutoryMonthlyPayment,
+            mortgageAssessmentMonthlyPayment,
             repaymentRule:
               formValues.repaymentRule === "UNKNOWN"
                 ? undefined
@@ -329,6 +381,12 @@ function formStateToProfile(formValues: ProfileFormState) {
                 : formValues.duoSituation,
             duoInterestRate,
             remainingTermYears,
+            debtParts: formValues.useDebtParts
+              ? debtPartsValidation.sanitizedParts.map((part) => ({
+                  remainingDebt: part.remainingDebt ?? 0,
+                  rateYear: part.rateYear ?? 0,
+                }))
+              : undefined,
           },
           housing: {
             targetHomePrice,
@@ -340,7 +398,12 @@ function formStateToProfile(formValues: ProfileFormState) {
         }
       : null;
 
-  return { errors, profile };
+  return {
+    errors,
+    profile,
+    debtPartErrors: debtPartsValidation.errorsById,
+    debtPartsTotal: debtPartsValidation.totalDebt,
+  };
 }
 
 function TextField({
@@ -350,6 +413,7 @@ function TextField({
   error,
   hint,
   placeholder,
+  readOnly = false,
   onChange,
 }: {
   field: keyof ProfileFormState;
@@ -358,6 +422,7 @@ function TextField({
   error?: string;
   hint?: string;
   placeholder?: string;
+  readOnly?: boolean;
   onChange: (value: string) => void;
 }) {
   const id = `profile-${field}`;
@@ -380,10 +445,11 @@ function TextField({
         inputMode="decimal"
         value={value}
         placeholder={placeholder}
+        readOnly={readOnly}
         onChange={(event) => onChange(event.target.value)}
         aria-invalid={error ? "true" : "false"}
         aria-describedby={describedBy}
-        className="ring-focus hair h-12 min-w-0 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none"
+        className="ring-focus hair h-12 min-w-0 rounded-md border bg-white px-4 font-mono text-[16px] tabular text-[var(--ink)] outline-none read-only:bg-[var(--paper-soft)]"
       />
       {hint ? (
         <p id={hintId} className="text-[12px] leading-[1.5] text-[var(--muted)]">
@@ -639,7 +705,12 @@ function ProfileEditor({
   const [activeStep, setActiveStep] = useState(0);
   const [didSubmitAttempt, setDidSubmitAttempt] = useState(false);
   const errorSummaryRef = useRef<HTMLDivElement | null>(null);
-  const { errors, profile: parsedProfile } = useMemo(
+  const {
+    errors,
+    profile: parsedProfile,
+    debtPartErrors,
+    debtPartsTotal,
+  } = useMemo(
     () => formStateToProfile(formValues),
     [formValues],
   );
@@ -649,6 +720,86 @@ function ProfileEditor({
     value: ProfileFormState[K],
   ) {
     setFormValues((current) => ({ ...current, [field]: value }));
+    onSaveMessageChange("");
+  }
+
+  function toggleDebtParts(enabled: boolean) {
+    setFormValues((current) => {
+      if (!enabled) {
+        const totalDebt =
+          validateDuoDebtPartFormValues(current.debtParts).totalDebt;
+        return {
+          ...current,
+          useDebtParts: false,
+          remainingDebt:
+            totalDebt > 0
+              ? String(totalDebt)
+              : current.remainingDebt,
+        };
+      }
+
+      const nextParts =
+        current.debtParts.length > 0
+          ? current.debtParts
+          : createDefaultDuoDebtPartFormValues();
+
+      return {
+        ...current,
+        useDebtParts: true,
+        debtParts: nextParts.map((part, index) =>
+          index === 0 &&
+          part.amount.trim().length === 0 &&
+          current.remainingDebt.trim().length > 0
+            ? { ...part, amount: current.remainingDebt }
+            : part,
+        ),
+      };
+    });
+    onSaveMessageChange("");
+  }
+
+  function updateDebtPart(
+    id: string,
+    field: keyof Pick<DuoDebtPartFormValue, "amount" | "rateYear">,
+    value: string,
+  ) {
+    setFormValues((current) => {
+      const debtParts = current.debtParts.map((part) =>
+        part.id === id ? { ...part, [field]: value } : part,
+      );
+      const totalDebt = validateDuoDebtPartFormValues(debtParts).totalDebt;
+
+      return {
+        ...current,
+        debtParts,
+        remainingDebt: totalDebt > 0 ? String(totalDebt) : current.remainingDebt,
+      };
+    });
+    onSaveMessageChange("");
+  }
+
+  function addDebtPart() {
+    setFormValues((current) => ({
+      ...current,
+      debtParts: [...current.debtParts, createDuoDebtPartFormValue()],
+    }));
+    onSaveMessageChange("");
+  }
+
+  function removeDebtPart(id: string) {
+    setFormValues((current) => {
+      const debtParts =
+        current.debtParts.length > 1
+          ? current.debtParts.filter((part) => part.id !== id)
+          : current.debtParts;
+      const totalDebt = validateDuoDebtPartFormValues(debtParts).totalDebt;
+
+      return {
+        ...current,
+        debtParts,
+        remainingDebt: totalDebt > 0 ? String(totalDebt) : current.remainingDebt,
+      };
+    });
     onSaveMessageChange("");
   }
 
@@ -798,6 +949,12 @@ function ProfileEditor({
               label="Resterende studieschuld"
               value={formValues.remainingDebt}
               error={errors.remainingDebt}
+              hint={
+                formValues.useDebtParts
+                  ? "Automatisch totaal van de leningdelen hieronder."
+                  : undefined
+              }
+              readOnly={formValues.useDebtParts}
               onChange={(value) => updateField("remainingDebt", value)}
             />
             <TextField
@@ -815,6 +972,16 @@ function ProfileEditor({
               hint="Alleen nodig voor sommige hypotheekberekeningen."
               onChange={(value) =>
                 updateField("statutoryMonthlyPayment", value)
+              }
+            />
+            <TextField
+              field="mortgageAssessmentMonthlyPayment"
+              label="Maandbedrag voor hypotheektoets"
+              value={formValues.mortgageAssessmentMonthlyPayment}
+              error={errors.mortgageAssessmentMonthlyPayment}
+              hint="Het rekenbedrag dat een hypotheektool gebruikt; dit kan afwijken van wat DUO incasseert."
+              onChange={(value) =>
+                updateField("mortgageAssessmentMonthlyPayment", value)
               }
             />
             <SelectField
@@ -852,6 +1019,23 @@ function ProfileEditor({
                 }))}
                 hint={`${getGlossaryExplanation("draagkracht")} ${getGlossaryExplanation("aflossingsvrijePeriode")}`}
                 onChange={(value) => updateField("duoSituation", value)}
+              />
+            </div>
+            <div className="md:col-span-2">
+              <DuoDebtPartsEditor
+                enabled={formValues.useDebtParts}
+                parts={formValues.debtParts}
+                totalDebt={debtPartsTotal}
+                errorsById={debtPartErrors}
+                repaymentRule={formValues.repaymentRule}
+                onToggle={toggleDebtParts}
+                onPartChange={updateDebtPart}
+                onAddPart={addDebtPart}
+                onRemovePart={removeDebtPart}
+              />
+              <FieldError
+                id="profile-debtParts-error"
+                message={errors.debtParts}
               />
             </div>
           </ProfileStep>
