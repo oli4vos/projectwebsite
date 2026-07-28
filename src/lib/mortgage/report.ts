@@ -106,21 +106,17 @@ function buildStudentLoanSummary(
   result: MortgageMaxMortgageResult,
 ) {
   if (!input.studentLoan?.hasStudentLoan) {
-    return "Geen studieschuld opgegeven.";
+    return "Geen studieschuld ingevuld. De impact is daarom € 0 per maand.";
   }
 
   const basePayment = deriveStudentLoanBasePayment(input);
   const monthlyImpact = result.breakdown.studentLoanMonthlyImpact;
-  const grossUpFactor = basePayment > 0 ? monthlyImpact / basePayment : 0;
+  const paymentLabel =
+    input.studentLoan.status === "repaying"
+      ? "actuele DUO-maandbedrag"
+      : "wettelijke DUO-maandbedrag";
 
-  return [
-    `Status: ${input.studentLoan.status ?? "repaying"}`,
-    `Basisbedrag: ${formatCurrency(basePayment, 2)} per maand`,
-    `Brutering naar hypotheektoets: ${formatCurrency(monthlyImpact, 2)} per maand`,
-    grossUpFactor > 0
-      ? `Afgeleide bruteringfactor: ${formatNumber(grossUpFactor, 2)}x`
-      : "Bruteringfactor kon niet worden afgeleid.",
-  ].join(". ");
+  return `Het ingevulde ${paymentLabel} is ${formatCurrency(basePayment, 2)}. Voor de hypotheektoets telt dit als ${formatCurrency(monthlyImpact, 2)} per maand.`;
 }
 
 function limitingFactorLabel(result: MortgageMaxMortgageResult) {
@@ -191,7 +187,7 @@ function buildSources(result: MortgageMaxMortgageResult): MortgageReportSource[]
   return sources;
 }
 
-function buildTimeline(
+export function buildMortgageCalculationTimeline(
   input: MortgageMaxMortgageInput,
   result: MortgageMaxMortgageResult,
 ): MortgageCalculationTimelineStep[] {
@@ -319,16 +315,27 @@ function buildTimeline(
     },
     {
       step: 6,
-      title: "Financiële verplichtingen verwerken",
+      title: "Studieschuld en andere verplichtingen verwerken",
       explanation:
         "Contractuele maandlasten verlagen eerst het beschikbare hypotheekbudget. Ze worden niet achteraf als bedrag van de maximale hypotheek afgetrokken.",
       formula:
         "beschikbaar maandbudget = woonlastbudget - studieschuldimpact - overige verplichtingen",
       lines: [
         {
-          label: "Studieschuldimpact",
+          label: "Omgerekende DUO-maandlast",
           value: formatCurrency(result.breakdown.studentLoanMonthlyImpact, 2),
           note: buildStudentLoanSummary(input, result),
+        },
+        {
+          label: "Minder hypotheekruimte op basis van inkomen door studieschuld",
+          value: formatCurrency(
+            result.breakdown.studentLoanBorrowingCapacityImpact,
+            2,
+          ),
+          note:
+            result.breakdown.studentLoanMonthlyImpact > 0
+              ? "Dit is het verschil in de inkomensruimte vóór de grenzen voor woningwaarde en NHG worden toegepast."
+              : "Er is geen studieschuldimpact in deze berekening.",
         },
         { label: "Overige verplichtingen", value: formatCurrency(otherLiabilities, 2) },
         {
@@ -365,15 +372,15 @@ function buildTimeline(
     },
     {
       step: 8,
-      title: "Woningwaarde en LTV toetsen",
+      title: "Woningwaarde als grens controleren",
       explanation:
-        "De woningwaardelimiet bestaat uit de basislimiet op woningwaarde plus uitsluitend de daadwerkelijk toegepaste extra LTV-ruimte voor energiebesparende maatregelen. De energielabelruimte verhoogt alleen de inkomensgrens.",
+        "De hypotheek mag normaal niet hoger zijn dan de woningwaarde. Alleen het bedrag voor toegestane energiebesparende maatregelen kan extra ruimte geven. De energielabelruimte verhoogt alleen de inkomensgrens.",
       formula: "woningwaardelimiet = woningwaarde x LTV-percentage + gefinancierde energiebesparende voorzieningen",
       lines: [
         { label: "Woningwaarde", value: formatCurrency(result.breakdown.propertyValue, 2) },
-        { label: "LTV-percentage", value: formatPercent(result.breakdown.ltvPercentage) },
+        { label: "Maximaal deel van de woningwaarde", value: formatPercent(result.breakdown.ltvPercentage) },
         { label: "Basislimiet op woningwaarde", value: formatCurrency(result.breakdown.baseMaxMortgageByLtv, 2) },
-        { label: "Toegepaste extra LTV-ruimte voor energiebesparende maatregelen", value: formatCurrency(result.breakdown.energySavingAllowance, 2) },
+        { label: "Extra ruimte voor energiebesparende maatregelen", value: formatCurrency(result.breakdown.energySavingAllowance, 2) },
         { label: "Extra leenruimte door energielabel", value: `${formatCurrency(result.breakdown.energyLabelAllowance, 2)}; alleen toegepast op de inkomensgrens` },
       ],
       outcome: {
@@ -531,7 +538,7 @@ export function buildMortgagePdfReport(
         : "Geen hogere uitkomst binnen de officiële financieringslasttabelbanden.",
     },
     {
-      label: "Impact op leencapaciteit",
+      label: "Minder hypotheekruimte op basis van inkomen door studieschuld",
       value: formatCurrency(studentLoanImpactOnLeencapaciteit, 2),
       note:
         result.breakdown.studentLoanMonthlyImpact > 0
@@ -574,7 +581,7 @@ export function buildMortgagePdfReport(
         { label: "Tabelversie", value: result.breakdown.financingLoadTableVersion ?? result.breakdown.financingLoadSource },
         { label: "Maximale jaarlijkse woonlast", value: formatCurrency(result.debug.maxAnnualHousingCost, 2) },
         { label: "Maandbudget vóór verplichtingen", value: formatCurrency(result.breakdown.monthlyHousingBudgetBeforeLiabilities, 2) },
-        { label: "Studieschuldimpact", value: formatCurrency(result.breakdown.studentLoanMonthlyImpact, 2), note: buildStudentLoanSummary(input, result) },
+        { label: "Omgerekende DUO-maandlast", value: formatCurrency(result.breakdown.studentLoanMonthlyImpact, 2), note: buildStudentLoanSummary(input, result) },
         { label: "Totale verplichtingen", value: formatCurrency(result.breakdown.monthlyLiabilityImpact, 2) },
         { label: "Maandbudget na verplichtingen", value: formatCurrency(result.breakdown.monthlyHousingBudgetAfterLiabilities, 2) },
         { label: "Annuïteitsfactor", value: formatNumber(result.debug.annuityFactor) },
@@ -634,7 +641,7 @@ export function buildMortgagePdfReport(
       "Volledige rekenvolgorde, uitkomsten, controlewaarden, aannames en bronnen.",
     generatedAt: generatedAtLabel,
     normYear: result.normYear,
-    timeline: buildTimeline(input, result),
+    timeline: buildMortgageCalculationTimeline(input, result),
     summaryLines,
     sections,
     warnings: result.warnings.map((warning) => warning.message),

@@ -54,7 +54,7 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 | Centrale tax/DUO/pension/constants lagen | actief | n.v.t. | aan | Hergebruikt door meerdere tools | n.v.t. |
 | Submit-driven calculatorflow | actief | n.v.t. | aan | Patroon beschikbaar via `CalculatorShell` + submitlogica | n.v.t. |
 | Volgende-stap navigatie tussen publieke tools | actief | `ToolNextSteps` + journey-map | aan | Compacte vervolgstap per publieke tool, afgestemd op de meest waarschijnlijke vervolgvraag | n.v.t. |
-| DUO-impact in maximale-hypotheektool | actief | n.v.t. | aan | Kernuitkomst toont rechtsboven de indicatieve daling van de leencapaciteit; onbekende DUO-regelingen worden niet stil met een standaardregeling doorgerekend | n.v.t. |
+| DUO-impact in maximale-hypotheektool | actief | n.v.t. | aan | De kernuitkomst heeft direct daaronder een ingeklapte berekeningsopbouw met toetsinkomen, maandruimte, omgerekende DUO-maandlast, daling van de inkomensruimte en de uiteindelijke laagste grens; onbekende DUO-regelingen worden niet stil met een standaardregeling doorgerekend | n.v.t. |
 | Hypotheekrentelink en salarisverhogingsanalyse | actief | centrale linkconfig + salarisadapter | aan | Maximale-hypotheekflow toont externe inspiratielink bij renteveld en vervolganalyse voor extra leenruimte via centrale hypotheekengine; PDF-uitbreiding blijft vervolgwerk | n.v.t. |
 | Familiehulp eerste woning | uitgeschakeld | `apps/familiehulp-eerste-woning/app.json -> enabled: false` | uit | Bewust buiten eerste-livegangscope; code blijft bestaan, maar publieke registry, routes, dashboard, zoekresultaten, lazy loading en journey-links sluiten de tool uit | zet alleen na scopebesluit `enabled: true` en draai volledige blueprint-/releasechecks |
 | Hypotheek Regulations-integratieadapter | voorbereid | centrale adapter | uit in UI | Centrale adapterlaag voor hypotheektools richting Regulations-architectuur; nog niet gekoppeld aan calculators en wijzigt geen publieke uitkomsten | koppel per tool pas na UX/PDF- en regressiecontrole |
@@ -79,6 +79,7 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 
 | Datum | Commit | Wijziging | Impact |
 |---|---|---|---|
+| 2026-07-28 | `pending` | Maximale-hypotheekuitkomst uitgebreid met een standaard ingeklapte, stapsgewijze berekeningsopbouw die de DUO-impact en alle geldende eindgrenzen vanuit dezelfde centrale rapportdata toont | Maximale hypotheek / studieschuld / resultaten / UX / PDF |
 | 2026-07-28 | `pending` | Softwarelicentie `AGPL-3.0-or-later`, merk- en contentscheiding, securitybeleid, publieke privacyverklaring en gebruiksvoorwaarden toegevoegd; Cloudflare Pages en eigen domein als toekomstige gecontroleerde hostingstap vastgelegd | Juridisch / privacy / security / routing / hosting |
 | 2026-07-28 | `pending` | Centrale tijdelijke vervolgtool-overdracht toegevoegd voor DUO-maandbedrag, extra aflossen, hypotheekimpact en maximale hypotheek, inclusief expliciete voorrang boven profielwaarden en tekstuele toelichting op de doeltool | Tooljourneys / profiel / DUO / hypotheek / UX |
 | 2026-07-28 | `pending` | Vrij DUO-renteveld in het browserprofiel vervangen door een stelselafhankelijke keuze uit centraal beheerde rentejaren en percentages; het gekozen rentejaar wordt expliciet bewaard en hergebruikt | Profiel / DUO / brondata / UX |

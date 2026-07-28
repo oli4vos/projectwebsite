@@ -6,7 +6,6 @@ import { FieldError } from "@/components/forms/FieldError";
 import { MobileFieldFlowControls } from "@/components/MobileFieldFlowControls";
 import { MortgageRateReferenceLink } from "@/components/mortgage/MortgageRateReferenceLink";
 import { ResultCard } from "@/components/ResultCard";
-import { ResultRow } from "@/components/ResultRow";
 import { CalculatorShell } from "@/components/tool/CalculatorShell";
 import {
   ExampleValuesNotice,
@@ -38,6 +37,7 @@ import {
   type MortgageFormState,
 } from "./logic";
 import { downloadMortgagePdfReport } from "./report";
+import { MortgageCalculationBreakdown } from "./MortgageCalculationBreakdown";
 import { SalaryBorrowingPowerExplorer } from "./SalaryBorrowingPowerExplorer";
 import {
   applyDuoMortgageCandidateToMaxMortgageForm,
@@ -48,13 +48,6 @@ function formatCurrency(value: number, maximumFractionDigits = 0) {
   return new Intl.NumberFormat("nl-NL", {
     style: "currency",
     currency: "EUR",
-    maximumFractionDigits,
-  }).format(value);
-}
-
-function formatPercent(value: number, maximumFractionDigits = 2) {
-  return new Intl.NumberFormat("nl-NL", {
-    minimumFractionDigits: 2,
     maximumFractionDigits,
   }).format(value);
 }
@@ -667,6 +660,12 @@ function CalculatorContent({
               </>
             )}
           </div>
+          {result && submittedValidation?.parsed ? (
+            <MortgageCalculationBreakdown
+              input={submittedValidation.parsed}
+              result={result}
+            />
+          ) : null}
           {result ? <ToolNextSteps {...nextSteps} /> : null}
           {result ? (
             <ToolActionButton
@@ -693,108 +692,6 @@ function CalculatorContent({
                 submittedScenarioKey={submittedScenarioKey}
               />
             ) : null}
-
-            <DisclosureSection title="Berekening per bedrag" subtitle="Hier zie je welke limiet het eindbedrag bepaalt.">
-              <ResultRow
-                label="Maximale hypotheek op inkomen"
-                value={formatCurrency(result.breakdown.maxMortgageByIncome)}
-                breakdown={
-                  <>
-                    <div>Toetsinkomen: {formatCurrency(result.breakdown.householdIncome)}</div>
-                    <div>Woonlastfactor: {formatPercent(result.breakdown.annualHousingCostRatio)}%</div>
-                    <div>Maandbudget na schulden: {formatCurrency(result.breakdown.monthlyHousingBudgetAfterLiabilities)}</div>
-                    <div>Basis hypotheekruimte uit inkomen: {formatCurrency(result.breakdown.baseMaxMortgageByIncome)}</div>
-                    <div>Toegepaste extra leenruimte op inkomen door energielabel: {formatCurrency(result.breakdown.energyLabelAllowance)}</div>
-                    <div>Toegepaste extra leenruimte op inkomen voor energiebesparende maatregelen: {formatCurrency(result.breakdown.energySavingAllowance)}</div>
-                  </>
-                }
-                breakdownLabel="Toon inkomensberekening"
-                defaultBreakdownOpen
-              />
-              <ResultRow
-                label="Maximale hypotheek op woningwaarde"
-                value={result.maxMortgageByCollateral === null ? "n.v.t." : formatCurrency(result.maxMortgageByCollateral)}
-                breakdown={
-                  result.maxMortgageByCollateral === null ? (
-                    <div>Geen woningwaarde opgegeven, dus geen aparte grens op basis van de woningwaarde.</div>
-                  ) : (
-                    <>
-                      <div>Woningwaarde: {formatCurrency(result.breakdown.propertyValue || result.breakdown.marketValue)}</div>
-                      <div>LTV: {formatPercent(result.breakdown.ltvPercentage)}%</div>
-                      <div>Basislimiet op woningwaarde: {formatCurrency(result.breakdown.baseMaxMortgageByLtv)}</div>
-                      <div>Toegepaste extra LTV-ruimte voor energiebesparende maatregelen: {formatCurrency(result.breakdown.energySavingAllowance)}</div>
-                      <div>Totaal maximale hypotheek op woningwaarde: {formatCurrency(result.breakdown.maxMortgageByLtv)}</div>
-                      <div>Extra leenruimte door energielabel: {formatCurrency(result.breakdown.energyLabelAllowance)}. Dit bedrag verhoogt alleen de inkomensgrens en is niet opgenomen in deze woningwaardelimiet.</div>
-                    </>
-                  )
-                }
-                breakdownLabel="Toon berekening op basis van woningwaarde"
-              />
-              {result.breakdown.maxMortgageByNhg !== undefined ? (
-                <ResultRow
-                  label="NHG-limiet"
-                  value={formatCurrency(result.breakdown.maxMortgageByNhg)}
-                  breakdown={<div>NHG is indicatief meegenomen op basis van de opgegeven grens.</div>}
-                  breakdownLabel="Toon NHG-uitleg"
-                />
-              ) : null}
-              <ResultRow
-                label="Woonlast vóór schulden"
-                value={formatCurrency(result.breakdown.monthlyHousingBudgetBeforeLiabilities)}
-                sub={`Na DUO en andere lasten: ${formatCurrency(result.breakdown.monthlyHousingBudgetAfterLiabilities)}`}
-              />
-              <ResultRow
-                label="Omgerekende DUO-maandlast"
-                value={formatCurrency(result.breakdown.studentLoanMonthlyImpact)}
-                breakdown={<div>Voor de hypotheektoets wordt de DUO-maandlast omgerekend naar een vergelijkbare bruto maandlast.</div>}
-              />
-              <ResultRow
-                label="Hogere hypotheek bij andere toetsrente"
-                value={
-                  result.breakdown.higherMortgageOpportunity
-                    ? `+ ${formatCurrency(result.breakdown.higherMortgageOpportunity.increaseInMaxMortgage)}`
-                    : "geen hogere uitkomst"
-                }
-                breakdown={
-                  result.breakdown.higherMortgageOpportunity ? (
-                    <>
-                      <div>
-                        Huidige toetsrente:{" "}
-                        {formatPercent(result.breakdown.higherMortgageOpportunity.referenceTestRate, 3)}
-                      </div>
-                      <div>
-                        Alternatieve toetsrente:{" "}
-                        {formatPercent(result.breakdown.higherMortgageOpportunity.alternativeTestRate, 3)}
-                      </div>
-                      <div>
-                        Financieringslastpercentage alternatief:{" "}
-                        {formatPercent(
-                          result.breakdown.higherMortgageOpportunity.alternativeAnnualHousingCostRatio,
-                        )}
-                      </div>
-                      <div>
-                        Alternatieve maximale hypotheek op inkomen:{" "}
-                        {formatCurrency(
-                          result.breakdown.higherMortgageOpportunity.alternativeMaxMortgageByIncome,
-                        )}
-                      </div>
-                      <div>
-                        Alternatieve einduitkomst:{" "}
-                        {formatCurrency(
-                          result.breakdown.higherMortgageOpportunity.alternativeFinalMaxMortgage,
-                        )}
-                      </div>
-                      <div>{result.breakdown.higherMortgageOpportunity.note}</div>
-                    </>
-                  ) : (
-                    <div>Geen hogere uitkomst binnen de officiële financieringslasttabelbanden.</div>
-                  )
-                }
-                breakdownLabel="Toon rentevergelijking"
-                strong={Boolean(result.breakdown.higherMortgageOpportunity)}
-                accent={Boolean(result.breakdown.higherMortgageOpportunity)}
-              />
-            </DisclosureSection>
 
             <DisclosureSection title="Waarschuwingen" subtitle="Wat deze tool niet automatisch voor je beslist.">
               {result.warnings.map((warning) => (

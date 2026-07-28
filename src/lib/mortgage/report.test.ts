@@ -49,17 +49,25 @@ describe("mortgage PDF report", () => {
     expect(
       report.summaryLines.some((line) => line.label === "Hogere hypotheek bij andere toetsrente"),
     ).toBe(true);
-    expect(report.summaryLines.some((line) => line.label === "Impact op leencapaciteit")).toBe(true);
+    expect(
+      report.summaryLines.some(
+        (line) =>
+          line.label ===
+          "Minder hypotheekruimte op basis van inkomen door studieschuld",
+      ),
+    ).toBe(true);
     expect(report.sections.some((section) => section.title === "Inkomens- en verplichtingentabel")).toBe(true);
     expect(report.sections.some((section) => section.title === "Woningwaarde, NHG en eigen middelen")).toBe(true);
     expect(
       report.timeline[2].lines.some((line) => line.label === "Werkelijke rente" && line.value === "4,01%"),
     ).toBe(true);
 
-    const ltvStep = report.timeline.find((step) => step.title === "Woningwaarde en LTV toetsen");
+    const ltvStep = report.timeline.find(
+      (step) => step.title === "Woningwaarde als grens controleren",
+    );
     expect(ltvStep?.lines.some(
       (line) =>
-        line.label === "Toegepaste extra LTV-ruimte voor energiebesparende maatregelen" &&
+        line.label === "Extra ruimte voor energiebesparende maatregelen" &&
         line.value.includes("0,00"),
     )).toBe(true);
     expect(ltvStep?.lines.some(
@@ -70,9 +78,20 @@ describe("mortgage PDF report", () => {
 
     const studentLoanLine = report.sections
       .find((section) => section.title === "Inkomens- en verplichtingentabel")
-      ?.lines?.find((line) => line.label === "Studieschuldimpact");
+      ?.lines?.find((line) => line.label === "Omgerekende DUO-maandlast");
 
-    expect(studentLoanLine?.note).toContain("Brutering");
+    expect(studentLoanLine?.note).toContain("Voor de hypotheektoets telt dit als");
+    const obligationStep = report.timeline.find((step) =>
+      step.title.includes("Studieschuld"),
+    );
+    expect(
+      obligationStep?.lines.some(
+        (line) =>
+          line.label ===
+            "Minder hypotheekruimte op basis van inkomen door studieschuld" &&
+          line.value.includes("€"),
+      ),
+    ).toBe(true);
     expect(report.warnings.length).toBeGreaterThan(0);
     expect(report.assumptions.length).toBeGreaterThan(0);
   });

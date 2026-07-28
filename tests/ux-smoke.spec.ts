@@ -114,6 +114,58 @@ test("maximale hypotheek toont één primaire uitkomst", async ({ page }, testIn
   await expect(summary.getByText("Impact DUO-schuld")).toHaveCount(0);
 });
 
+test("maximale hypotheek legt de uitkomst uit inclusief studieschuld", async ({
+  page,
+}) => {
+  await page.goto("/apps/artifact-hypotheek-wonen-maximale-hypotheek", {
+    waitUntil: "networkidle",
+  });
+  await page.getByRole("button", { name: "Voorbeeld invullen" }).click();
+
+  const desktopCalculate = page.getByRole("button", {
+    name: "Bereken",
+    exact: true,
+  });
+  if (await desktopCalculate.isVisible()) {
+    await desktopCalculate.click();
+  } else {
+    const nextField = page.getByRole("button", { name: "Volgende veld" });
+    while (await nextField.isVisible()) {
+      await nextField.click();
+    }
+    await page.getByRole("button", { name: "Bekijk uitkomst" }).click();
+  }
+
+  const breakdown = page.getByTestId("mortgage-calculation-breakdown");
+  await expect(
+    breakdown.getByText("Zo is dit bedrag opgebouwd"),
+  ).toBeVisible();
+
+  const disclosure = breakdown.locator("details");
+  await expect(disclosure).not.toHaveAttribute("open", "");
+  await breakdown
+    .getByText("Zo is dit bedrag opgebouwd")
+    .click();
+  await expect(disclosure).toHaveAttribute("open", "");
+
+  await expect(
+    breakdown.getByText("Studieschuld en andere verplichtingen verwerken"),
+  ).toBeVisible();
+  await expect(
+    breakdown.getByText(
+      "Minder hypotheekruimte op basis van inkomen door studieschuld",
+    ),
+  ).toBeVisible();
+  await expect(
+    breakdown.getByText("Eindbedrag na alle grenzen"),
+  ).toBeVisible();
+
+  const hasHorizontalOverflow = await page.evaluate(
+    () => document.documentElement.scrollWidth > window.innerWidth + 1,
+  );
+  expect(hasHorizontalOverflow).toBe(false);
+});
+
 test("maximale hypotheek toont rentelink en salarisverhogingsanalyse", async ({
   page,
 }, testInfo) => {
