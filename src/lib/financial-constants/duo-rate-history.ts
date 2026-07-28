@@ -205,5 +205,5 @@ export function formatDuoRateYearLabel(year: number, rule: RepaymentRuleKey = "U
     maximumFractionDigits: 2,
   }).format(rate);
 
-  return `${year} — ${formattedRate}%`;
+  return `${year}, ${formattedRate}%`;
 }

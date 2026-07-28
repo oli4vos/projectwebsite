@@ -528,7 +528,7 @@ function buildSources() {
     },
     {
       key: "duo-studentenreisproduct",
-      title: "Hoelang recht – Studentenreisproduct",
+      title: "Hoelang recht, Studentenreisproduct",
       organization: "DUO",
       url: "https://www.duo.nl/particulier/ov-en-reizen/hoelang-recht.jsp",
       appliesTo:

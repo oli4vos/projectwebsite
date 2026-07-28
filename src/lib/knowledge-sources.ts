@@ -158,7 +158,7 @@ export const knowledgeSources = {
     lastChecked: "2026-07-13",
   },
   "duo-studentenreisproduct-hoelang-recht": {
-    title: "Hoelang recht – Studentenreisproduct",
+    title: "Hoelang recht, Studentenreisproduct",
     publisher: "DUO",
     date: "Actuele DUO-pagina",
     type: "Primaire uitvoeringsbron",

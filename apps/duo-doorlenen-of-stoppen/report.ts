@@ -494,7 +494,7 @@ function renderSourceSection(doc: PdfDocument, report: StudyStopPdfReport, y: nu
   );
 
   for (const source of report.sources) {
-    const sourceText = `${source.key} — ${source.organization}: ${source.title}. ${source.appliesTo}`;
+    const sourceText = `${source.key}, ${source.organization}: ${source.title}. ${source.appliesTo}`;
     const note = `Regeling: ${source.regulation}. Geldigheid: ${source.validityDate}. Geraadpleegd: ${source.consultedAt}. Regelversie: ${source.ruleVersion}. URL: ${source.url}. Onzekerheden: ${source.uncertainties.join(" ")}`;
     currentY += renderLineItem(doc, sourceText, source.url, note, currentY) + 6;
   }

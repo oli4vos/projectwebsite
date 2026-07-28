@@ -49,8 +49,8 @@ describe("financial constants helpers", () => {
   });
 
   it("formats rate-year labels with the visible percentage", () => {
-    expect(formatDuoRateYearLabel(2026, "SF35")).toBe("2026 — 2,33%");
-    expect(formatDuoRateYearLabel(2024, "SF15")).toBe("2024 — 2,95%");
+    expect(formatDuoRateYearLabel(2026, "SF35")).toBe("2026, 2,33%");
+    expect(formatDuoRateYearLabel(2024, "SF15")).toBe("2024, 2,95%");
   });
 
   it("exposes central DUO borrowing limits for tool sliders", () => {

@@ -921,7 +921,7 @@ export const ALLOWANCE_CALCULATION_RULES_2026: AllowanceCalculationRules2026 = {
       { incomeFrom: 235_698, incomeTo: 99_999_999, firstChildPercent: 36.5, nextChildPercent: 68.2 },
     ],
     calculationSteps: [
-      "1. Controleer recht: betaalde en geregistreerde opvang, kind woont bij aanvrager, eigen bijdrage, kwalificerende activiteit van aanvrager en partner, en leeftijd/einde recht.",
+      "1. Controleer recht: betaalde en geregistreerde opvang, kind woont bij aanvrager, eigen bijdrage, kwalificerende activiteit van aanvrager en partner en leeftijd/einde recht.",
       "2. Bepaal per kind en opvangsoort het subsidiabele uurtarief: min(werkelijk tarief, maximumuurtarief voor dagopvang/BSO/gastouderopvang).",
       "3. Bepaal subsidiabele uren: maximaal 230 uur per kind per maand en gekoppeld aan gewerkte maanden; bij twee ouders geldt de ouder die het minst werkt.",
       "4. Bepaal het 1e kind: kind met meeste subsidiabele opvanguren; bij gelijke uren het kind met hoogste subsidiabele opvangkosten.",

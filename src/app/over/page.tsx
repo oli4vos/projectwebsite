@@ -25,7 +25,7 @@ export default function OverPage() {
           <div className="mt-6 max-w-[70ch] space-y-6 text-[14px] leading-[1.7] text-[var(--ink-2)]">
             <p>
               Deze site is een onafhankelijk project met heldere rekentools voor
-              mensen met een DUO-studieschuld, en voor starters die hun maximale
+              mensen met een DUO-studieschuld en voor starters die hun maximale
               hypotheek willen inschatten. Er zijn geen advertenties of
               doorverwijzingen naar aanbieders. Je ziet informatieve scenario&apos;s
               met je eigen cijfers; geen persoonlijk advies.
@@ -48,7 +48,7 @@ export default function OverPage() {
               <p>
                 Elke aanname is terug te voeren op wet- en
                 regelgeving, het normadvies van het Nibud, toezichthouders
-                zoals de AFM, en officiële uitleg van de overheid, DUO en de
+                zoals de AFM en officiële uitleg van de overheid, DUO en de
                 Belastingdienst. De waarden worden minstens jaarlijks en bij
                 relevante wijzigingen gecontroleerd. Bekijk de{" "}
                 <Link

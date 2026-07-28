@@ -250,7 +250,7 @@ function timelineStepHeight(
     height += doc.splitTextToSize(step.formula, textWidth - 16).length * 11 + 18;
   }
   for (const line of step.lines) {
-    const value = `${line.label}: ${line.value}${line.note ? ` — ${line.note}` : ""}`;
+    const value = `${line.label}: ${line.value}${line.note ? `, ${line.note}` : ""}`;
     height += doc.splitTextToSize(value, textWidth).length * 10 + 5;
   }
   const outcome = `${step.outcome.label}: ${step.outcome.value}`;
@@ -312,7 +312,7 @@ function renderTimelineStep(
   }
 
   for (const line of step.lines) {
-    const value = `${line.label}: ${line.value}${line.note ? ` — ${line.note}` : ""}`;
+    const value = `${line.label}: ${line.value}${line.note ? `, ${line.note}` : ""}`;
     const valueLines = doc.splitTextToSize(value, textWidth);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8.5);
@@ -448,7 +448,7 @@ function renderMortgagePdfDocument(doc: PdfDocument, report: MortgagePdfReport) 
       y,
     );
     report.sources.forEach((source) => {
-      const sourceText = `${source.key} — ${source.organization}: ${source.title}. ${source.appliesTo} ${source.url}`;
+      const sourceText = `${source.key}, ${source.organization}: ${source.title}. ${source.appliesTo} ${source.url}`;
       const sourceHeight = doc.splitTextToSize(
         sourceText,
         pageWidth - PAGE_MARGIN * 2,
