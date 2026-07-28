@@ -11,6 +11,7 @@ export type StudentDebtProfileResult = {
   mortgageAssessmentMonthlyPayment: number;
   repaymentRule: ProfileRepaymentRule;
   duoInterestRate: number;
+  duoRateYear: number;
   remainingTermYears: number;
   currentMonthlyPayment?: number;
   duoSituation?: ProfileDuoSituation;
@@ -28,6 +29,7 @@ export function createStudentDebtProfilePatch(
         result.mortgageAssessmentMonthlyPayment,
       repaymentRule: result.repaymentRule,
       duoInterestRate: result.duoInterestRate,
+      duoRateYear: result.duoRateYear,
       remainingTermYears: result.remainingTermYears,
       ...(result.currentMonthlyPayment !== undefined
         ? { currentMonthlyPayment: result.currentMonthlyPayment }

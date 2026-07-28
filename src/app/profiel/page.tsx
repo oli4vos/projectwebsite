@@ -24,6 +24,12 @@ import {
 } from "@/lib/copy-glossary";
 import { ENABLE_PROFILE } from "@/lib/feature-flags";
 import {
+  formatDuoRateYearLabel,
+  getAvailableDuoRateYears,
+  getDuoHistoricalRateYearForRule,
+  getDuoRateForRule,
+} from "@/lib/financial-constants";
+import {
   createDefaultDuoDebtPartFormValues,
   createDuoDebtPartFormValue,
   validateDuoDebtPartFormValues,
@@ -50,7 +56,7 @@ type ProfileFormState = {
   mortgageAssessmentMonthlyPayment: string;
   repaymentRule: ProfileRepaymentRule;
   duoSituation: ProfileDuoSituation;
-  duoInterestRate: string;
+  duoRateYear: string;
   remainingTermYears: string;
   useDebtParts: boolean;
   debtParts: DuoDebtPartFormValue[];
@@ -74,7 +80,7 @@ const defaultFormState: ProfileFormState = {
   mortgageAssessmentMonthlyPayment: "",
   repaymentRule: "UNKNOWN",
   duoSituation: "unknown",
-  duoInterestRate: "",
+  duoRateYear: "",
   remainingTermYears: "",
   useDebtParts: false,
   debtParts: createDefaultDuoDebtPartFormValues(),
@@ -98,7 +104,7 @@ const profileStepByField: Record<keyof ProfileFormState, number> = {
   mortgageAssessmentMonthlyPayment: 1,
   repaymentRule: 1,
   duoSituation: 1,
-  duoInterestRate: 1,
+  duoRateYear: 1,
   remainingTermYears: 1,
   useDebtParts: 1,
   debtParts: 1,
@@ -153,6 +159,20 @@ function toFormValue(value?: number) {
 }
 
 function profileToFormState(profile: UserProfile): ProfileFormState {
+  const repaymentRule = profile.studentDebt?.repaymentRule ?? "UNKNOWN";
+  const inferredRateYear =
+    repaymentRule === "UNKNOWN"
+      ? undefined
+      : getDuoHistoricalRateYearForRule(
+          repaymentRule,
+          profile.studentDebt?.duoInterestRate,
+        );
+  const storedRateYear = profile.studentDebt?.duoRateYear;
+  const duoRateYear =
+    storedRateYear !== undefined &&
+    getAvailableDuoRateYears().includes(storedRateYear)
+      ? storedRateYear
+      : inferredRateYear;
   const debtParts =
     profile.studentDebt?.debtParts?.map((part, index) => ({
       id: `profile-duo-debt-part-${index + 1}`,
@@ -177,9 +197,9 @@ function profileToFormState(profile: UserProfile): ProfileFormState {
     mortgageAssessmentMonthlyPayment: toFormValue(
       profile.studentDebt?.mortgageAssessmentMonthlyPayment,
     ),
-    repaymentRule: profile.studentDebt?.repaymentRule ?? "UNKNOWN",
+    repaymentRule,
     duoSituation: profile.studentDebt?.duoSituation ?? "unknown",
-    duoInterestRate: toFormValue(profile.studentDebt?.duoInterestRate),
+    duoRateYear: toFormValue(duoRateYear),
     remainingTermYears: toFormValue(profile.studentDebt?.remainingTermYears),
     useDebtParts: debtParts.length > 0,
     debtParts:
@@ -234,9 +254,10 @@ function formStateToProfile(formValues: ProfileFormState) {
   const mortgageAssessmentMonthlyPayment = parseOptionalDecimalInput(
     formValues.mortgageAssessmentMonthlyPayment,
   );
-  const duoInterestRate = parseOptionalDecimalInput(
-    formValues.duoInterestRate,
-  );
+  const duoRateYear =
+    formValues.duoRateYear.trim().length > 0
+      ? Number.parseInt(formValues.duoRateYear, 10)
+      : undefined;
   const remainingTermYears = parseOptionalDecimalInput(
     formValues.remainingTermYears,
   );
@@ -319,12 +340,10 @@ function formStateToProfile(formValues: ProfileFormState) {
   );
 
   if (
-    duoInterestRate !== undefined &&
-    (!Number.isFinite(duoInterestRate) ||
-      duoInterestRate < 0 ||
-      duoInterestRate > 100)
+    duoRateYear !== undefined &&
+    !getAvailableDuoRateYears().includes(duoRateYear)
   ) {
-    errors.duoInterestRate = "Gebruik een rentepercentage tussen 0 en 100.";
+    errors.duoRateYear = "Kies een beschikbaar DUO-rentejaar.";
   }
 
   if (
@@ -379,7 +398,12 @@ function formStateToProfile(formValues: ProfileFormState) {
               formValues.duoSituation === "unknown"
                 ? undefined
                 : formValues.duoSituation,
-            duoInterestRate,
+            duoRateYear,
+            duoInterestRate:
+              duoRateYear !== undefined &&
+              formValues.repaymentRule !== "UNKNOWN"
+                ? getDuoRateForRule(formValues.repaymentRule, duoRateYear)
+                : undefined,
             remainingTermYears,
             debtParts: formValues.useDebtParts
               ? debtPartsValidation.sanitizedParts.map((part) => ({
@@ -467,6 +491,8 @@ function SelectField<T extends string>({
   value,
   options,
   hint,
+  error,
+  disabled = false,
   onChange,
 }: {
   field: keyof ProfileFormState;
@@ -474,10 +500,16 @@ function SelectField<T extends string>({
   value: T;
   options: readonly { value: T; label: string }[];
   hint?: string;
+  error?: string;
+  disabled?: boolean;
   onChange: (value: T) => void;
 }) {
   const id = `profile-${field}`;
   const hintId = `${id}-hint`;
+  const errorId = `${id}-error`;
+  const describedBy =
+    [hint ? hintId : null, error ? errorId : null].filter(Boolean).join(" ") ||
+    undefined;
 
   return (
     <div className="grid gap-2">
@@ -490,9 +522,11 @@ function SelectField<T extends string>({
       <select
         id={id}
         value={value}
+        disabled={disabled}
         onChange={(event) => onChange(event.target.value as T)}
-        aria-describedby={hint ? hintId : undefined}
-        className="ring-focus hair h-12 min-w-0 rounded-md border bg-white px-4 text-[15px] text-[var(--ink)] outline-none"
+        aria-invalid={error ? "true" : "false"}
+        aria-describedby={describedBy}
+        className="ring-focus hair h-12 min-w-0 rounded-md border bg-white px-4 text-[15px] text-[var(--ink)] outline-none disabled:cursor-not-allowed disabled:bg-[var(--paper-soft)] disabled:text-[var(--muted)]"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
@@ -505,6 +539,7 @@ function SelectField<T extends string>({
           {hint}
         </p>
       ) : null}
+      <FieldError id={errorId} message={error} />
     </div>
   );
 }
@@ -720,6 +755,15 @@ function ProfileEditor({
     value: ProfileFormState[K],
   ) {
     setFormValues((current) => ({ ...current, [field]: value }));
+    onSaveMessageChange("");
+  }
+
+  function updateRepaymentRule(value: ProfileRepaymentRule) {
+    setFormValues((current) => ({
+      ...current,
+      repaymentRule: value,
+      duoRateYear: value === "UNKNOWN" ? "" : current.duoRateYear,
+    }));
     onSaveMessageChange("");
   }
 
@@ -992,14 +1036,35 @@ function ProfileEditor({
                 value,
                 label: getRepaymentRuleLabel(value),
               }))}
-              onChange={(value) => updateField("repaymentRule", value)}
+              onChange={updateRepaymentRule}
             />
-            <TextField
-              field="duoInterestRate"
-              label="DUO-rentepercentage"
-              value={formValues.duoInterestRate}
-              error={errors.duoInterestRate}
-              onChange={(value) => updateField("duoInterestRate", value)}
+            <SelectField
+              field="duoRateYear"
+              label="DUO-rentejaar en percentage"
+              value={formValues.duoRateYear}
+              options={
+                formValues.repaymentRule === "UNKNOWN"
+                  ? [
+                      {
+                        value: "",
+                        label: "Kies eerst je terugbetalingsregel",
+                      },
+                    ]
+                  : [
+                      { value: "", label: "Nog niet ingevuld" },
+                      ...getAvailableDuoRateYears().map((year) => ({
+                        value: String(year),
+                        label: formatDuoRateYearLabel(
+                          year,
+                          formValues.repaymentRule,
+                        ),
+                      })),
+                    ]
+              }
+              error={errors.duoRateYear}
+              disabled={formValues.repaymentRule === "UNKNOWN"}
+              hint="Kies het rentejaar dat in Mijn DUO bij je schuld staat."
+              onChange={(value) => updateField("duoRateYear", value)}
             />
             <TextField
               field="remainingTermYears"

@@ -163,6 +163,7 @@ describe("createLocalProfileStore", () => {
     store.saveProfile({
       studentDebt: {
         mortgageAssessmentMonthlyPayment: 164.25,
+        duoRateYear: 2025,
         debtParts: [
           { remainingDebt: 11000, rateYear: 2025 },
           { remainingDebt: -1, rateYear: 2026 },
@@ -176,6 +177,7 @@ describe("createLocalProfileStore", () => {
     expect(result.data?.studentDebt?.mortgageAssessmentMonthlyPayment).toBe(
       164.25,
     );
+    expect(result.data?.studentDebt?.duoRateYear).toBe(2025);
     expect(result.data?.studentDebt?.debtParts).toEqual([
       { remainingDebt: 11000, rateYear: 2025 },
     ]);

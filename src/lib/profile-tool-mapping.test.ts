@@ -213,6 +213,23 @@ describe("profile tool mapping", () => {
     expect(mapped.duoRateYear).toBe("2026");
   });
 
+  it("prefers the explicitly stored DUO rate year", () => {
+    const profile: UserProfile = {
+      studentDebt: {
+        repaymentRule: "SF35",
+        duoInterestRate: 2.33,
+        duoRateYear: 2025,
+      },
+    };
+
+    expect(getDuoMonthlyPaymentDefaultsFromProfile(profile).duoRateYear).toBe(
+      "2025",
+    );
+    expect(getMortgageImpactDefaultsFromProfile(profile).duoRateYear).toBe(
+      "2025",
+    );
+  });
+
   it("maps student-debt-vs-investing defaults and falls back fiscal partner from household", () => {
     const profile: UserProfile = {
       income: {

@@ -10,6 +10,7 @@ describe("profile result mapping", () => {
         mortgageAssessmentMonthlyPayment: 112.4,
         repaymentRule: "SF35",
         duoInterestRate: 2.33,
+        duoRateYear: 2026,
         remainingTermYears: 30,
         currentMonthlyPayment: 78,
         duoSituation: "incomeBasedReduction",
@@ -25,6 +26,7 @@ describe("profile result mapping", () => {
         mortgageAssessmentMonthlyPayment: 112.4,
         repaymentRule: "SF35",
         duoInterestRate: 2.33,
+        duoRateYear: 2026,
         remainingTermYears: 30,
         currentMonthlyPayment: 78,
         duoSituation: "incomeBasedReduction",
@@ -43,6 +45,7 @@ describe("profile result mapping", () => {
       mortgageAssessmentMonthlyPayment: 112.4,
       repaymentRule: "SF35",
       duoInterestRate: 2.33,
+      duoRateYear: 2026,
       remainingTermYears: 30,
     });
 

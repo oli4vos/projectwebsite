@@ -18,6 +18,7 @@ export const PROFILE_FIELDS_MORTGAGE_IMPACT = [
   "studentDebt.repaymentRule",
   "studentDebt.duoSituation",
   "studentDebt.duoInterestRate",
+  "studentDebt.duoRateYear",
   "studentDebt.remainingTermYears",
   "studentDebt.debtParts",
   "housing.targetHomePrice",
@@ -31,6 +32,7 @@ export const PROFILE_FIELDS_DUO_MONTHLY_PAYMENT = [
   "studentDebt.remainingDebt",
   "studentDebt.repaymentRule",
   "studentDebt.duoInterestRate",
+  "studentDebt.duoRateYear",
   "studentDebt.debtParts",
   "income.householdType",
 ] as const;
@@ -39,6 +41,7 @@ export const PROFILE_FIELDS_DUO_EXTRA_REPAYMENT = [
   "studentDebt.remainingDebt",
   "studentDebt.repaymentRule",
   "studentDebt.duoInterestRate",
+  "studentDebt.duoRateYear",
   "studentDebt.currentMonthlyPayment",
   "studentDebt.debtParts",
 ] as const;
@@ -319,6 +322,14 @@ function toStringValue(value?: number) {
 }
 
 function getProfileDuoRateYear(profile: UserProfile) {
+  const storedRateYear = profile.studentDebt?.duoRateYear;
+  if (
+    storedRateYear !== undefined &&
+    getAvailableDuoRateYears().includes(storedRateYear)
+  ) {
+    return String(storedRateYear);
+  }
+
   const repaymentRule = profile.studentDebt?.repaymentRule;
   const duoInterestRate = profile.studentDebt?.duoInterestRate;
 
@@ -549,16 +560,9 @@ export function getMortgageImpactDefaultsFromProfile(
     defaults.situation = profile.studentDebt.duoSituation;
   }
 
-  if (profile.studentDebt?.duoInterestRate !== undefined) {
-    const repaymentRule = profile.studentDebt.repaymentRule ?? "SF35";
-    const duoRateYear = getDuoHistoricalRateYearForRule(
-      repaymentRule,
-      profile.studentDebt.duoInterestRate,
-    );
-
-    if (duoRateYear !== undefined) {
-      defaults.duoRateYear = String(duoRateYear);
-    }
+  const duoRateYear = getProfileDuoRateYear(profile);
+  if (duoRateYear !== undefined) {
+    defaults.duoRateYear = duoRateYear;
   }
 
   const debtParts = getProfileDebtPartDefaults(profile);

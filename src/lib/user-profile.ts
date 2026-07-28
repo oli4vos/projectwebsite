@@ -41,6 +41,7 @@ export type UserProfile = {
     repaymentRule?: ProfileRepaymentRule;
     duoSituation?: ProfileDuoSituation;
     duoInterestRate?: number;
+    duoRateYear?: number;
     remainingTermYears?: number;
     debtParts?: ProfileDuoDebtPart[];
   };
@@ -149,6 +150,24 @@ function sanitizePositiveYears(value?: number) {
   return sanitizedValue;
 }
 
+function sanitizeDuoRateYear(value?: number) {
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+
+  const sanitizedValue = sanitizeFiniteNumber(value, 0);
+
+  if (
+    !Number.isInteger(sanitizedValue) ||
+    sanitizedValue < 2000 ||
+    sanitizedValue > 2200
+  ) {
+    return undefined;
+  }
+
+  return sanitizedValue;
+}
+
 function sanitizeDuoDebtParts(
   parts: ProfileDuoDebtPart[] | undefined,
 ): ProfileDuoDebtPart[] | undefined {
@@ -218,6 +237,7 @@ export function sanitizeUserProfile(profile: UserProfile): UserProfile {
     repaymentRule: sanitizeEnum(profile.studentDebt?.repaymentRule, repaymentRules),
     duoSituation: sanitizeEnum(profile.studentDebt?.duoSituation, duoSituations),
     duoInterestRate: sanitizePercentNumber(profile.studentDebt?.duoInterestRate),
+    duoRateYear: sanitizeDuoRateYear(profile.studentDebt?.duoRateYear),
     remainingTermYears: sanitizePositiveYears(profile.studentDebt?.remainingTermYears),
     debtParts: sanitizeDuoDebtParts(profile.studentDebt?.debtParts),
   };

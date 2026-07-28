@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { DuoDebtPartsEditor } from "@/components/duo/DuoDebtPartsEditor";
 import { DisclosureSection } from "@/components/DisclosureSection";
 import { FieldError } from "@/components/forms/FieldError";
@@ -217,6 +217,8 @@ function CalculatorContent({
   const [pdfError, setPdfError] = useState("");
   const [pdfStatus, setPdfStatus] = useState("");
   const [profileSaveMessage, setProfileSaveMessage] = useState("");
+  const initialValuesAtMount = useRef(initialValues);
+  const profilePrefillApplied = useRef(hasRelevantProfileValues);
   const [duoTransferMessage, setDuoTransferMessage] = useState("");
   const [pendingDuoCandidate, setPendingDuoCandidate] =
     useState<PendingDuoMortgageCandidate | null>(null);
@@ -377,6 +379,21 @@ function CalculatorContent({
       );
     });
   }, [setValues]);
+
+  useEffect(() => {
+    if (!hasRelevantProfileValues || profilePrefillApplied.current) {
+      return;
+    }
+
+    profilePrefillApplied.current = true;
+    if (
+      JSON.stringify(formValues) ===
+      JSON.stringify(initialValuesAtMount.current)
+    ) {
+      setShowHousingTarget(hasHousingTargetInput(initialValues));
+      setFormValues(initialValues);
+    }
+  }, [formValues, hasRelevantProfileValues, initialValues, setFormValues]);
 
   function updateField<K extends keyof FormState>(field: K, value: FormState[K]) {
     setFormValues((current) => ({
@@ -541,6 +558,7 @@ function CalculatorContent({
     }
 
     const parsedInput = submittedValidation.parsedValues;
+    profilePrefillApplied.current = true;
     onSaveToProfile(
       createStudentDebtProfilePatch({
         remainingDebt: result.remainingStudentDebt,
@@ -551,6 +569,7 @@ function CalculatorContent({
         repaymentRule: submittedValues.repaymentRule,
         duoSituation: submittedValues.situation,
         duoInterestRate: result.duoRateUsed,
+        duoRateYear: result.debtPortfolio.rateYearUsed,
         remainingTermYears: result.duoTermYearsUsed,
         currentMonthlyPayment: parsedInput.actualMonthlyPayment,
         debtParts: result.debtPortfolio.usesDebtParts

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { DuoDebtPartsEditor } from "@/components/duo/DuoDebtPartsEditor";
 import { DisclosureSection } from "@/components/DisclosureSection";
 import { FieldError } from "@/components/forms/FieldError";
@@ -149,6 +149,8 @@ function DuoMaandbedragContent({
     useState<DuoMortgageTransferRecord | null>(null);
   const [transferMessage, setTransferMessage] = useState("");
   const [profileSaveMessage, setProfileSaveMessage] = useState("");
+  const initialValuesAtMount = useRef(initialValues);
+  const profilePrefillApplied = useRef(hasRelevantProfileValues);
   const view = useMemo(() => calculateDuoMonthlyPaymentView(formValues), [formValues]);
   const isExample = JSON.stringify(formValues) === JSON.stringify(exampleValues);
   const nextSteps = getToolNextSteps("duo-maandbedrag");
@@ -174,6 +176,20 @@ function DuoMaandbedragContent({
       setTransferRecord(transfer.data);
     });
   }, []);
+
+  useEffect(() => {
+    if (!hasRelevantProfileValues || profilePrefillApplied.current) {
+      return;
+    }
+
+    profilePrefillApplied.current = true;
+    if (
+      JSON.stringify(formValues) ===
+      JSON.stringify(initialValuesAtMount.current)
+    ) {
+      setFormValues(initialValues);
+    }
+  }, [formValues, hasRelevantProfileValues, initialValues]);
 
   function updateField<K extends keyof DuoMonthlyPaymentFormValues>(
     field: K,
@@ -239,6 +255,7 @@ function DuoMaandbedragContent({
       return;
     }
 
+    profilePrefillApplied.current = true;
     onSaveToProfile(
       createStudentDebtProfilePatch({
         remainingDebt: view.remainingDebt,
@@ -247,6 +264,7 @@ function DuoMaandbedragContent({
           mortgageCandidate.recommendedMonthlyAssessmentPayment,
         repaymentRule: view.repaymentRule,
         duoInterestRate: view.annualInterestRate,
+        duoRateYear: view.duoRateYear,
         remainingTermYears: view.termYears,
         debtParts: view.debtPortfolio.usesDebtParts
           ? view.debtPortfolio.parts.map((part) => ({
