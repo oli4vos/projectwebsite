@@ -45,6 +45,7 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 | Studieschuld-vs-beleggen | hidden-draft | `visibility: "hidden"` | uit | Bewust uit zichtbare positionering; code behouden voor mogelijke latere heractivatie | alleen heractiveren met nieuwe productbeslissing + copycheck |
 | Volgende euro | hidden-draft | `visibility: "hidden"` | uit | Bewust uit zichtbare positionering; route niet meer gelinkt vanuit publieke UI | alleen heractiveren met nieuwe productbeslissing + copycheck |
 | DUO-doorlenen-of-stoppen | hidden-draft | `visibility: "hidden"` | uit | Stopscenario-tool technisch aanwezig, maar niet in huidige publieke registry | zet manifest op `public` + volledige blueprint-check |
+| Gerichte DUO-leenfase-resultaten | actief | gedeelde `FocusedDuoTool` + centrale studieschuldscenario’s | aan | Bij een verwachte eindschuld staat direct het totale bedrag inclusief rente bij regulier aflossen binnen 35 jaar, zonder extra aflossing of aflosvrije maanden; scherm en PDF gebruiken dezelfde centrale `totalPaid`-uitkomst | n.v.t. |
 | DUO-leenbedrag-impact | experimenteel | `visibility: "public"` | aan | Eenvoudige leenfase-tool voor impact van nieuw leenbedrag op eindschuld | n.v.t. |
 | DUO-stoppen-kosten-prestatiebeurs | experimenteel | `visibility: "public"` | aan | Eenvoudige tool voor prestatiebeursbedragen die schuld blijven bij stoppen zonder diploma | n.v.t. |
 | DUO-maandbedrag | experimenteel | `visibility: "public"` | aan | Lege persoonlijke beginstaat; wettelijke maandtermijn, optionele draagkrachtindicatie en uitgebreide PDF. Een onbekende terugbetalingsregel wordt eerst opgelost en niet als SF35 doorgerekend | n.v.t. |
@@ -74,6 +75,7 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 
 | Datum | Commit | Wijziging | Impact |
 |---|---|---|---|
+| 2026-07-28 | `pending` | Verwachte eindschuld in de gerichte DUO-leenfasetool direct aangevuld met het totale terug te betalen bedrag inclusief rente bij regulier aflossen; dezelfde centrale `totalPaid`-uitkomst staat aansluitend in de PDF | DUO / studieschuld / resultaten / PDF |
 | 2026-07-27 | `pending` | Publieke calculators starten zonder persoonlijke voorbeeldbedragen, markeren voorbeelden en indicaties consequent, geven korte veldhulp bij moeilijke begrippen en blokkeren onbekende DUO-regelingen vóór berekening | UX / toegankelijkheid / unknown resolution / DUO-veiligheid |
 | 2026-07-27 | `pending` | Resterende categorie A/B-vereenvoudigingen uitgevoerd: alle publieke tools direct zichtbaar, optionele woningdoelvelden conditioneel, bijzondere DUO-oudersituaties taakgericht uitgelegd en toeslagbedragen per regeling geblokkeerd bij onopgeloste noodzakelijke invoer | UX / DUO / hypotheek / toeslagenveiligheid |
 | 2026-07-26 | `pending` | Versie 2 publiek gepauzeerd; v1 is de enige actieve ontwerp- en livegangversie, v2-routecode blijft alleen als private broncode bestaan | Architectuur / routing / livegangscope |

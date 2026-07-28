@@ -20,6 +20,11 @@ describe("duo-schuld-bij-starten-lenen", () => {
       expect(view.focusScenario.key).toBe("start-study-borrowing");
       expect(view.focusScenario.primaryAmount).toBeGreaterThan(0);
       expect(view.result.scenarios[2].debtAtStop.alwaysRepayable).toBe(view.focusScenario.secondaryAmount);
+      expect(view.input.monthlyExtraRepayment).toBe(0);
+      expect(view.input.oneTimeExtraRepayment).toBe(0);
+      expect(view.input.aflosvrijeMonths).toBe(0);
+      expect(view.focusScenario.totalPaid).toBe(view.result.scenarios[2].repayment.totalPaid);
+      expect(view.result.scenarios[2].repayment.restschuld).toBe(0);
     }
   });
 });

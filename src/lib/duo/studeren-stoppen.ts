@@ -709,7 +709,16 @@ function simulateRepaymentPhase(input: {
   const monthlyExtraRepayment = roundMoney(input.monthlyExtraRepayment ?? 0);
   const oneTimeExtraRepayment = roundMoney(input.oneTimeExtraRepayment ?? 0);
   const aflosvrijeMonths = Math.min(Math.max(Math.round(input.aflosvrijeMonths ?? 0), 0), 60);
-  const maxMonths = input.maxMonths ?? Math.max(Math.round(input.remainingTermYears * 12), 0);
+  const regularTermMonths = Math.max(Math.round(input.remainingTermYears * 12), 0);
+  const maxMonths = input.maxMonths ?? regularTermMonths;
+  const usesFullStatutoryPayment =
+    repaymentPayment.usedMonthlyPayment === repaymentPayment.statutoryMonthlyPayment;
+  const canCloseOnFinalRegularTerm =
+    usesFullStatutoryPayment &&
+    monthlyExtraRepayment === 0 &&
+    oneTimeExtraRepayment === 0 &&
+    aflosvrijeMonths === 0 &&
+    maxMonths >= regularTermMonths;
   const timeline: StudyDebtTimelinePoint[] = [];
   let giftConversionSnapshot: StudyDebtSnapshot | undefined;
   let totalPaid = 0;
@@ -730,7 +739,10 @@ function simulateRepaymentPhase(input: {
     let payment = 0;
     const isAflosvrij = month <= aflosvrijeMonths;
     if (!isAflosvrij) {
-      payment = repaymentPayment.usedMonthlyPayment;
+      payment =
+        canCloseOnFinalRegularTerm && month === regularTermMonths
+          ? getSnapshot(nextStates).total
+          : repaymentPayment.usedMonthlyPayment;
     }
     payment = roundMoney(payment + monthlyExtraRepayment);
     if (!oneTimeApplied && oneTimeExtraRepayment > 0) {

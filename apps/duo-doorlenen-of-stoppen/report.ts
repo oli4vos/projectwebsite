@@ -766,16 +766,29 @@ export function buildStudyStopPdfReport(
       description: scenario.description,
       metrics: [
         { label: scenario.primaryLabel, value: formatCurrency(scenario.primaryAmount, 0) },
+        ...(scenario.key === "start-study-borrowing"
+          ? [
+              {
+                label: "Totaal terug te betalen inclusief rente",
+                value: formatCurrency(scenario.totalPaid, 0),
+                note: `Bij regulier aflossen binnen ${scenario.repaymentTermYears} jaar, zonder extra aflossingen of aflosvrije maanden.`,
+              },
+            ]
+          : []),
         { label: scenario.secondaryLabel, value: formatCurrency(scenario.secondaryAmount, 0) },
         {
           label: "Schuld bij aanvang terugbetaling",
           value: formatCurrency(scenario.debtAtRepaymentStart, 0),
         },
-        {
-          label: "Totaal betaald incl. rente",
-          value: formatCurrency(scenario.totalPaid, 0),
-          note: `Vanaf start terugbetalen, maximaal ${scenario.repaymentTermYears} jaar.`,
-        },
+        ...(scenario.key !== "start-study-borrowing"
+          ? [
+              {
+                label: "Totaal terug te betalen inclusief rente",
+                value: formatCurrency(scenario.totalPaid, 0),
+                note: `Bij regulier aflossen binnen ${scenario.repaymentTermYears} jaar, zonder extra aflossingen of aflosvrije maanden.`,
+              },
+            ]
+          : []),
         { label: "Rente in aflosfase", value: formatCurrency(scenario.totalInterest, 0) },
         { label: "Schuldenvrij", value: scenario.payoffDate ?? "n.v.t." },
       ],

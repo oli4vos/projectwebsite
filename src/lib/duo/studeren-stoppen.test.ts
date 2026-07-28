@@ -40,6 +40,26 @@ describe("studeren-stoppen engine", () => {
     expect(stopNow.repayment.payoffDate).toBeDefined();
   });
 
+  it("adjusts the final regular term to repay debt and interest exactly within the term", () => {
+    const result = calculateStudyStopScenarios({
+      ...BASE_INPUT,
+      grossAnnualIncome: undefined,
+      partnerGrossAnnualIncome: undefined,
+      annualRepaymentInterestRate: 2.33,
+    });
+    const stopNow = result.scenarios[0];
+    const finalPayment = stopNow.repayment.timeline.at(-1);
+
+    expect(stopNow.repayment.monthsToDebtFree).toBe(35 * 12);
+    expect(stopNow.repayment.restschuld).toBe(0);
+    expect(finalPayment?.closingDebt).toBe(0);
+    expect(stopNow.repayment.totalPaid).toBe(
+      Math.round(
+        (stopNow.debtAtRepaymentStart.total + stopNow.repayment.totalInterest) * 100,
+      ) / 100,
+    );
+  });
+
   it("separates prestatiebeurs debt from always-repayable debt", () => {
     const result = calculateStudyStopScenarios(BASE_INPUT);
     const stopNow = result.scenarios[0];

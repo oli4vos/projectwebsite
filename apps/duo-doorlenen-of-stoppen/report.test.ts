@@ -39,6 +39,25 @@ describe("duo-doorlenen-of-stoppen pdf report", () => {
     expect(report.ruleVersion).toBe(result.ruleVersion);
     expect(report.focusScenarios).toHaveLength(3);
     expect(report.focusScenarios[0].title).toContain("begin met studeren");
+    expect(report.focusScenarios[0].metrics.slice(0, 2)).toEqual([
+      {
+        label: "Verwachte eindschuld",
+        value: expect.stringContaining("€"),
+      },
+      {
+        label: "Totaal terug te betalen inclusief rente",
+        value: expect.stringContaining("€"),
+        note: expect.stringContaining("zonder extra aflossingen of aflosvrije maanden"),
+      },
+    ]);
+    expect(report.focusScenarios[0].metrics[1].value).toBe(
+      new Intl.NumberFormat("nl-NL", {
+        style: "currency",
+        currency: "EUR",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }).format(result.focusScenarios[0].totalPaid),
+    );
     expect(report.scenarioComparison).toHaveLength(3);
     expect(report.scenarios[0].metrics[0].value).toContain("€");
     expect(report.scenarios[0].timeline.length).toBe(result.scenarios[0].timeline.length);

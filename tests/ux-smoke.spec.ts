@@ -668,7 +668,28 @@ test("losse DUO-tools tonen simpele scenario-uitkomst en schuldenvrije datum", a
   await expect(page.getByRole("heading", { name: "Ik studeer al: impact nieuw leenbedrag per maand" })).toBeVisible();
   await page.getByText("Bekijk de volledige berekening").click();
   await expect(page.getByText("Schuldenvrij rond")).toBeVisible();
-  await expect(page.getByText("Totaal betalen inclusief rente")).toBeVisible();
+  await expect(page.getByText("Totaal terug te betalen inclusief rente")).toBeVisible();
+});
+
+test("verwachte eindschuld toont direct het totaal bij regulier aflossen", async ({ page }) => {
+  await page.goto("/apps/duo-schuld-bij-starten-lenen", { waitUntil: "networkidle" });
+  await page.getByRole("button", { name: "Voorbeeld invullen" }).click();
+  await page.getByRole("button", { name: "Bereken", exact: true }).click();
+
+  const summary = page.locator("#tool-result-summary");
+  await expect(summary.getByText("Verwachte eindschuld", { exact: true })).toBeVisible();
+  await expect(
+    summary.getByText("Totaal terug te betalen inclusief rente", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    summary.getByText(/Bij regulier aflossen binnen 35 jaar, zonder extra aflossingen of aflosvrije maanden\./),
+  ).toBeVisible();
+
+  const width = await page.evaluate(() => ({
+    body: document.body.scrollWidth,
+    viewport: document.documentElement.clientWidth,
+  }));
+  expect(width.body).toBeLessThanOrEqual(width.viewport + 1);
 });
 
 test("alle tien tools doorlopen invoer, uitkomst, details en vervolgactie", async ({

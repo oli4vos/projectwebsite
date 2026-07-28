@@ -449,8 +449,15 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
           <ResultCard
             label={submittedView.focusScenario.primaryLabel}
             value={formatCurrency(submittedView.focusScenario.primaryAmount)}
-            className="sm:col-span-2"
+            className={mode === "start-borrowing" ? undefined : "sm:col-span-2"}
           />
+          {mode === "start-borrowing" ? (
+            <ResultCard
+              label="Totaal terug te betalen inclusief rente"
+              value={formatCurrency(submittedView.focusScenario.totalPaid)}
+              note={`Bij regulier aflossen binnen ${submittedView.focusScenario.repaymentTermYears} jaar, zonder extra aflossingen of aflosvrije maanden.`}
+            />
+          ) : null}
         </div>
         {mode === "stop-cost" && selectedScenario ? (
           <div className="surface-subtle px-4">
@@ -482,11 +489,13 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
             Bekijk de volledige berekening
           </summary>
           <div className="mt-4">
-            <ResultRow
-              label="Totaal betalen inclusief rente"
-              value={formatCurrency(submittedView.focusScenario.totalPaid)}
-              sub={`Berekend vanaf start terugbetalen met SF35 over maximaal ${submittedView.focusScenario.repaymentTermYears} jaar.`}
-            />
+            {mode !== "start-borrowing" ? (
+              <ResultRow
+                label="Totaal terug te betalen inclusief rente"
+                value={formatCurrency(submittedView.focusScenario.totalPaid)}
+                sub={`Bij regulier aflossen binnen ${submittedView.focusScenario.repaymentTermYears} jaar, zonder extra aflossingen of aflosvrije maanden.`}
+              />
+            ) : null}
             <ResultRow
               label="Eindschuld bij start terugbetaling"
               value={formatCurrency(submittedView.focusScenario.debtAtRepaymentStart)}
