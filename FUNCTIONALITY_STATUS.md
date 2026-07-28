@@ -72,11 +72,14 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 | Bewaartermijn browserprofiel | actief | keuze op `/profiel` | `session` | Nieuwe profielen blijven standaard alleen tijdens de browsersessie; expliciete keuze voor opslag op hetzelfde apparaat migreert dezelfde gevalideerde data en verwijdert de oude kopie | n.v.t. |
 | Profile storage mode: `hybrid`/`remote` | voorbereid | `NEXT_PUBLIC_PROFILE_STORAGE_MODE` | `local` | Fallback/no-op zonder remote activering | latere database/auth activatiestap nodig |
 | Supabase/auth/session-contract | voorbereid | env/config | uit | Client-safe voorbereiding zonder verplichte login | alleen activeren met aparte rollout |
+| Juridische informatie (`/privacy`, `/voorwaarden`) | actief | publieke statische routes + footerlinks | aan | Beschrijft local-first gegevensverwerking, indicatieve uitkomsten en scheiding tussen AGPL-software, gereserveerd merk/content en officiële brondata | actualiseer vóór nieuwe gegevensverwerking of licentiewijziging |
+| Cloudflare Pages + eigen domein | voorbereid | toekomstige hostingmigratie | uit | Roadmap voor securityheaders, DNS, caching en rollback; activeert geen analytics of remote opslag | aparte DevOps-, privacy- en releasecontrole |
 
 ## Mutatielog (append-only)
 
 | Datum | Commit | Wijziging | Impact |
 |---|---|---|---|
+| 2026-07-28 | `pending` | Softwarelicentie `AGPL-3.0-or-later`, merk- en contentscheiding, securitybeleid, publieke privacyverklaring en gebruiksvoorwaarden toegevoegd; Cloudflare Pages en eigen domein als toekomstige gecontroleerde hostingstap vastgelegd | Juridisch / privacy / security / routing / hosting |
 | 2026-07-28 | `pending` | Centrale tijdelijke vervolgtool-overdracht toegevoegd voor DUO-maandbedrag, extra aflossen, hypotheekimpact en maximale hypotheek, inclusief expliciete voorrang boven profielwaarden en tekstuele toelichting op de doeltool | Tooljourneys / profiel / DUO / hypotheek / UX |
 | 2026-07-28 | `pending` | Vrij DUO-renteveld in het browserprofiel vervangen door een stelselafhankelijke keuze uit centraal beheerde rentejaren en percentages; het gekozen rentejaar wordt expliciet bewaard en hergebruikt | Profiel / DUO / brondata / UX |
 | 2026-07-28 | `pending` | Browserprofiel uitgebreid met optionele DUO-leningdelen, afzonderlijk hypotheektoetsbedrag en expliciete opslag van actuele DUO- en hypotheekimpactuitkomsten | Profiel / DUO / hypotheek / UX |

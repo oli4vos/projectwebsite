@@ -280,3 +280,24 @@ Gebruik geen echte webhook-, service-role- of providersecrets met `NEXT_PUBLIC_`
 - Inputvalidatie gebeurt in calculatorcomponenten en app-façades; formules horen centraal.
 - De generator weigert ongeldige manifests of onveilige `entry`-paden.
 - GitHub Pages ondersteunt in deze setup geen project-eigen security headers zoals CSP of `X-Frame-Options`; herbeoordeel headers bij een toekomstige hostingmigratie of Type B-backend.
+
+## Licentie en rechten
+
+De softwarecode is beschikbaar onder de GNU Affero General Public License,
+versie 3 of later (`AGPL-3.0-or-later`). Zie `LICENSE`.
+
+De open-sourcelicentie omvat niet automatisch de namen Grip en Project Site,
+het logo, de herkenbare visuele identiteit of originele redactionele content.
+Zie `NOTICE.md` voor de merk- en contentscheiding. Officiële brondata, wet- en
+regelgeving, normen en publicaties blijven onder de rechten en voorwaarden van
+de betreffende bronhouders; het project claimt daarop geen exclusief eigendom.
+
+Kwetsbaarheden worden volgens `SECURITY.md` gemeld. De publieke uitleg over
+browseropslag en gebruik staat op `/privacy` en `/voorwaarden`.
+
+## Geplande hostingstap
+
+Een toekomstige verhuizing naar Cloudflare Pages met een eigen domeinnaam is
+vastgelegd in `docs/hosting-roadmap.md`. Die stap is bedoeld voor
+projectgestuurde securityheaders, DNS, caching en rollback en vereist vóór
+activering een aparte DevOps-, privacy- en releasecontrole.

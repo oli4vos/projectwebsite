@@ -235,3 +235,17 @@ Mogelijke uitbreidingen zijn:
 - koppelingen naar officiële portalen zonder automatische aanvraag namens de gebruiker.
 
 Elke uitbreiding moet de kernprincipes behouden: centrale waarheid, traceerbare bronnen, uitlegbare evaluatie, minimale infrastructuur, privacy-first ontwerp en geen schijnzekerheid.
+
+## 13. Licentie, merk en hosting
+
+De softwarecode is open source onder `AGPL-3.0-or-later`. Merknaam, logo,
+herkenbare visuele identiteit en originele redactionele content zijn daarvan
+uitgezonderd en blijven voorbehouden zoals vastgelegd in `NOTICE.md`.
+Officiële wet- en regelgeving, normen, tarieven, percentages en bronpublicaties
+worden niet als exclusief eigendom van het project geclaimd.
+
+De huidige site blijft local-first op GitHub Pages. Een latere migratie naar
+Cloudflare Pages met een eigen domeinnaam is gepland om projectgestuurde
+securityheaders, DNS, caching en rollback mogelijk te maken. Deze migratie
+activeert niet automatisch analytics, remote opslag of andere
+gegevensverwerking. De releasevoorwaarden staan in `docs/hosting-roadmap.md`.

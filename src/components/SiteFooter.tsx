@@ -22,6 +22,20 @@ export function SiteFooter() {
           <Link href="/over" className={footerLinkClassName}>
             Over
           </Link>
+          <Link href="/privacy" className={footerLinkClassName}>
+            Privacy
+          </Link>
+          <Link href="/voorwaarden" className={footerLinkClassName}>
+            Voorwaarden
+          </Link>
+          <a
+            href="https://github.com/oli4vos/projectwebsite"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={footerLinkClassName}
+          >
+            Broncode
+          </a>
         </div>
       </div>
     </footer>

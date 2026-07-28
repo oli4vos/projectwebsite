@@ -36,8 +36,17 @@ export default function OverPage() {
                 Privacy
               </h2>
               <p>
-                In deze versie rekent alles lokaal in je browser. Wat je
-                invult, wordt niet opgeslagen of verstuurd.
+                In deze versie rekent alles lokaal in je browser. Persoonlijke
+                invoer wordt niet naar een centrale database verstuurd. Een
+                profiel blijft standaard in de browsersessie en wordt alleen na
+                jouw bewuste keuze op dit apparaat bewaard. Lees de volledige{" "}
+                <Link
+                  href="/privacy"
+                  className="underline text-[var(--ink)] hover:text-[var(--ink-2)]"
+                >
+                  privacyverklaring
+                </Link>
+                .
               </p>
             </div>
 

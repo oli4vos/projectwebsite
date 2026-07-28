@@ -7,6 +7,9 @@ Status: gebruik deze lijst vóór elke publieke release.
 - [ ] Elke tool bevat duidelijk: geen persoonlijk financieel advies.
 - [ ] Elke tool bevat duidelijk: geen officiële aangifte- of hypotheekberekening.
 - [ ] Terminologie blijft begrijpelijk; vaktermen worden kort uitgelegd.
+- [ ] `/privacy` en `/voorwaarden` zijn actueel en bereikbaar vanuit de footer.
+- [ ] `LICENSE`, `NOTICE.md` en `SECURITY.md` passen bij de publicatievorm.
+- [ ] Officiële brondata wordt niet als exclusief projecteigendom gepresenteerd.
 
 ## 2) Versiebeheer en traceerbaarheid
 - [ ] Elke publieke tool heeft complete manifestmetadata (`app.json`).
