@@ -55,14 +55,12 @@ export function PersonalRoute({ apps }: PersonalRouteProps) {
               Heb je een profiel ingevuld?
             </h3>
             <p className="mt-2 max-w-[62ch] text-[13px] leading-[1.6] text-[var(--ink-2)]">
-              Zonder profiel kun je direct starten. Met profiel krijg je compactere snelle startpunten.
+              Je kunt de tools op deze pagina direct gebruiken. Met een profiel
+              worden passende startpunten vooraf ingevuld.
             </p>
-            <div className="mt-4 flex flex-wrap gap-3">
+            <div className="mt-4">
               <BtnLink href="/profiel" kind="outline" size="sm">
                 Open mijn profiel
-              </BtnLink>
-              <BtnLink href="/apps/volgende-euro" kind="ghost" size="sm">
-                Of start zonder profiel
               </BtnLink>
             </div>
           </>

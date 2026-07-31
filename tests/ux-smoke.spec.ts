@@ -10,7 +10,7 @@ type AppManifest = {
 
 const allowanceScanRoute = "/apps/toeslagen-scan";
 
-function getPublicToolRoutes() {
+function getAppManifests() {
   const appsDirectory = path.join(process.cwd(), "apps");
 
   return fs
@@ -24,14 +24,40 @@ function getPublicToolRoutes() {
         fs.readFileSync(manifestPath, "utf8"),
       ) as AppManifest;
 
-      return manifest.enabled !== false && (manifest.visibility ?? "public") === "public"
-        ? [`/apps/${manifest.slug}`]
-        : [];
-    })
+      return [manifest];
+    });
+}
+
+function getPublicToolRoutes() {
+  return getAppManifests()
+    .filter(
+      (manifest) =>
+        manifest.enabled !== false &&
+        (manifest.visibility ?? "public") === "public",
+    )
+    .map((manifest) => `/apps/${manifest.slug}`)
     .sort();
 }
 
-const routes = ["/", "/kennisbank", "/variabelen", ...getPublicToolRoutes()];
+function getNonPublicToolRoutes() {
+  return new Set(
+    getAppManifests()
+      .filter(
+        (manifest) =>
+          manifest.enabled === false || manifest.visibility === "hidden",
+      )
+      .map((manifest) => `/apps/${manifest.slug}`),
+  );
+}
+
+const routes = [
+  "/",
+  "/apps",
+  "/profiel",
+  "/kennisbank",
+  "/variabelen",
+  ...getPublicToolRoutes(),
+];
 
 for (const route of routes) {
   test(`${route} heeft een bruikbare basisstructuur`, async ({ page }, testInfo) => {
@@ -97,6 +123,174 @@ test("mobiele hypotheekflow kan naar veld 2", async ({ page }, testInfo) => {
   await expect(
     page.getByLabel("Terugbetalingsregel", { exact: true }),
   ).toBeVisible();
+});
+
+test("publieke links verwijzen alleen naar bestaande publieke routes", async ({
+  page,
+  request,
+}, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "Een volledige linkcrawl volstaat");
+
+  const nonPublicToolRoutes = getNonPublicToolRoutes();
+  const links = new Map<string, string>();
+
+  for (const route of routes) {
+    const response = await page.goto(route, { waitUntil: "networkidle" });
+    expect(response?.status(), route).toBe(200);
+
+    const visibleLinks = await page.locator("a[href]").evaluateAll((anchors) =>
+      anchors
+        .filter((anchor) => {
+          const element = anchor as HTMLElement;
+          const style = window.getComputedStyle(element);
+          return Boolean(element.getClientRects().length) && style.visibility !== "hidden";
+        })
+        .map((anchor) => anchor.getAttribute("href") ?? "")
+        .filter(Boolean),
+    );
+
+    for (const href of visibleLinks) {
+      if (href.startsWith("/") && !links.has(href)) {
+        links.set(href, route);
+      }
+    }
+  }
+
+  for (const [href, sourceRoute] of links) {
+    const pathname = href.split(/[?#]/, 1)[0] || "/";
+    expect(
+      nonPublicToolRoutes.has(pathname),
+      `${sourceRoute} verwijst publiek naar ${pathname}`,
+    ).toBe(false);
+
+    const response = await request.get(href);
+    expect(
+      response.status(),
+      `${sourceRoute} verwijst naar niet-bestaande route ${href}`,
+    ).toBeLessThan(400);
+  }
+
+  expect(links.has("/apps/volgende-euro")).toBe(false);
+});
+
+test("aanvullende beurs houdt oudervelden solide tijdens resizen", async ({
+  page,
+}, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "Eén volledige resizematrix volstaat");
+
+  const sizes = [
+    { width: 320, height: 568 },
+    { width: 390, height: 844 },
+    { width: 430, height: 932 },
+    { width: 640, height: 720 },
+    { width: 768, height: 1024 },
+    { width: 1024, height: 768 },
+    { width: 1180, height: 820 },
+    { width: 1280, height: 720 },
+    { width: 1440, height: 900 },
+    { width: 1920, height: 1080 },
+  ] as const;
+
+  async function expectSolidFormLayout(label: string) {
+    const audit = await page.evaluate(() => {
+      const scope = document.querySelector(".additional-grant-form");
+      if (!scope) throw new Error("Aanvullende-beursformulier ontbreekt");
+
+      const controls = [...scope.querySelectorAll("input, select, textarea")]
+        .filter((control) => Boolean((control as HTMLElement).getClientRects().length))
+        .map((control) => {
+          const rect = control.getBoundingClientRect();
+          return {
+            id: control.id,
+            left: rect.left,
+            right: rect.right,
+            top: rect.top,
+            bottom: rect.bottom,
+          };
+        });
+      const overlaps: string[] = [];
+
+      for (let leftIndex = 0; leftIndex < controls.length; leftIndex += 1) {
+        for (let rightIndex = leftIndex + 1; rightIndex < controls.length; rightIndex += 1) {
+          const left = controls[leftIndex];
+          const right = controls[rightIndex];
+          const horizontalOverlap = Math.min(left.right, right.right) - Math.max(left.left, right.left);
+          const verticalOverlap = Math.min(left.bottom, right.bottom) - Math.max(left.top, right.top);
+          if (horizontalOverlap > 1 && verticalOverlap > 1) {
+            overlaps.push(`${left.id} / ${right.id}`);
+          }
+        }
+      }
+
+      const boundedElements = [
+        ...scope.querySelectorAll("label, legend, input, select, textarea"),
+      ].filter((element) => Boolean((element as HTMLElement).getClientRects().length));
+      const outsideViewport = boundedElements
+        .filter((element) => {
+          const rect = element.getBoundingClientRect();
+          return rect.left < -1 || rect.right > window.innerWidth + 1;
+        })
+        .map((element) =>
+          element.getAttribute("for") || element.getAttribute("id") || element.textContent?.trim() || element.tagName,
+        );
+
+      return {
+        htmlWidth: document.documentElement.scrollWidth,
+        bodyWidth: document.body.scrollWidth,
+        clientWidth: document.documentElement.clientWidth,
+        overlaps,
+        outsideViewport,
+      };
+    });
+
+    expect(audit.htmlWidth, `${label}: html overflow`).toBeLessThanOrEqual(audit.clientWidth + 1);
+    expect(audit.bodyWidth, `${label}: body overflow`).toBeLessThanOrEqual(audit.clientWidth + 1);
+    expect(audit.overlaps, `${label}: overlappende velden`).toEqual([]);
+    expect(audit.outsideViewport, `${label}: onderdelen buiten viewport`).toEqual([]);
+  }
+
+  await page.goto("/apps/duo-aanvullende-beurs", { waitUntil: "networkidle" });
+  await page.getByRole("button", { name: "Voorbeeld invullen" }).click();
+
+  const deductions = page
+    .locator("details")
+    .filter({ hasText: "Aftrekposten en broers of zussen" });
+  await deductions.locator("summary").click();
+  await expect(deductions).toHaveAttribute("open", "");
+  await deductions.locator("summary").focus();
+  await page.keyboard.press("Enter");
+  await expect(deductions).not.toHaveAttribute("open", "");
+  await page.keyboard.press("Enter");
+  await expect(deductions).toHaveAttribute("open", "");
+  await expect(page.locator('[data-parent-income-group="1"]')).toBeVisible();
+  await expect(page.locator('[data-parent-income-group="2"]')).toBeVisible();
+  await expect(page.locator('[data-parent-deductions-group="1"]')).toBeVisible();
+  await expect(page.locator('[data-parent-deductions-group="2"]')).toBeVisible();
+
+  for (const size of [...sizes, ...[...sizes].reverse()]) {
+    await page.setViewportSize(size);
+    await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => resolve())));
+    await expectSolidFormLayout(`${size.width}x${size.height}, twee ouders`);
+  }
+
+  await page.getByLabel("Hoeveel ouders tellen mee?").selectOption("single-parent");
+  await expect(page.locator('[data-parent-income-group="2"]')).toHaveCount(0);
+  await expect(page.locator('[data-parent-deductions-group="2"]')).toHaveCount(0);
+  for (const size of sizes) {
+    await page.setViewportSize(size);
+    await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => resolve())));
+    await expectSolidFormLayout(`${size.width}x${size.height}, één ouder`);
+  }
+
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page
+    .locator('[data-parent-deductions-group="1"]')
+    .getByLabel("Andere kwalificerende kinderen")
+    .fill("12345678901234567890,5");
+  await expect(
+    page.locator('[data-parent-deductions-group="1"]').getByText("Gebruik een heel aantal van 0 of hoger."),
+  ).toBeVisible();
+  await expectSolidFormLayout("320x568 met lange ongeldige invoer en foutmelding");
 });
 
 test("maximale hypotheek toont één primaire uitkomst", async ({ page }, testInfo) => {

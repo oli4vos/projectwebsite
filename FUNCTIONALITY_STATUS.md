@@ -35,7 +35,7 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 
 | Onderdeel | Status | Schakelaar | Default | Opmerking | Heractivatie |
 |---|---|---|---|---|---|
-| Toolbibliotheek + categorie-navigatie | actief | n.v.t. | aan | `/apps` toont alle 10 publieke tools direct in taakgerichte groepen, zonder doelgroepfilter | n.v.t. |
+| Toolbibliotheek + categorie-navigatie | actief | n.v.t. | aan | `/apps` toont alle 10 publieke tools direct in taakgerichte groepen, zonder doelgroepfilter en zonder links naar hidden of uitgeschakelde tools | n.v.t. |
 | Financiële kennisbank (`/kennisbank`) | actief | n.v.t. | aan | Centrale studieschuld-kennislaag met DUO-bronnen, hidden oude horizon-/beleggingskaders | n.v.t. |
 | Versie 1 publieke website | actief | route-oppervlak zonder `/v2` | aan | Enige publieke en actieve ontwerp-, UX-, performance- en optimalisatielijn voor de eerste livegang | n.v.t. |
 | Versie 2 presentatie | uitgeschakeld | private routecode onder `src/app/_v2-paused` | uit | Code behouden als gepauzeerde bron, maar geen publieke routes, navigatie, sitemap, SEO-output, dashboard, journey of livegangoppervlak | alleen heractiveren via expliciet scopebesluit + blueprint-/releasecheck |
@@ -50,7 +50,7 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 | DUO-stoppen-kosten-prestatiebeurs | experimenteel | `visibility: "public"` | aan | Eenvoudige tool voor prestatiebeursbedragen die schuld blijven bij stoppen zonder diploma | n.v.t. |
 | DUO-maandbedrag | experimenteel | `visibility: "public"` | aan | Lege persoonlijke beginstaat; wettelijke maandtermijn, optionele draagkrachtindicatie en uitgebreide PDF. Een onbekende terugbetalingsregel wordt eerst opgelost en niet als SF35 doorgerekend | n.v.t. |
 | DUO-extra-aflossen | experimenteel | `visibility: "public"` | aan | Lege persoonlijke beginstaat; scenario voor extra DUO-aflossing, looptijd/maandbedrag, afloscurve en uitgebreide PDF. Een onbekende terugbetalingsregel blokkeert de berekening | n.v.t. |
-| DUO-aanvullende-beurs | experimenteel | `visibility: "public"` | aan | Publieke 2026-tool bovenop `src/lib/duo/additional-grant`; berekent reguliere aanvullende-beursindicatie met concrete ouderinkomens en toont bij bijzondere oudersituaties conditionele officiële uitleg zonder regulier bedrag; nog geen PDF | n.v.t. |
+| DUO-aanvullende-beurs | experimenteel | `visibility: "public"` | aan | Publieke 2026-tool bovenop `src/lib/duo/additional-grant`; berekent reguliere aanvullende-beursindicatie met concrete ouderinkomens, groepeert inkomen en optionele aftrekposten responsief per ouder en toont bij bijzondere oudersituaties conditionele officiële uitleg zonder regulier bedrag; nog geen PDF | n.v.t. |
 | Centrale tax/DUO/pension/constants lagen | actief | n.v.t. | aan | Hergebruikt door meerdere tools | n.v.t. |
 | Submit-driven calculatorflow | actief | n.v.t. | aan | Patroon beschikbaar via `CalculatorShell` + submitlogica | n.v.t. |
 | Volgende-stap navigatie tussen publieke tools | actief | `ToolNextSteps` + journey-map | aan | Compacte vervolgstap per publieke tool, afgestemd op de meest waarschijnlijke vervolgvraag | n.v.t. |
@@ -79,6 +79,7 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 
 | Datum | Commit | Wijziging | Impact |
 |---|---|---|---|
+| 2026-07-31 | `pending` | De laatste twee v1-releaseblokkers opgelost: de publieke link naar een verborgen tool verwijderd en de aanvullende-beursinvoer per ouder gegroepeerd met containerveilige responsieve velden | V1-livegang / routing / aanvullende beurs / responsive UX / toegankelijkheid |
 | 2026-07-28 | `pending` | Maximale-hypotheekuitkomst uitgebreid met een standaard ingeklapte, stapsgewijze berekeningsopbouw die de DUO-impact en alle geldende eindgrenzen vanuit dezelfde centrale rapportdata toont | Maximale hypotheek / studieschuld / resultaten / UX / PDF |
 | 2026-07-28 | `pending` | Softwarelicentie `AGPL-3.0-or-later`, merk- en contentscheiding, securitybeleid, publieke privacyverklaring en gebruiksvoorwaarden toegevoegd; Cloudflare Pages en eigen domein als toekomstige gecontroleerde hostingstap vastgelegd | Juridisch / privacy / security / routing / hosting |
 | 2026-07-28 | `pending` | Centrale tijdelijke vervolgtool-overdracht toegevoegd voor DUO-maandbedrag, extra aflossen, hypotheekimpact en maximale hypotheek, inclusief expliciete voorrang boven profielwaarden en tekstuele toelichting op de doeltool | Tooljourneys / profiel / DUO / hypotheek / UX |

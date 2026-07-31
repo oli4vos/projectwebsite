@@ -35,7 +35,7 @@ type FieldProps = {
 };
 
 function FieldShell({ children }: { children: ReactNode }) {
-  return <div className="grid gap-2">{children}</div>;
+  return <div className="grid min-w-0 gap-2">{children}</div>;
 }
 
 function Label({ htmlFor, children }: { htmlFor: string; children: ReactNode }) {
@@ -68,7 +68,7 @@ function MoneyField({
   return (
     <FieldShell>
       <Label htmlFor={String(id)}>{label}</Label>
-      <span className="field-shell flex min-h-12 items-center px-3">
+      <span className="field-shell flex min-h-12 w-full min-w-0 items-center px-3">
         {prefix ? <span className="mr-2 text-[var(--muted)]">{prefix}</span> : null}
         <input
           id={String(id)}
@@ -124,7 +124,7 @@ function SelectField<T extends string>({
         onChange={(event) => onChange(event.target.value as T)}
         aria-invalid={error ? "true" : "false"}
         aria-describedby={describedBy}
-        className="field-shell ring-focus h-12 px-3 text-[15px] text-[var(--ink)] outline-none"
+        className="field-shell ring-focus h-12 w-full min-w-0 px-3 text-[15px] text-[var(--ink)] outline-none"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
@@ -211,7 +211,7 @@ export default function DuoAanvullendeBeursCalculator() {
   }
 
   const inputs = (
-    <div className="space-y-6">
+    <div className="additional-grant-form space-y-6">
       {hasErrors ? (
         <div
           id="aanvullende-beurs-errors"
@@ -227,7 +227,7 @@ export default function DuoAanvullendeBeursCalculator() {
         <h3 id="duo-additional-study-heading" className="font-serif text-[23px] text-[var(--ink)]">
           Studie en woonsituatie
         </h3>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="additional-grant-responsive-grid">
           <SelectField
             id="educationType"
             label="Opleiding"
@@ -289,7 +289,7 @@ export default function DuoAanvullendeBeursCalculator() {
           Voor aanvullende beurs in 2026 gebruikt DUO normaal ouderinkomen uit 2024:
           verzamelinkomen uit de definitieve aanslag, of belastbaar loon als er geen aangifte is.
         </p>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4">
           <SelectField
             id="specialCase"
             label="Bijzondere oudersituatie?"
@@ -341,32 +341,50 @@ export default function DuoAanvullendeBeursCalculator() {
                 ]}
                 onChange={(value) => updateField("familySituation", value)}
               />
-              <MoneyField
-                id="parent1Income"
-                label="Ouderinkomen 2024 ouder 1"
-                value={formValues.parent1Income}
-                error={errors.parent1Income}
-                hint="Verzamelinkomen op de definitieve aanslag 2024; anders belastbaar loon"
-                onChange={(value) => updateField("parent1Income", value)}
-              />
-              <SelectField
-                id="parent1IncomeReliability"
-                label="Status inkomen ouder 1"
-                value={formValues.parent1IncomeReliability}
-                hint="Definitief = vastgesteld op de aanslag; anders kies je Schatting"
-                options={[
-                  { value: "final", label: "Definitief" },
-                  { value: "estimated", label: "Schatting" },
-                ]}
-                onChange={(value) =>
-                  updateField("parent1IncomeReliability", value)
-                }
-              />
-              {hasTwoParents ? (
-                <>
+              <div className="grid gap-4">
+                <fieldset
+                  data-parent-income-group="1"
+                  className="min-w-0 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] p-4"
+                >
+                  <legend className="px-1 text-[13px] font-semibold text-[var(--ink)]">
+                    Inkomen ouder 1
+                  </legend>
+                  <div className="additional-grant-responsive-grid mt-1">
+                    <MoneyField
+                      id="parent1Income"
+                      label="Ouderinkomen 2024"
+                      value={formValues.parent1Income}
+                      error={errors.parent1Income}
+                      hint="Verzamelinkomen op de definitieve aanslag 2024; anders belastbaar loon"
+                      onChange={(value) => updateField("parent1Income", value)}
+                    />
+                    <SelectField
+                      id="parent1IncomeReliability"
+                      label="Status inkomen"
+                      value={formValues.parent1IncomeReliability}
+                      hint="Definitief = vastgesteld op de aanslag; anders kies je Schatting"
+                      options={[
+                        { value: "final", label: "Definitief" },
+                        { value: "estimated", label: "Schatting" },
+                      ]}
+                      onChange={(value) =>
+                        updateField("parent1IncomeReliability", value)
+                      }
+                    />
+                  </div>
+                </fieldset>
+                {hasTwoParents ? (
+                  <fieldset
+                    data-parent-income-group="2"
+                    className="min-w-0 rounded-xl border border-[var(--hair)] bg-[var(--paper-soft)] p-4"
+                  >
+                    <legend className="px-1 text-[13px] font-semibold text-[var(--ink)]">
+                      Inkomen ouder 2
+                    </legend>
+                    <div className="additional-grant-responsive-grid mt-1">
                   <MoneyField
                     id="parent2Income"
-                    label="Ouderinkomen 2024 ouder 2"
+                    label="Ouderinkomen 2024"
                     value={formValues.parent2Income}
                     error={errors.parent2Income}
                     hint="Verzamelinkomen op de definitieve aanslag 2024; anders belastbaar loon"
@@ -374,7 +392,7 @@ export default function DuoAanvullendeBeursCalculator() {
                   />
                   <SelectField
                     id="parent2IncomeReliability"
-                    label="Status inkomen ouder 2"
+                    label="Status inkomen"
                     value={formValues.parent2IncomeReliability}
                     hint="Definitief = vastgesteld op de aanslag; anders kies je Schatting"
                     options={[
@@ -385,8 +403,10 @@ export default function DuoAanvullendeBeursCalculator() {
                       updateField("parent2IncomeReliability", value)
                     }
                   />
-                </>
-              ) : null}
+                    </div>
+                  </fieldset>
+                ) : null}
+              </div>
             </>
           )}
         </div>
@@ -398,60 +418,78 @@ export default function DuoAanvullendeBeursCalculator() {
             Laat deze velden leeg als ze niet spelen. De berekening gebruikt ze alleen als je
             concrete waarden invult.
           </p>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            <MoneyField
-              id="parent1AnnualDuoRepaymentTerms"
-              label="DUO-termijnen ouder 1 per jaar"
-              value={formValues.parent1AnnualDuoRepaymentTerms}
-              error={errors.parent1AnnualDuoRepaymentTerms}
-              onChange={(value) => updateField("parent1AnnualDuoRepaymentTerms", value)}
-            />
-            <MoneyField
-              id="parent1OtherQualifyingChildren"
-              label="Andere kwalificerende kinderen ouder 1"
-              value={formValues.parent1OtherQualifyingChildren}
-              error={errors.parent1OtherQualifyingChildren}
-              prefix=""
-              inputMode="numeric"
-              onChange={(value) => updateField("parent1OtherQualifyingChildren", value)}
-            />
-            <MoneyField
-              id="parent1ChildrenWithAdditionalGrant"
-              label="Kinderen met aanvullende beurs ouder 1"
-              value={formValues.parent1ChildrenWithAdditionalGrant}
-              error={errors.parent1ChildrenWithAdditionalGrant}
-              prefix=""
-              inputMode="numeric"
-              onChange={(value) => updateField("parent1ChildrenWithAdditionalGrant", value)}
-            />
+          <div className="mt-4 grid gap-4">
+            <fieldset
+              data-parent-deductions-group="1"
+              className="min-w-0 rounded-xl border border-[var(--hair)] bg-white p-4"
+            >
+              <legend className="px-1 text-[13px] font-semibold text-[var(--ink)]">
+                Ouder 1
+              </legend>
+              <div className="additional-grant-responsive-grid mt-1">
+                <MoneyField
+                  id="parent1AnnualDuoRepaymentTerms"
+                  label="DUO-termijnen per jaar"
+                  value={formValues.parent1AnnualDuoRepaymentTerms}
+                  error={errors.parent1AnnualDuoRepaymentTerms}
+                  onChange={(value) => updateField("parent1AnnualDuoRepaymentTerms", value)}
+                />
+                <MoneyField
+                  id="parent1OtherQualifyingChildren"
+                  label="Andere kwalificerende kinderen"
+                  value={formValues.parent1OtherQualifyingChildren}
+                  error={errors.parent1OtherQualifyingChildren}
+                  prefix=""
+                  inputMode="numeric"
+                  onChange={(value) => updateField("parent1OtherQualifyingChildren", value)}
+                />
+                <MoneyField
+                  id="parent1ChildrenWithAdditionalGrant"
+                  label="Kinderen met aanvullende beurs"
+                  value={formValues.parent1ChildrenWithAdditionalGrant}
+                  error={errors.parent1ChildrenWithAdditionalGrant}
+                  prefix=""
+                  inputMode="numeric"
+                  onChange={(value) => updateField("parent1ChildrenWithAdditionalGrant", value)}
+                />
+              </div>
+            </fieldset>
             {hasTwoParents ? (
-              <>
-                <MoneyField
-                  id="parent2AnnualDuoRepaymentTerms"
-                  label="DUO-termijnen ouder 2 per jaar"
-                  value={formValues.parent2AnnualDuoRepaymentTerms}
-                  error={errors.parent2AnnualDuoRepaymentTerms}
-                  onChange={(value) => updateField("parent2AnnualDuoRepaymentTerms", value)}
-                />
-                <MoneyField
-                  id="parent2OtherQualifyingChildren"
-                  label="Andere kwalificerende kinderen ouder 2"
-                  value={formValues.parent2OtherQualifyingChildren}
-                  error={errors.parent2OtherQualifyingChildren}
-                  prefix=""
-                  inputMode="numeric"
-                  onChange={(value) => updateField("parent2OtherQualifyingChildren", value)}
-                />
-                <MoneyField
-                  id="parent2ChildrenWithAdditionalGrant"
-                  label="Kinderen met aanvullende beurs ouder 2"
-                  value={formValues.parent2ChildrenWithAdditionalGrant}
-                  error={errors.parent2ChildrenWithAdditionalGrant}
-                  prefix=""
-                  inputMode="numeric"
-                  onChange={(value) => updateField("parent2ChildrenWithAdditionalGrant", value)}
-                />
-              </>
+              <fieldset
+                data-parent-deductions-group="2"
+                className="min-w-0 rounded-xl border border-[var(--hair)] bg-white p-4"
+              >
+                <legend className="px-1 text-[13px] font-semibold text-[var(--ink)]">
+                  Ouder 2
+                </legend>
+                <div className="additional-grant-responsive-grid mt-1">
+                  <MoneyField
+                    id="parent2AnnualDuoRepaymentTerms"
+                    label="DUO-termijnen per jaar"
+                    value={formValues.parent2AnnualDuoRepaymentTerms}
+                    error={errors.parent2AnnualDuoRepaymentTerms}
+                    onChange={(value) => updateField("parent2AnnualDuoRepaymentTerms", value)}
+                  />
+                  <MoneyField
+                    id="parent2OtherQualifyingChildren"
+                    label="Andere kwalificerende kinderen"
+                    value={formValues.parent2OtherQualifyingChildren}
+                    error={errors.parent2OtherQualifyingChildren}
+                    prefix=""
+                    inputMode="numeric"
+                    onChange={(value) => updateField("parent2OtherQualifyingChildren", value)}
+                  />
+                  <MoneyField
+                    id="parent2ChildrenWithAdditionalGrant"
+                    label="Kinderen met aanvullende beurs"
+                    value={formValues.parent2ChildrenWithAdditionalGrant}
+                    error={errors.parent2ChildrenWithAdditionalGrant}
+                    prefix=""
+                    inputMode="numeric"
+                    onChange={(value) => updateField("parent2ChildrenWithAdditionalGrant", value)}
+                  />
+                </div>
+              </fieldset>
             ) : null}
           </div>
         </DisclosureSection>
