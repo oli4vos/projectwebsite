@@ -48,6 +48,9 @@ Voor reproduceerbare CI-achtige installaties gebruik je `npm ci`; voor dagelijks
 | `npm run generate:source-overview` | Genereert `docs/source-data-overview.md` uit de centrale source-datasetregistry. |
 | `npm run validate:source-data` | Valideert bronmetadata, actieve datasetselectie en dataset-specifieke grenzen. |
 | `npm run check:source-freshness` | Rapporteert freshnesswaarschuwingen zonder reviewwaarschuwingen automatisch hard te blokkeren. |
+| `npm run process:check` | Controleert procesdocumenten, Mermaid-basisstructuur, bronbestanden, hashes en de centrale inventaris. |
+| `npm run process:index` | Genereert `docs/processes/README.md` uit actieve publieke appmanifests en procesmetadata. |
+| `npm run process:update -- --tool <tool-id> --reviewed` | Vernieuwt na inhoudelijke review de datum en bronvingerafdruk van een tool. |
 | `npm run update:mortgage-financing-load-table` | Werkt de centrale hypotheek-financieringslasttabel bij via het importscripts. |
 | `npm run import:artifact-tools` | Importeert staging/artifact-tools naar `apps/`. |
 | `npm run browser:compare` | Draait de browservergelijking voor hypotheekaanbiederscenario's. |
@@ -63,6 +66,8 @@ Voor reproduceerbare CI-achtige installaties gebruik je `npm ci`; voor dagelijks
 | `npm run typecheck` | Genereert Next route types en draait `tsc --noEmit`. |
 
 `predev` en `prebuild` draaien automatisch eerst `generate:apps`, zodat de registry synchroon blijft met de inhoud van `apps/`.
+
+De publieke toolpagina's tonen onder **Wil je weten hoe deze tool werkt?** een interactieve procesgids die tijdens de statische build rechtstreeks uit de gecontroleerde `apps/<slug>/PROCESS.md` wordt opgebouwd. De drie publieke weergaven volgen het gebruikersproces, beslisproces en rekenproces; `process:check` bewaakt dat deze Mermaid-platen publiceerbaar blijven.
 
 ## Structuur
 
@@ -205,6 +210,7 @@ Belangrijke centrale rekenlagen:
 | `AGENTS.md` | Verplichte regels voor agents en engineers, vooral centrale rekenlagen en UX-checks. |
 | `CONTRIBUTING.md` | Lokale workflow, checks en opleverregels voor wijzigingen. |
 | `docs/calculator-architecture.md` | Laagmodel, calculatorcontract, actieve scope en blueprint voor activatie/publicatie. |
+| `docs/processes/README.md` | Gegenereerde index van gebruikers-, beslis-, reken- en gegevensprocessen per publieke tool. |
 | `FUNCTIONALITY_STATUS.md` | Single source of truth voor actief, hidden, voorbereid en uitgeschakeld gedrag. |
 | `UX_GUIDELINES.md` | UX-regels voor calculators, formulieren, mobiele flow en toegankelijkheid. |
 | `DESIGN_SYSTEM.md` | Design tokens, componentconventies en visuele patronen. |

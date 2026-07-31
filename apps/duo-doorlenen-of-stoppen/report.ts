@@ -801,7 +801,9 @@ export function buildStudyStopPdfReport(
           ? "Geen diploma betekent dat de prestatiebeurs niet omgezet wordt in gift."
           : scenario.key === "stop-now-later-diploma"
             ? "Bij tijdig diploma kan de prestatiebeurs alsnog gift worden."
-            : "Doorstuderen vergroot de schuld, maar kan prestatiebeurs later alsnog gift maken.",
+            : scenario.key === "continue-no-diploma"
+              ? "Je leent door tot de gekozen stopmaand en de prestatiebeurs wordt niet omgezet in een gift."
+              : "Doorstuderen vergroot de schuld, maar kan prestatiebeurs later alsnog gift maken.",
       debtAtStop: scenario.debtAtStop.total,
       debtAtRepaymentStart: scenario.debtAtRepaymentStart.total,
       usedMonthlyPayment: scenario.repayment.usedMonthlyPayment,
@@ -817,7 +819,9 @@ export function buildStudyStopPdfReport(
           ? "Stop nu en geen diploma meer."
           : scenario.key === "stop-now-later-diploma"
             ? "Stop nu en haal later alsnog op tijd een diploma."
-            : "Doorstuderen tot diploma.",
+            : scenario.key === "continue-no-diploma"
+              ? "Studeer door tot de gekozen stopmaand en haal geen diploma."
+              : "Doorstuderen tot diploma.",
       metrics: [
         { label: "Schuld op stopdatum", value: formatCurrency(scenario.debtAtStop.total, 0) },
         {

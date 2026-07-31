@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
+  createSimpleDuoView,
   defaultSimpleDuoValues,
   getSimpleDuoMonthlyLimits,
+  maxBorrowingWithoutDiplomaValues,
   validateSimpleDuoValues,
   type SimpleDuoValues,
 } from "./focused-logic";
@@ -88,5 +90,38 @@ describe("centrale DUO-maandmaxima in de eenvoudige tools", () => {
     expect(unsupportedMonthErrors.calculationMonth).toBe(
       "Voor deze maand zijn geen centrale DUO-maximumbedragen beschikbaar.",
     );
+  });
+
+  it("bouwt het maximale scenario met centrale bedragen en zonder giftomzetting", () => {
+    const values = maxBorrowingWithoutDiplomaValues({
+      ...valuesForAugust2026(),
+      monthsUntilDiploma: "24",
+    });
+
+    expect(values).toMatchObject({
+      calculationMonth: "2026-08",
+      monthsUntilDiploma: "24",
+      monthlyLoan: "315.17",
+      monthlyCollegegeldkrediet: "216.75",
+      monthlyBasisbeurs: "324.52",
+      monthlyAanvullendeBeurs: "491.08",
+      monthlyReisproduct: "0",
+    });
+
+    const view = createSimpleDuoView(
+      "start-borrowing",
+      values,
+      "max-borrowing-no-diploma",
+    );
+    expect(view.isValid).toBe(true);
+    if (view.isValid) {
+      const scenario = view.result.scenarios.find(
+        ({ key }) => key === "continue-no-diploma",
+      );
+      expect(view.focusScenario.key).toBe("max-borrowing-no-diploma");
+      expect(scenario?.diplomaMonth).toBeUndefined();
+      expect(scenario?.debtAtStop.prestatiebeurs).toBeGreaterThan(0);
+      expect(view.focusScenario.primaryAmount).toBe(scenario?.debtAtStop.total);
+    }
   });
 });

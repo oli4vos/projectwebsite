@@ -25,10 +25,12 @@ export type StudyDebtComponentKey =
 export type StudyStopScenarioKey =
   | "stop-now-no-diploma"
   | "stop-now-later-diploma"
-  | "continue-to-diploma";
+  | "continue-to-diploma"
+  | "continue-no-diploma";
 
 export type StudyStopFocusScenarioKey =
   | "start-study-borrowing"
+  | "max-borrowing-no-diploma"
   | "stop-performance-grant-cost"
   | "change-monthly-loan-impact";
 
@@ -58,6 +60,7 @@ export type StudyStopInput = {
   oneTimeExtraRepayment?: number;
   monthlyExtraRepayment?: number;
   aflosvrijeMonths?: number;
+  includeContinueWithoutDiplomaScenario?: boolean;
 };
 
 export type StudyDebtComponentState = {
@@ -171,7 +174,7 @@ export type StudyStopCalculationResult = {
   }>;
 };
 
-export const STUDY_STOP_ENGINE_VERSION = "1.0.0";
+export const STUDY_STOP_ENGINE_VERSION = "1.1.0";
 export const STUDY_STOP_SOURCE_CHECKED_AT = "2026-07-13";
 
 type YearMonth = {
@@ -1016,6 +1019,9 @@ function buildFocusScenarios(scenarios: StudyStopScenarioResult[], repaymentTerm
   const stopNow = scenarios.find((scenario) => scenario.key === "stop-now-no-diploma") ?? scenarios[0];
   const continueToDiploma =
     scenarios.find((scenario) => scenario.key === "continue-to-diploma") ?? scenarios[scenarios.length - 1];
+  const continueWithoutDiploma = scenarios.find(
+    (scenario) => scenario.key === "continue-no-diploma",
+  );
 
   const extraDebtAtStop = roundMoney(
     Math.max((continueToDiploma?.debtAtStop.total ?? 0) - (stopNow?.debtAtStop.total ?? 0), 0),
@@ -1073,6 +1079,27 @@ function buildFocusScenarios(scenarios: StudyStopScenarioResult[], repaymentTerm
       payoffDate: continueToDiploma?.repayment.payoffDate ?? null,
       note: "Pas je maandelijkse lening aan en bereken opnieuw om te zien wat dat doet met je eindschuld.",
     },
+    ...(continueWithoutDiploma
+      ? [
+          {
+            key: "max-borrowing-no-diploma" as const,
+            title: "Maximaal lenen en geen diploma halen",
+            description:
+              "Laat zien wat er gebeurt als je de gekozen periode maximaal studiefinanciering gebruikt en de prestatiebeurs niet wordt omgezet in een gift.",
+            primaryLabel: "Verwachte eindschuld zonder diploma",
+            primaryAmount: continueWithoutDiploma.debtAtStop.total,
+            secondaryLabel: "Prestatiebeurs die schuld blijft",
+            secondaryAmount: continueWithoutDiploma.debtAtStop.prestatiebeurs,
+            debtAtRepaymentStart: continueWithoutDiploma.debtAtRepaymentStart.total,
+            totalPaid: continueWithoutDiploma.repayment.totalPaid,
+            totalInterest: continueWithoutDiploma.repayment.totalInterest,
+            repaymentTermYears,
+            payoffDate: continueWithoutDiploma.repayment.payoffDate,
+            note:
+              "Dit scenario gebruikt de maximale hbo/wo-bedragen voor een uitwonende student met regulier collegegeld. Het studentenreisproduct staat op € 0, omdat de centrale normlaag daarvoor geen maandbedrag bevat.",
+          },
+        ]
+      : []),
   ];
 }
 
@@ -1178,6 +1205,29 @@ export function calculateStudyStopScenarios(
     aflosvrijeMonths: input.aflosvrijeMonths,
   });
 
+  const continueWithoutDiplomaBase = input.includeContinueWithoutDiplomaScenario
+    ? simulateScenario({
+        key: "continue-no-diploma",
+        title: "Doorstuderen en geen diploma halen",
+        calculationMonth,
+        stopMonths: Math.max(Math.round(input.monthsUntilContinueDiploma ?? 0), 0),
+        annualStudyInterestRate,
+        annualRepaymentInterestRate,
+        repaymentRule,
+        duoRateYear,
+        remainingTermYears,
+        currentStates,
+        monthlyStudyAdditions,
+        remainingDiplomaTermMonths,
+        grossAnnualIncome: input.grossAnnualIncome,
+        partnerGrossAnnualIncome: input.partnerGrossAnnualIncome,
+        hasPartner: input.hasPartner,
+        monthlyExtraRepayment: input.monthlyExtraRepayment,
+        oneTimeExtraRepayment: input.oneTimeExtraRepayment,
+        aflosvrijeMonths: input.aflosvrijeMonths,
+      })
+    : undefined;
+
   const scenarios = [
     summarizeScenario(
       input,
@@ -1209,6 +1259,20 @@ export function calculateStudyStopScenarios(
       Math.max(Math.round(input.monthsUntilContinueDiploma ?? 0), 0),
       Math.max(Math.round(input.monthsUntilContinueDiploma ?? 0), 0),
     ),
+    ...(continueWithoutDiplomaBase
+      ? [
+          summarizeScenario(
+            input,
+            continueWithoutDiplomaBase,
+            "continue-no-diploma",
+            "Doorstuderen en geen diploma halen",
+            monthlyStudyAdditions,
+            remainingDiplomaTermMonths,
+            Math.max(Math.round(input.monthsUntilContinueDiploma ?? 0), 0),
+            undefined,
+          ),
+        ]
+      : []),
   ] as StudyStopScenarioResult[];
 
   return {

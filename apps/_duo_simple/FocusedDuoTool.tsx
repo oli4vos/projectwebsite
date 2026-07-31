@@ -22,10 +22,13 @@ import {
   defaultSimpleDuoValues,
   emptySimpleDuoValues,
   getSimpleDuoMonthlyLimits,
+  maxBorrowingWithoutDiplomaValues,
   type SimpleDuoMonthlyLimits,
+  type SimpleDuoOutcomeKey,
   type SimpleDuoToolMode,
   type SimpleDuoValues,
 } from "./focused-logic";
+import { ProjectedDebtMortgageImpact } from "./ProjectedDebtMortgageImpact";
 
 type ToolCopy = {
   eyebrow: string;
@@ -134,6 +137,7 @@ function Field({
   prefix,
   suffix,
   max,
+  step,
   type = "number",
   onChange,
   onEnter,
@@ -147,6 +151,7 @@ function Field({
   prefix?: string;
   suffix?: string;
   max?: number;
+  step?: string;
   type?: "number" | "month";
   onChange: (value: string) => void;
   onEnter?: (event: KeyboardEvent) => void;
@@ -172,7 +177,7 @@ function Field({
           value={value}
           min="0"
           max={max}
-          step={type === "month" ? undefined : "0.01"}
+          step={type === "month" ? undefined : step ?? "0.01"}
           onChange={(event) => onChange(event.target.value)}
           onKeyDown={onEnter}
           aria-invalid={error ? "true" : "false"}
@@ -298,7 +303,7 @@ function Select({
 function fieldLabel(field: keyof SimpleDuoValues) {
   const labels: Record<keyof SimpleDuoValues, string> = {
     calculationMonth: "Berekeningsmaand",
-    monthsUntilDiploma: "Maanden tot diploma",
+    monthsUntilDiploma: "Aantal maanden studeren",
     currentLoanDebt: "Huidige lening",
     currentCollegegeldkredietDebt: "Huidig collegegeldkrediet",
     currentBasisbeursDebt: "Basisbeurs als prestatiebeurs",
@@ -340,6 +345,7 @@ function fieldHint(
   }
 
   const hints: Partial<Record<keyof SimpleDuoValues, string>> = {
+    monthsUntilDiploma: "Gebruik hele maanden",
     currentLoanDebt: "Mijn DUO: lening",
     currentCollegegeldkredietDebt: "Mijn DUO: collegegeldkrediet",
     currentBasisbeursDebt: "Mijn DUO: prestatiebeurs",
@@ -372,18 +378,36 @@ function fieldMaximum(
   return undefined;
 }
 
+function fieldStep(field: keyof SimpleDuoValues) {
+  if (field === "monthsUntilDiploma") return "1";
+  if (field === "calculationMonth" || field === "duoRateYear") return undefined;
+  return "0.01";
+}
+
 export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
   const copy = modeCopy[mode];
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
+  const [submittedOutcome, setSubmittedOutcome] =
+    useState<SimpleDuoOutcomeKey>("standard");
   const exampleValues = useMemo(() => defaultSimpleDuoValues(mode), [mode]);
   const initialValues = useMemo(() => emptySimpleDuoValues(mode), [mode]);
-  const { formValues, setFormValues, submittedValues, submit, replaceValues } =
+  const {
+    formValues,
+    setFormValues,
+    submittedValues,
+    submit,
+    submitValues,
+    replaceValues,
+  } =
     useSubmittedCalculation<SimpleDuoValues>(initialValues);
   const currentView = useMemo(() => createSimpleDuoView(mode, formValues), [formValues, mode]);
-  const submittedView = submittedValues ? createSimpleDuoView(mode, submittedValues) : null;
+  const submittedView = submittedValues
+    ? createSimpleDuoView(mode, submittedValues, submittedOutcome)
+    : null;
   const isExampleInput = JSON.stringify(formValues) === JSON.stringify(exampleValues);
   const isExampleResult =
     submittedValues !== null &&
+    submittedOutcome === "standard" &&
     JSON.stringify(submittedValues) === JSON.stringify(exampleValues);
   const mobileFlow = useMobileFieldFlow(copy.fields);
   const monthlyLimits = useMemo(
@@ -399,6 +423,22 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
     if (currentView.isValid) {
       submit();
     }
+  }
+
+  function handleMaxBorrowingWithoutDiploma() {
+    const nextValues = maxBorrowingWithoutDiplomaValues(formValues);
+    const nextView = createSimpleDuoView(
+      "start-borrowing",
+      nextValues,
+      "max-borrowing-no-diploma",
+    );
+    if (!nextView.isValid) return;
+
+    setSubmittedOutcome("max-borrowing-no-diploma");
+    submitValues(
+      nextValues,
+      "Maximale studiefinanciering zonder diploma is doorgerekend.",
+    );
   }
 
   async function handleDownloadPdf() {
@@ -464,6 +504,7 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
         prefix={field.includes("Debt") || field.startsWith("monthly") ? "€" : undefined}
         suffix={field === "monthsUntilDiploma" ? "maanden" : undefined}
         max={fieldMaximum(field, monthlyLimits)}
+        step={fieldStep(field)}
         type={field === "calculationMonth" ? "month" : "number"}
         onChange={(value) => updateField(field, value)}
         onEnter={mobileFlow.handleEnterAdvance(field, false)}
@@ -473,9 +514,13 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
   }
 
   const selectedScenario = submittedView?.isValid
-    ? mode === "stop-cost"
-      ? submittedView.result.scenarios[0]
-      : submittedView.result.scenarios[2]
+    ? submittedView.result.scenarios.find((scenario) =>
+        submittedOutcome === "max-borrowing-no-diploma"
+          ? scenario.key === "continue-no-diploma"
+          : mode === "stop-cost"
+            ? scenario.key === "stop-now-no-diploma"
+            : scenario.key === "continue-to-diploma",
+      )
     : undefined;
   const baseNextSteps = getToolNextSteps(nextStepSlugByMode[mode]);
   const nextSteps = mode === "start-borrowing"
@@ -539,6 +584,11 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
         <p className="text-[13px] leading-[1.7] text-[var(--soft)]">
           {submittedView.focusScenario.note}
         </p>
+        <ProjectedDebtMortgageImpact
+          debtAtStudyEnd={
+            selectedScenario?.debtAtStop.total ?? submittedView.focusScenario.primaryAmount
+          }
+        />
         <ToolNextSteps {...nextSteps} />
         <ToolActionButton
           type="button"
@@ -578,11 +628,7 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
             />
             <ResultRow
               label="Altijd terug te betalen"
-              value={formatCurrency(
-                mode === "stop-cost"
-                  ? submittedView.result.scenarios[0].debtAtStop.alwaysRepayable
-                  : submittedView.result.scenarios[2].debtAtStop.alwaysRepayable,
-              )}
+              value={formatCurrency(selectedScenario?.debtAtStop.alwaysRepayable ?? 0)}
             />
           </div>
         </details>
@@ -621,19 +667,32 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
             <ToolActionButton
               type="button"
               variant="secondary"
-              onClick={() =>
+              onClick={() => {
+                setSubmittedOutcome("standard");
                 replaceValues(
                   exampleValues,
                   "Voorbeeld ingevuld. Klik op Bereken voor de voorbeeldberekening.",
-                )
-              }
+                );
+              }}
             >
               Voorbeeld invullen
             </ToolActionButton>
+            {mode === "start-borrowing" ? (
+              <ToolActionButton
+                type="button"
+                variant="secondary"
+                onClick={handleMaxBorrowingWithoutDiploma}
+              >
+                Wat als ik maximaal leen en geen diploma haal?
+              </ToolActionButton>
+            ) : null}
             <ToolActionButton
               type="button"
               variant="secondary"
-              onClick={() => replaceValues(initialValues, "Invoer gewist.")}
+              onClick={() => {
+                setSubmittedOutcome("standard");
+                replaceValues(initialValues, "Invoer gewist.");
+              }}
             >
               Wis invoer
             </ToolActionButton>

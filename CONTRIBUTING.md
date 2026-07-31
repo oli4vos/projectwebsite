@@ -46,6 +46,7 @@ Nieuwe tools blijven standaard hidden totdat manifest, copy, logica, tests, resp
 ## Verplichte controles
 
 ```bash
+npm run process:check
 npm run test
 npm run test:ux
 npm run lint
@@ -61,12 +62,16 @@ Voor een brede wijziging heeft `npm run check` de voorkeur.
 - Architectuur- of flowwijziging: update `PROJECT.md`.
 - Nieuw UX-patroon: update `UX_GUIDELINES.md` en `DESIGN_SYSTEM.md`.
 - Nieuwe publieke tool: update README of relevante statusdocumentatie wanneer aantallen of routes veranderen.
+- Wijzigingen in formulier, zichtbaarheid, validatie, berekening, brondata, profiel, sessie, handoff, resultaten, waarschuwingen, PDF, vervolgstappen, route of activatie vereisen review van de bijbehorende `apps/<slug>/PROCESS.md`.
+- Werk gedrag en procesplaat in dezelfde wijziging bij. Vernieuw de bronvingerafdruk pas na die inhoudelijke review met `npm run process:update -- --tool <tool-id> --reviewed`.
+- De gegenereerde inventaris staat in `docs/processes/README.md`; `npm run process:check` controleert volledigheid en actualiteit.
 
 ## Reviewchecklist
 
 - Geen gedupliceerde formule of business rule.
 - `Calculator.tsx` is een dunne facade; parsing, validatie, mapping, berekening, scherm-viewmodel en PDF-data zijn gescheiden waar de tool complex genoeg is.
 - Tests dekken het gewijzigde gedrag.
+- `npm run process:check` slaagt en de procesplaat beschrijft het actuele gedrag.
 - Registry is opnieuw gegenereerd en schoon.
 - Inactieve tools zijn niet onbedoeld publiek zichtbaar geworden.
 - Eén `h1` per pagina en logische kopvolgorde.

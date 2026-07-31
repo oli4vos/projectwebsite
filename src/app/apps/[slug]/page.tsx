@@ -5,8 +5,10 @@ import { AppRenderer } from "@/components/AppRenderer";
 import { KnowledgeLevelHint } from "@/components/KnowledgeLevelHint";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import { ToolProcessGuide } from "@/components/tool/ToolProcessGuide";
 import { ENABLE_KNOWLEDGE_LEVEL } from "@/lib/feature-flags";
 import { appRegistry, appRegistryBySlug } from "@/lib/app-registry";
+import { getPublishedToolProcess } from "@/lib/tool-process-docs.server";
 
 type AppDetailPageProps = {
   params: Promise<{
@@ -46,6 +48,8 @@ export default async function AppDetailPage({ params }: AppDetailPageProps) {
     notFound();
   }
 
+  const toolProcess = getPublishedToolProcess(app.slug);
+
   return (
     <>
       <SiteHeader />
@@ -64,6 +68,9 @@ export default async function AppDetailPage({ params }: AppDetailPageProps) {
             </div>
           ) : null}
           <AppRenderer slug={app.slug} />
+        </section>
+        <section className="mt-10" aria-label="Werking van deze tool">
+          <ToolProcessGuide process={toolProcess} />
         </section>
       </main>
       <SiteFooter />

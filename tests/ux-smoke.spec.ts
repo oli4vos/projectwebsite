@@ -538,6 +538,14 @@ test("maximale hypotheek legt de uitkomst uit inclusief studieschuld", async ({
   await expect(
     breakdown.getByText("Studieschuld en andere verplichtingen verwerken"),
   ).toBeVisible();
+  await expect(breakdown.getByText("Inkomen en rente", { exact: true })).toBeVisible();
+  await expect(
+    breakdown.getByText("Ruimte na verplichtingen", { exact: true }),
+  ).toBeVisible();
+  await expect(breakdown.getByText("Grens op inkomen", { exact: true })).toBeVisible();
+  await expect(
+    breakdown.getByText("Uiteindelijke maximum", { exact: true }),
+  ).toBeVisible();
   await expect(
     breakdown.getByText(
       "Minder hypotheekruimte op basis van inkomen door studieschuld",
@@ -551,6 +559,33 @@ test("maximale hypotheek legt de uitkomst uit inclusief studieschuld", async ({
     () => document.documentElement.scrollWidth > window.innerWidth + 1,
   );
   expect(hasHorizontalOverflow).toBe(false);
+});
+
+test("maximale hypotheek noemt rente en extra leenruimte in de samenvatting", async ({
+  page,
+}, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "Desktop rentevergelijking");
+
+  await page.goto("/apps/artifact-hypotheek-wonen-maximale-hypotheek", {
+    waitUntil: "networkidle",
+  });
+  await page.getByRole("button", { name: "Voorbeeld invullen" }).click();
+  await page
+    .getByRole("textbox", { name: /^Hypotheekrente/ })
+    .fill("4,99");
+  await page.getByRole("textbox", { name: /^Koopprijs/ }).fill("1000000");
+  await page.getByRole("textbox", { name: /^Woningwaarde/ }).fill("1000000");
+  await page.getByRole("combobox", { name: /^NHG gewenst/ }).selectOption("no");
+  await page.getByRole("button", { name: "Bereken", exact: true }).click();
+
+  const breakdown = page.getByTestId("mortgage-calculation-breakdown");
+  await breakdown.getByText("Zo is dit bedrag opgebouwd").click();
+  await expect(
+    breakdown.getByText(/Bij een toetsrente van .+ is indicatief .+ meer hypotheek mogelijk\./),
+  ).toBeVisible();
+  await expect(
+    breakdown.getByText(/De alternatieve einduitkomst is .+ Dit komt door een andere officiële financieringslastband/),
+  ).toBeVisible();
 });
 
 test("maximale hypotheek toont rentelink en salarisverhogingsanalyse", async ({
@@ -1131,6 +1166,47 @@ test("verwachte eindschuld toont direct het totaal bij regulier aflossen", async
   expect(width.body).toBeLessThanOrEqual(width.viewport + 1);
 });
 
+test("maximaal lenen zonder diploma gebruikt centrale bedragen en hele maanden", async ({
+  page,
+}) => {
+  await page.goto("/apps/duo-schuld-bij-starten-lenen", {
+    waitUntil: "networkidle",
+  });
+
+  await expect(page.locator("#monthsUntilDiploma")).toHaveAttribute("step", "1");
+  await expect(page.locator("#monthlyLoan")).toHaveAttribute("step", "0.01");
+  await page.locator("#calculationMonth").fill("2026-08");
+  await page
+    .getByRole("button", {
+      name: "Wat als ik maximaal leen en geen diploma haal?",
+    })
+    .click();
+
+  const summary = page.locator("#tool-result-summary");
+  await expect(
+    summary.getByRole("heading", {
+      name: "Maximaal lenen en geen diploma halen",
+    }),
+  ).toBeVisible();
+  await expect(
+    summary.getByText("Verwachte eindschuld zonder diploma", { exact: true }),
+  ).toBeVisible();
+  await summary.getByText("Bekijk de volledige berekening").click();
+  await expect(
+    summary.getByText("Prestatiebeurs die schuld blijft", { exact: true }),
+  ).toBeVisible();
+  await expect(page.locator("#monthlyLoan")).toHaveValue("315.17");
+  await expect(page.locator("#monthlyCollegegeldkrediet")).toHaveValue("216.75");
+  await expect(page.locator("#monthlyBasisbeurs")).toHaveValue("324.52");
+  await expect(page.locator("#monthlyAanvullendeBeurs")).toHaveValue("491.08");
+
+  const width = await page.evaluate(() => ({
+    body: document.body.scrollWidth,
+    viewport: document.documentElement.clientWidth,
+  }));
+  expect(width.body).toBeLessThanOrEqual(width.viewport + 1);
+});
+
 test("DUO-maandbedragen gebruiken centrale maxima met toelichting rechts", async ({ page }) => {
   const isMobile = (page.viewportSize()?.width ?? 0) < 768;
 
@@ -1310,5 +1386,36 @@ test("alle tien tools doorlopen invoer, uitkomst, details en vervolgactie", asyn
     } else {
       await expect(pdfButton).toHaveCount(0);
     }
+  }
+});
+
+test("publieke tools tonen een doorloopbare procesgids", async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "Desktop procesregressie volstaat");
+
+  for (const route of getPublicToolRoutes()) {
+    await page.goto(route, { waitUntil: "networkidle" });
+    const processSection = page.getByRole("region", { name: "Werking van deze tool" });
+    const guide = processSection.getByText("Wil je weten hoe deze tool werkt?", { exact: true });
+    await expect(guide, route).toBeVisible();
+    await guide.click();
+
+    await expect(
+      processSection.getByRole("tab", { name: "Jouw route door de tool" }),
+      route,
+    ).toHaveAttribute("aria-selected", "true");
+    await expect(processSection.getByText("Stap 1", { exact: true }), route).toBeVisible();
+    await processSection.getByRole("button", { name: /Volgende|.+ →/ }).first().click();
+    await expect(processSection.getByText("Stap 2", { exact: true }), route).toBeVisible();
+
+    await processSection.getByRole("tab", { name: "Keuzes en uitzonderingen" }).click();
+    await expect(
+      processSection.getByRole("heading", { name: "Keuzes en uitzonderingen" }),
+      route,
+    ).toBeVisible();
+    await processSection.getByText("Bekijk het volledige stroomschema", { exact: true }).click();
+    await expect(
+      processSection.getByRole("list", { name: "Keuzes en uitzonderingen" }),
+      route,
+    ).toBeVisible();
   }
 });

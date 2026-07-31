@@ -12,6 +12,9 @@ import type { RepaymentRule } from "@/lib/duo/types";
 import { parseOptionalDecimalInput } from "@/lib/number-input";
 
 export type SimpleDuoToolMode = "start-borrowing" | "stop-cost" | "monthly-impact";
+export type SimpleDuoOutcomeKey =
+  | "standard"
+  | "max-borrowing-no-diploma";
 
 export type SimpleDuoValues = {
   calculationMonth: string;
@@ -212,6 +215,46 @@ export function emptySimpleDuoValues(mode: SimpleDuoToolMode): SimpleDuoValues {
   };
 }
 
+export function maxBorrowingWithoutDiplomaValues(
+  values: SimpleDuoValues,
+): SimpleDuoValues {
+  const defaults = defaultSimpleDuoValues("start-borrowing");
+  const calculationMonth = getSimpleDuoMonthlyLimits(values.calculationMonth)
+    ? values.calculationMonth
+    : defaults.calculationMonth;
+  const amounts = getDuoStudentFinanceAmountsForDate({
+    asOf: `${calculationMonth}-01`,
+    educationTrack: "hbo-university",
+  });
+  const livingAway = amounts.amountsByResidence["living-away"];
+  const monthsUntilStop = parseMonths(values.monthsUntilDiploma);
+  const supportedRateYears = new Set(getAvailableDuoRateYears());
+  const rateYear = Number.parseInt(values.duoRateYear, 10);
+
+  return {
+    ...values,
+    calculationMonth,
+    monthsUntilDiploma:
+      monthsUntilStop !== undefined && monthsUntilStop > 0
+        ? String(monthsUntilStop)
+        : defaults.monthsUntilDiploma,
+    currentLoanDebt: "0",
+    currentCollegegeldkredietDebt: "0",
+    currentBasisbeursDebt: "0",
+    currentAanvullendeBeursDebt: "0",
+    currentReisproductDebt: "0",
+    monthlyLoan: String(livingAway.regularLoanMax),
+    monthlyCollegegeldkrediet: String(amounts.tuitionCreditMax ?? 0),
+    monthlyBasisbeurs: String(livingAway.basicGrantMax),
+    monthlyAanvullendeBeurs: String(livingAway.additionalGrantMax),
+    monthlyReisproduct: "0",
+    repaymentRule: "SF35",
+    duoRateYear: supportedRateYears.has(rateYear)
+      ? String(rateYear)
+      : defaults.duoRateYear,
+  };
+}
+
 export function validateSimpleDuoValues(mode: SimpleDuoToolMode, values: SimpleDuoValues) {
   const errors: SimpleDuoErrors = {};
   const supportedRateYears = new Set(getAvailableDuoRateYears());
@@ -221,7 +264,7 @@ export function validateSimpleDuoValues(mode: SimpleDuoToolMode, values: SimpleD
   }
 
   if (mode !== "stop-cost" && parseMonths(values.monthsUntilDiploma) === undefined) {
-    errors.monthsUntilDiploma = "Vul het aantal maanden tot je diploma in.";
+    errors.monthsUntilDiploma = "Vul een heel aantal maanden in.";
   }
 
   for (const field of [
@@ -318,17 +361,28 @@ export function mapSimpleDuoValuesToInput(mode: SimpleDuoToolMode, values: Simpl
   };
 }
 
-export function createSimpleDuoView(mode: SimpleDuoToolMode, values: SimpleDuoValues): SimpleDuoView {
+export function createSimpleDuoView(
+  mode: SimpleDuoToolMode,
+  values: SimpleDuoValues,
+  outcome: SimpleDuoOutcomeKey = "standard",
+): SimpleDuoView {
   const errors = validateSimpleDuoValues(mode, values);
 
   if (Object.keys(errors).length > 0) {
     return { isValid: false, errors };
   }
 
-  const input = mapSimpleDuoValuesToInput(mode, values);
+  const input = {
+    ...mapSimpleDuoValuesToInput(mode, values),
+    includeContinueWithoutDiplomaScenario:
+      mode === "start-borrowing" && outcome === "max-borrowing-no-diploma",
+  };
   const result = calculateStudyStopScenarios(input);
+  const focusKey = outcome === "max-borrowing-no-diploma"
+    ? "max-borrowing-no-diploma"
+    : modeToFocusKey[mode];
   const focusScenario =
-    result.focusScenarios.find((scenario) => scenario.key === modeToFocusKey[mode]) ??
+    result.focusScenarios.find((scenario) => scenario.key === focusKey) ??
     result.focusScenarios[0];
 
   return {

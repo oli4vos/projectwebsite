@@ -46,6 +46,9 @@ jobs:
       - name: Verify generated files are committed
         run: git diff --exit-code src/lib/app-registry.ts src/lib/app-components.tsx
 
+      - name: Validate process documentation
+        run: npm run process:check
+
       - name: Run unit tests
         run: npm run test
 

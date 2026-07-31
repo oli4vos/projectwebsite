@@ -147,6 +147,39 @@ describe("studeren-stoppen engine", () => {
     );
   });
 
+  it("adds a future stop without diploma only when explicitly requested", () => {
+    const standard = calculateStudyStopScenarios(BASE_INPUT);
+    expect(
+      standard.scenarios.some(({ key }) => key === "continue-no-diploma"),
+    ).toBe(false);
+
+    const result = calculateStudyStopScenarios({
+      ...BASE_INPUT,
+      currentLoanDebt: 0,
+      currentCollegegeldkredietDebt: 0,
+      currentBasisbeursDebt: 0,
+      currentAanvullendeBeursDebt: 0,
+      monthlyLoan: 315.17,
+      monthlyCollegegeldkrediet: 216.75,
+      monthlyBasisbeurs: 324.52,
+      monthlyAanvullendeBeurs: 491.08,
+      monthsUntilContinueDiploma: 24,
+      includeContinueWithoutDiplomaScenario: true,
+    });
+    const scenario = result.scenarios.find(
+      ({ key }) => key === "continue-no-diploma",
+    );
+
+    expect(scenario?.monthsUntilStop).toBe(24);
+    expect(scenario?.diplomaMonth).toBeUndefined();
+    expect(scenario?.debtAtStop.prestatiebeurs).toBeGreaterThan(0);
+    expect(
+      result.focusScenarios.some(
+        ({ key }) => key === "max-borrowing-no-diploma",
+      ),
+    ).toBe(true);
+  });
+
   it("keeps interest running during an aflosvrije period", () => {
     const withoutAflosvrij = calculateStudyStopScenarios({
       ...BASE_INPUT,
