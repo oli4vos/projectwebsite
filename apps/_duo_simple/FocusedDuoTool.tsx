@@ -21,6 +21,8 @@ import {
   createSimpleDuoView,
   defaultSimpleDuoValues,
   emptySimpleDuoValues,
+  getSimpleDuoMonthlyLimits,
+  type SimpleDuoMonthlyLimits,
   type SimpleDuoToolMode,
   type SimpleDuoValues,
 } from "./focused-logic";
@@ -131,6 +133,7 @@ function Field({
   hint,
   prefix,
   suffix,
+  max,
   type = "number",
   onChange,
   onEnter,
@@ -143,6 +146,7 @@ function Field({
   hint?: string;
   prefix?: string;
   suffix?: string;
+  max?: number;
   type?: "number" | "month";
   onChange: (value: string) => void;
   onEnter?: (event: KeyboardEvent) => void;
@@ -150,11 +154,15 @@ function Field({
 }) {
   return (
     <label className={`grid gap-2 ${className ?? ""}`.trim()} htmlFor={String(id)}>
-      <span className="flex items-baseline justify-between gap-3">
-        <span className="text-[12px] font-medium uppercase tracking-[0.04em] text-[var(--muted)]">
+      <span className="grid grid-cols-[minmax(0,1fr)_minmax(0,auto)] items-start gap-3">
+        <span className="min-w-0 text-[12px] font-medium uppercase tracking-[0.04em] text-[var(--muted)]">
           {label}
         </span>
-        {hint ? <span className="text-right text-[11px] leading-snug text-[var(--soft)]">{hint}</span> : null}
+        {hint ? (
+          <span className="min-w-0 max-w-56 text-right text-[11px] leading-snug text-[var(--soft)]">
+            {hint}
+          </span>
+        ) : null}
       </span>
       <span className="field-shell flex min-h-12 items-center px-3">
         {prefix ? <span className="mr-2 text-[var(--muted)]">{prefix}</span> : null}
@@ -163,6 +171,7 @@ function Field({
           type={type}
           value={value}
           min="0"
+          max={max}
           step={type === "month" ? undefined : "0.01"}
           onChange={(event) => onChange(event.target.value)}
           onKeyDown={onEnter}
@@ -182,18 +191,23 @@ function Field({
 function MonthlyLoanSliderField({
   value,
   error,
+  maximum,
   onChange,
   onEnter,
   className,
 }: {
   value: string;
   error?: string;
+  maximum?: number;
   onChange: (value: string) => void;
   onEnter?: (event: KeyboardEvent) => void;
   className?: string;
 }) {
   const numericValue = Number.parseFloat(value);
-  const safeValue = Number.isFinite(numericValue) ? Math.min(Math.max(numericValue, 0), 1000) : 0;
+  const safeMaximum = maximum ?? 0;
+  const safeValue = Number.isFinite(numericValue)
+    ? Math.min(Math.max(numericValue, 0), safeMaximum)
+    : 0;
 
   return (
     <div className={`grid gap-3 ${className ?? ""}`.trim()}>
@@ -202,8 +216,13 @@ function MonthlyLoanSliderField({
         label="Lening per maand"
         value={value}
         error={error}
-        hint="Sleep of typ je bedrag"
+        hint={
+          maximum !== undefined
+            ? `Max. ${formatCurrency(maximum, 2)} per maand`
+            : "Geen maximum voor deze maand"
+        }
         prefix="€"
+        max={maximum}
         type="number"
         onChange={onChange}
         onEnter={onEnter}
@@ -212,15 +231,16 @@ function MonthlyLoanSliderField({
         <span className="flex items-center justify-between gap-3 text-[12px] text-[var(--soft)]">
           <span>€0</span>
           <span className="font-mono text-[13px] text-[var(--muted)]">{formatCurrency(safeValue, 0)} per maand</span>
-          <span>€1.000</span>
+          <span>{formatCurrency(safeMaximum, 2)}</span>
         </span>
         <input
           id="monthlyLoanSlider"
           type="range"
           min="0"
-          max="1000"
+          max={safeMaximum}
           step="25"
           value={safeValue}
+          disabled={maximum === undefined}
           onChange={(event) => onChange(event.target.value)}
           className="ring-focus h-10 w-full accent-[var(--accent)]"
           aria-label="Lening per maand slider"
@@ -296,7 +316,29 @@ function fieldLabel(field: keyof SimpleDuoValues) {
   return labels[field];
 }
 
-function fieldHint(field: keyof SimpleDuoValues) {
+function fieldHint(
+  field: keyof SimpleDuoValues,
+  limits: SimpleDuoMonthlyLimits | null,
+) {
+  if (!limits && field.startsWith("monthly") && field !== "monthlyReisproduct") {
+    return "Geen maximum voor deze maand";
+  }
+
+  if (limits) {
+    if (field === "monthlyLoan") {
+      return `Max. ${formatCurrency(limits.monthlyLoan, 2)} per maand`;
+    }
+    if (field === "monthlyCollegegeldkrediet") {
+      return `Max. ${formatCurrency(limits.monthlyCollegegeldkrediet, 2)}; regulier ${formatCurrency(limits.regularTuitionCredit, 2)}`;
+    }
+    if (field === "monthlyBasisbeurs") {
+      return `Max. ${formatCurrency(limits.monthlyBasisbeurs, 2)} uitwonend`;
+    }
+    if (field === "monthlyAanvullendeBeurs") {
+      return `Max. ${formatCurrency(limits.monthlyAanvullendeBeurs, 2)}`;
+    }
+  }
+
   const hints: Partial<Record<keyof SimpleDuoValues, string>> = {
     currentLoanDebt: "Mijn DUO: lening",
     currentCollegegeldkredietDebt: "Mijn DUO: collegegeldkrediet",
@@ -314,6 +356,22 @@ function fieldHint(field: keyof SimpleDuoValues) {
   return hints[field];
 }
 
+function fieldMaximum(
+  field: keyof SimpleDuoValues,
+  limits: SimpleDuoMonthlyLimits | null,
+) {
+  if (!limits) return undefined;
+  if (field === "monthlyLoan") return limits.monthlyLoan;
+  if (field === "monthlyCollegegeldkrediet") {
+    return limits.monthlyCollegegeldkrediet;
+  }
+  if (field === "monthlyBasisbeurs") return limits.monthlyBasisbeurs;
+  if (field === "monthlyAanvullendeBeurs") {
+    return limits.monthlyAanvullendeBeurs;
+  }
+  return undefined;
+}
+
 export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
   const copy = modeCopy[mode];
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
@@ -328,6 +386,10 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
     submittedValues !== null &&
     JSON.stringify(submittedValues) === JSON.stringify(exampleValues);
   const mobileFlow = useMobileFieldFlow(copy.fields);
+  const monthlyLimits = useMemo(
+    () => getSimpleDuoMonthlyLimits(formValues.calculationMonth),
+    [formValues.calculationMonth],
+  );
 
   function updateField<K extends keyof SimpleDuoValues>(field: K, value: SimpleDuoValues[K]) {
     setFormValues((current) => ({ ...current, [field]: value }));
@@ -383,6 +445,7 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
           key={field}
           value={formValues[field]}
           error={currentView.isValid ? undefined : currentView.errors[field]}
+          maximum={monthlyLimits?.monthlyLoan}
           onChange={(value) => updateField(field, value)}
           onEnter={mobileFlow.handleEnterAdvance(field, false)}
           className={fieldClassName}
@@ -397,9 +460,10 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
         label={fieldLabel(field)}
         value={formValues[field]}
         error={currentView.isValid ? undefined : currentView.errors[field]}
-        hint={fieldHint(field)}
+        hint={fieldHint(field, monthlyLimits)}
         prefix={field.includes("Debt") || field.startsWith("monthly") ? "€" : undefined}
         suffix={field === "monthsUntilDiploma" ? "maanden" : undefined}
+        max={fieldMaximum(field, monthlyLimits)}
         type={field === "calculationMonth" ? "month" : "number"}
         onChange={(value) => updateField(field, value)}
         onEnter={mobileFlow.handleEnterAdvance(field, false)}

@@ -1131,6 +1131,105 @@ test("verwachte eindschuld toont direct het totaal bij regulier aflossen", async
   expect(width.body).toBeLessThanOrEqual(width.viewport + 1);
 });
 
+test("DUO-maandbedragen gebruiken centrale maxima met toelichting rechts", async ({ page }) => {
+  const isMobile = (page.viewportSize()?.width ?? 0) < 768;
+
+  async function expectLimitedField(inputId: string, maximum: string, hint: RegExp) {
+    const input = page.locator(`#${inputId}`);
+    await expect(input).toHaveAttribute("max", maximum);
+
+    const label = page.locator(`label[for="${inputId}"]`);
+    const heading = label.locator(":scope > span").first();
+    const rightHint = heading.locator(":scope > span").last();
+    await expect(rightHint).toHaveText(hint);
+    const alignment = await Promise.all([
+      heading.evaluate((element) => element.getBoundingClientRect().right),
+      rightHint.evaluate((element) => element.getBoundingClientRect().right),
+    ]);
+    expect(
+      Math.abs(alignment[0] - alignment[1]),
+      `${inputId}: maximumtoelichting staat niet rechts`,
+    ).toBeLessThanOrEqual(1);
+
+    const columns = await Promise.all([
+      heading.locator(":scope > span").first().boundingBox(),
+      rightHint.boundingBox(),
+    ]);
+    expect(columns[0]).not.toBeNull();
+    expect(columns[1]).not.toBeNull();
+    expect(
+      columns[0]!.x + columns[0]!.width,
+      `${inputId}: veldlabel overlapt de maximumtoelichting`,
+    ).toBeLessThanOrEqual(columns[1]!.x);
+  }
+
+  await page.goto("/apps/duo-schuld-bij-starten-lenen", {
+    waitUntil: "networkidle",
+  });
+  await page.getByRole("button", { name: "Voorbeeld invullen" }).click();
+  if (isMobile) {
+    await page.getByRole("button", { name: "Volgende veld" }).click();
+    await page.getByRole("button", { name: "Volgende veld" }).click();
+  }
+  await expectLimitedField(
+    "monthlyLoan",
+    "1213.95",
+    /Max\. €\s*1\.213,95 per maand/,
+  );
+
+  const advanced = page.locator("details").filter({
+    hasText: "Andere studiebedragen toevoegen",
+  });
+  await advanced.locator("summary").click();
+  await expectLimitedField(
+    "monthlyCollegegeldkrediet",
+    "1083.75",
+    /Max\. €\s*1\.083,75; regulier €\s*216,75/,
+  );
+  await expectLimitedField(
+    "monthlyBasisbeurs",
+    "324.52",
+    /Max\. €\s*324,52 uitwonend/,
+  );
+  await expectLimitedField(
+    "monthlyAanvullendeBeurs",
+    "491.08",
+    /Max\. €\s*491,08/,
+  );
+
+  if (isMobile) {
+    await page.getByRole("button", { name: "Vorige" }).click();
+    await page.getByRole("button", { name: "Vorige" }).click();
+  }
+  await page.locator("#calculationMonth").fill("2026-09");
+  if (isMobile) {
+    await page.getByRole("button", { name: "Volgende veld" }).click();
+    await page.getByRole("button", { name: "Volgende veld" }).click();
+  }
+  await expectLimitedField(
+    "monthlyCollegegeldkrediet",
+    "1122.5",
+    /Max\. €\s*1\.122,50; regulier €\s*224,50/,
+  );
+
+  await page.locator("#monthlyLoan").fill("1213.96");
+  await expect(
+    page.getByText(/Gebruik maximaal €\s*1\.213,95 per maand\./),
+  ).toBeVisible();
+  await expect(page.getByRole("button", { name: "Bereken", exact: true })).toBeDisabled();
+
+  await page.goto("/apps/duo-leenbedrag-impact", { waitUntil: "networkidle" });
+  await page.getByRole("button", { name: "Voorbeeld invullen" }).click();
+  await expect(page.locator("#monthlyLoanSlider")).toHaveAttribute("max", "1213.95");
+  await expect(page.getByText(/Max\. €\s*1\.213,95 per maand/)).toBeVisible();
+
+  const width = await page.evaluate(() => ({
+    body: document.body.scrollWidth,
+    viewport: document.documentElement.clientWidth,
+  }));
+  expect(width.body).toBeLessThanOrEqual(width.viewport + 1);
+});
+
 test("alle tien tools doorlopen invoer, uitkomst, details en vervolgactie", async ({
   page,
 }, testInfo) => {

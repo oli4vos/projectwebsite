@@ -32,6 +32,16 @@ export type SimpleDuoValues = {
 
 export type SimpleDuoErrors = Partial<Record<keyof SimpleDuoValues, string>>;
 
+export type SimpleDuoMonthlyLimits = Readonly<{
+  monthlyLoan: number;
+  monthlyCollegegeldkrediet: number;
+  regularTuitionCredit: number;
+  monthlyBasisbeurs: number;
+  monthlyAanvullendeBeurs: number;
+  totalExcludingTuitionCredit: number;
+  periodId: string;
+}>;
+
 export type SimpleDuoView =
   | {
       isValid: false;
@@ -82,6 +92,71 @@ function validateMoney(values: SimpleDuoValues, field: keyof SimpleDuoValues, er
 
   if (parseMoney(value) === undefined) {
     errors[field] = "Gebruik 0 of een positief bedrag.";
+  }
+}
+
+function formatMaximum(value: number) {
+  return new Intl.NumberFormat("nl-NL", {
+    style: "currency",
+    currency: "EUR",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
+}
+
+export function getSimpleDuoMonthlyLimits(
+  calculationMonth: string,
+): SimpleDuoMonthlyLimits | null {
+  if (!/^(\d{4})-(\d{2})$/.test(calculationMonth)) {
+    return null;
+  }
+
+  try {
+    const amounts = getDuoStudentFinanceAmountsForDate({
+      asOf: `${calculationMonth}-01`,
+      educationTrack: "hbo-university",
+    });
+    const residenceAmounts = Object.values(amounts.amountsByResidence);
+
+    return Object.freeze({
+      monthlyLoan: amounts.loanPhaseRegularLoanMax,
+      monthlyCollegegeldkrediet:
+        amounts.institutionalTuitionCreditMax ?? amounts.tuitionCreditMax ?? 0,
+      regularTuitionCredit: amounts.tuitionCreditMax ?? 0,
+      monthlyBasisbeurs: Math.max(
+        ...residenceAmounts.map((residence) => residence.basicGrantMax),
+      ),
+      monthlyAanvullendeBeurs: Math.max(
+        ...residenceAmounts.map((residence) => residence.additionalGrantMax),
+      ),
+      totalExcludingTuitionCredit: Math.max(
+        amounts.loanPhaseRegularLoanMax,
+        ...residenceAmounts.map(
+          (residence) => residence.totalExcludingTuitionCreditMax,
+        ),
+      ),
+      periodId: amounts.id,
+    });
+  } catch {
+    return null;
+  }
+}
+
+function validateMonthlyMaximum(
+  values: SimpleDuoValues,
+  field:
+    | "monthlyLoan"
+    | "monthlyCollegegeldkrediet"
+    | "monthlyBasisbeurs"
+    | "monthlyAanvullendeBeurs",
+  maximum: number,
+  errors: SimpleDuoErrors,
+) {
+  if (errors[field]) return;
+
+  const value = parseMoney(values[field]);
+  if (value !== undefined && value > maximum) {
+    errors[field] = `Gebruik maximaal ${formatMaximum(maximum)} per maand.`;
   }
 }
 
@@ -162,6 +237,47 @@ export function validateSimpleDuoValues(mode: SimpleDuoToolMode, values: SimpleD
     "monthlyReisproduct",
   ] as const) {
     validateMoney(values, field, errors);
+  }
+
+  if (mode !== "stop-cost") {
+    const limits = getSimpleDuoMonthlyLimits(values.calculationMonth);
+    if (!limits) {
+      errors.calculationMonth =
+        "Voor deze maand zijn geen centrale DUO-maximumbedragen beschikbaar.";
+    } else {
+      validateMonthlyMaximum(values, "monthlyLoan", limits.monthlyLoan, errors);
+      validateMonthlyMaximum(
+        values,
+        "monthlyCollegegeldkrediet",
+        limits.monthlyCollegegeldkrediet,
+        errors,
+      );
+      validateMonthlyMaximum(
+        values,
+        "monthlyBasisbeurs",
+        limits.monthlyBasisbeurs,
+        errors,
+      );
+      validateMonthlyMaximum(
+        values,
+        "monthlyAanvullendeBeurs",
+        limits.monthlyAanvullendeBeurs,
+        errors,
+      );
+
+      const totalExcludingTuitionCredit = [
+        values.monthlyLoan,
+        values.monthlyBasisbeurs,
+        values.monthlyAanvullendeBeurs,
+      ].reduce((total, value) => total + (parseMoney(value) ?? 0), 0);
+      if (
+        !errors.monthlyLoan &&
+        totalExcludingTuitionCredit > limits.totalExcludingTuitionCredit
+      ) {
+        errors.monthlyLoan =
+          `Lening, basisbeurs en aanvullende beurs zijn samen maximaal ${formatMaximum(limits.totalExcludingTuitionCredit)} per maand.`;
+      }
+    }
   }
 
   const parsedRateYear = Number.parseInt(values.duoRateYear, 10);
