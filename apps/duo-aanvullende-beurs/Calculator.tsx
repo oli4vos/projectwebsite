@@ -35,14 +35,18 @@ type FieldProps = {
 };
 
 function FieldShell({ children }: { children: ReactNode }) {
-  return <div className="grid min-w-0 gap-2">{children}</div>;
+  return (
+    <div className="additional-grant-field grid min-w-0 content-start gap-2">
+      {children}
+    </div>
+  );
 }
 
 function Label({ htmlFor, children }: { htmlFor: string; children: ReactNode }) {
   return (
     <label
       htmlFor={htmlFor}
-      className="text-[12px] font-medium uppercase tracking-[0.04em] text-[var(--muted)]"
+      className="additional-grant-field-label text-[12px] font-medium uppercase tracking-[0.04em] text-[var(--muted)]"
     >
       {children}
     </label>

@@ -32,7 +32,7 @@ export function ResultCard({ label, value, note, tone = "default", className }: 
 
   return (
     <article className={`result-panel border p-5 ${styles.card} ${className ?? ""}`.trim()}>
-      <p className="text-[13.5px] font-medium text-[var(--muted)]">
+      <p className="text-[13.5px] font-medium text-[var(--muted)] sm:min-h-[2lh]">
         <GlossaryText text={label} />
       </p>
       <p className={`mt-2 font-mono text-2xl font-semibold tracking-normal tabular sm:text-[1.7rem] ${styles.value}`}>

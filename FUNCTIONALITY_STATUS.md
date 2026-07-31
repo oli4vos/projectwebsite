@@ -37,7 +37,7 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 |---|---|---|---|---|---|
 | Toolbibliotheek + categorie-navigatie | actief | n.v.t. | aan | `/apps` toont alle 10 publieke tools direct in taakgerichte groepen, zonder doelgroepfilter en zonder links naar hidden of uitgeschakelde tools | n.v.t. |
 | Financiële kennisbank (`/kennisbank`) | actief | n.v.t. | aan | Centrale studieschuld-kennislaag met DUO-bronnen, hidden oude horizon-/beleggingskaders | n.v.t. |
-| Versie 1 publieke website | actief | route-oppervlak zonder `/v2` | aan | Enige publieke en actieve ontwerp-, UX-, performance- en optimalisatielijn voor de eerste livegang | n.v.t. |
+| Versie 1 publieke website | actief | route-oppervlak zonder `/v2` | aan | Enige publieke en actieve ontwerp-, UX-, performance- en optimalisatielijn; gekoppelde formulierkolommen en kaartinhoud blijven op gedeelde horizontale rijen uitgelijnd | n.v.t. |
 | Versie 2 presentatie | uitgeschakeld | private routecode onder `src/app/_v2-paused` | uit | Code behouden als gepauzeerde bron, maar geen publieke routes, navigatie, sitemap, SEO-output, dashboard, journey of livegangoppervlak | alleen heractiveren via expliciet scopebesluit + blueprint-/releasecheck |
 | Publieke calculators (app-registry) | actief | `enabled: true` + `visibility: "public"` | aan | 10 publieke tools in de huidige registry; disabled tools tellen niet mee | n.v.t. |
 | Draft tools (concept) | hidden-draft | `enabled: true` + `visibility: "hidden"` | uit | Alle tools en flows die niet meer actief aangeroepen worden blijven hier verborgen totdat er expliciet heractivatie is | zet manifest op `public` + checks draaien |
@@ -79,6 +79,7 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 
 | Datum | Commit | Wijziging | Impact |
 |---|---|---|---|
+| 2026-07-31 | `pending` | Horizontale uitlijning aangescherpt voor profiel- en aanvullende-beursvelden, toolkaarttitels en resultaatkaartlabels; geometrische regressiecontrole toegevoegd voor publieke routes en relevante rijen | V1 / formulieren / kaarten / responsive UX / toegankelijkheid |
 | 2026-07-31 | `pending` | De laatste twee v1-releaseblokkers opgelost: de publieke link naar een verborgen tool verwijderd en de aanvullende-beursinvoer per ouder gegroepeerd met containerveilige responsieve velden | V1-livegang / routing / aanvullende beurs / responsive UX / toegankelijkheid |
 | 2026-07-28 | `pending` | Maximale-hypotheekuitkomst uitgebreid met een standaard ingeklapte, stapsgewijze berekeningsopbouw die de DUO-impact en alle geldende eindgrenzen vanuit dezelfde centrale rapportdata toont | Maximale hypotheek / studieschuld / resultaten / UX / PDF |
 | 2026-07-28 | `pending` | Softwarelicentie `AGPL-3.0-or-later`, merk- en contentscheiding, securitybeleid, publieke privacyverklaring en gebruiksvoorwaarden toegevoegd; Cloudflare Pages en eigen domein als toekomstige gecontroleerde hostingstap vastgelegd | Juridisch / privacy / security / routing / hosting |

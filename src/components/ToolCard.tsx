@@ -24,7 +24,7 @@ export function ToolCard({
       <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-[var(--accent-soft)] opacity-0 transition group-hover:opacity-100" />
 
       <h3
-        className={`font-serif leading-[1.15] tracking-[-0.01em] text-[var(--ink)] ${
+        className={`font-serif leading-[1.15] tracking-[-0.01em] text-[var(--ink)] md:min-h-[2.3em] ${
           dense
             ? "text-[clamp(1rem,0.95rem+0.3vw,1.125rem)]"
             : "text-[clamp(1.15rem,1.05rem+0.6vw,1.375rem)]"

@@ -457,10 +457,10 @@ function TextField({
     undefined;
 
   return (
-    <div className="grid gap-2">
+    <div className="grid content-start gap-2">
       <label
         htmlFor={id}
-        className="text-[12px] font-medium uppercase tracking-[0.04em] text-[var(--muted)]"
+        className="text-[12px] font-medium uppercase tracking-[0.04em] text-[var(--muted)] md:min-h-[2lh]"
       >
         {label}
       </label>
@@ -512,10 +512,10 @@ function SelectField<T extends string>({
     undefined;
 
   return (
-    <div className="grid gap-2">
+    <div className="grid content-start gap-2">
       <label
         htmlFor={id}
-        className="text-[12px] font-medium uppercase tracking-[0.04em] text-[var(--muted)]"
+        className="text-[12px] font-medium uppercase tracking-[0.04em] text-[var(--muted)] md:min-h-[2lh]"
       >
         {label}
       </label>

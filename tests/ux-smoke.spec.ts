@@ -173,6 +173,199 @@ test("publieke links verwijzen alleen naar bestaande publieke routes", async ({
   expect(links.has("/apps/volgende-euro")).toBe(false);
 });
 
+test("publieke oppervlakken blijven binnen dezelfde horizontale randen", async ({
+  page,
+}, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "Eén volledige resizematrix volstaat");
+
+  const sizes = [
+    { width: 320, height: 568 },
+    { width: 390, height: 844 },
+    { width: 768, height: 1024 },
+    { width: 1024, height: 768 },
+    { width: 1180, height: 820 },
+    { width: 1440, height: 900 },
+  ] as const;
+
+  for (const route of routes) {
+    const response = await page.goto(route, { waitUntil: "networkidle" });
+    expect(response?.status(), route).toBe(200);
+
+    for (const size of sizes) {
+      await page.setViewportSize(size);
+      await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => resolve())));
+
+      const audit = await page.evaluate(() => {
+        const visibleInteractiveElements = [
+          ...document.querySelectorAll("main input, main select, main textarea, main button, main a[href]"),
+        ].filter((element) => {
+          const htmlElement = element as HTMLElement;
+          const style = window.getComputedStyle(htmlElement);
+          return Boolean(htmlElement.getClientRects().length) && style.visibility !== "hidden";
+        });
+        const outsideViewport = visibleInteractiveElements
+          .filter((element) => {
+            const rect = element.getBoundingClientRect();
+            return rect.left < -1 || rect.right > window.innerWidth + 1;
+          })
+          .map((element) =>
+            element.getAttribute("aria-label") ||
+            element.getAttribute("id") ||
+            element.textContent?.trim().slice(0, 80) ||
+            element.tagName,
+          );
+
+        return {
+          htmlWidth: document.documentElement.scrollWidth,
+          bodyWidth: document.body.scrollWidth,
+          clientWidth: document.documentElement.clientWidth,
+          outsideViewport,
+        };
+      });
+
+      const label = `${route} bij ${size.width}x${size.height}`;
+      expect(audit.htmlWidth, `${label}: html-overflow`).toBeLessThanOrEqual(audit.clientWidth + 1);
+      expect(audit.bodyWidth, `${label}: body-overflow`).toBeLessThanOrEqual(audit.clientWidth + 1);
+      expect(audit.outsideViewport, `${label}: interactie buiten viewport`).toEqual([]);
+    }
+  }
+});
+
+test("gekoppelde velden en kaarten delen horizontale rijen", async ({
+  page,
+}, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "Desktop geometriecontrole");
+
+  async function expectAlignedFieldRows(containerSelector: string, label: string) {
+    const rows = await page.locator(containerSelector).evaluateAll((containers) =>
+      containers.flatMap((container) => {
+        const groups = new Map<number, Array<{ label: string; controlTop: number }>>();
+
+        for (const child of [...container.children]) {
+          const control = child.querySelector("input, select, textarea") as HTMLElement | null;
+          if (!control || !control.getClientRects().length) continue;
+          const visualControl =
+            (control.closest(".field-shell") as HTMLElement | null) ?? control;
+          const childTop = Math.round((child as HTMLElement).getBoundingClientRect().top);
+          const fieldLabel = child.querySelector("label")?.textContent?.trim() || control.id;
+          const row = groups.get(childTop) ?? [];
+          row.push({
+            label: fieldLabel,
+            controlTop: Math.round(visualControl.getBoundingClientRect().top),
+          });
+          groups.set(childTop, row);
+        }
+
+        return [...groups.values()]
+          .filter((row) => row.length > 1)
+          .map((row) => ({
+            labels: row.map((field) => field.label),
+            difference:
+              Math.max(...row.map((field) => field.controlTop)) -
+              Math.min(...row.map((field) => field.controlTop)),
+          }));
+      }),
+    );
+
+    for (const row of rows) {
+      expect(row.difference, `${label}: ${row.labels.join(" / ")}`).toBeLessThanOrEqual(1);
+    }
+  }
+
+  for (const width of [768, 1024, 1180, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/profiel", { waitUntil: "networkidle" });
+    for (const step of ["Inkomen", "Studieschuld", "Wonen"]) {
+      await page.getByRole("button", { name: step, exact: true }).first().click();
+      await expectAlignedFieldRows(
+        "section.surface-panel:has(> h3) > div.mt-5",
+        `Profiel ${step} bij ${width}px`,
+      );
+    }
+  }
+
+  await page.goto("/apps/duo-aanvullende-beurs", { waitUntil: "networkidle" });
+  await page.getByRole("button", { name: "Voorbeeld invullen" }).click();
+  const deductions = page.locator("details").filter({ hasText: "Aftrekposten en broers of zussen" });
+  await deductions.locator("summary").click();
+  for (const width of [768, 1024, 1180, 1280, 1440, 1920]) {
+    await page.setViewportSize({ width, height: 900 });
+    await expectAlignedFieldRows(
+      ".additional-grant-responsive-grid",
+      `Aanvullende beurs bij ${width}px`,
+    );
+  }
+
+  for (const width of [768, 1024, 1280, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/apps", { waitUntil: "networkidle" });
+    const cardRows = await page.locator("#apps a.surface-panel").evaluateAll((cards) => {
+      const groups = new Map<number, HTMLElement[]>();
+      for (const card of cards as HTMLElement[]) {
+        const top = Math.round(card.getBoundingClientRect().top);
+        const row = groups.get(top) ?? [];
+        row.push(card);
+        groups.set(top, row);
+      }
+
+      return [...groups.values()]
+        .filter((row) => row.length > 1)
+        .map((row) => {
+          const descriptionTops = row.map((card) =>
+            Math.round(card.querySelector("p")!.getBoundingClientRect().top),
+          );
+          const actionTops = row.map((card) =>
+            Math.round(card.querySelector("div.mt-auto")!.getBoundingClientRect().top),
+          );
+          return {
+            titles: row.map((card) => card.querySelector("h3")?.textContent?.trim() || "kaart"),
+            descriptionDifference: Math.max(...descriptionTops) - Math.min(...descriptionTops),
+            actionDifference: Math.max(...actionTops) - Math.min(...actionTops),
+          };
+        });
+    });
+
+    for (const row of cardRows) {
+      const label = `Toolkaarten bij ${width}px: ${row.titles.join(" / ")}`;
+      expect(row.descriptionDifference, label).toBeLessThanOrEqual(1);
+      expect(row.actionDifference, label).toBeLessThanOrEqual(1);
+    }
+  }
+
+  await page.goto("/apps/duo-schuld-bij-starten-lenen", { waitUntil: "networkidle" });
+  await page.getByRole("button", { name: "Voorbeeld invullen" }).click();
+  await page.getByRole("button", { name: "Bereken", exact: true }).click();
+  for (const width of [768, 1024, 1180, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    const resultRows = await page.locator(".grid").evaluateAll((grids) =>
+      grids.flatMap((grid) => {
+        const cards = [...grid.children].filter((child) =>
+          child.matches("article.result-panel"),
+        ) as HTMLElement[];
+        if (cards.length < 2) return [];
+        const groups = new Map<number, HTMLElement[]>();
+        for (const card of cards) {
+          const top = Math.round(card.getBoundingClientRect().top);
+          const row = groups.get(top) ?? [];
+          row.push(card);
+          groups.set(top, row);
+        }
+        return [...groups.values()]
+          .filter((row) => row.length > 1)
+          .map((row) => {
+            const valueTops = row.map((card) =>
+              Math.round(card.querySelectorAll(":scope > p")[1].getBoundingClientRect().top),
+            );
+            return Math.max(...valueTops) - Math.min(...valueTops);
+          });
+      }),
+    );
+    expect(resultRows, `Resultaatkaarten bij ${width}px`).toEqual(
+      resultRows.map(() => 0),
+    );
+  }
+});
+
 test("aanvullende beurs houdt oudervelden solide tijdens resizen", async ({
   page,
 }, testInfo) => {
