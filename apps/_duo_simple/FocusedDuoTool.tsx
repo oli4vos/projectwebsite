@@ -334,13 +334,16 @@ function fieldHint(
       return `Max. ${formatCurrency(limits.monthlyLoan, 2)} per maand`;
     }
     if (field === "monthlyCollegegeldkrediet") {
-      return `Max. ${formatCurrency(limits.monthlyCollegegeldkrediet, 2)}; regulier ${formatCurrency(limits.regularTuitionCredit, 2)}`;
+      return `Max. ${formatCurrency(limits.monthlyCollegegeldkrediet, 2)} per maand, ${formatCurrency(limits.annualStatutoryTuitionFee, 0)} ÷ 12`;
     }
     if (field === "monthlyBasisbeurs") {
       return `Max. ${formatCurrency(limits.monthlyBasisbeurs, 2)} uitwonend`;
     }
     if (field === "monthlyAanvullendeBeurs") {
       return `Max. ${formatCurrency(limits.monthlyAanvullendeBeurs, 2)}`;
+    }
+    if (field === "monthlyReisproduct") {
+      return `${formatCurrency(limits.monthlyReisproduct, 2)} zolang dit nog geen gift is`;
     }
   }
 
@@ -375,6 +378,7 @@ function fieldMaximum(
   if (field === "monthlyAanvullendeBeurs") {
     return limits.monthlyAanvullendeBeurs;
   }
+  if (field === "monthlyReisproduct") return limits.monthlyReisproduct;
   return undefined;
 }
 

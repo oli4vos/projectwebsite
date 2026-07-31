@@ -4,7 +4,7 @@ title: Hypotheek-impact studieschuld
 route: /apps/hypotheek-impact-studieschuld
 status: active-public
 lastReviewed: 2026-07-31
-sourceHash: sha256:2d420bac675e43a50827ea24a2eedc4ac5667430662553858e9c116e10439432
+sourceHash: sha256:772ffbae7b45e719306894b6901d19310f4897348f3cfdb7eba0c98d6e979f0f
 sources:
   - apps/hypotheek-impact-studieschuld/app.json
   - apps/hypotheek-impact-studieschuld/Calculator.tsx

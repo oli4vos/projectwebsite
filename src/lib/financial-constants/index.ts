@@ -158,7 +158,10 @@ export function getDuoStudentFinanceAmounts(year?: number) {
 export function getDuoStudentFinanceAmountsForDate(input: {
   asOf: string;
   educationTrack: DuoEducationTrack;
-}): DuoStudentFinancePeriod & { readonly loanPhaseRegularLoanMax: number } {
+}): DuoStudentFinancePeriod & {
+  readonly loanPhaseRegularLoanMax: number;
+  readonly travelProductMonthlyDebtValue: number;
+} {
   const year = Number(input.asOf.slice(0, 4));
   const data = getDuoStudentFinanceAmounts(year);
   const period = data.periods.find((candidate) =>
@@ -169,7 +172,11 @@ export function getDuoStudentFinanceAmountsForDate(input: {
   if (!period) {
     throw new Error(`Geen DUO-bedragen voor ${input.educationTrack} op ${input.asOf}.`);
   }
-  return { ...period, loanPhaseRegularLoanMax: data.loanPhaseRegularLoanMax };
+  return {
+    ...period,
+    loanPhaseRegularLoanMax: data.loanPhaseRegularLoanMax,
+    travelProductMonthlyDebtValue: data.travelProductMonthlyDebtValue,
+  };
 }
 
 export function getDuoRateHistoryMeta() {
@@ -294,6 +301,9 @@ export type {
   DuoResidence,
   DuoStudentFinanceAmounts,
   DuoStudentFinancePeriod,
+} from "@/lib/financial-constants/duo-student-finance-amounts-2026";
+export {
+  calculateMonthlyTuitionCreditMaximum,
 } from "@/lib/financial-constants/duo-student-finance-amounts-2026";
 export { getMortgageFinancingLoadTable };
 export { getAvailableDuoRateYears };

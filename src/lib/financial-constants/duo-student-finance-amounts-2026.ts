@@ -13,6 +13,8 @@ export type DuoStudentFinancePeriod = {
     readonly totalExcludingTuitionCreditMax: number;
   }>>;
   readonly additionalGrantMaxWithoutTuitionDue?: Readonly<Record<DuoResidence, number>>;
+  readonly annualStatutoryTuitionFee?: number;
+  readonly annualInstitutionalTuitionCreditCap?: number;
   readonly tuitionCreditMax?: number;
   readonly institutionalTuitionCreditMax?: number;
 };
@@ -20,14 +22,33 @@ export type DuoStudentFinancePeriod = {
 export type DuoStudentFinanceAmounts = {
   readonly year: 2026;
   readonly sourceUrl: string;
+  readonly tuitionFeeSourceUrl: string;
+  readonly travelProductSourceUrl: string;
   readonly loanPhaseRegularLoanMax: number;
+  readonly travelProductMonthlyDebtValue: number;
   readonly periods: readonly DuoStudentFinancePeriod[];
 };
+
+export function calculateMonthlyTuitionCreditMaximum(annualTuitionFee: number) {
+  if (!Number.isFinite(annualTuitionFee) || annualTuitionFee < 0) {
+    throw new Error("Jaarlijks collegegeld moet nul of een positief bedrag zijn.");
+  }
+
+  return Math.round((annualTuitionFee / 12) * 100) / 100;
+}
+
+const STATUTORY_TUITION_FEE_2025_2026 = 2_601;
+const STATUTORY_TUITION_FEE_2026_2027 = 2_694;
+const INSTITUTIONAL_TUITION_CREDIT_CAP_2025_2026 = 13_005;
+const INSTITUTIONAL_TUITION_CREDIT_CAP_2026_2027 = 13_470;
 
 export const DUO_STUDENT_FINANCE_AMOUNTS_2026: DuoStudentFinanceAmounts = {
   year: 2026,
   sourceUrl: "https://www.duo.nl/particulier/studiefinanciering/bedragen.jsp",
+  tuitionFeeSourceUrl: "https://www.duo.nl/particulier/collegegeld.jsp",
+  travelProductSourceUrl: "https://www.duo.nl/particulier/studiefinanciering/ov.jsp",
   loanPhaseRegularLoanMax: 1_213.95,
+  travelProductMonthlyDebtValue: 110.95,
   periods: [
     {
       id: "mbo-2026-jan-jul",
@@ -96,8 +117,14 @@ export const DUO_STUDENT_FINANCE_AMOUNTS_2026: DuoStudentFinanceAmounts = {
           totalExcludingTuitionCreditMax: 1_130.77,
         },
       },
-      tuitionCreditMax: 216.75,
-      institutionalTuitionCreditMax: 1_083.75,
+      annualStatutoryTuitionFee: STATUTORY_TUITION_FEE_2025_2026,
+      annualInstitutionalTuitionCreditCap: INSTITUTIONAL_TUITION_CREDIT_CAP_2025_2026,
+      tuitionCreditMax: calculateMonthlyTuitionCreditMaximum(
+        STATUTORY_TUITION_FEE_2025_2026,
+      ),
+      institutionalTuitionCreditMax: calculateMonthlyTuitionCreditMaximum(
+        INSTITUTIONAL_TUITION_CREDIT_CAP_2025_2026,
+      ),
     },
     {
       id: "higher-education-2026-sep-dec",
@@ -118,8 +145,14 @@ export const DUO_STUDENT_FINANCE_AMOUNTS_2026: DuoStudentFinanceAmounts = {
           totalExcludingTuitionCreditMax: 1_130.77,
         },
       },
-      tuitionCreditMax: 224.5,
-      institutionalTuitionCreditMax: 1_122.5,
+      annualStatutoryTuitionFee: STATUTORY_TUITION_FEE_2026_2027,
+      annualInstitutionalTuitionCreditCap: INSTITUTIONAL_TUITION_CREDIT_CAP_2026_2027,
+      tuitionCreditMax: calculateMonthlyTuitionCreditMaximum(
+        STATUTORY_TUITION_FEE_2026_2027,
+      ),
+      institutionalTuitionCreditMax: calculateMonthlyTuitionCreditMaximum(
+        INSTITUTIONAL_TUITION_CREDIT_CAP_2026_2027,
+      ),
     },
   ],
 };

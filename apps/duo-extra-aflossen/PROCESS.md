@@ -4,7 +4,7 @@ title: Wat doet extra aflossen?
 route: /apps/duo-extra-aflossen
 status: active-public
 lastReviewed: 2026-07-31
-sourceHash: sha256:5cbe65b62589501cf260da882591e78667f0c60b637b77fa163ff16c35d111f6
+sourceHash: sha256:a2d16a10f5f11429c857c5abb357c663c97107ae60c40c272af7936aee480417
 sources:
   - apps/duo-extra-aflossen/app.json
   - apps/duo-extra-aflossen/Calculator.tsx

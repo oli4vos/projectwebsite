@@ -4,7 +4,7 @@ title: Impact van mijn leenbedrag
 route: /apps/duo-leenbedrag-impact
 status: active-public
 lastReviewed: 2026-07-31
-sourceHash: sha256:65535430e18405a4df484be7e07e4e74d4134ca3f27b77005d347d211fc24535
+sourceHash: sha256:2955d5047f91e4e1966b0e66c3d9a435a7332ec2cd549f7d2e623a34062e8d29
 sources:
   - apps/duo-leenbedrag-impact/app.json
   - apps/duo-leenbedrag-impact/Calculator.tsx
@@ -127,6 +127,7 @@ Er is geen profielprefill, sessieherstel of persistente opslag. Vervolglinks uit
 | Resultaat of status | Ontstaat uit | Wanneer zichtbaar | Belangrijk voor gebruiker |
 | --- | --- | --- | --- |
 | Verwachte eindschuld | Schuld na studie- en aanloopfase | Na geldige berekening | Gebaseerd op opgegeven maandlening en studieduur. |
+| Collegegeldkrediet en reisproduct | Centrale jaar- en maandnormen | Bij invoer van verdiepende maandbedragen | Collegegeldkrediet is jaarlijks wettelijk collegegeld gedeeld door 12; reisproduct telt als prestatiebeurs zolang het geen gift is. |
 | Hypotheekimpact eindschuld | Schuld op het diplomamoment, nieuwste DUO-rente en centrale hypotheekdefaults | Na één druk op de impactknop | Indicatie zonder inkomen, draagkracht, andere schulden, woningwaarde of bankbeleid. |
 | Totaal terug te betalen | Reguliere SF35-projectie | In resultaatdetails | Inclusief modelrente, zonder persoonlijke draagkracht. |
 | Rente in aflosfase | Verschil tussen terugbetaling en startsaldo | In verdieping | Rentepercentages kunnen later veranderen. |

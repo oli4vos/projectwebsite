@@ -411,12 +411,14 @@ describe("source dataset registry", () => {
     });
     const data = dataset.data as {
       loanPhaseRegularLoanMax: number;
+      travelProductMonthlyDebtValue: number;
       periods: readonly { id: string }[];
     };
 
     expect(dataset.meta.id).toBe("duo-student-finance-amounts-2026");
     expect(dataset.meta.sourceName).toBe("DUO");
     expect(data.loanPhaseRegularLoanMax).toBe(1_213.95);
+    expect(data.travelProductMonthlyDebtValue).toBe(110.95);
     expect(data.periods.map((period) => period.id)).toEqual([
       "mbo-2026-jan-jul",
       "mbo-2026-aug-dec",

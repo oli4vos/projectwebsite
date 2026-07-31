@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  calculateMonthlyTuitionCreditMaximum,
   getAvailableFinancialYears,
   getAvailableDuoRateYears,
   getDefaultFinancialYear,
@@ -78,8 +79,21 @@ describe("financial constants helpers", () => {
       regularLoanMax: 233.65,
       totalExcludingTuitionCreditMax: 1_054.5,
     });
+    expect(higherEducation.annualStatutoryTuitionFee).toBe(2_694);
+    expect(higherEducation.tuitionCreditMax).toBe(
+      calculateMonthlyTuitionCreditMaximum(2_694),
+    );
     expect(higherEducation.tuitionCreditMax).toBe(224.5);
+    expect(higherEducation.travelProductMonthlyDebtValue).toBe(110.95);
     expect(higherEducation.loanPhaseRegularLoanMax).toBe(1_213.95);
+  });
+
+  it("derives the monthly tuition-credit maximum from annual tuition", () => {
+    expect(calculateMonthlyTuitionCreditMaximum(2_601)).toBe(216.75);
+    expect(calculateMonthlyTuitionCreditMaximum(2_694)).toBe(224.5);
+    expect(() => calculateMonthlyTuitionCreditMaximum(-1)).toThrow(
+      "Jaarlijks collegegeld",
+    );
   });
 
   it("selects the gross-up factor band by mortgage rate", () => {

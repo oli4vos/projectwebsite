@@ -4,7 +4,7 @@ title: Wat wordt mijn studieschuld?
 route: /apps/duo-schuld-bij-starten-lenen
 status: active-public
 lastReviewed: 2026-07-31
-sourceHash: sha256:baf9d8bdf1a1b576eba8bdd1f796ba61c748e8a5e344410e211200a1ebda32f6
+sourceHash: sha256:6ebbbc2c1319ae3c453cac4f1ee2653c385c8b2e77089c39793b039456142784
 sources:
   - apps/duo-schuld-bij-starten-lenen/app.json
   - apps/duo-schuld-bij-starten-lenen/Calculator.tsx
@@ -134,7 +134,7 @@ Er is geen profielprefill, session storage of persistente gegevensoverdracht. De
 | Resultaat of status | Ontstaat uit | Wanneer zichtbaar | Belangrijk voor gebruiker |
 | --- | --- | --- | --- |
 | Eindschuld bij start terugbetaling | Lening plus rente na studie en aanloopfase | Na geldige berekening | Prestatiebeurs wordt alleen als gift behandeld in het diplomascenario. |
-| Maximumscenario zonder diploma | Centrale maximale hbo/wo-bedragen en gekozen studieduur | Na de expliciete maximumactie | Gebruikt uitwonend, regulier collegegeld en € 0 voor het reisproduct; de prestatiebeurs blijft schuld. |
+| Maximumscenario zonder diploma | Centrale maximale hbo/wo-bedragen en gekozen studieduur | Na de expliciete maximumactie | Regulier collegegeldkrediet is jaarcollegegeld gedeeld door 12. De centrale reisproductwaarde telt als prestatiebeurs mee zolang die geen gift is. |
 | Hypotheekimpact eindschuld | Schuld op het diplomamoment, nieuwste DUO-rente en centrale hypotheekdefaults | Na één druk op de impactknop | Indicatie zonder inkomen, draagkracht, andere schulden, woningwaarde of bankbeleid. |
 | Totaal terug te betalen | SF35-aflossimulatie | Hoofdresultaat | Inclusief geraamde rente. |
 | Rente in aflosfase | Aflossimulatie | In verdieping | Toekomstige rente kan afwijken. |
@@ -148,7 +148,7 @@ De berekening wordt niet uitgevoerd bij ongeldige maand, ontbrekende studieduur,
 - `apps/duo-schuld-bij-starten-lenen/app.json`: publieke route en metadata.
 - `apps/duo-schuld-bij-starten-lenen/Calculator.tsx`: activeert `start-borrowing`.
 - `apps/_duo_simple/FocusedDuoTool.tsx`: formulier, verdieping, resultaat en PDF.
-- `apps/_duo_simple/focused-logic.ts`: dwingt beginschuld nul en SF35 af en bouwt op verzoek het centrale maximumscenario.
+- `apps/_duo_simple/focused-logic.ts`: dwingt beginschuld nul en SF35 af en bouwt op verzoek het centrale maximumscenario met de afgeleide collegegeld- en reisproductnormen.
 - `apps/_duo_simple/ProjectedDebtMortgageImpact.tsx`: toont de optionele hypotheekimpact na een expliciete gebruikersactie.
 - `apps/_duo_simple/projected-debt-mortgage-impact.ts`: vertaalt de eindschuld via de centrale DUO- en hypotheekfuncties naar een indicatie.
 - `src/lib/duo/studeren-stoppen.ts`: component-, diploma-, rente- en aflossimulatie, inclusief optioneel doorstuderen zonder diploma.

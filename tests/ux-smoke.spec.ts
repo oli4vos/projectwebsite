@@ -1226,6 +1226,7 @@ test("maximaal lenen zonder diploma gebruikt centrale bedragen en hele maanden",
   await expect(page.locator("#monthlyCollegegeldkrediet")).toHaveValue("216.75");
   await expect(page.locator("#monthlyBasisbeurs")).toHaveValue("324.52");
   await expect(page.locator("#monthlyAanvullendeBeurs")).toHaveValue("491.08");
+  await expect(page.locator("#monthlyReisproduct")).toHaveValue("110.95");
 
   const width = await page.evaluate(() => ({
     body: document.body.scrollWidth,
@@ -1286,8 +1287,8 @@ test("DUO-maandbedragen gebruiken centrale maxima met toelichting rechts", async
   await advanced.locator("summary").click();
   await expectLimitedField(
     "monthlyCollegegeldkrediet",
-    "1083.75",
-    /Max\. €\s*1\.083,75; regulier €\s*216,75/,
+    "216.75",
+    /Max\. €\s*216,75 per maand, €\s*2\.601 ÷ 12/,
   );
   await expectLimitedField(
     "monthlyBasisbeurs",
@@ -1298,6 +1299,11 @@ test("DUO-maandbedragen gebruiken centrale maxima met toelichting rechts", async
     "monthlyAanvullendeBeurs",
     "491.08",
     /Max\. €\s*491,08/,
+  );
+  await expectLimitedField(
+    "monthlyReisproduct",
+    "110.95",
+    /€\s*110,95 zolang dit nog geen gift is/,
   );
 
   if (isMobile) {
@@ -1311,8 +1317,8 @@ test("DUO-maandbedragen gebruiken centrale maxima met toelichting rechts", async
   }
   await expectLimitedField(
     "monthlyCollegegeldkrediet",
-    "1122.5",
-    /Max\. €\s*1\.122,50; regulier €\s*224,50/,
+    "224.5",
+    /Max\. €\s*224,50 per maand, €\s*2\.694 ÷ 12/,
   );
 
   await page.locator("#monthlyLoan").fill("1213.96");

@@ -24,25 +24,29 @@ describe("centrale DUO-maandmaxima in de eenvoudige tools", () => {
   it("haalt alle veldlimieten uit de periodegebonden centrale 2026-dataset", () => {
     expect(getSimpleDuoMonthlyLimits("2026-08")).toEqual({
       monthlyLoan: 1_213.95,
-      monthlyCollegegeldkrediet: 1_083.75,
+      monthlyCollegegeldkrediet: 216.75,
       regularTuitionCredit: 216.75,
+      annualStatutoryTuitionFee: 2_601,
       monthlyBasisbeurs: 324.52,
       monthlyAanvullendeBeurs: 491.08,
+      monthlyReisproduct: 110.95,
       totalExcludingTuitionCredit: 1_213.95,
       periodId: "higher-education-2026-jan-aug",
     });
     expect(getSimpleDuoMonthlyLimits("2026-09")).toMatchObject({
-      monthlyCollegegeldkrediet: 1_122.5,
+      monthlyCollegegeldkrediet: 224.5,
       regularTuitionCredit: 224.5,
+      annualStatutoryTuitionFee: 2_694,
       periodId: "higher-education-2026-sep-dec",
     });
   });
 
   it.each([
     ["monthlyLoan", "1213,96", "€ 1.213,95"],
-    ["monthlyCollegegeldkrediet", "1083,76", "€ 1.083,75"],
+    ["monthlyCollegegeldkrediet", "216,76", "€ 216,75"],
     ["monthlyBasisbeurs", "324,53", "€ 324,52"],
     ["monthlyAanvullendeBeurs", "491,09", "€ 491,08"],
+    ["monthlyReisproduct", "110,96", "€ 110,95"],
   ] as const)("blokkeert %s boven de centrale norm", (field, value, maximum) => {
     const errors = validateSimpleDuoValues("start-borrowing", {
       ...valuesForAugust2026(),
@@ -105,7 +109,7 @@ describe("centrale DUO-maandmaxima in de eenvoudige tools", () => {
       monthlyCollegegeldkrediet: "216.75",
       monthlyBasisbeurs: "324.52",
       monthlyAanvullendeBeurs: "491.08",
-      monthlyReisproduct: "0",
+      monthlyReisproduct: "110.95",
     });
 
     const view = createSimpleDuoView(
@@ -120,6 +124,7 @@ describe("centrale DUO-maandmaxima in de eenvoudige tools", () => {
       );
       expect(view.focusScenario.key).toBe("max-borrowing-no-diploma");
       expect(scenario?.diplomaMonth).toBeUndefined();
+      expect(scenario?.debtAtStop.reisproduct).toBeGreaterThan(0);
       expect(scenario?.debtAtStop.prestatiebeurs).toBeGreaterThan(0);
       expect(view.focusScenario.primaryAmount).toBe(scenario?.debtAtStop.total);
     }

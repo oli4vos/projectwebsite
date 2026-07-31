@@ -4,7 +4,7 @@ title: Wat kost stoppen met studeren?
 route: /apps/duo-stoppen-kosten-prestatiebeurs
 status: active-public
 lastReviewed: 2026-07-31
-sourceHash: sha256:a3f862aa705e3d48b02f85cbf4570f9dbb118cd04a33611d9246ebea4e51ddb3
+sourceHash: sha256:00cc42b9aac3336244b2b9ddf4903ff3d9d20191dcebaf3b1677d094a8742463
 sources:
   - apps/duo-stoppen-kosten-prestatiebeurs/app.json
   - apps/duo-stoppen-kosten-prestatiebeurs/Calculator.tsx
@@ -126,7 +126,7 @@ Er is geen profielprefill, sessieherstel of persistente toolhandoff. De gebruike
 | Hypotheekimpact eindschuld | Schuld op het stopmoment, nieuwste DUO-rente en centrale hypotheekdefaults | Na één druk op de impactknop | Indicatie zonder inkomen, draagkracht, andere schulden, woningwaarde of bankbeleid. |
 | Basisbeurs blijft schuld | Ingevoerde basisbeurscomponent | In details | Werkelijke omzetting hangt af van DUO-voorwaarden en diplomatermijn. |
 | Aanvullende beurs blijft schuld | Ingevoerde aanvullende beurscomponent | In details | Bijzondere giftregels worden niet persoonlijk vastgesteld. |
-| Studentenreisproduct blijft schuld | Ingevoerde reisproductwaarde | In details | DUO bepaalt de officiële waarde. |
+| Studentenreisproduct blijft schuld | Ingevoerde of centraal begrensde reisproductwaarde | In details | De centrale 2026-maandwaarde telt als prestatiebeurs zolang DUO deze niet in een gift heeft omgezet. |
 | Terugbetaalprojectie | Totale schuld, rentejaar en SF35 | In verdieping en PDF | Draagkracht kan de feitelijke betaling veranderen. |
 
 Negatieve of onleesbare bedragen en een ongeldig rentejaar blokkeren. Nul is toegestaan. De waarschuwingen benadrukken dat dit geen DUO-beschikking is en dat prestatiebeurs alleen onder toepasselijke voorwaarden een gift wordt.

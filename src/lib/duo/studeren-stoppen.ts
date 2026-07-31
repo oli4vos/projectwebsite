@@ -1096,7 +1096,7 @@ function buildFocusScenarios(scenarios: StudyStopScenarioResult[], repaymentTerm
             repaymentTermYears,
             payoffDate: continueWithoutDiploma.repayment.payoffDate,
             note:
-              "Dit scenario gebruikt de maximale hbo/wo-bedragen voor een uitwonende student met regulier collegegeld. Het studentenreisproduct staat op € 0, omdat de centrale normlaag daarvoor geen maandbedrag bevat.",
+              "Dit scenario gebruikt de maximale hbo/wo-bedragen voor een uitwonende student met regulier collegegeld. De maandwaarde van het studentenreisproduct telt als prestatiebeursschuld mee zolang die niet in een gift is omgezet.",
           },
         ]
       : []),

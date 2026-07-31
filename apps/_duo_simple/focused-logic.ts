@@ -39,8 +39,10 @@ export type SimpleDuoMonthlyLimits = Readonly<{
   monthlyLoan: number;
   monthlyCollegegeldkrediet: number;
   regularTuitionCredit: number;
+  annualStatutoryTuitionFee: number;
   monthlyBasisbeurs: number;
   monthlyAanvullendeBeurs: number;
+  monthlyReisproduct: number;
   totalExcludingTuitionCredit: number;
   periodId: string;
 }>;
@@ -123,15 +125,16 @@ export function getSimpleDuoMonthlyLimits(
 
     return Object.freeze({
       monthlyLoan: amounts.loanPhaseRegularLoanMax,
-      monthlyCollegegeldkrediet:
-        amounts.institutionalTuitionCreditMax ?? amounts.tuitionCreditMax ?? 0,
+      monthlyCollegegeldkrediet: amounts.tuitionCreditMax ?? 0,
       regularTuitionCredit: amounts.tuitionCreditMax ?? 0,
+      annualStatutoryTuitionFee: amounts.annualStatutoryTuitionFee ?? 0,
       monthlyBasisbeurs: Math.max(
         ...residenceAmounts.map((residence) => residence.basicGrantMax),
       ),
       monthlyAanvullendeBeurs: Math.max(
         ...residenceAmounts.map((residence) => residence.additionalGrantMax),
       ),
+      monthlyReisproduct: amounts.travelProductMonthlyDebtValue,
       totalExcludingTuitionCredit: Math.max(
         amounts.loanPhaseRegularLoanMax,
         ...residenceAmounts.map(
@@ -151,7 +154,8 @@ function validateMonthlyMaximum(
     | "monthlyLoan"
     | "monthlyCollegegeldkrediet"
     | "monthlyBasisbeurs"
-    | "monthlyAanvullendeBeurs",
+    | "monthlyAanvullendeBeurs"
+    | "monthlyReisproduct",
   maximum: number,
   errors: SimpleDuoErrors,
 ) {
@@ -247,7 +251,7 @@ export function maxBorrowingWithoutDiplomaValues(
     monthlyCollegegeldkrediet: String(amounts.tuitionCreditMax ?? 0),
     monthlyBasisbeurs: String(livingAway.basicGrantMax),
     monthlyAanvullendeBeurs: String(livingAway.additionalGrantMax),
-    monthlyReisproduct: "0",
+    monthlyReisproduct: String(amounts.travelProductMonthlyDebtValue),
     repaymentRule: "SF35",
     duoRateYear: supportedRateYears.has(rateYear)
       ? String(rateYear)
@@ -305,6 +309,12 @@ export function validateSimpleDuoValues(mode: SimpleDuoToolMode, values: SimpleD
         values,
         "monthlyAanvullendeBeurs",
         limits.monthlyAanvullendeBeurs,
+        errors,
+      );
+      validateMonthlyMaximum(
+        values,
+        "monthlyReisproduct",
+        limits.monthlyReisproduct,
         errors,
       );
 

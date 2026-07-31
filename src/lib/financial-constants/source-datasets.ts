@@ -1164,7 +1164,7 @@ export const SOURCE_DATASET_REGISTRY: readonly SourceDataset[] = [
       id: "duo-student-finance-amounts-2026",
       title: "DUO-studiefinancieringsbedragen 2026",
       year: 2026,
-      version: "1.0.0",
+      version: "1.1.0",
       effectiveFrom: "2026-01-01",
       effectiveTo: "2026-12-31",
       retrievedAt: "2026-07-31",
@@ -1174,10 +1174,10 @@ export const SOURCE_DATASET_REGISTRY: readonly SourceDataset[] = [
       sourceUrl: DUO_STUDENT_FINANCE_AMOUNTS_2026.sourceUrl,
       sourceType: "official-execution",
       methodology:
-        "Centrale maandbedragen per onderwijssoort, woonsituatie en geldigheidsperiode. De resterende extra lening is uitsluitend het verschil tussen de maximale en werkelijk ontvangen aanvullende beurs.",
+        "Centrale bedragen per onderwijssoort, woonsituatie en geldigheidsperiode. Het maandmaximum voor regulier collegegeldkrediet is het jaarlijkse wettelijke collegegeld gedeeld door 12. De maandwaarde van het studentenreisproduct wordt als prestatiebeurs gevolgd zolang die niet in een gift is omgezet.",
       methodologyType: "official-norm",
       notes:
-        "Basisbeurs verlaagt de gewone rentedragende lening niet. Collegegeldkrediet is een afzonderlijk product en de leenfase heeft een eigen maximum.",
+        "Basisbeurs verlaagt de gewone rentedragende lening niet. Collegegeldkrediet is een afzonderlijk product, de leenfase heeft een eigen maximum en de reisproductwaarde voor 2026 is € 110,95 per maand.",
       status: "active",
     },
     data: DUO_STUDENT_FINANCE_AMOUNTS_2026,

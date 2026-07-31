@@ -163,6 +163,7 @@ describe("studeren-stoppen engine", () => {
       monthlyCollegegeldkrediet: 216.75,
       monthlyBasisbeurs: 324.52,
       monthlyAanvullendeBeurs: 491.08,
+      monthlyReisproduct: 110.95,
       monthsUntilContinueDiploma: 24,
       includeContinueWithoutDiplomaScenario: true,
     });
@@ -172,6 +173,7 @@ describe("studeren-stoppen engine", () => {
 
     expect(scenario?.monthsUntilStop).toBe(24);
     expect(scenario?.diplomaMonth).toBeUndefined();
+    expect(scenario?.debtAtStop.reisproduct).toBeGreaterThan(0);
     expect(scenario?.debtAtStop.prestatiebeurs).toBeGreaterThan(0);
     expect(
       result.focusScenarios.some(

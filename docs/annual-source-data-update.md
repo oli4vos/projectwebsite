@@ -42,7 +42,7 @@ Bij manifest- of registryimpact komt daar `npm run generate:apps` bij. De gegene
 
 ## DUO-bedragen
 
-Alle maximale maandbedragen voor basisbeurs, aanvullende beurs, gewone rentedragende lening, leenfase en collegegeldkrediet staan per periode in `src/lib/financial-constants/duo-student-finance-amounts-2026.ts`. `calculateDuoBorrowingCapacity` in `src/lib/duo/borrowing-capacity.ts` bepaalt de resterende leenruimte.
+Alle maximale bedragen voor basisbeurs, aanvullende beurs, gewone rentedragende lening, leenfase, collegegeld en het studentenreisproduct staan per periode of jaar in `src/lib/financial-constants/duo-student-finance-amounts-2026.ts`. `calculateDuoBorrowingCapacity` in `src/lib/duo/borrowing-capacity.ts` bepaalt de resterende leenruimte.
 
 De centrale regel is:
 
@@ -53,6 +53,15 @@ maximale rentedragende lening tijdens beursfase
 ```
 
 De basisbeurs verlaagt de gewone lening niet. In de leenfase geldt het afzonderlijke leenfasemaximum. Collegegeldkrediet blijft apart en mag nooit hoger zijn dan het werkelijk verschuldigde collegegeld of de toepasselijke DUO-grens.
+
+Het reguliere maandmaximum voor collegegeldkrediet wordt niet los ingevoerd:
+
+```text
+maximaal collegegeldkrediet per maand
+= jaarlijks wettelijk collegegeld ÷ 12
+```
+
+Leg daarom het jaarlijkse collegegeld per studiejaar centraal vast. Leg ook de officiële maandwaarde van het studentenreisproduct vast. Voor mbo 3/4, hbo en universiteit telt die waarde als prestatiebeurs mee zolang DUO deze nog niet in een gift heeft omgezet.
 
 DUO kan bedragen binnen één kalenderjaar op verschillende momenten wijzigen. Voeg daarom perioden met volledige ISO-datums toe en test ten minste de dag vóór en op iedere overgang.
 
