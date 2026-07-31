@@ -1,4 +1,7 @@
-import { getAvailableDuoRateYears } from "@/lib/financial-constants";
+import {
+  getAvailableDuoRateYears,
+  getDuoStudentFinanceAmountsForDate,
+} from "@/lib/financial-constants";
 import {
   calculateStudyStopScenarios,
   type StudyStopCalculationResult,
@@ -83,6 +86,10 @@ function validateMoney(values: SimpleDuoValues, field: keyof SimpleDuoValues, er
 }
 
 export function defaultSimpleDuoValues(mode: SimpleDuoToolMode): SimpleDuoValues {
+  const higherEducationAmounts = getDuoStudentFinanceAmountsForDate({
+    asOf: `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, "0")}-01`,
+    educationTrack: "hbo-university",
+  });
   const shared = {
     calculationMonth: currentMonth(),
     monthsUntilDiploma: mode === "stop-cost" ? "0" : "36",
@@ -93,7 +100,9 @@ export function defaultSimpleDuoValues(mode: SimpleDuoToolMode): SimpleDuoValues
     currentReisproductDebt: mode === "start-borrowing" ? "0" : "1200",
     monthlyLoan: mode === "stop-cost" ? "0" : "300",
     monthlyCollegegeldkrediet: mode === "stop-cost" ? "0" : "0",
-    monthlyBasisbeurs: mode === "start-borrowing" ? "130.21" : "0",
+    monthlyBasisbeurs: mode === "start-borrowing"
+      ? String(higherEducationAmounts.amountsByResidence["living-at-home"].basicGrantMax)
+      : "0",
     monthlyAanvullendeBeurs: "0",
     monthlyReisproduct: "0",
     repaymentRule: "SF35" as RepaymentRule,

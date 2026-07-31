@@ -67,6 +67,7 @@ export type SourceDatasetFamily =
   | "duo-repayment-terms"
   | "duo-income-based-repayment-rules"
   | "duo-borrowing-limits"
+  | "duo-student-finance-amounts"
   | "duo-additional-grant-rules"
   | "allowance-signal-rules"
   | "allowance-calculation-rules"

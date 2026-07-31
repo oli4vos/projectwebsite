@@ -1,5 +1,6 @@
 import { DUO_RATE_HISTORY_BY_YEAR, DUO_RATE_YEAR_METADATA_BY_YEAR } from "@/lib/financial-constants/duo-rate-history";
 import { DUO_ADDITIONAL_GRANT_RULES_2026 } from "@/lib/financial-constants/duo-additional-grant-rules-2026";
+import { DUO_STUDENT_FINANCE_AMOUNTS_2026 } from "@/lib/financial-constants/duo-student-finance-amounts-2026";
 import { ALLOWANCE_CALCULATION_RULES_2026 } from "@/lib/financial-constants/allowance-calculation-rules-2026";
 import { MORTGAGE_FINANCING_LOAD_DATA } from "@/lib/financial-constants/mortgage-financing-load-data";
 import { DEBT_PRIORITY_RULES_2026 } from "@/lib/planning/debt-priority-rules";
@@ -627,6 +628,26 @@ function validateDatasetSpecificBounds(dataset: SourceDataset) {
       }
       break;
     }
+    case "duo-student-finance-amounts": {
+      const data = dataset.data as typeof DUO_STUDENT_FINANCE_AMOUNTS_2026;
+      if (data.loanPhaseRegularLoanMax <= 0 || data.periods.length === 0) {
+        issues.push("DUO-studiefinancieringsbedragen missen een leenfasegrens of perioden.");
+      }
+      for (const period of data.periods) {
+        for (const amounts of Object.values(period.amountsByResidence)) {
+          const calculatedTotal = Math.round((
+            amounts.basicGrantMax + amounts.additionalGrantMax + amounts.regularLoanMax
+          ) * 100) / 100;
+          if (Object.values(amounts).some((amount) => amount < 0)) {
+            issues.push(`DUO-bedragen mogen niet negatief zijn in ${period.id}.`);
+          }
+          if (calculatedTotal !== amounts.totalExcludingTuitionCreditMax) {
+            issues.push(`DUO-totaal sluit niet aan op de componenten in ${period.id}.`);
+          }
+        }
+      }
+      break;
+    }
     case "duo-additional-grant-rules":
       return validateDuoAdditionalGrantRulesDataset(dataset.data);
     case "allowance-signal-rules":
@@ -1134,6 +1155,38 @@ export const SOURCE_DATASET_REGISTRY: readonly SourceDataset[] = [
     },
     data: constants2026.duo.borrowingLimits,
     usedBy: ["duo-leenbedrag-impact", "duo-schuld-bij-starten-lenen"],
+  },
+  {
+    family: "duo-student-finance-amounts",
+    scenario: "mbo-higher-education-monthly-components",
+    meta: {
+      recordType: "dataset",
+      id: "duo-student-finance-amounts-2026",
+      title: "DUO-studiefinancieringsbedragen 2026",
+      year: 2026,
+      version: "1.0.0",
+      effectiveFrom: "2026-01-01",
+      effectiveTo: "2026-12-31",
+      retrievedAt: "2026-07-31",
+      lastVerifiedAt: "2026-07-31",
+      nextReviewAt: "2026-11-15",
+      sourceName: "DUO",
+      sourceUrl: DUO_STUDENT_FINANCE_AMOUNTS_2026.sourceUrl,
+      sourceType: "official-execution",
+      methodology:
+        "Centrale maandbedragen per onderwijssoort, woonsituatie en geldigheidsperiode. De resterende extra lening is uitsluitend het verschil tussen de maximale en werkelijk ontvangen aanvullende beurs.",
+      methodologyType: "official-norm",
+      notes:
+        "Basisbeurs verlaagt de gewone rentedragende lening niet. Collegegeldkrediet is een afzonderlijk product en de leenfase heeft een eigen maximum.",
+      status: "active",
+    },
+    data: DUO_STUDENT_FINANCE_AMOUNTS_2026,
+    usedBy: [
+      "duo-leenbedrag-impact",
+      "duo-schuld-bij-starten-lenen",
+      "duo-stoppen-kosten-prestatiebeurs",
+      "duo-additional-grant",
+    ],
   },
   {
     family: "planning-debt-priority-rules",

@@ -1,6 +1,7 @@
 import {
   getDuoRateForRule,
   getDuoDefaultTermForRule,
+  getDuoStudentFinanceAmountsForDate,
 } from "@/lib/financial-constants";
 import type {
   DuoIncomeBasedMonthlyPaymentResult,
@@ -1236,6 +1237,11 @@ export function calculateStudyStopScenarios(
 }
 
 export function createStudyStopDefaultValues(calculationMonth = formatYearMonth(createCurrentYearMonth())) {
+  const amounts = getDuoStudentFinanceAmountsForDate({
+    asOf: `${calculationMonth}-01`,
+    educationTrack: "hbo-university",
+  });
+  const livingAtHome = amounts.amountsByResidence["living-at-home"];
   return {
     calculationMonth,
     studyLevel: "hbo" as StudyLevel,
@@ -1244,9 +1250,9 @@ export function createStudyStopDefaultValues(calculationMonth = formatYearMonth(
     currentBasisbeursDebt: "1500",
     currentAanvullendeBeursDebt: "2500",
     currentReisproductDebt: "1200",
-    monthlyLoan: "315.17",
-    monthlyCollegegeldkrediet: "216.75",
-    monthlyBasisbeurs: "130.21",
+    monthlyLoan: String(livingAtHome.regularLoanMax),
+    monthlyCollegegeldkrediet: String(amounts.tuitionCreditMax ?? 0),
+    monthlyBasisbeurs: String(livingAtHome.basicGrantMax),
     monthlyAanvullendeBeurs: "0",
     monthlyReisproduct: "0",
     monthsUntilLaterDiploma: "24",

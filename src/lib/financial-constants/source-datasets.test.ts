@@ -404,6 +404,27 @@ describe("source dataset registry", () => {
     expect(limits.monthlyLoanAmountStep).toBe(25);
   });
 
+  it("registers the complete dateable DUO study-finance amounts", () => {
+    const dataset = getActiveDataset("duo-student-finance-amounts", {
+      scenario: "mbo-higher-education-monthly-components",
+      asOf: "2026-07-31",
+    });
+    const data = dataset.data as {
+      loanPhaseRegularLoanMax: number;
+      periods: readonly { id: string }[];
+    };
+
+    expect(dataset.meta.id).toBe("duo-student-finance-amounts-2026");
+    expect(dataset.meta.sourceName).toBe("DUO");
+    expect(data.loanPhaseRegularLoanMax).toBe(1_213.95);
+    expect(data.periods.map((period) => period.id)).toEqual([
+      "mbo-2026-jan-jul",
+      "mbo-2026-aug-dec",
+      "higher-education-2026-jan-aug",
+      "higher-education-2026-sep-dec",
+    ]);
+  });
+
   it("separates official datasets from project assumptions", () => {
     const official = getActiveDataset("mortgage-financing-load", {
       scenario: "before-and-from-aow",

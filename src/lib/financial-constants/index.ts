@@ -21,6 +21,11 @@ import {
   getMortgageFinancingLoadPercentage,
   getMortgageFinancingLoadTable,
 } from "@/lib/financial-constants/mortgage-financing-load";
+import type {
+  DuoEducationTrack,
+  DuoStudentFinanceAmounts,
+  DuoStudentFinancePeriod,
+} from "@/lib/financial-constants/duo-student-finance-amounts-2026";
 export {
   SOURCE_DATA_REFERENCE_DATE,
   SOURCE_DATASET_REGISTRY,
@@ -141,6 +146,32 @@ export function getDuoBorrowingLimits(year?: number) {
   return dataset.data as AnnualFinancialConstants["duo"]["borrowingLimits"];
 }
 
+export function getDuoStudentFinanceAmounts(year?: number) {
+  const dataset = getDatasetForYearOrDefault(
+    "duo-student-finance-amounts",
+    year,
+    "mbo-higher-education-monthly-components",
+  );
+  return dataset.data as DuoStudentFinanceAmounts;
+}
+
+export function getDuoStudentFinanceAmountsForDate(input: {
+  asOf: string;
+  educationTrack: DuoEducationTrack;
+}): DuoStudentFinancePeriod & { readonly loanPhaseRegularLoanMax: number } {
+  const year = Number(input.asOf.slice(0, 4));
+  const data = getDuoStudentFinanceAmounts(year);
+  const period = data.periods.find((candidate) =>
+    candidate.educationTrack === input.educationTrack &&
+    input.asOf >= candidate.effectiveFrom &&
+    input.asOf <= candidate.effectiveTo
+  );
+  if (!period) {
+    throw new Error(`Geen DUO-bedragen voor ${input.educationTrack} op ${input.asOf}.`);
+  }
+  return { ...period, loanPhaseRegularLoanMax: data.loanPhaseRegularLoanMax };
+}
+
 export function getDuoRateHistoryMeta() {
   return DUO_RATE_HISTORY_META;
 }
@@ -258,6 +289,12 @@ export type {
   SourceFreshnessStatus,
   SourceReference,
 } from "@/lib/financial-constants/types";
+export type {
+  DuoEducationTrack,
+  DuoResidence,
+  DuoStudentFinanceAmounts,
+  DuoStudentFinancePeriod,
+} from "@/lib/financial-constants/duo-student-finance-amounts-2026";
 export { getMortgageFinancingLoadTable };
 export { getAvailableDuoRateYears };
 export { getDuoHistoricalRateYearForRule };

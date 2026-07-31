@@ -4,6 +4,7 @@ import {
   getAvailableDuoRateYears,
   getDefaultFinancialYear,
   getDuoBorrowingLimits,
+  getDuoStudentFinanceAmountsForDate,
   getDuoRateForRule,
   getDuoHistoricalRateYearForRule,
   getDuoRateYearMetadata,
@@ -59,6 +60,26 @@ describe("financial constants helpers", () => {
     expect(limits.monthlyLoanAmountMax).toBe(1213.95);
     expect(limits.monthlyLoanAmountStep).toBeGreaterThan(0);
     expect(limits.sourceUrl).toContain("duo.nl");
+  });
+
+  it("selects all DUO study-finance maxima by date and education track", () => {
+    const mbo = getDuoStudentFinanceAmountsForDate({
+      asOf: "2026-08-01",
+      educationTrack: "mbo",
+    });
+    const higherEducation = getDuoStudentFinanceAmountsForDate({
+      asOf: "2026-09-01",
+      educationTrack: "hbo-university",
+    });
+
+    expect(mbo.amountsByResidence["living-away"]).toMatchObject({
+      basicGrantMax: 350.03,
+      additionalGrantMax: 470.82,
+      regularLoanMax: 233.65,
+      totalExcludingTuitionCreditMax: 1_054.5,
+    });
+    expect(higherEducation.tuitionCreditMax).toBe(224.5);
+    expect(higherEducation.loanPhaseRegularLoanMax).toBe(1_213.95);
   });
 
   it("selects the gross-up factor band by mortgage rate", () => {

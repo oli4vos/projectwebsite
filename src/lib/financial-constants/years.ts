@@ -1,4 +1,5 @@
 import type { AnnualFinancialConstants } from "@/lib/financial-constants/types";
+import { DUO_STUDENT_FINANCE_AMOUNTS_2026 } from "@/lib/financial-constants/duo-student-finance-amounts-2026";
 
 export const DEFAULT_FINANCIAL_YEAR = 2026;
 
@@ -61,7 +62,7 @@ export const FINANCIAL_CONSTANTS_BY_YEAR: Record<number, AnnualFinancialConstant
           },
         },
         borrowingLimits: {
-          monthlyLoanAmountMax: 1213.95,
+          monthlyLoanAmountMax: DUO_STUDENT_FINANCE_AMOUNTS_2026.loanPhaseRegularLoanMax,
           monthlyLoanAmountStep: 25,
           sourceUrl: "https://duo.nl/particulier/studiefinanciering/bedragen.jsp",
           notes:

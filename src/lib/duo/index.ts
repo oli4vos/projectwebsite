@@ -15,6 +15,11 @@ export {
   sanitizeDuoPercent,
 } from "@/lib/duo/calculations";
 export { projectDuoLoan } from "@/lib/duo/project-duo-loan";
+export { calculateDuoBorrowingCapacity } from "@/lib/duo/borrowing-capacity";
+export type {
+  DuoBorrowingCapacityInput,
+  DuoBorrowingCapacityResult,
+} from "@/lib/duo/borrowing-capacity";
 export { determineDuoMortgageAssessmentPayment } from "@/lib/duo/mortgage-assessment";
 export { calculateDuoAdditionalGrant } from "@/lib/duo/additional-grant";
 export type {

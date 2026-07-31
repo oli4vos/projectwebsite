@@ -92,6 +92,8 @@ const duoAdditionalGrantAmountUrl = "https://duo.nl/particulier/aanvullende-beur
 const duoParentIncomeUrl = "https://duo.nl/particulier/aanvullende-beurs-studiefinanciering/inkomen-ouders.jsp";
 const duoMboCalculationPdfUrl = "https://duo.nl/images/folder-berekening-aanvullende-beurs-mbo-2026.pdf";
 const duoHboUniversityCalculationPdfUrl = "https://duo.nl/images/folder-berekening-aanvullende-beurs-hbo-universiteit-2026.pdf";
+const mboAmounts = getDuoStudentFinancePeriod2026("mbo", "2026-07-01");
+const higherEducationAmounts = getDuoStudentFinancePeriod2026("hbo-university", "2026-07-01");
 
 function value(input: Omit<DuoAdditionalGrantSourceValue, "calculationYear" | "validFrom" | "validUntil" | "retrievedAt">): DuoAdditionalGrantSourceValue {
   return {
@@ -261,7 +263,7 @@ export const DUO_ADDITIONAL_GRANT_RULES_2026: DuoAdditionalGrantRules2026 = {
         regulationId: "duo.additional-grant.mbo.maximum-living-at-home.2026",
         educationType: "mbo",
         residence: "living-at-home",
-        value: 438.08,
+        value: mboAmounts.amountsByResidence["living-at-home"].additionalGrantMax,
         unit: "eur-per-month",
         officialSourceTitle: "Hoeveel is het? - Aanvullende beurs",
         officialSourceUrl: duoAdditionalGrantAmountUrl,
@@ -274,7 +276,7 @@ export const DUO_ADDITIONAL_GRANT_RULES_2026: DuoAdditionalGrantRules2026 = {
         regulationId: "duo.additional-grant.mbo.maximum-living-away.2026",
         educationType: "mbo",
         residence: "living-away",
-        value: 466.40,
+        value: mboAmounts.amountsByResidence["living-away"].additionalGrantMax,
         unit: "eur-per-month",
         officialSourceTitle: "Hoeveel is het? - Aanvullende beurs",
         officialSourceUrl: duoAdditionalGrantAmountUrl,
@@ -358,7 +360,7 @@ export const DUO_ADDITIONAL_GRANT_RULES_2026: DuoAdditionalGrantRules2026 = {
         regulationId: "duo.additional-grant.hbo-university.maximum.2026",
         educationType: "hbo-university",
         residence: "both",
-        value: 491.08,
+        value: higherEducationAmounts.amountsByResidence["living-at-home"].additionalGrantMax,
         unit: "eur-per-month",
         officialSourceTitle: "Hoeveel is het? - Aanvullende beurs",
         officialSourceUrl: duoAdditionalGrantAmountUrl,
@@ -506,3 +508,4 @@ export const DUO_ADDITIONAL_GRANT_RULES_2026: DuoAdditionalGrantRules2026 = {
     "Mbo-bedragen na juli 2026 en lesgeldperioden moeten voor publieke bedragen extra tegen DUO-bedragenpagina worden gecontroleerd.",
   ],
 };
+import { getDuoStudentFinancePeriod2026 } from "@/lib/financial-constants/duo-student-finance-amounts-2026";
