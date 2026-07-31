@@ -1166,6 +1166,33 @@ test("verwachte eindschuld toont direct het totaal bij regulier aflossen", async
   expect(width.body).toBeLessThanOrEqual(width.viewport + 1);
 });
 
+test("gerichte DUO-tools tonen op verzoek de hypotheekimpact van de eindschuld", async ({
+  page,
+}, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "Desktopinteractie controleren");
+
+  for (const slug of [
+    "duo-schuld-bij-starten-lenen",
+    "duo-leenbedrag-impact",
+    "duo-stoppen-kosten-prestatiebeurs",
+  ]) {
+    await page.goto(`/apps/${slug}`, { waitUntil: "networkidle" });
+    await page.getByRole("button", { name: "Voorbeeld invullen" }).first().click();
+    await page.getByRole("button", { name: "Bereken", exact: true }).first().click();
+
+    const impact = page.getByRole("region", { name: "Hypotheekimpact eindschuld" });
+    await expect(impact).toBeVisible();
+    await impact
+      .getByRole("button", { name: "Bereken impact op hypotheekruimte" })
+      .click();
+
+    await expect(impact.getByText("Wettelijk DUO-bedrag", { exact: true })).toBeVisible();
+    await expect(impact.getByText("Minder hypotheekruimte", { exact: true })).toBeVisible();
+    await expect(impact.getByText(/2,33% voor 2026/)).toBeVisible();
+    await expect(impact.getByText(/annuïtair terug in 35 jaar/)).toBeVisible();
+  }
+});
+
 test("maximaal lenen zonder diploma gebruikt centrale bedragen en hele maanden", async ({
   page,
 }) => {

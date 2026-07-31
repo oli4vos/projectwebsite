@@ -79,6 +79,7 @@ Als een commit functionaliteit wijzigt maar dit bestand niet bijwerkt, is de wij
 
 | Datum | Commit | Wijziging | Impact |
 |---|---|---|---|
+| 2026-07-31 | `pending` | De drie gerichte DUO-opbouwtools tonen na een expliciete knopdruk de indicatieve hypotheekimpact van de berekende eindschuld, via de centrale SF35-maandtermijn met de nieuwste beschikbare DUO-rente en de bestaande centrale hypotheekomrekening | DUO / studieschuld / hypotheekimpact / resultaten / UX |
 | 2026-07-31 | `pending` | Direct DUO-scenario toegevoegd voor maximale hbo/wo-studiefinanciering tot de gekozen stopmaand zonder diploma, maandinvoer op hele stappen gezet en de maximale-hypotheeksamenvatting uitgebreid met compacte grensblokken en de centrale toetsrente-kans op extra leenruimte | DUO / hypotheek / scenario’s / resultaten / invoer-UX / responsive UX |
 | 2026-07-31 | `pending` | Maandelijkse lening, collegegeldkrediet, basisbeurs en aanvullende beurs in de gerichte DUO-tools hard begrensd met de centrale periodegebonden 2026-normen; ieder maximum staat kort rechts bij het veld en wordt responsief zonder overlap getoond | DUO / brondata / validatie / formulieren / responsive UX |
 | 2026-07-31 | `pending` | Horizontale uitlijning aangescherpt voor profiel- en aanvullende-beursvelden, toolkaarttitels en resultaatkaartlabels; geometrische regressiecontrole toegevoegd voor publieke routes en relevante rijen | V1 / formulieren / kaarten / responsive UX / toegankelijkheid |
