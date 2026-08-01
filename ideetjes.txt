@@ -58,6 +58,7 @@ Wat wordt mijn studieschuld als ik ga lenen?
 - berekningsmaand moet ene slider opnemen waarin jaar en maand geselcteerd kan worden.
 
 
+
 Toeslagenscan:
 TOESLAGENSCAN – TOEKOMSTIGE AFRONDING
 

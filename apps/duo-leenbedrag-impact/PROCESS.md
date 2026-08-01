@@ -3,8 +3,8 @@ tool: duo-leenbedrag-impact
 title: Impact van mijn leenbedrag
 route: /apps/duo-leenbedrag-impact
 status: active-public
-lastReviewed: 2026-07-31
-sourceHash: sha256:2955d5047f91e4e1966b0e66c3d9a435a7332ec2cd549f7d2e623a34062e8d29
+lastReviewed: 2026-08-01
+sourceHash: sha256:d536948a25054928a7fd4c27d6a81de3b8fcbff60082d61ead1a46ebc5451ff4
 sources:
   - apps/duo-leenbedrag-impact/app.json
   - apps/duo-leenbedrag-impact/Calculator.tsx
@@ -134,7 +134,7 @@ Er is geen profielprefill, sessieherstel of persistente opslag. Vervolglinks uit
 | Schuldenvrij rond | Maandsimulatie van aflossing | In verdieping | Indicatief, geen DUO-beschikking. |
 | PDF | Dezelfde scenario-output | Na resultaat | Geen zelfstandig rekenpad. |
 
-Ongeldige maanden, negatieve bedragen of een onbekend rentejaar blokkeren. De engine waarschuwt dat toekomstige rente en persoonlijke draagkracht kunnen afwijken.
+Ongeldige maanden, negatieve bedragen of een onbekend rentejaar blokkeren. Als lening en beursbedragen samen boven de centrale maandnorm uitkomen, noemt de foutmelding ook de resterende maximale leenruimte bij de ingevulde beursbedragen. De engine waarschuwt dat toekomstige rente en persoonlijke draagkracht kunnen afwijken.
 
 ## 7. Functionele bronverwijzingen
 

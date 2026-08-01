@@ -3,8 +3,8 @@ tool: duo-schuld-bij-starten-lenen
 title: Wat wordt mijn studieschuld?
 route: /apps/duo-schuld-bij-starten-lenen
 status: active-public
-lastReviewed: 2026-07-31
-sourceHash: sha256:6ebbbc2c1319ae3c453cac4f1ee2653c385c8b2e77089c39793b039456142784
+lastReviewed: 2026-08-01
+sourceHash: sha256:956d2fdc36a60fb9f057f044bebd791307aeac03152e2b95b515b167d9ad8644
 sources:
   - apps/duo-schuld-bij-starten-lenen/app.json
   - apps/duo-schuld-bij-starten-lenen/Calculator.tsx
@@ -13,6 +13,7 @@ sources:
   - apps/_duo_simple/focused-logic.ts
   - apps/_duo_simple/ProjectedDebtMortgageImpact.tsx
   - apps/_duo_simple/projected-debt-mortgage-impact.ts
+  - apps/duo-aanvullende-beurs/app.json
   - apps/duo-doorlenen-of-stoppen/report.ts
   - src/lib/duo/studeren-stoppen.ts
   - src/lib/duo/calculations.ts
@@ -29,14 +30,14 @@ sources:
 - **Tool-ID:** `duo-schuld-bij-starten-lenen`
 - **Publieke route:** `/apps/duo-schuld-bij-starten-lenen`
 - **Doel:** de toekomstige studieschuld ramen voor iemand die zonder beginschuld een nieuwe leenperiode start.
-- **Gecontroleerd op:** 2026-07-31.
+- **Gecontroleerd op:** 2026-08-01.
 - **Functionele basis:** mode `start-borrowing` in `apps/_duo_simple/FocusedDuoTool.tsx` en centrale scenario-engine in `src/lib/duo/studeren-stoppen.ts`.
 
 ## 2. Gebruikersproces
 
 ```mermaid
 flowchart TD
-  A[Open Wat wordt mijn studieschuld] --> B[Vul berekeningsmaand in]
+  A[Open Wat wordt mijn studieschuld] --> B[Kies een ondersteunde berekeningsmaand met de slider]
   B --> C[Vul maanden tot diploma in]
   C --> D[Vul lening per maand in]
   D --> E[Kies DUO-rentejaar]
@@ -44,9 +45,10 @@ flowchart TD
   EA -->|Ja| EB[Vul centrale hbo-wo-maxima voor uitwonend en regulier collegegeld in]
   EB --> K[Bereken scenario doorstuderen zonder diploma]
   EA -->|Nee| F{Verdiepende studiefinanciering invullen?}
-  F -->|Ja| G[Vul collegegeldkrediet, basisbeurs en aanvullende beurs in]
+  F -->|Ja| G[Vul collegegeldkrediet in en neem eventueel een thuis- of uitwonende basisbeurs over]
+  G --> GA[Vul aanvullende beurs in of open de aanvullende-beurstool]
   F -->|Nee| H[Gebruik nul voor optionele maandcomponenten]
-  G --> I{Invoer geldig?}
+  GA --> I{Invoer geldig?}
   H --> I
   I -->|Nee| J[Herstel datum, duur, bedragen of rentejaar]
   J --> I
@@ -60,6 +62,7 @@ flowchart TD
   N -->|PDF| O[Download overzicht]
   N -->|Andere invoer| B
   N -->|DUO-maandbedrag| P[Open vervolgtool zonder automatische overdracht]
+  N -->|Aanvullende beurs| Q[Open aanvullende-beurstool]
 ```
 
 ## 3. Beslisproces
@@ -79,6 +82,10 @@ flowchart TD
   J -->|Nee| L[Projecteer alleen lening en collegegeldkrediet]
   K --> M[Selecteer scenario doorstuderen tot diploma]
   L --> M
+  M --> N{Lening en beurzen binnen het centrale maandmaximum?}
+  N -->|Nee| O[Bereken resterende leenruimte en bied overnemen aan]
+  N -->|Ja| P[Ga verder met de scenario-engine]
+  O --> P
 ```
 
 ## 4. Rekenproces
@@ -88,10 +95,13 @@ flowchart TD
   A[Beginschuld wordt nul] --> B[Maak schuldcomponenten aan]
   C[Maandelijkse lening en collegegeldkrediet] --> D[Voeg altijd terug te betalen schuld toe]
   E[Basisbeurs en aanvullende beurs] --> F[Voeg prestatiebeurscomponenten toe]
+  EA[Centraal maandmaximum] --> FA[Trek ingevulde basis- en aanvullende beurs af]
+  FA --> FB[Begrens en rond resterende leenruimte af op centen]
   G[DUO-rentejaar] --> H[Bereken maandrente per studiemaand]
   B --> I[Herhaal tot diploma]
   D --> I
   F --> I
+  FB --> I
   H --> I
   I --> J{Tijdig diploma in gekozen scenario?}
   J -->|Ja| JA[Zet prestatiebeurs om in gift]
@@ -113,10 +123,14 @@ flowchart TD
 sequenceDiagram
   participant U as Gebruiker
   participant F as Gedeelde DUO-tool
+  participant A as Aanvullende-beurscalculator
   participant E as Studiescenario-engine
   participant H as Hypotheekimpact-adapter
   participant P as PDF-generator
   U->>F: Vult toekomstige leenperiode in
+  F-->>U: Toont basisbeursvarianten en resterende leenruimte
+  U->>A: Opent optioneel de aanvullende-beurscalculator
+  A-->>U: Toont een maandbedrag om bewust over te nemen
   F->>E: Stuurt SF35-scenario zonder beginschuld
   E->>E: Scheidt lening en prestatiebeurscomponenten
   E-->>F: Geeft schuld bij terugbetaling en aflossimulatie
@@ -127,7 +141,7 @@ sequenceDiagram
   U->>P: Downloadt hetzelfde scenario als PDF
 ```
 
-Er is geen profielprefill, session storage of persistente gegevensoverdracht. De link naar een volgende tool is navigatie zonder ingevulde bedragen. PDF-uitvoer gebruikt de gedeelde reportmodule en hetzelfde centrale scenarioresultaat.
+Er is geen profielprefill, session storage of persistente gegevensoverdracht. De aanvullende-beurskoppeling en de link naar een volgende tool zijn navigatie zonder ingevulde bedragen; een beursbedrag wordt alleen handmatig overgenomen. PDF-uitvoer gebruikt de gedeelde reportmodule en hetzelfde centrale scenarioresultaat.
 
 ## 6. Resultaten en uitzonderingen
 
@@ -135,13 +149,16 @@ Er is geen profielprefill, session storage of persistente gegevensoverdracht. De
 | --- | --- | --- | --- |
 | Eindschuld bij start terugbetaling | Lening plus rente na studie en aanloopfase | Na geldige berekening | Prestatiebeurs wordt alleen als gift behandeld in het diplomascenario. |
 | Maximumscenario zonder diploma | Centrale maximale hbo/wo-bedragen en gekozen studieduur | Na de expliciete maximumactie | Regulier collegegeldkrediet is jaarcollegegeld gedeeld door 12. De centrale reisproductwaarde telt als prestatiebeurs mee zolang die geen gift is. |
+| Resterende leenruimte per maand | Centraal maandmaximum min ingevulde basis- en aanvullende beurs | Tijdens invoer en bij overschrijding | Het voorgestelde bedrag kan met één knop worden overgenomen. |
+| Basisbeurs thuis- of uitwonend | Periodegebonden centrale DUO-bedragen | In de verdieping | Beide bedragen staan afzonderlijk klaar om over te nemen. |
+| Aanvullende-beursschatting | Centrale aanvullende-beurscalculator | Na openen van de info-uitleg | De koppeling draagt geen persoonsgegevens of bedragen automatisch over. |
 | Hypotheekimpact eindschuld | Schuld op het diplomamoment, nieuwste DUO-rente en centrale hypotheekdefaults | Na één druk op de impactknop | Indicatie zonder inkomen, draagkracht, andere schulden, woningwaarde of bankbeleid. |
 | Totaal terug te betalen | SF35-aflossimulatie | Hoofdresultaat | Inclusief geraamde rente. |
 | Rente in aflosfase | Aflossimulatie | In verdieping | Toekomstige rente kan afwijken. |
 | Schuldenvrije maand | Einde van simulatie | In verdieping | Persoonlijke draagkracht kan de looptijd veranderen. |
 | PDF | Zelfde resultaat | Na berekening | Geen aparte formule. |
 
-De berekening wordt niet uitgevoerd bij ongeldige maand, ontbrekende studieduur, negatieve bedragen of onbekend rentejaar. De tool ondersteunt bewust alleen het eenvoudige SF35-pad.
+De berekening wordt niet uitgevoerd bij een niet-ondersteunde maand, ontbrekende studieduur, negatieve bedragen of onbekend rentejaar. Als lening en beursbedragen samen boven de centrale maandnorm uitkomen, noemt de foutmelding de resterende maximale leenruimte bij de gekozen beursbedragen. De tool ondersteunt bewust alleen het eenvoudige SF35-pad.
 
 ## 7. Functionele bronverwijzingen
 
@@ -149,6 +166,7 @@ De berekening wordt niet uitgevoerd bij ongeldige maand, ontbrekende studieduur,
 - `apps/duo-schuld-bij-starten-lenen/Calculator.tsx`: activeert `start-borrowing`.
 - `apps/_duo_simple/FocusedDuoTool.tsx`: formulier, verdieping, resultaat en PDF.
 - `apps/_duo_simple/focused-logic.ts`: dwingt beginschuld nul en SF35 af en bouwt op verzoek het centrale maximumscenario met de afgeleide collegegeld- en reisproductnormen.
+- `apps/duo-aanvullende-beurs/app.json`: borgt de publieke doelroute van de aanvullende-beurskoppeling.
 - `apps/_duo_simple/ProjectedDebtMortgageImpact.tsx`: toont de optionele hypotheekimpact na een expliciete gebruikersactie.
 - `apps/_duo_simple/projected-debt-mortgage-impact.ts`: vertaalt de eindschuld via de centrale DUO- en hypotheekfuncties naar een indicatie.
 - `src/lib/duo/studeren-stoppen.ts`: component-, diploma-, rente- en aflossimulatie, inclusief optioneel doorstuderen zonder diploma.

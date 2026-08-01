@@ -1,5 +1,6 @@
 import {
   getAvailableDuoRateYears,
+  getDuoStudentFinanceAmounts,
   getDuoStudentFinanceAmountsForDate,
 } from "@/lib/financial-constants";
 import {
@@ -41,6 +42,8 @@ export type SimpleDuoMonthlyLimits = Readonly<{
   regularTuitionCredit: number;
   annualStatutoryTuitionFee: number;
   monthlyBasisbeurs: number;
+  monthlyBasisbeursLivingAtHome: number;
+  monthlyBasisbeursLivingAway: number;
   monthlyAanvullendeBeurs: number;
   monthlyReisproduct: number;
   totalExcludingTuitionCredit: number;
@@ -109,6 +112,34 @@ function formatMaximum(value: number) {
   }).format(value);
 }
 
+function monthRange(from: string, to: string) {
+  const [fromYear, fromMonth] = from.split("-").map(Number);
+  const [toYear, toMonth] = to.split("-").map(Number);
+  const months: string[] = [];
+  let year = fromYear;
+  let month = fromMonth;
+
+  while (year < toYear || (year === toYear && month <= toMonth)) {
+    months.push(`${year}-${String(month).padStart(2, "0")}`);
+    month += 1;
+    if (month === 13) {
+      year += 1;
+      month = 1;
+    }
+  }
+
+  return months;
+}
+
+export function getSimpleDuoSupportedCalculationMonths() {
+  const amounts = getDuoStudentFinanceAmounts();
+  const months = amounts.periods
+    .filter((period) => period.educationTrack === "hbo-university")
+    .flatMap((period) => monthRange(period.effectiveFrom.slice(0, 7), period.effectiveTo.slice(0, 7)));
+
+  return Object.freeze([...new Set(months)].sort());
+}
+
 export function getSimpleDuoMonthlyLimits(
   calculationMonth: string,
 ): SimpleDuoMonthlyLimits | null {
@@ -122,6 +153,8 @@ export function getSimpleDuoMonthlyLimits(
       educationTrack: "hbo-university",
     });
     const residenceAmounts = Object.values(amounts.amountsByResidence);
+    const livingAtHome = amounts.amountsByResidence["living-at-home"];
+    const livingAway = amounts.amountsByResidence["living-away"];
 
     return Object.freeze({
       monthlyLoan: amounts.loanPhaseRegularLoanMax,
@@ -131,6 +164,8 @@ export function getSimpleDuoMonthlyLimits(
       monthlyBasisbeurs: Math.max(
         ...residenceAmounts.map((residence) => residence.basicGrantMax),
       ),
+      monthlyBasisbeursLivingAtHome: livingAtHome.basicGrantMax,
+      monthlyBasisbeursLivingAway: livingAway.basicGrantMax,
       monthlyAanvullendeBeurs: Math.max(
         ...residenceAmounts.map((residence) => residence.additionalGrantMax),
       ),
@@ -146,6 +181,21 @@ export function getSimpleDuoMonthlyLimits(
   } catch {
     return null;
   }
+}
+
+export function calculateAvailableSimpleDuoMonthlyLoan(
+  values: Pick<SimpleDuoValues, "monthlyBasisbeurs" | "monthlyAanvullendeBeurs">,
+  limits: SimpleDuoMonthlyLimits,
+) {
+  const usedGrantSpace =
+    (parseMoney(values.monthlyBasisbeurs) ?? 0) +
+    (parseMoney(values.monthlyAanvullendeBeurs) ?? 0);
+  const available = Math.min(
+    limits.monthlyLoan,
+    Math.max(limits.totalExcludingTuitionCredit - usedGrantSpace, 0),
+  );
+
+  return Math.round(available * 100) / 100;
 }
 
 function validateMonthlyMaximum(
@@ -327,8 +377,12 @@ export function validateSimpleDuoValues(mode: SimpleDuoToolMode, values: SimpleD
         !errors.monthlyLoan &&
         totalExcludingTuitionCredit > limits.totalExcludingTuitionCredit
       ) {
+        const availableMonthlyLoan = calculateAvailableSimpleDuoMonthlyLoan(
+          values,
+          limits,
+        );
         errors.monthlyLoan =
-          `Lening, basisbeurs en aanvullende beurs zijn samen maximaal ${formatMaximum(limits.totalExcludingTuitionCredit)} per maand.`;
+          `Lening, basisbeurs en aanvullende beurs zijn samen maximaal ${formatMaximum(limits.totalExcludingTuitionCredit)} per maand. Met deze beursbedragen kun je maximaal ${formatMaximum(availableMonthlyLoan)} per maand lenen.`;
       }
     }
   }

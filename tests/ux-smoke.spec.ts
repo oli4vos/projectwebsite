@@ -1202,7 +1202,7 @@ test("maximaal lenen zonder diploma gebruikt centrale bedragen en hele maanden",
 
   await expect(page.locator("#monthsUntilDiploma")).toHaveAttribute("step", "1");
   await expect(page.locator("#monthlyLoan")).toHaveAttribute("step", "0.01");
-  await page.locator("#calculationMonth").fill("2026-08");
+  await page.locator("#calculationMonthSlider").fill("7");
   await page
     .getByRole("button", {
       name: "Wat als ik maximaal leen en geen diploma haal?",
@@ -1277,14 +1277,21 @@ test("DUO-maandbedragen gebruiken centrale maxima met toelichting rechts", async
   }
   await expectLimitedField(
     "monthlyLoan",
-    "1213.95",
-    /Max\. €\s*1\.213,95 per maand/,
+    "1083.74",
+    /Beschikbaar: €\s*1\.083,74 per maand/,
   );
 
   const advanced = page.locator("details").filter({
     hasText: "Andere studiebedragen toevoegen",
   });
-  await advanced.locator("summary").click();
+  await advanced.locator(":scope > summary").click();
+  await expect(
+    advanced.getByRole("button", { name: /Uitwonend.*€\s*324,52/ }),
+  ).toBeVisible();
+  await advanced.getByText("Benieuwd of je recht hebt op aanvullende beurs?").click();
+  await expect(
+    advanced.getByRole("link", { name: "Bereken mijn aanvullende beurs" }),
+  ).toHaveAttribute("href", "/apps/duo-aanvullende-beurs");
   await expectLimitedField(
     "monthlyCollegegeldkrediet",
     "216.75",
@@ -1310,7 +1317,7 @@ test("DUO-maandbedragen gebruiken centrale maxima met toelichting rechts", async
     await page.getByRole("button", { name: "Vorige" }).click();
     await page.getByRole("button", { name: "Vorige" }).click();
   }
-  await page.locator("#calculationMonth").fill("2026-09");
+  await page.locator("#calculationMonthSlider").fill("8");
   if (isMobile) {
     await page.getByRole("button", { name: "Volgende veld" }).click();
     await page.getByRole("button", { name: "Volgende veld" }).click();

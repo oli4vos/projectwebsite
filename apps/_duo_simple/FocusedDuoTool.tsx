@@ -10,7 +10,10 @@ import {
   ExampleValuesNotice,
   ResultContextNotice,
 } from "@/components/tool/CalculationContextNotice";
-import { ToolActionButton } from "@/components/tool/ToolActionButton";
+import {
+  ToolActionButton,
+  ToolActionLinkButton,
+} from "@/components/tool/ToolActionButton";
 import { ToolNextSteps } from "@/components/tool/ToolNextSteps";
 import { useMobileFieldFlow } from "@/hooks/useMobileFieldFlow";
 import { useSubmittedCalculation } from "@/hooks/useSubmittedCalculation";
@@ -18,10 +21,12 @@ import { formatDuoRateYearLabel, getAvailableDuoRateYears } from "@/lib/financia
 import { getToolNextSteps } from "@/lib/tool-journeys";
 import { downloadStudyStopPdfReport } from "../duo-doorlenen-of-stoppen/report";
 import {
+  calculateAvailableSimpleDuoMonthlyLoan,
   createSimpleDuoView,
   defaultSimpleDuoValues,
   emptySimpleDuoValues,
   getSimpleDuoMonthlyLimits,
+  getSimpleDuoSupportedCalculationMonths,
   maxBorrowingWithoutDiplomaValues,
   type SimpleDuoMonthlyLimits,
   type SimpleDuoOutcomeKey,
@@ -128,6 +133,17 @@ function formatCurrency(value: number, maximumFractionDigits = 0) {
   }).format(value);
 }
 
+function formatCalculationMonth(value: string, format: "long" | "short" = "long") {
+  const [year, month] = value.split("-").map(Number);
+  if (!Number.isInteger(year) || !Number.isInteger(month)) return value;
+
+  return new Intl.DateTimeFormat("nl-NL", {
+    month: format,
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(Date.UTC(year, month - 1, 1)));
+}
+
 function Field({
   id,
   label,
@@ -159,12 +175,12 @@ function Field({
 }) {
   return (
     <label className={`grid gap-2 ${className ?? ""}`.trim()} htmlFor={String(id)}>
-      <span className="grid grid-cols-[minmax(0,1fr)_minmax(0,auto)] items-start gap-3">
+      <span className="grid items-start gap-1 sm:grid-cols-[minmax(0,1fr)_minmax(0,auto)] sm:gap-3">
         <span className="min-w-0 text-[12px] font-medium uppercase tracking-[0.04em] text-[var(--muted)]">
           {label}
         </span>
         {hint ? (
-          <span className="min-w-0 max-w-56 text-right text-[11px] leading-snug text-[var(--soft)]">
+          <span className="min-w-0 text-left text-[11px] leading-snug text-[var(--soft)] sm:max-w-56 sm:text-right">
             {hint}
           </span>
         ) : null}
@@ -251,6 +267,169 @@ function MonthlyLoanSliderField({
           aria-label="Lening per maand slider"
         />
       </label>
+    </div>
+  );
+}
+
+function CalculationMonthSliderField({
+  value,
+  error,
+  months,
+  onChange,
+  className,
+}: {
+  value: string;
+  error?: string;
+  months: readonly string[];
+  onChange: (value: string) => void;
+  className?: string;
+}) {
+  const selectedIndex = months.indexOf(value);
+  const safeIndex = selectedIndex >= 0 ? selectedIndex : 0;
+
+  return (
+    <div className={`grid gap-3 ${className ?? ""}`.trim()}>
+      <div className="flex items-end justify-between gap-4">
+        <label
+          className="text-[12px] font-medium uppercase tracking-[0.04em] text-[var(--muted)]"
+          htmlFor="calculationMonthSlider"
+        >
+          Berekeningsmaand
+        </label>
+        <output
+          htmlFor="calculationMonthSlider"
+          className="font-mono text-[14px] font-medium tabular-nums text-[var(--ink)]"
+        >
+          {selectedIndex >= 0 ? formatCalculationMonth(value) : "Kies een maand"}
+        </output>
+      </div>
+      <div className="surface-subtle px-4 py-3">
+        <input
+          id="calculationMonthSlider"
+          type="range"
+          min="0"
+          max={Math.max(months.length - 1, 0)}
+          step="1"
+          value={safeIndex}
+          disabled={months.length === 0}
+          onChange={(event) => onChange(months[Number(event.target.value)] ?? value)}
+          aria-invalid={error ? "true" : "false"}
+          aria-describedby={error ? "calculationMonth-error" : "calculationMonth-hint"}
+          className="ring-focus h-10 w-full accent-[var(--accent)]"
+        />
+        <div
+          id="calculationMonth-hint"
+          className="flex justify-between gap-3 text-[11px] text-[var(--soft)]"
+        >
+          <span>{months[0] ? formatCalculationMonth(months[0], "short") : ""}</span>
+          <span>{months.at(-1) ? formatCalculationMonth(months.at(-1)!, "short") : ""}</span>
+        </div>
+      </div>
+      <div id="calculationMonth-error">
+        <FieldError message={error} />
+      </div>
+    </div>
+  );
+}
+
+function BasisGrantReference({
+  limits,
+  onSelect,
+}: {
+  limits: SimpleDuoMonthlyLimits | null;
+  onSelect: (value: number) => void;
+}) {
+  return (
+    <div className="surface-subtle grid gap-3 p-4">
+      <div>
+        <div className="text-[12px] font-medium text-[var(--ink)]">Basisbeurs overnemen</div>
+        <p className="mt-1 text-[12px] leading-[1.55] text-[var(--soft)]">
+          Kies het bedrag dat past bij je woonsituatie in de geselecteerde maand.
+        </p>
+      </div>
+      {limits ? (
+        <div className="grid grid-cols-2 gap-2">
+          <ToolActionButton
+            type="button"
+            variant="secondary"
+            className="min-w-0 flex-col gap-0.5 px-2"
+            onClick={() => onSelect(limits.monthlyBasisbeursLivingAtHome)}
+          >
+            <span className="text-[11px] text-[var(--soft)]">Thuiswonend</span>
+            <span className="font-mono tabular-nums">
+              {formatCurrency(limits.monthlyBasisbeursLivingAtHome, 2)}
+            </span>
+          </ToolActionButton>
+          <ToolActionButton
+            type="button"
+            variant="secondary"
+            className="min-w-0 flex-col gap-0.5 px-2"
+            onClick={() => onSelect(limits.monthlyBasisbeursLivingAway)}
+          >
+            <span className="text-[11px] text-[var(--soft)]">Uitwonend</span>
+            <span className="font-mono tabular-nums">
+              {formatCurrency(limits.monthlyBasisbeursLivingAway, 2)}
+            </span>
+          </ToolActionButton>
+        </div>
+      ) : (
+        <p className="text-[12px] text-[var(--soft)]">Kies eerst een ondersteunde berekeningsmaand.</p>
+      )}
+    </div>
+  );
+}
+
+function AdditionalGrantHelp() {
+  return (
+    <details className="surface-subtle group p-4">
+      <summary className="flex cursor-pointer list-none items-center gap-2 text-[12px] font-medium text-[var(--ink)]">
+        <span
+          aria-hidden="true"
+          className="inline-flex size-6 shrink-0 items-center justify-center rounded-full border border-[var(--accent-line)] font-mono text-[12px] text-[var(--accent)]"
+        >
+          i
+        </span>
+        Benieuwd of je recht hebt op aanvullende beurs?
+      </summary>
+      <div className="mt-3 space-y-3 border-t border-[var(--line)] pt-3">
+        <p className="text-[12px] leading-[1.6] text-[var(--soft)]">
+          Beantwoord alleen de vragen die nodig zijn om je aanvullende beurs voor 2026 te schatten. Neem het maandbedrag daarna hier over.
+        </p>
+        <ToolActionLinkButton href="/apps/duo-aanvullende-beurs" variant="secondary">
+          Bereken mijn aanvullende beurs
+        </ToolActionLinkButton>
+      </div>
+    </details>
+  );
+}
+
+function AvailableLoanReference({
+  available,
+  totalMaximum,
+  onSelect,
+}: {
+  available: number;
+  totalMaximum: number;
+  onSelect: (value: number) => void;
+}) {
+  return (
+    <div className="surface-subtle flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <div className="text-[12px] font-medium text-[var(--ink)]">
+          Maximale lening met deze beursbedragen
+        </div>
+        <p className="mt-1 text-[12px] leading-[1.55] text-[var(--soft)]">
+          {formatCurrency(available, 2)} per maand binnen het gezamenlijke maximum van {formatCurrency(totalMaximum, 2)}.
+        </p>
+      </div>
+      <ToolActionButton
+        type="button"
+        variant="secondary"
+        className="shrink-0"
+        onClick={() => onSelect(available)}
+      >
+        Neem {formatCurrency(available, 2)} over
+      </ToolActionButton>
     </div>
   );
 }
@@ -418,6 +597,16 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
     () => getSimpleDuoMonthlyLimits(formValues.calculationMonth),
     [formValues.calculationMonth],
   );
+  const supportedCalculationMonths = useMemo(
+    () => getSimpleDuoSupportedCalculationMonths(),
+    [],
+  );
+  const availableMonthlyLoan = useMemo(
+    () => monthlyLimits
+      ? calculateAvailableSimpleDuoMonthlyLoan(formValues, monthlyLimits)
+      : null,
+    [formValues, monthlyLimits],
+  );
 
   function updateField<K extends keyof SimpleDuoValues>(field: K, value: SimpleDuoValues[K]) {
     setFormValues((current) => ({ ...current, [field]: value }));
@@ -465,6 +654,19 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
   function renderField(field: keyof SimpleDuoValues, useMobileClass = true) {
     const fieldClassName = useMobileClass ? mobileFlow.getFieldClassName(field) : undefined;
 
+    if (field === "calculationMonth" && mode === "start-borrowing") {
+      return (
+        <CalculationMonthSliderField
+          key={field}
+          value={formValues[field]}
+          error={currentView.isValid ? undefined : currentView.errors[field]}
+          months={supportedCalculationMonths}
+          onChange={(value) => updateField(field, value)}
+          className={fieldClassName}
+        />
+      );
+    }
+
     if (field === "duoRateYear") {
       return (
         <Select
@@ -494,6 +696,83 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
           onEnter={mobileFlow.handleEnterAdvance(field, false)}
           className={fieldClassName}
         />
+      );
+    }
+
+    if (field === "monthlyLoan" && mode === "start-borrowing") {
+      return (
+        <div key={field} className={`grid gap-3 ${fieldClassName ?? ""}`.trim()}>
+          <Field
+            id={field}
+            label={fieldLabel(field)}
+            value={formValues[field]}
+            error={currentView.isValid ? undefined : currentView.errors[field]}
+            hint={availableMonthlyLoan !== null
+              ? `Beschikbaar: ${formatCurrency(availableMonthlyLoan, 2)} per maand`
+              : fieldHint(field, monthlyLimits)}
+            prefix="€"
+            max={availableMonthlyLoan ?? fieldMaximum(field, monthlyLimits)}
+            step={fieldStep(field)}
+            onChange={(value) => updateField(field, value)}
+            onEnter={mobileFlow.handleEnterAdvance(field, false)}
+          />
+          {monthlyLimits && availableMonthlyLoan !== null ? (
+            <AvailableLoanReference
+              available={availableMonthlyLoan}
+              totalMaximum={monthlyLimits.totalExcludingTuitionCredit}
+              onSelect={(value) => updateField(field, String(value))}
+            />
+          ) : null}
+        </div>
+      );
+    }
+
+    if (field === "monthlyBasisbeurs" && mode === "start-borrowing") {
+      return (
+        <div
+          key={field}
+          className="grid gap-3 md:grid-cols-[minmax(0,1fr)_minmax(15rem,0.9fr)] md:items-start"
+        >
+          <Field
+            id={field}
+            label={fieldLabel(field)}
+            value={formValues[field]}
+            error={currentView.isValid ? undefined : currentView.errors[field]}
+            hint={fieldHint(field, monthlyLimits)}
+            prefix="€"
+            max={fieldMaximum(field, monthlyLimits)}
+            step={fieldStep(field)}
+            onChange={(value) => updateField(field, value)}
+            onEnter={mobileFlow.handleEnterAdvance(field, false)}
+          />
+          <BasisGrantReference
+            limits={monthlyLimits}
+            onSelect={(value) => updateField(field, String(value))}
+          />
+        </div>
+      );
+    }
+
+    if (field === "monthlyAanvullendeBeurs" && mode === "start-borrowing") {
+      return (
+        <div
+          key={field}
+          className="grid gap-3 md:grid-cols-[minmax(0,1fr)_minmax(15rem,0.9fr)] md:items-start"
+        >
+          <Field
+            id={field}
+            label={fieldLabel(field)}
+            value={formValues[field]}
+            error={currentView.isValid ? undefined : currentView.errors[field]}
+            hint={fieldHint(field, monthlyLimits)}
+            prefix="€"
+            max={fieldMaximum(field, monthlyLimits)}
+            step={fieldStep(field)}
+            onChange={(value) => updateField(field, value)}
+            onEnter={mobileFlow.handleEnterAdvance(field, false)}
+          />
+          <AdditionalGrantHelp />
+        </div>
       );
     }
 

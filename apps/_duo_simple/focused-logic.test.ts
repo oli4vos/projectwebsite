@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
+  calculateAvailableSimpleDuoMonthlyLoan,
   createSimpleDuoView,
   defaultSimpleDuoValues,
   getSimpleDuoMonthlyLimits,
+  getSimpleDuoSupportedCalculationMonths,
   maxBorrowingWithoutDiplomaValues,
   validateSimpleDuoValues,
   type SimpleDuoValues,
@@ -28,6 +30,8 @@ describe("centrale DUO-maandmaxima in de eenvoudige tools", () => {
       regularTuitionCredit: 216.75,
       annualStatutoryTuitionFee: 2_601,
       monthlyBasisbeurs: 324.52,
+      monthlyBasisbeursLivingAtHome: 130.21,
+      monthlyBasisbeursLivingAway: 324.52,
       monthlyAanvullendeBeurs: 491.08,
       monthlyReisproduct: 110.95,
       totalExcludingTuitionCredit: 1_213.95,
@@ -39,6 +43,50 @@ describe("centrale DUO-maandmaxima in de eenvoudige tools", () => {
       annualStatutoryTuitionFee: 2_694,
       periodId: "higher-education-2026-sep-dec",
     });
+  });
+
+  it("leidt ondersteunde berekeningsmaanden af uit de centrale hbo-wo-perioden", () => {
+    const months = getSimpleDuoSupportedCalculationMonths();
+
+    expect(months).toEqual([
+      "2026-01",
+      "2026-02",
+      "2026-03",
+      "2026-04",
+      "2026-05",
+      "2026-06",
+      "2026-07",
+      "2026-08",
+      "2026-09",
+      "2026-10",
+      "2026-11",
+      "2026-12",
+    ]);
+    expect(Object.isFrozen(months)).toBe(true);
+  });
+
+  it("berekent de resterende leenruimte uit het centrale maandtotaal", () => {
+    const limits = getSimpleDuoMonthlyLimits("2026-08");
+    expect(limits).not.toBeNull();
+
+    expect(
+      calculateAvailableSimpleDuoMonthlyLoan(
+        {
+          monthlyBasisbeurs: "324,52",
+          monthlyAanvullendeBeurs: "491,08",
+        },
+        limits!,
+      ),
+    ).toBe(398.35);
+    expect(
+      calculateAvailableSimpleDuoMonthlyLoan(
+        {
+          monthlyBasisbeurs: "0",
+          monthlyAanvullendeBeurs: "0",
+        },
+        limits!,
+      ),
+    ).toBe(1_213.95);
   });
 
   it.each([
@@ -75,6 +123,7 @@ describe("centrale DUO-maandmaxima in de eenvoudige tools", () => {
     });
     expect(combinedErrors.monthlyLoan).toContain("samen maximaal");
     expect(combinedErrors.monthlyLoan).toContain("€ 1.213,95");
+    expect(combinedErrors.monthlyLoan).toContain("€ 398,35");
   });
 
   it("begrenst geen opgebouwde schuldsaldi en blokkeert maanden zonder norm", () => {
