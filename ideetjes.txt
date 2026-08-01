@@ -32,9 +32,68 @@
 - Zet alles op github op private wat nu niet gebruikt wordt voor de website
 - linken naar de huidige hypotheekrente voor 10 jaar annuitair gemiddeld genomen bij de grootbanken, zodat dit naast het in te vullen veld staat als indicatie en een bronverwijzing
 - meer leenruimte slider door salarisverhoging, handig voor je salarisonderhandeling, soms kan een klein verschil je net in een gunstigere klassen plaatsen
-
+- goed structureren welke data als brondata wordt gebruikt en borgen dat dit makkelijk vernieuwd kan worden als er nieuwe cijfers beschikbaar zijn
+- koppeling maken binnen de hypotheekcalculator dat als iemand zijn duo maandbedrag niet weet die naar de calculator geleid kan worden, altijd belangrijk om te vermelden dat de bank rekent met het wettelijke maandbedrag
+- toeslagen scan invoeren, hiermee mensen attenderen op mogelijke toeslagrechten
+- actuele leengrenzen altijd meenemen en de tools dus ook fysiek beperken, werk ook met sliders, naast invulvelden
+- nog eens door heel de site gaan en checken of alles clean is, irrelevante zaken voor de gebruikers weg laten, 
+- bij hypotheek meenemen dat als de woningwaarde de lenruimte beperkt je gewoon goed kan lenen obv salris en schuld etc om het huis te kopen.
 buiten doelgroep:
 - impact private lease op hypotheek
+- bij duo schuld een grafiek en tabel als uitvouwbaar onderdeel opnemen per jaar
+- recht op aanvullende beurs scan meenemen als nieuwe tool.
+- v2 voor nu even links laten liggen en niet live zetten. design en optimalistatie puur in versie 1 doen.
+- account aanmaken waarin mensen hun duo overzicht kunne uploaden, vervolgens gaat dit door de tools en heeft iemand een overzicht.
+- overal de horizontale uitlijning testen en waar nodig goed zetten.
+- centrale laag doorvoeren waarin alle maximum bedragen bij DUO staan, dus ook bijvoorbeeld als je een X beurs hebt wat dit doet met je max lening etc.
+- centraal bijhouden welke bronnen jaarlijks ververst moeten worden en een instructie schrijven hoe dit voor de gehele website makkelijk doorgevoerd kan worden.
+- Knop maken wat als ik altijd maximaal ga lenen en niet afstudeer.
+- maximale hypotoheek samenvatting uitvouwen met een iets uitgebreidere korte samenvatting in blokken waarbij ook geneomd wordt met welke rente er X bedrag meer geleend zou kunnen worden.
+
+
+Wat wordt mijn studieschuld als ik ga lenen?
+- in het vak ernaast de uitwonende beurs en basisbeurs opsplitsen zodat gebruikers dit kunnen overnemen.
+- bij aanvullende beurs een i'tje plaatsen met daarin de opmerking of iemand beneiuwd is naar of hij of zij recht heeft op een aanvullende beurs, vervolgens wordt er doorgelinkt naar een subtool van de toelslagen scan die puur uitvraagt wat er nodig is om de aanvullende beurs te bereken.
+- als deze melding komt: 'Lening, basisbeurs en aanvullende beurs zijn samen maximaal € 1.213,95 per maand.' wil ik dat er automatisch wordt bepaald wat de maximale leenruimte per maand is zodat dit overgenomen kan worden.
+- berekningsmaand moet ene slider opnemen waarin jaar en maand geselcteerd kan worden.
+
+
+Toeslagenscan:
+TOESLAGENSCAN – TOEKOMSTIGE AFRONDING
+
+De huidige Toeslagenscan is nog niet het gewenste eindproduct. Wanneer een gebruiker alle normale gegevens invult, moet de tool een concrete schatting geven en niet onnodig blijven melden dat meer gegevens nodig zijn.
+
+Bij hervatting uitvoeren:
+
+- Volledige officiële 2026-berekening toevoegen voor:
+  - huurtoeslag;
+  - kindgebonden budget;
+  - kinderopvangtoeslag.
+- Zorgtoeslagberekening behouden en waar nodig verbeteren.
+- Alle noodzakelijke officiële brongegevens centraal opnemen:
+  - bedragen;
+  - grenzen;
+  - staffels;
+  - percentages;
+  - leeftijdscategorieën;
+  - afbouwformules;
+  - huurparameters;
+  - opvangpercentages;
+  - afrondingsregels.
+- De berekening moet deze brondata rechtstreeks gebruiken.
+- Geen normale gebruiker doorsturen naar primaire bronnen om zelf waarden of berekeningen op te zoeken.
+- Primaire overheidsbronnen alleen tonen voor:
+  - aanvullende uitleg;
+  - bronverantwoording;
+  - officiële verificatie;
+  - uiteindelijke aanvraag.
+- Bij volledig ingevulde standaardsituaties altijd een bruikbare maand- en jaarschatting geven.
+- Alleen bij echte uitzonderingssituaties of ontbrekende essentiële invoer een special-case/incomplete-status tonen.
+- De tool positioneren als digitale toeslagenadviseur, niet alleen als signaleringsscan.
+- overzicht van alle rekenlogica zodat ik kan toetsen of dit klopt.
+- test en corrigeren of alle sliders steeds 1 omhoog of omlaag gaan, bijvoorbeeld wanneer een maand wordt bijgeplust.s
+
+Voor nu: Toeslagenscan pauzeren en later vanuit deze uitgangspunten hervatten.
 
 
 Niet aan codex vragen maar gericht uitzoeken:

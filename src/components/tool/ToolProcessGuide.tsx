@@ -15,9 +15,15 @@ function FullProcessOverview({ graph }: { graph: ToolProcessGraph }) {
   const nodesById = new Map(graph.nodes.map((node) => [node.id, node]));
 
   return (
-    <details className="mt-6 border-t border-[var(--hair)] pt-5">
-      <summary className="ring-focus cursor-pointer text-[14px] font-semibold text-[var(--ink)]">
-        Bekijk het volledige stroomschema
+    <details className="group/overview mt-6 border-t border-[var(--hair)] pt-5">
+      <summary className="ring-focus flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 rounded-xl px-3 py-2 text-[14px] font-semibold text-[var(--ink)] transition hover:bg-white [&::-webkit-details-marker]:hidden">
+        <span>Bekijk het volledige stroomschema</span>
+        <span
+          aria-hidden="true"
+          className="flex size-8 shrink-0 items-center justify-center rounded-full bg-white text-[var(--muted)] transition-transform duration-300 group-open/overview:rotate-180"
+        >
+          <span className="block size-2.5 -translate-y-0.5 rotate-45 border-b-2 border-r-2 border-current" />
+        </span>
       </summary>
       <ol className="mt-5 grid gap-0" aria-label={graph.title}>
         {graph.nodes.map((node, index) => {
@@ -33,7 +39,7 @@ function FullProcessOverview({ graph }: { graph: ToolProcessGraph }) {
               <span
                 className={`relative z-10 flex size-8 items-center justify-center border text-[12px] font-semibold ${
                   node.kind === "decision"
-                    ? "rotate-45 border-[var(--accent)] bg-[var(--accent-soft)]"
+                    ? "rotate-45 rounded-lg border-[var(--accent)] bg-[var(--accent-soft)]"
                     : "rounded-full border-[var(--hair-2)] bg-white"
                 }`}
                 aria-hidden="true"
@@ -49,7 +55,7 @@ function FullProcessOverview({ graph }: { graph: ToolProcessGraph }) {
                     {outgoing.map((edge) => (
                       <li
                         key={`${edge.from}-${edge.label ?? "volgende"}-${edge.to}`}
-                        className="rounded-md border border-[var(--hair)] bg-[var(--paper-soft)] px-2.5 py-1"
+                        className="rounded-full border border-[var(--hair)] bg-[var(--paper-soft)] px-3 py-1"
                       >
                         {edge.label ? `${edge.label}: ` : "Daarna: "}
                         {nodesById.get(edge.to)?.label ?? edge.to}
@@ -94,11 +100,16 @@ function GuidedGraph({ graph }: { graph: ToolProcessGraph }) {
   return (
     <div>
       <div className="mb-4 flex items-center justify-between gap-4 text-[12px] text-[var(--muted)]">
-        <span>Stap {history.length + 1}</span>
+        <span className="rounded-full bg-[var(--accent-soft)] px-3 py-1 font-semibold text-[var(--ink)]">
+          Stap {history.length + 1}
+        </span>
         <span>{currentNode.kind === "decision" ? "Keuzemoment" : "Processtap"}</span>
       </div>
 
-      <div className="min-h-48 rounded-lg border border-[var(--hair)] bg-white p-5 sm:p-6" aria-live="polite">
+      <div
+        className="rounded-[1.25rem] border border-[var(--hair)] bg-white p-5 shadow-[var(--shadow-soft)] sm:p-6"
+        aria-live="polite"
+      >
         <p className="text-[11px] font-semibold uppercase tracking-[0.05em] text-[var(--muted)]">
           {currentNode.kind === "decision" ? "Wat geldt voor jou?" : "Dit gebeurt er"}
         </p>
@@ -106,12 +117,12 @@ function GuidedGraph({ graph }: { graph: ToolProcessGraph }) {
           {currentNode.label}
         </p>
 
-        <div className="mt-6 flex flex-wrap gap-2">
+        <div className="mt-5 flex flex-wrap gap-2.5">
           {outgoing.length === 0 ? (
             <button
               type="button"
               onClick={restart}
-              className="ring-focus min-h-11 rounded-md bg-[var(--deep)] px-4 py-2 text-[13px] font-semibold text-[var(--button-text-on-dark)]"
+              className="ring-focus min-h-11 rounded-xl bg-[var(--deep)] px-4 py-2 text-[13px] font-semibold text-[var(--button-text-on-dark)] transition active:translate-y-px"
             >
               Opnieuw doorlopen
             </button>
@@ -119,7 +130,7 @@ function GuidedGraph({ graph }: { graph: ToolProcessGraph }) {
             <button
               type="button"
               onClick={() => advance(outgoing[0])}
-              className="ring-focus min-h-11 rounded-md bg-[var(--deep)] px-4 py-2 text-[13px] font-semibold text-[var(--button-text-on-dark)]"
+              className="ring-focus min-h-11 rounded-xl bg-[var(--deep)] px-4 py-2 text-[13px] font-semibold text-[var(--button-text-on-dark)] transition active:translate-y-px"
             >
               Volgende →
             </button>
@@ -129,7 +140,7 @@ function GuidedGraph({ graph }: { graph: ToolProcessGraph }) {
                 key={`${edge.label ?? "volgende"}-${edge.to}`}
                 type="button"
                 onClick={() => advance(edge)}
-                className="ring-focus min-h-11 rounded-md border border-[var(--hair-2)] bg-white px-4 py-2 text-left text-[13px] font-semibold text-[var(--ink)] transition hover:border-[var(--accent)] hover:bg-[var(--accent-soft)]"
+                className="ring-focus min-h-11 rounded-xl border border-[var(--hair-2)] bg-white px-4 py-2 text-left text-[13px] font-semibold text-[var(--ink)] transition hover:border-[var(--accent)] hover:bg-[var(--accent-soft)] active:translate-y-px"
               >
                 {edge.label ?? graph.nodes.find((node) => node.id === edge.to)?.label ?? "Volgende"} →
               </button>
@@ -139,7 +150,7 @@ function GuidedGraph({ graph }: { graph: ToolProcessGraph }) {
             <button
               type="button"
               onClick={goBack}
-              className="ring-focus min-h-11 rounded-md px-3 py-2 text-[13px] font-medium text-[var(--muted)] hover:text-[var(--ink)]"
+              className="ring-focus min-h-11 rounded-xl px-3 py-2 text-[13px] font-medium text-[var(--muted)] transition hover:bg-[var(--paper-soft)] hover:text-[var(--ink)] active:translate-y-px"
             >
               ← Vorige
             </button>
@@ -158,8 +169,8 @@ export function ToolProcessGuide({ process }: ToolProcessGuideProps) {
     process.graphs.find((graph) => graph.id === activeGraphId) ?? process.graphs[0];
 
   return (
-    <details className="group border-y border-[var(--hair)] bg-white/45">
-      <summary className="ring-focus flex min-h-20 cursor-pointer list-none items-center justify-between gap-5 py-5 [&::-webkit-details-marker]:hidden">
+    <details className="group overflow-hidden rounded-[1.5rem] border border-[var(--hair)] bg-white/75 shadow-paper">
+      <summary className="flex min-h-20 cursor-pointer list-none items-center justify-between gap-5 px-5 py-5 transition hover:bg-white focus-visible:outline-none focus-visible:shadow-[inset_0_0_0_2px_var(--accent)] sm:px-6 [&::-webkit-details-marker]:hidden">
         <span>
           <span className="block text-[18px] font-semibold text-[var(--ink)]">
             Wil je weten hoe deze tool werkt?
@@ -170,14 +181,18 @@ export function ToolProcessGuide({ process }: ToolProcessGuideProps) {
         </span>
         <span
           aria-hidden="true"
-          className="flex size-9 shrink-0 items-center justify-center rounded-full border border-[var(--hair-2)] bg-white text-xl transition group-open:rotate-45"
+          className="flex size-10 shrink-0 items-center justify-center rounded-full border border-[var(--hair)] bg-[var(--paper-soft)] text-[var(--muted)] shadow-[var(--shadow-inner)] transition-transform duration-300 group-open:rotate-180"
         >
-          +
+          <span className="block size-3 -translate-y-0.5 rotate-45 border-b-2 border-r-2 border-current" />
         </span>
       </summary>
 
-      <div className="border-t border-[var(--hair)] py-6 sm:py-8">
-        <div className="grid gap-3 sm:grid-cols-3" role="tablist" aria-label="Procesweergave">
+      <div className="border-t border-[var(--hair)] bg-[var(--paper)]/55 px-5 py-6 sm:px-6 sm:py-7">
+        <div
+          className="grid gap-1.5 rounded-[1.125rem] bg-[var(--paper-soft)] p-1.5 sm:grid-cols-3"
+          role="tablist"
+          aria-label="Procesweergave"
+        >
           {process.graphs.map((graph) => {
             const selected = graph.id === activeGraph.id;
             return (
@@ -189,10 +204,10 @@ export function ToolProcessGuide({ process }: ToolProcessGuideProps) {
                 aria-controls={`tool-process-panel-${graph.id}`}
                 aria-selected={selected}
                 onClick={() => setActiveGraphId(graph.id)}
-                className={`ring-focus min-h-12 rounded-md border px-4 py-3 text-left text-[13px] font-semibold transition ${
+                className={`ring-focus min-h-12 rounded-xl border px-4 py-3 text-left text-[13px] font-semibold transition active:translate-y-px ${
                   selected
-                    ? "border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--ink)]"
-                    : "border-[var(--hair)] bg-white text-[var(--muted)] hover:text-[var(--ink)]"
+                    ? "border-[var(--accent-line)] bg-white text-[var(--ink)] shadow-[var(--shadow-soft)]"
+                    : "border-transparent bg-transparent text-[var(--muted)] hover:bg-white/65 hover:text-[var(--ink)]"
                 }`}
               >
                 {graph.title}
@@ -202,7 +217,7 @@ export function ToolProcessGuide({ process }: ToolProcessGuideProps) {
         </div>
 
         <div
-          className="mt-6"
+          className="mt-7"
           role="tabpanel"
           id={`tool-process-panel-${activeGraph.id}`}
           aria-labelledby={`tool-process-tab-${activeGraph.id}`}

@@ -10,7 +10,7 @@ Een tool valt in deze index wanneer het manifest onder `apps/<slug>/app.json` zo
 
 | Tool | Publieke route | Procesdocument | Laatst gecontroleerd | Procesplaten |
 | --- | --- | --- | --- | --- |
-| Maximale hypotheek | `/apps/artifact-hypotheek-wonen-maximale-hypotheek` | [PROCESS.md](../../apps/artifact-hypotheek-wonen-maximale-hypotheek/PROCESS.md) | 2026-07-31 | Gebruiker, Beslissingen, Berekening, Gegevensstroom |
+| Maximale hypotheek | `/apps/artifact-hypotheek-wonen-maximale-hypotheek` | [PROCESS.md](../../apps/artifact-hypotheek-wonen-maximale-hypotheek/PROCESS.md) | 2026-08-01 | Gebruiker, Beslissingen, Berekening, Gegevensstroom |
 | Aanvullende beurs berekenen | `/apps/duo-aanvullende-beurs` | [PROCESS.md](../../apps/duo-aanvullende-beurs/PROCESS.md) | 2026-07-31 | Gebruiker, Beslissingen, Berekening, Gegevensstroom |
 | Wat doet extra aflossen? | `/apps/duo-extra-aflossen` | [PROCESS.md](../../apps/duo-extra-aflossen/PROCESS.md) | 2026-07-31 | Gebruiker, Beslissingen, Berekening, Gegevensstroom |
 | Impact van mijn leenbedrag | `/apps/duo-leenbedrag-impact` | [PROCESS.md](../../apps/duo-leenbedrag-impact/PROCESS.md) | 2026-07-31 | Gebruiker, Beslissingen, Berekening, Gegevensstroom |

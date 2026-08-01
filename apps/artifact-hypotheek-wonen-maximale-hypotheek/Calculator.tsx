@@ -576,21 +576,28 @@ function CalculatorContent({
                     suffix="per maand"
                   />
                 )}
-                <div className="rounded-xl border border-[var(--hair)] bg-white px-4 py-3 text-[13px] leading-6 text-[var(--muted)]">
+                <div className="rounded-xl border border-[color:var(--neg)]/25 bg-[color:var(--neg)]/[0.04] px-4 py-3 text-[13px] leading-6 text-[var(--muted)]">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--neg)]">
+                    DUO-impact op hypotheekruimte
+                  </p>
                   <p>
                     Banken kijken bij studieschuld niet altijd naar het bedrag dat DUO nu
-                    incasseert. Bij draagkrachtverlaging, pauze of een nog niet gestarte
-                    aflosfase kan het wettelijke DUO-maandbedrag hoger zijn dan je actuele
-                    maandbedrag.
+                    incasseert. Het wettelijke DUO-maandbedrag kan voor de hypotheektoets dus
+                    hoger uitvallen dan je actuele DUO-incasso.
                   </p>
                   <ToolActionButton
                     type="button"
                     variant="secondary"
                     onClick={handleOpenDuoMonthlyPaymentTool}
+                    className="mt-3 border-[color:var(--neg)]/30 text-[var(--neg)] hover:border-[color:var(--neg)]/50 hover:bg-[color:var(--neg)]/[0.06]"
                   >
                     Weet je jouw wettelijke DUO-maandbedrag niet? Bereken het in ongeveer 1 minuut.
                   </ToolActionButton>
                 </div>
+                <p className="text-[13px] leading-6 text-[var(--neg)]">
+                  Dit wettelijke bedrag telt direct mee in de hypotheektoets en kan je
+                  leenruimte merkbaar verlagen.
+                </p>
                 {duoTransferMessage ? (
                   <p className="text-[13px] leading-6 text-[var(--ink-2)]" role="status">
                     {duoTransferMessage}
