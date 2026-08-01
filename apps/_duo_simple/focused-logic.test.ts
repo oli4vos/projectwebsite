@@ -4,6 +4,7 @@ import {
   createSimpleDuoView,
   defaultSimpleDuoValues,
   getSimpleDuoMonthlyLimits,
+  getSimpleDuoMonthlyLimitAdjustments,
   getSimpleDuoSupportedCalculationMonths,
   maxBorrowingWithoutDiplomaValues,
   validateSimpleDuoValues,
@@ -87,6 +88,25 @@ describe("centrale DUO-maandmaxima in de eenvoudige tools", () => {
         limits!,
       ),
     ).toBe(1_213.95);
+  });
+
+  it("stelt expliciete correcties voor zonder invoer stil te wijzigen", () => {
+    const limits = getSimpleDuoMonthlyLimits("2026-08");
+    expect(limits).not.toBeNull();
+    const values = {
+      ...valuesForAugust2026(),
+      monthlyLoan: "900",
+      monthlyBasisbeurs: "324,52",
+      monthlyAanvullendeBeurs: "491,08",
+      monthlyCollegegeldkrediet: "220",
+    };
+
+    expect(getSimpleDuoMonthlyLimitAdjustments(values, limits!)).toEqual([
+      { field: "monthlyLoan", maximum: 398.35 },
+      { field: "monthlyCollegegeldkrediet", maximum: 216.75 },
+    ]);
+    expect(values.monthlyLoan).toBe("900");
+    expect(values.monthlyCollegegeldkrediet).toBe("220");
   });
 
   it.each([

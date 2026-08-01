@@ -50,6 +50,16 @@ export type SimpleDuoMonthlyLimits = Readonly<{
   periodId: string;
 }>;
 
+export type SimpleDuoMonthlyLimitAdjustment = Readonly<{
+  field:
+    | "monthlyLoan"
+    | "monthlyCollegegeldkrediet"
+    | "monthlyBasisbeurs"
+    | "monthlyAanvullendeBeurs"
+    | "monthlyReisproduct";
+  maximum: number;
+}>;
+
 export type SimpleDuoView =
   | {
       isValid: false;
@@ -196,6 +206,41 @@ export function calculateAvailableSimpleDuoMonthlyLoan(
   );
 
   return Math.round(available * 100) / 100;
+}
+
+export function getSimpleDuoMonthlyLimitAdjustments(
+  values: SimpleDuoValues,
+  limits: SimpleDuoMonthlyLimits,
+) {
+  const maxima = [
+    {
+      field: "monthlyLoan" as const,
+      maximum: calculateAvailableSimpleDuoMonthlyLoan(values, limits),
+    },
+    {
+      field: "monthlyCollegegeldkrediet" as const,
+      maximum: limits.monthlyCollegegeldkrediet,
+    },
+    {
+      field: "monthlyBasisbeurs" as const,
+      maximum: limits.monthlyBasisbeurs,
+    },
+    {
+      field: "monthlyAanvullendeBeurs" as const,
+      maximum: limits.monthlyAanvullendeBeurs,
+    },
+    {
+      field: "monthlyReisproduct" as const,
+      maximum: limits.monthlyReisproduct,
+    },
+  ];
+
+  return Object.freeze(
+    maxima.filter(({ field, maximum }) => {
+      const value = parseMoney(values[field]);
+      return value !== undefined && value > maximum;
+    }),
+  ) as readonly SimpleDuoMonthlyLimitAdjustment[];
 }
 
 function validateMonthlyMaximum(

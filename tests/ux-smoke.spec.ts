@@ -1261,16 +1261,34 @@ test("DUO-maandbedragen gebruiken centrale maxima met toelichting rechts", async
     ]);
     expect(columns[0]).not.toBeNull();
     expect(columns[1]).not.toBeNull();
+    const labelBox = columns[0]!;
+    const hintBox = columns[1]!;
+    const horizontallySeparated = labelBox.x + labelBox.width <= hintBox.x + 1;
+    const verticallySeparated =
+      labelBox.y + labelBox.height <= hintBox.y + 1 ||
+      hintBox.y + hintBox.height <= labelBox.y + 1;
     expect(
-      columns[0]!.x + columns[0]!.width,
+      horizontallySeparated || verticallySeparated,
       `${inputId}: veldlabel overlapt de maximumtoelichting`,
-    ).toBeLessThanOrEqual(columns[1]!.x);
+    ).toBe(true);
   }
 
   await page.goto("/apps/duo-schuld-bij-starten-lenen", {
     waitUntil: "networkidle",
   });
   await page.getByRole("button", { name: "Voorbeeld invullen" }).click();
+  await expect(page.locator("#calculationMonthSlider")).toHaveAttribute(
+    "aria-valuetext",
+    "augustus 2026",
+  );
+  await expect(page.getByRole("button", { name: "Vorige maand" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Volgende maand" })).toBeVisible();
+  await expect(page.getByText("Normen in augustus 2026")).toBeVisible();
+  await expect(
+    page.getByText(
+      /Vanaf september 2026 verandert het collegegeldkrediet van €\s*216,75 naar €\s*224,50/,
+    ),
+  ).toBeVisible();
   if (isMobile) {
     await page.getByRole("button", { name: "Volgende veld" }).click();
     await page.getByRole("button", { name: "Volgende veld" }).click();
@@ -1327,6 +1345,25 @@ test("DUO-maandbedragen gebruiken centrale maxima met toelichting rechts", async
     "224.5",
     /Max\. €\s*224,50 per maand, €\s*2\.694 ÷ 12/,
   );
+
+  await page.locator("#monthlyCollegegeldkrediet").fill("224.5");
+  if (isMobile) {
+    await page.getByRole("button", { name: "Vorige" }).click();
+    await page.getByRole("button", { name: "Vorige" }).click();
+  }
+  await page.locator("#calculationMonthSlider").fill("7");
+  await expect(page.locator("#monthlyCollegegeldkrediet")).toHaveValue("224.5");
+  await page
+    .getByRole("button", {
+      name: /Pas collegegeldkrediet aan naar €\s*216,75/,
+    })
+    .click();
+  await expect(page.locator("#monthlyCollegegeldkrediet")).toHaveValue("216.75");
+  await page.locator("#calculationMonthSlider").fill("8");
+  if (isMobile) {
+    await page.getByRole("button", { name: "Volgende veld" }).click();
+    await page.getByRole("button", { name: "Volgende veld" }).click();
+  }
 
   await page.locator("#monthlyLoan").fill("1213.96");
   await expect(

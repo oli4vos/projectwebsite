@@ -4,7 +4,7 @@ title: Wat wordt mijn studieschuld?
 route: /apps/duo-schuld-bij-starten-lenen
 status: active-public
 lastReviewed: 2026-08-01
-sourceHash: sha256:956d2fdc36a60fb9f057f044bebd791307aeac03152e2b95b515b167d9ad8644
+sourceHash: sha256:93390174dc3627441b62884cf49aae4c840d10358e80a238bc70383392bce02a
 sources:
   - apps/duo-schuld-bij-starten-lenen/app.json
   - apps/duo-schuld-bij-starten-lenen/Calculator.tsx
@@ -37,8 +37,9 @@ sources:
 
 ```mermaid
 flowchart TD
-  A[Open Wat wordt mijn studieschuld] --> B[Kies een ondersteunde berekeningsmaand met de slider]
-  B --> C[Vul maanden tot diploma in]
+  A[Open Wat wordt mijn studieschuld] --> B[Kies een ondersteunde berekeningsmaand met de slider of maandknoppen]
+  B --> BA[Bekijk de centrale maandnormen en eventuele normovergang]
+  BA --> C[Vul maanden tot diploma in]
   C --> D[Vul lening per maand in]
   D --> E[Kies DUO-rentejaar]
   E --> EA{Maximum lenen zonder diploma direct doorrekenen?}
@@ -83,7 +84,7 @@ flowchart TD
   K --> M[Selecteer scenario doorstuderen tot diploma]
   L --> M
   M --> N{Lening en beurzen binnen het centrale maandmaximum?}
-  N -->|Nee| O[Bereken resterende leenruimte en bied overnemen aan]
+  N -->|Nee| O[Behoud invoer en bied een expliciete correctie naar de maandnorm aan]
   N -->|Ja| P[Ga verder met de scenario-engine]
   O --> P
 ```
@@ -149,6 +150,7 @@ Er is geen profielprefill, session storage of persistente gegevensoverdracht. De
 | --- | --- | --- | --- |
 | Eindschuld bij start terugbetaling | Lening plus rente na studie en aanloopfase | Na geldige berekening | Prestatiebeurs wordt alleen als gift behandeld in het diplomascenario. |
 | Maximumscenario zonder diploma | Centrale maximale hbo/wo-bedragen en gekozen studieduur | Na de expliciete maximumactie | Regulier collegegeldkrediet is jaarcollegegeld gedeeld door 12. De centrale reisproductwaarde telt als prestatiebeurs mee zolang die geen gift is. |
+| Maandnormen en normovergang | Periodegebonden centrale DUO-bedragen | Direct bij de berekeningsmaand | De huidige maxima staan bij de maand. De tool meldt de eerstvolgende of zojuist gepasseerde overgang en wijzigt bestaande invoer nooit stil. |
 | Resterende leenruimte per maand | Centraal maandmaximum min ingevulde basis- en aanvullende beurs | Tijdens invoer en bij overschrijding | Het voorgestelde bedrag kan met één knop worden overgenomen. |
 | Basisbeurs thuis- of uitwonend | Periodegebonden centrale DUO-bedragen | In de verdieping | Beide bedragen staan afzonderlijk klaar om over te nemen. |
 | Aanvullende-beursschatting | Centrale aanvullende-beurscalculator | Na openen van de info-uitleg | De koppeling draagt geen persoonsgegevens of bedragen automatisch over. |
@@ -158,7 +160,7 @@ Er is geen profielprefill, session storage of persistente gegevensoverdracht. De
 | Schuldenvrije maand | Einde van simulatie | In verdieping | Persoonlijke draagkracht kan de looptijd veranderen. |
 | PDF | Zelfde resultaat | Na berekening | Geen aparte formule. |
 
-De berekening wordt niet uitgevoerd bij een niet-ondersteunde maand, ontbrekende studieduur, negatieve bedragen of onbekend rentejaar. Als lening en beursbedragen samen boven de centrale maandnorm uitkomen, noemt de foutmelding de resterende maximale leenruimte bij de gekozen beursbedragen. De tool ondersteunt bewust alleen het eenvoudige SF35-pad.
+De berekening wordt niet uitgevoerd bij een niet-ondersteunde maand, ontbrekende studieduur, negatieve bedragen of onbekend rentejaar. Als de gebruiker naar een maand met lagere normen gaat, blijft de bestaande invoer zichtbaar en biedt de tool per te hoog bedrag een expliciete correctieknop. Als lening en beursbedragen samen boven de centrale maandnorm uitkomen, noemt de foutmelding de resterende maximale leenruimte bij de gekozen beursbedragen. De tool ondersteunt bewust alleen het eenvoudige SF35-pad.
 
 ## 7. Functionele bronverwijzingen
 

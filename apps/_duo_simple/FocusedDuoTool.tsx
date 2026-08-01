@@ -25,9 +25,11 @@ import {
   createSimpleDuoView,
   defaultSimpleDuoValues,
   emptySimpleDuoValues,
+  getSimpleDuoMonthlyLimitAdjustments,
   getSimpleDuoMonthlyLimits,
   getSimpleDuoSupportedCalculationMonths,
   maxBorrowingWithoutDiplomaValues,
+  type SimpleDuoMonthlyLimitAdjustment,
   type SimpleDuoMonthlyLimits,
   type SimpleDuoOutcomeKey,
   type SimpleDuoToolMode,
@@ -275,21 +277,92 @@ function CalculationMonthSliderField({
   value,
   error,
   months,
+  limits,
+  adjustments,
   onChange,
+  onApplyAdjustment,
   className,
 }: {
   value: string;
   error?: string;
   months: readonly string[];
+  limits: SimpleDuoMonthlyLimits | null;
+  adjustments: readonly SimpleDuoMonthlyLimitAdjustment[];
   onChange: (value: string) => void;
+  onApplyAdjustment: (adjustment: SimpleDuoMonthlyLimitAdjustment) => void;
   className?: string;
 }) {
   const selectedIndex = months.indexOf(value);
   const safeIndex = selectedIndex >= 0 ? selectedIndex : 0;
+  const previousMonth = selectedIndex > 0 ? months[selectedIndex - 1] : undefined;
+  const nextMonth = selectedIndex >= 0 ? months[selectedIndex + 1] : undefined;
+  const previousLimits = previousMonth
+    ? getSimpleDuoMonthlyLimits(previousMonth)
+    : null;
+  const nextLimits = nextMonth ? getSimpleDuoMonthlyLimits(nextMonth) : null;
+  const transitionMonths = months.filter((month, index) => {
+    if (index === 0) return false;
+    return getSimpleDuoMonthlyLimits(month)?.periodId !==
+      getSimpleDuoMonthlyLimits(months[index - 1])?.periodId;
+  });
+  const comparableNorms = limits
+    ? [
+        {
+          label: "het collegegeldkrediet",
+          current: limits.monthlyCollegegeldkrediet,
+          previous: previousLimits?.monthlyCollegegeldkrediet,
+          next: nextLimits?.monthlyCollegegeldkrediet,
+        },
+        {
+          label: "de thuiswonende basisbeurs",
+          current: limits.monthlyBasisbeursLivingAtHome,
+          previous: previousLimits?.monthlyBasisbeursLivingAtHome,
+          next: nextLimits?.monthlyBasisbeursLivingAtHome,
+        },
+        {
+          label: "de uitwonende basisbeurs",
+          current: limits.monthlyBasisbeursLivingAway,
+          previous: previousLimits?.monthlyBasisbeursLivingAway,
+          next: nextLimits?.monthlyBasisbeursLivingAway,
+        },
+        {
+          label: "de aanvullende beurs",
+          current: limits.monthlyAanvullendeBeurs,
+          previous: previousLimits?.monthlyAanvullendeBeurs,
+          next: nextLimits?.monthlyAanvullendeBeurs,
+        },
+        {
+          label: "de reisproductwaarde",
+          current: limits.monthlyReisproduct,
+          previous: previousLimits?.monthlyReisproduct,
+          next: nextLimits?.monthlyReisproduct,
+        },
+      ]
+    : [];
+  const upcomingChanges = comparableNorms.filter(
+    ({ current, next }) => next !== undefined && current !== next,
+  );
+  const currentChanges = comparableNorms.filter(
+    ({ current, previous }) => previous !== undefined && current !== previous,
+  );
+  const highlightedChanges = upcomingChanges.length > 0 ? upcomingChanges : currentChanges;
+  const changeMonth = upcomingChanges.length > 0 ? nextMonth : value;
+  const adjustmentLabels: Record<SimpleDuoMonthlyLimitAdjustment["field"], string> = {
+    monthlyLoan: "lening",
+    monthlyCollegegeldkrediet: "collegegeldkrediet",
+    monthlyBasisbeurs: "basisbeurs",
+    monthlyAanvullendeBeurs: "aanvullende beurs",
+    monthlyReisproduct: "reisproduct",
+  };
+
+  function selectIndex(index: number) {
+    const month = months[index];
+    if (month) onChange(month);
+  }
 
   return (
     <div className={`grid gap-3 ${className ?? ""}`.trim()}>
-      <div className="flex items-end justify-between gap-4">
+      <div className="flex items-center justify-between gap-4">
         <label
           className="text-[12px] font-medium uppercase tracking-[0.04em] text-[var(--muted)]"
           htmlFor="calculationMonthSlider"
@@ -303,7 +376,34 @@ function CalculationMonthSliderField({
           {selectedIndex >= 0 ? formatCalculationMonth(value) : "Kies een maand"}
         </output>
       </div>
-      <div className="surface-subtle px-4 py-3">
+
+      <div className="surface-subtle grid gap-3 p-4">
+        <div className="grid grid-cols-[2.75rem_1fr_2.75rem] items-center gap-2 sm:grid-cols-[1fr_auto_1fr]">
+          <button
+            type="button"
+            onClick={() => selectIndex(safeIndex - 1)}
+            disabled={selectedIndex <= 0}
+            aria-label="Vorige maand"
+            className="ring-focus flex size-11 items-center justify-center justify-self-start rounded-xl border border-[var(--hair)] bg-white text-[16px] font-medium text-[var(--ink)] transition hover:border-[var(--accent-line)] disabled:cursor-not-allowed disabled:opacity-40 active:translate-y-px sm:w-auto sm:px-3 sm:text-[12px]"
+          >
+            <span aria-hidden="true">←</span>
+            <span className="sr-only sm:not-sr-only sm:ml-1">Vorige maand</span>
+          </button>
+          <strong className="text-center text-[14px] font-semibold text-[var(--ink)]">
+            {selectedIndex >= 0 ? formatCalculationMonth(value) : "Kies een maand"}
+          </strong>
+          <button
+            type="button"
+            onClick={() => selectIndex(safeIndex + 1)}
+            disabled={selectedIndex < 0 || selectedIndex >= months.length - 1}
+            aria-label="Volgende maand"
+            className="ring-focus flex size-11 items-center justify-center justify-self-end rounded-xl border border-[var(--hair)] bg-white text-[16px] font-medium text-[var(--ink)] transition hover:border-[var(--accent-line)] disabled:cursor-not-allowed disabled:opacity-40 active:translate-y-px sm:w-auto sm:px-3 sm:text-[12px]"
+          >
+            <span className="sr-only sm:not-sr-only sm:mr-1">Volgende maand</span>
+            <span aria-hidden="true">→</span>
+          </button>
+        </div>
+
         <input
           id="calculationMonthSlider"
           type="range"
@@ -314,17 +414,102 @@ function CalculationMonthSliderField({
           disabled={months.length === 0}
           onChange={(event) => onChange(months[Number(event.target.value)] ?? value)}
           aria-invalid={error ? "true" : "false"}
+          aria-valuetext={selectedIndex >= 0 ? formatCalculationMonth(value) : "Geen maand gekozen"}
           aria-describedby={error ? "calculationMonth-error" : "calculationMonth-hint"}
-          className="ring-focus h-10 w-full accent-[var(--accent)]"
+          className="ring-focus h-11 w-full touch-pan-x accent-[var(--accent)]"
         />
         <div
           id="calculationMonth-hint"
-          className="flex justify-between gap-3 text-[11px] text-[var(--soft)]"
+          className="relative h-5 text-[11px] text-[var(--soft)]"
         >
-          <span>{months[0] ? formatCalculationMonth(months[0], "short") : ""}</span>
-          <span>{months.at(-1) ? formatCalculationMonth(months.at(-1)!, "short") : ""}</span>
+          <span className="absolute left-0">
+            {months[0] ? formatCalculationMonth(months[0], "short").split(" ")[0] : ""}
+          </span>
+          {transitionMonths.map((month) => {
+            const index = months.indexOf(month);
+            const position = months.length > 1 ? (index / (months.length - 1)) * 100 : 0;
+            return (
+              <span
+                key={month}
+                className="absolute -translate-x-1/2 font-medium text-[var(--accent)]"
+                style={{ left: `${position}%` }}
+              >
+                {formatCalculationMonth(month, "short").split(" ")[0]}
+              </span>
+            );
+          })}
+          <span className="absolute right-0">
+            {months.at(-1)
+              ? formatCalculationMonth(months.at(-1)!, "short").split(" ")[0]
+              : ""}
+          </span>
         </div>
       </div>
+
+      {limits ? (
+        <div className="rounded-[1.125rem] border border-[var(--hair)] bg-white p-4">
+          <p className="text-[12px] font-semibold text-[var(--ink)]">
+            Normen in {formatCalculationMonth(value)}
+          </p>
+          <dl className="mt-3 grid grid-cols-2 gap-x-5 gap-y-3 text-[12px] sm:grid-cols-5">
+            {[
+              ["Collegegeldkrediet", limits.monthlyCollegegeldkrediet],
+              ["Basisbeurs thuis", limits.monthlyBasisbeursLivingAtHome],
+              ["Basisbeurs uit", limits.monthlyBasisbeursLivingAway],
+              ["Aanvullende beurs", limits.monthlyAanvullendeBeurs],
+              ["Reisproduct", limits.monthlyReisproduct],
+            ].map(([label, amount]) => (
+              <div key={String(label)} className="border-t border-[var(--hair)] pt-2">
+                <dt className="leading-5 text-[var(--soft)]">{label}</dt>
+                <dd className="mt-0.5 font-mono font-medium tabular-nums text-[var(--ink)]">
+                  {formatCurrency(Number(amount), 2)}
+                </dd>
+              </div>
+            ))}
+          </dl>
+          {highlightedChanges.length > 0 && changeMonth ? (
+            <p className="mt-3 rounded-xl bg-[var(--accent-soft)] px-3 py-2 text-[12px] leading-5 text-[var(--ink-2)]">
+              Vanaf {formatCalculationMonth(changeMonth)} verandert {highlightedChanges[0].label} van {formatCurrency(
+                upcomingChanges.length > 0
+                  ? highlightedChanges[0].current
+                  : highlightedChanges[0].previous ?? highlightedChanges[0].current,
+                2,
+              )} naar {formatCurrency(
+                upcomingChanges.length > 0
+                  ? highlightedChanges[0].next ?? highlightedChanges[0].current
+                  : highlightedChanges[0].current,
+                2,
+              )}.
+            </p>
+          ) : null}
+        </div>
+      ) : null}
+
+      {adjustments.length > 0 ? (
+        <div
+          className="rounded-[1.125rem] border border-[var(--warn)]/35 bg-[var(--warn-soft)] p-4"
+          role="status"
+        >
+          <p className="text-[13px] font-semibold text-[var(--ink)]">
+            Een ingevuld bedrag ligt boven de norm van deze maand
+          </p>
+          <p className="mt-1 text-[12px] leading-5 text-[var(--muted)]">
+            We veranderen niets automatisch. Kies zelf welke invoer je naar het maximum wilt aanpassen.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {adjustments.map((adjustment) => (
+              <button
+                key={adjustment.field}
+                type="button"
+                onClick={() => onApplyAdjustment(adjustment)}
+                className="ring-focus min-h-11 rounded-xl border border-[var(--warn)]/40 bg-white px-3 py-2 text-[12px] font-semibold text-[var(--ink)] transition hover:border-[var(--warn)] active:translate-y-px"
+              >
+                Pas {adjustmentLabels[adjustment.field]} aan naar {formatCurrency(adjustment.maximum, 2)}
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
       <div id="calculationMonth-error">
         <FieldError message={error} />
       </div>
@@ -607,6 +792,12 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
       : null,
     [formValues, monthlyLimits],
   );
+  const monthlyLimitAdjustments = useMemo(
+    () => monthlyLimits
+      ? getSimpleDuoMonthlyLimitAdjustments(formValues, monthlyLimits)
+      : [],
+    [formValues, monthlyLimits],
+  );
 
   function updateField<K extends keyof SimpleDuoValues>(field: K, value: SimpleDuoValues[K]) {
     setFormValues((current) => ({ ...current, [field]: value }));
@@ -661,7 +852,12 @@ export function FocusedDuoTool({ mode }: { mode: SimpleDuoToolMode }) {
           value={formValues[field]}
           error={currentView.isValid ? undefined : currentView.errors[field]}
           months={supportedCalculationMonths}
+          limits={monthlyLimits}
+          adjustments={monthlyLimitAdjustments}
           onChange={(value) => updateField(field, value)}
+          onApplyAdjustment={({ field: adjustmentField, maximum }) =>
+            updateField(adjustmentField, String(maximum))
+          }
           className={fieldClassName}
         />
       );
